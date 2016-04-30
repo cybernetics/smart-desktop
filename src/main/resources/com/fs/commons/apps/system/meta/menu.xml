@@ -1,0 +1,64 @@
+<main-menu>
+	<menu name="MEN_CURRENT_USER" icon-name="current_user_com_sys_icon.gif" privlige-id="101">
+		<menu-item name="RESET_PASSWORD" icon-name="change_password_com_sys_icon.gif" privlige-id="10101">
+			<properties>
+				<property name="panel-class" value="com.fs.security.ui.PnlResetPassword" cache="false" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_EXIT" icon-name="exit.png" privlige-id="10102">
+			<properties>
+				<property name="executor" value="com.fs.commons.apps.executors.LogoutExecutor" />
+			</properties>
+		</menu-item>
+	</menu>
+
+	<menu name="MEN_TOOLS" icon-name="setting_commons_system_icon.gif" privlige-id="103">
+		<menu-item name="MI_FEED_BACK" icon-name="feed_back.png" privlige-id="10301">
+			<properties>
+				<property name="panel-class" value="com.fs.commons.apps.feedback.PnlFeedBack" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_CHANGE_LOCALE" icon-name="change_language.gif" privlige-id="10305">
+			<properties>
+				<property name="executor" value="com.fs.commons.apps.executors.ChangeLocaleExecutor" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_CLEAR_CACHE" icon-name="backup_database.png" privlige-id="10306">
+			<properties>
+				<property name="executor" value="com.fs.commons.apps.executors.RestoreDefaultsExecutor" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_SYSTEM_MODIFICATION" icon-name="roles.png" privlige-id="10307">
+			<properties>
+				<property name="table-meta" value="version" />
+			</properties>
+		</menu-item>
+	</menu>
+
+	<menu name="MEN_DATABASE" icon-name="database-backup.png" privlige-id="103">
+		<menu-item name="MI_BACKUP_DATABASE" icon-name="save.png" privlige-id="10302">
+			<properties>
+				<property name="panel-class" value="com.fs.security.ui.database.PnlDbBackup" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_IMPORT_DATABASE" icon-name="import_db.gif" privlige-id="10303">
+			<properties>
+				<property name="panel-class" value="com.fs.security.ui.database.PnlImportDb" />
+			</properties>
+		</menu-item>
+		<!-- <menu-item name="MI_LABLES" icon-name="Labeles.png"> <properties> <property name="table-meta" value="conf_lables" /> </properties> </menu-item> -->
+	</menu>
+	<menu name="DYNAMIC_QUERIES" icon-name="query.png">
+		<menu-item name="QUERIES_MANAGEMENT" icon-name="query_managment.png">
+			<properties>
+				<property name="table-meta" value="conf_queries" />
+			</properties>
+		</menu-item>
+		<menu-item name="QUERIES_CONFIG" icon-name="configuration.png">
+			<properties>
+				<property name="table-meta" value="conf_query_type_config" />
+			</properties>		
+		</menu-item>
+	</menu>
+
+</main-menu>

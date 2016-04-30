@@ -1,0 +1,152 @@
+<tables>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -boolean-with id : -boolean- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='boolean'  allow-manage='false'  caption='boolean'>
+<id-field  name='boolean_id'  type='2'  max-length='50' />
+<field  name='boolean_name'  max-length='50' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -sec_audit_type-with id : -sec_audit_type- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='sec_audit_type'  allow-manage='true'  caption='sec_audit_type'>
+<id-field  name='audit_type_id'  type='2'  max-length='50' />
+<field  name='audit_type_name'  max-length='50'  default-value='null'/>
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -sec_audits-with id : -sec_audits- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='sec_audits'  allow-manage='true'  caption='sec_audits' allow-delete="false">
+<id-field  name='audit_id'  type='2'  max-length='50' />
+<field  name='audit_date'  type='91'  max-length='50'  required='false'  default-value='null'/>
+<field  name='audit_type_id'  type='4'  max-length='50'  default-value='null' reference_table='sec_audit_type'  reference_field='audit_type_id' />
+<field  name='user_id'  max-length='50'  default-value='null' reference_table='sec_users'  reference_field='user_id' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -sec_privileges-with id : -sec_privileges- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='sec_privileges'  allow-manage='true'  caption='sec_privileges'>
+<id-field  name='privilege_id'  type='2'  max-length='50' />
+<field  name='privilege_name'  max-length='50'  default-value='null'/>
+<field  name='privilege_desc'  max-length='50'  default-value='null'/>
+<short-sql>
+SELECT
+sec_privileges.privilege_id,
+concat_ws('',sec_privileges.privilege_id),
+sec_privileges.privilege_desc
+FROM
+sec_privileges
+</short-sql>
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -sec_role_privileges-with id : -sec_role_privileges- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='sec_role_privileges'  allow-manage='true'  caption='sec_role_privileges' icon-image="users-roles.png">
+<id-field  name='role_privilege_id'  type='2'  max-length='50' />
+<field  name='role_id'  type='4'  max-length='50'  default-value='null' reference_table='sec_roles'  reference_field='role_id' />
+<field  name='privilege_id'  type='4'  max-length='50'  default-value='null' reference_table='sec_privileges'  reference_field='privilege_id' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -sec_roles-with id : -sec_roles- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='sec_roles'  allow-manage='true'  caption='sec_roles' icon-image='roles.png'>
+<id-field  name='role_id'  type='2'  max-length='50' />
+<field  name='role_name'  max-length='50'  default-value='null'/>
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -sec_user_roles-with id : -sec_user_roles- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='sec_user_roles'  allow-manage='true'  caption='sec_user_roles' icon-image="role-authority.png">
+<id-field  name='user_role_id'  type='2'  max-length='50' />
+<field  name='user_id'  type='4'  max-length='50'  default-value='null' reference_table='sec_users'  reference_field='user_record_id' />
+<field  name='role_id'  type='4'  max-length='50'  default-value='null' reference_table='sec_roles'  reference_field='role_id' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -sec_users-with id : -sec_users- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='sec_users'  caption='sec_users' icon-image="users.png" class="com.fs.commons.security.User">
+<id-field  name='user_record_id'  type='2'  max-length='50' />
+<field  name='user_id'  max-length='50'  default-value='null' />
+<field  name='user_full_name'  max-length='50'  default-value='null' property="fullName"/>
+<field  name='password'  type='100'  max-length='50'  default-value='null'/>
+<field  name='disabled'  type='16'  max-length='50'  default-value='0'/>
+<triggers>
+<trigger>com.fs.security.StudentDaoTrigger</trigger>
+</triggers>
+<report-sql>
+SELECT sec_users.user_record_id, sec_users.user_id,
+			sec_users.user_full_name, 
+			sec_boolean.boolean_name  as `sec_boolean.boolean_name`			
+			FROM	
+			sec_users 		
+			Inner Join boolean as sec_boolean ON sec_boolean.boolean_id =sec_users.disabled
+	</report-sql>
+</table>
+
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_lables-with id : -conf_lables- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_lables' icon-image="Labeles.png">
+<id-field  name='lable_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='lable_key'  max-length='255' enabled='false'/>
+<field  name='lable_value'  max-length='255' />
+<field  name='module_id'  type='4'  max-length='11'  reference_table='conf_modules'  reference_field='module_id' enabled='false'/>
+<field  name='lang_id'  type='4'  max-length='11'  reference_table='conf_languages'  reference_field='lang_id' enabled='false' />
+</table>
+
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : version  -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='version' ui-colunm-count='4' >
+<id-field  name='version_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='version_number'  required='true' />
+<field  name='version_date'  type='91'  max-length='10'  required='true' />
+<field  name='version_note'   type='-1'  max-length='500'  required='true' />
+</table>
+
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_queries-with id : -conf_queries- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_queries' icon-image='conf_queries.png' >
+<id-field  name='query_id'  type='4'  max-length='11'  visible='false'  enabled='false'/>
+<field  name='query_name'  max-length='255'  required='false' />
+<field  name='desc'  max-length='255' />
+<field  name='query_type_id'  type='4'  max-length='11'  reference_table='conf_query_types'  reference_field='query_type_id' />
+<field  name='query_text'  type='-1'  visible-height="500" visible-width="1000"/>
+<report-sql>
+SELECT
+conf_queries.query_id,
+conf_query_types.query_type_name,
+conf_queries.query_name,
+conf_queries.`desc`
+FROM
+conf_queries
+LEFT JOIN conf_query_types ON conf_queries.query_type_id = conf_query_types.query_type_id
+</report-sql>
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_query_type_config-with id : -conf_query_type_config- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_query_type_config' icon-image='conf_query_type_config.png' max-records_count='1'>
+<id-field  name='config_id'  type='4'  max-length='11'  visible='false'  enabled='false'/>
+<field  name='templete_variables_id'  type='4'  max-length='11'  required='false'  reference_table='conf_query_types'  reference_field='query_type_id' />
+<field  name='templete_parameter_id'  type='4'  max-length='11'  required='false'  reference_table='conf_query_types'  reference_field='query_type_id' />
+<field  name='master_report_id'  type='4'  max-length='11'  required='false'  reference_table='conf_query_types'  reference_field='query_type_id' />
+<field  name='account_creation_id'  type='4'  max-length='11'  required='false'  reference_table='conf_query_types'  reference_field='query_type_id' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_query_types-with id : -conf_query_types- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_query_types' icon-image='conf_query_types.png' allow-manage="true" >
+<id-field  name='query_type_id'  type='4'  max-length='11'  visible='false'  enabled='false'/>
+<field  name='query_type_name'  max-length='255' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_reports-with id : -conf_reports- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_reports' icon-image='conf_reports.png' >
+<id-field  name='report_id'  type='4'  max-length='11'  visible='false'  enabled='false'/>
+<field  name='report_name'  max-length='255' />
+<field  name='report_file'  max-length='255'  required='false' />
+</table>
+</tables>

@@ -1,0 +1,13 @@
+<reports>
+	<source-path>/resources/reports</source-path>
+	<out-path>reports-out</out-path>
+	<!-- Sub reports section -->
+	<report name="sub_header" />
+	<!-- end of sub-reports section -->
+	
+	<!-- the parameters for the following  will be set manually-->
+	<report title="sec_user_role_privilege" name="sec_user_role_privilege" />
+	<report title="sec_privilege" name="sec_privilege" />
+	
+	
+</reports>

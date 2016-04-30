@@ -1,0 +1,89 @@
+<main-menu>
+	<menu name="MEN_TEMPLATES_MANAGEMENT" icon-name="group_event.png" privlige-id="601">
+		<menu-item name="MI_QUERIES" privlige-id="60101" icon-name="event_type_3.png">
+			<properties>
+				<property name="table-meta" value="conf_queries" />
+			</properties>
+		</menu-item>
+
+		<menu-item name="MI_VARS" icon-name="identity.png" privlige-id="60102">
+			<properties>
+				<property name="table-meta" value="conf_vars" />
+			</properties>
+		</menu-item>
+
+		<menu-item name="MI_TEMPLATES" icon-name="temp.png" privlige-id="60103">
+			<properties>
+				<property name="table-meta" value="conf_templates" />
+				<property name="detail-tables" value="conf_template_vars" />
+				<property name="detail_fields" value="template_id" />
+			</properties>
+		</menu-item>
+
+		<menu-item name="MI_TEST_TEMPLATE" icon-name="test_temp.png" privlige-id="60104">
+			<properties>
+				<property name="panel-class" value="com.fs.commons.apps.templates.ui.PnlTemplateTest" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_QUERY_TYPE_CONFIG" privlige-id="60105" icon-name="account_type.png">
+			<properties>
+				<property name="table-meta" value="conf_query_type_config" />
+			</properties>
+		</menu-item>
+	</menu>
+
+	<menu name="MEN_EVENT_CONFIG" privlige-id="602" icon-name="event_manage.png">
+		<menu-item name="MI_NOT_TYPES" privlige-id="60201" icon-name="notification_type.png">
+			<properties>
+				<property name="table-meta" value="not_notification_types" />
+			</properties>
+		</menu-item>
+
+		<menu-item name="MI_EVENT_GENERATION_TASK" privlige-id="60202" icon-name="group_event_type.png">
+			<properties>
+				<property name="table-meta" value="not_event_generation_task" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_EVENT_STATUS_CONFIG" privlige-id="60203" icon-name="system_general_managment.png">
+			<properties>
+				<property name="table-meta" value="not_event_status_config" />
+			</properties>
+		</menu-item>
+	</menu>
+
+	<menu name="MEN_ACOUNTS_MANAGMENT" privlige-id="603" icon-name="Account_manage_1.png">		
+
+		<menu-item name="MI_ACCOUNTS_GENERATION" privlige-id="60301" icon-name="Account_event_type.png">
+			<properties>
+				<property name="panel-class" value="com.fs.notification.ui.PnlAccountsGenerator" />
+			</properties>
+		</menu-item>
+	
+		<menu-item name="MI_ACCOUNT" privlige-id="60302" icon-name="group_accounts_1.png">
+			<properties>
+				<property name="table-meta" value="not_accounts" />
+			</properties>
+		</menu-item>
+	</menu>
+	<menu name="MEN_EVENTS_MANAGMENT" privlige-id="604" icon-name="Account.png">	
+		<menu-item name="MI_EVENT_GENERATION" privlige-id="60401" icon-name="event.png">
+			<properties>
+				<property name="panel-class" value="com.fs.notification.ui.PnlEventGenerator" />
+			</properties>
+		</menu-item>
+				
+		<menu-item name="MI_EVENT" privlige-id="60402" icon-name="EventLogo.png">
+			<properties>
+				<property name="table-meta" value="not_events" />
+				<property name="detail-tables" value="not_account_events" />
+				<property name="detail_fields" value="event_id" />
+				<property name="cross-table" value="true" />
+			</properties>
+		</menu-item>
+	</menu>
+<!-- 
+	<menu name="MEN_ACCOUNT_MANAGMENT" privlige-id="202" icon-name="Account_manage_1.png">
+
+	</menu>
+ -->
+</main-menu>

@@ -1,0 +1,58 @@
+<main-menu>
+	<menu name="MEN_SECURITY" icon-name="security_key_icons.gif" privlige-id="102">
+		<menu-item name="MI_ROLES" icon-name="roles.png" privlige-id="10201">
+			<properties>
+				<property name="table-meta" value="sec_roles" />
+				<property name="detail-tables" value="sec_role_privileges" />
+				<property name="detail_fields" value="role_id" />
+				<property name="cross-table" value="true" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_ADVANCED_ROLES" icon-name="advanced_roles.png" privlige-id="10201">
+			<properties>
+				<property name="panel-class" value="com.fs.security.ui.helpers.PnlSecuityPrivliges" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_USERS" icon-name="manage_account_icons.gif" privlige-id="10202">
+			<properties>
+				<property name="table-meta" value="sec_users" />
+				<property name="detail-tables" value="sec_user_roles" />
+				<property name="detail_fields" value="user_id" />
+				<property name="cross-table" value="true" />
+			</properties>
+		</menu-item>
+
+		<menu-item name="MI_ROLE_PRIVILEGE" privlige-id="10204" icon-name="role_privliges.png">
+			<properties>
+				<property name="panel-class" value="com.fs.security.ui.privileges.PnlPrivileges" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_SYNC_PRIVLIGES" icon-name="Sync_priv.png">
+			<properties>
+				<property name="executor" value="com.fs.commons.apps.executors.PnlSyncPriviliges" />
+			</properties>
+		</menu-item>
+
+		<menu-item name="MI_RESET_PRIVILEGES" privlige-id="10205" icon-name="reset_priv.png">
+			<properties>
+				<property name="panel-class" value="com.fs.security.ui.privileges.PnlResetPrivilegs" />
+			</properties>
+		</menu-item>
+	</menu>
+	<menu name="MEN_REPORTS" icon-name="reports.png" privlige-id="102">
+		<menu-item name="MI_USER_ROLE_PRIVILEGE" privlige-id="10206" icon-name="user_role_privliges.png">
+			<properties>
+				<property name="panel-class" value="com.fs.security.ui.privileges.PnlUserPrivileges" />
+			</properties>
+		</menu-item>
+
+		<menu-item name="MI_AUDITS" privlige-id="10203" icon-name="view_detailed.png">
+			<properties>
+				<property name="master-report" value="yes" />
+				<property name="sql-file-name" value="sec_audits.sql" />
+				<property name="report-title" value="USERS_AUDITS" />
+			</properties>
+		</menu-item>
+	</menu>
+
+</main-menu>

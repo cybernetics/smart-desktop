@@ -1,0 +1,183 @@
+<tables>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_vars-with id : -conf_vars- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_vars' panel-class="com.fs.commons.apps.templates.ui.PnlVariables" allow-manage="true" icon-image='variable.png'>
+<id-field  name='var_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='var_name'  max-length='255' />
+<field  name='table_name'  max-length='255' options-query="SHOW tables" required="false"/>
+<field  name='field_name'  max-length='255' options-query="SELECT 'N/A'  ORDER BY 1" required="false"/>
+<field  name='query_id'  type='4'  max-length='11'  required='false'  reference_table='conf_queries'  reference_field='query_id' />
+<report-sql>
+SELECT
+conf_vars.var_id,
+conf_vars.var_name,
+conf_vars.table_name,
+conf_vars.field_name,
+conf_queries.`desc`
+FROM
+conf_vars
+LEFT JOIN conf_queries ON conf_vars.query_id = conf_queries.query_id
+</report-sql>
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_template_vars-with id : -conf_template_vars- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_template_vars'  caption='conf_template_vars' icon-image='variable.png'>
+<id-field  name='template_var_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='template_id'  type='4'  max-length='11'  reference_table='conf_templates'  reference_field='template_id' relation='ONE_TO_MANY'/>
+<field  name='var_index'  type='4'  max-length='11'   />
+<field  name='var_id'  type='4'  max-length='11'  reference_table='conf_vars'  reference_field='var_id'  relation='ONE_TO_MANY' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_templates-with id : -conf_templates- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_templates' icon-image='temp.png' >
+<id-field  name='template_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='template_name' />
+<field  name='template_title'  required='false' />
+<field  name='template_text'  type='-1'  max-length='2147483647'  required='false' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_query_types-with id : -conf_query_types- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_query_types' allow-manage="true" >
+<id-field  name='query_type_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='query_type_name'  max-length='255' summary-field="true"/>
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_queries-with id : -conf_queries- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_queries' allow-manage="true" icon-image="event_type_3.gif">
+<id-field  name='query_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='desc'  max-length='255' summary-field="true"/>
+<field  name='query_type_id'  type='4'  max-length='11'  reference_table='conf_query_types'  reference_field='query_type_id' summary-field="true"/>
+<field  name='query_text'  type='-1'  max-length='2147483647' />
+</table>
+<list-sql>
+SELECT
+conf_queries.query_id,
+CONCAT_WS('-',conf_queries.`desc`,conf_query_types.query_type_name)
+FROM
+conf_queries
+INNER JOIN conf_query_types ON conf_queries.query_type_id = conf_query_types.query_type_id
+</list-sql>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -not_notification_types-with id : -not_notification_types- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='not_notification_types' icon-image="notification_type.gif">
+<id-field  name='not_type_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='not_type_name'  max-length='255'  required='false' />
+<field  name='not_type_impl'  max-length='255'  required='false' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -not_event_generation_task-with id : -not_event_generation_task- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='not_event_generation_task' icon-image="group_event_type.png">
+<id-field  name='task_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='task_name'  max-length='255'  required='false' />
+<field  name='template_id'  type='4'  max-length='11'  reference_table='conf_templates'  reference_field='template_id' />
+<field  name='not_type_id'  type='4'  max-length='11'  required='false'  reference_table='not_notification_types'  reference_field='not_type_id' />
+<field  name='paramters_query_id'  type='4'  max-length='11'  required='false'  reference_table='vi_paramters_queries'  reference_field='query_id' />
+<field  name='accounts_creation_query'  type='4'  max-length='11'  required='false'  reference_table='vi_accont_creation_query'  reference_field='query_id' />
+<report-sql>
+SELECT
+not_event_generation_task.task_id,
+not_event_generation_task.task_name,
+not_notification_types.not_type_name,
+conf_templates.template_name,
+account_creation.`desc`,
+parameter_query.`desc`
+FROM
+not_event_generation_task
+LEFT JOIN conf_queries AS parameter_query ON not_event_generation_task.accounts_creation_query = parameter_query.query_id
+LEFT JOIN not_notification_types ON not_event_generation_task.not_type_id = not_notification_types.not_type_id
+LEFT JOIN conf_queries AS account_creation ON not_event_generation_task.paramters_query_id = account_creation.query_id
+LEFT JOIN conf_templates ON not_event_generation_task.template_id = conf_templates.template_id
+</report-sql>
+</table>
+
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -not_events-with id : -not_events- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='not_events' icon-image="event.gif">
+<id-field  name='event_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='event_title'  max-length='255'  required='false' />
+<field  name='event_text' type="-1" max-length='255'  required='false' />
+<field  name='status_id'  type='4'  max-length='11'  reference_table='not_event_status'  reference_field='status_id' />
+<field  name='not_type_id'  type='4'  max-length='11'  reference_table='not_notification_types'  reference_field='not_type_id' />
+</table>
+
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -not_account_events-with id : -not_account_events- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='not_account_events' icon-image="Account_type.png">
+<id-field  name='account_event_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='event_id'  type='4'  max-length='11'  reference_table='not_events'  reference_field='event_id' relation="MANY_TO_MANY"/>
+<field  name='account_id'  type='4'  max-length='10'  reference_table='not_accounts'  reference_field='account_id' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -not_accounts-with id : -not_accounts- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='not_accounts' icon-image="Account.gif" allow-manage="true">
+<id-field  name='account_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='account_id_str'  max-length='255' />
+<field  name='account_name'  max-length='255' />
+<field  name='mobile'  max-length='255'  required='false' />
+<field  name='email'  max-length='255'  required='false' />
+<field  name='active'  type='-7'  max-length='1'  default-value='1'/>
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_query_type_config-with id : -conf_query_type_config- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_query_type_config' max-records_count='1' icon-image="account_type.gif">
+<id-field  name='config_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='templete_variables_id'  type='4'  max-length='11'  required='false'  reference_table='conf_query_types'  reference_field='query_type_id' />
+<field  name='templete_parameter_id'  type='4'  max-length='11'  required='false'  reference_table='conf_query_types'  reference_field='query_type_id' />
+<field  name='master_report_id'  type='4'  max-length='11'  required='false'  reference_table='conf_query_types'  reference_field='query_type_id' />
+<field  name='account_creation_id'  type='4'  max-length='11'  required='false'  reference_table='conf_query_types'  reference_field='query_type_id' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -not_event_status_config-with id : -not_event_status_config- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='not_event_status_config' max-records_count='1' icon-image="system_general_managment.png">
+<id-field  name='config_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='new_event_id'  type='4'  max-length='11'  required='false'  reference_table='not_event_status'  reference_field='status_id' />
+<field  name='temp_event_id'  type='4'  max-length='11'  required='false'  reference_table='not_event_status'  reference_field='status_id' />
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_queries-with id : -conf_queries- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_queries'  id="vi_accont_creation_query" allow-manage="true" icon-image="event_type_3.gif">
+<id-field  name='query_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='desc'  max-length='255' summary-field="true"/>
+<field  name='query_type_id'  type='4'  max-length='11'  reference_table='conf_query_types'  reference_field='query_type_id' summary-field="true"/>
+<field  name='query_text'  type='-1'  max-length='2147483647' />
+<list-sql>
+SELECT
+conf_queries.query_id,
+conf_queries.`desc`
+FROM
+conf_queries
+INNER JOIN conf_query_type_config ON conf_queries.query_type_id = conf_query_type_config.account_creation_id
+</list-sql>
+</table>
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<!-- Table Meta for : -conf_queries-with id : -conf_queries- -->
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+<table name='conf_queries'  id="vi_paramters_queries" allow-manage="true" icon-image="event_type_3.gif">
+<id-field  name='query_id'  type='2'  visible='false'  enabled='false'/>
+<field  name='desc'  max-length='255' summary-field="true"/>
+<field  name='query_type_id'  type='4'  max-length='11'  reference_table='conf_query_types'  reference_field='query_type_id' summary-field="true"/>
+<field  name='query_text'  type='-1'  max-length='2147483647' />
+<list-sql>
+SELECT
+conf_queries.query_id,
+conf_queries.`desc`
+FROM
+conf_queries
+INNER JOIN conf_query_type_config ON conf_queries.query_type_id = conf_query_type_config.templete_parameter_id
+</list-sql>
+</table>
+</tables>
