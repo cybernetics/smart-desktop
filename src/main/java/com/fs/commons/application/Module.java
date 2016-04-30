@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.application;
 
 import java.util.ArrayList;
@@ -16,124 +31,126 @@ import com.fs.commons.security.Privilige;
 public interface Module {
 
 	/**
-	 * 
-	 * @throws ModuleException
-	 */
-	public void init()throws ModuleException;
-	
-	/**
-	 * 
-	 * @return
-	 * @throws ModuleException
-	 */
-	public Hashtable<String, TableMeta> getTablesMeta()throws ModuleException;
-	
-	/**
-	 * 
-	 * @return
-	 * @throws ModuleException
-	 */
-	public List<Lable>  getLables(String locale)throws ModuleException;
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public LablesLoader getLablesLoader();
-	
-	/**
-	 * 
-	 * @param lablesLoader
-	 */
-	public void setLablesLoader(LablesLoader lablesLoader);
-
-	/**
-	 * 
-	 * @return
-	 * @throws ModuleException
-	 */
-	public String getFileFullPath(String shortFileName) ;
-	/**
-	 * 
-	 * @return
-	 * @throws ModuleException
-	 */
-	public ArrayList<Menu> getMenu();
-	
-	/**
-	 * 
-	 * @param string 
-	 * @return
-	 * @throws ModuleException
-	 */
-	public ArrayList<Report> getReports(String prefix, String prefix2)throws ModuleException;
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getModuleName();
-
-	/*
-	 * 
-	 */
-	public void setModuleName(String moduleName);
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Privilige getPrivilige();
-	
-	/**
-	 * 
-	 * @param privligeId
-	 */
-//	public void setPriviligeId(int privligeId);
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getIconName();
-
-	/**
-	 * 
-	 * @param defaultModule
-	 */
-	public void setDefault(boolean defaultModule);
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isDefault();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public DataSource getDataSource();
-	
-	/**
-	 * 
-	 * @param connectionManager
-	 */
-	public void setDataSource(DataSource connectionManager);
-
-	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public Application getApplication();
 
 	/**
-	 * 
+	 *
+	 * @return
+	 */
+	public DataSource getDataSource();
+
+	/**
+	 *
+	 * @return
+	 * @throws ModuleException
+	 */
+	public String getFileFullPath(String shortFileName);
+
+	/**
+	 *
+	 * @return
+	 */
+	public String getIconName();
+
+	/**
+	 *
+	 * @return
+	 * @throws ModuleException
+	 */
+	public List<Lable> getLables(String locale) throws ModuleException;
+
+	/**
+	 *
+	 * @return
+	 */
+	public LablesLoader getLablesLoader();
+
+	/**
+	 *
+	 * @return
+	 * @throws ModuleException
+	 */
+	public ArrayList<Menu> getMenu();
+
+	public int getModuleId();
+
+	/**
+	 *
+	 * @return
+	 */
+	public String getModuleName();
+
+	/**
+	 *
+	 * @return
+	 */
+	public Privilige getPrivilige();
+
+	/**
+	 *
+	 * @param string
+	 * @return
+	 * @throws ModuleException
+	 */
+	public ArrayList<Report> getReports(String prefix, String prefix2) throws ModuleException;
+
+	/**
+	 *
+	 * @param privligeId
+	 */
+	// public void setPriviligeId(int privligeId);
+
+	/**
+	 *
+	 * @return
+	 * @throws ModuleException
+	 */
+	public Hashtable<String, TableMeta> getTablesMeta() throws ModuleException;
+
+	/**
+	 *
+	 * @throws ModuleException
+	 */
+	public void init() throws ModuleException;
+
+	/**
+	 *
+	 * @return
+	 */
+	public boolean isDefault();
+
+	/**
+	 *
 	 * @param application
 	 */
 	public void setApplication(Application application);
 
+	/**
+	 *
+	 * @param connectionManager
+	 */
+	public void setDataSource(DataSource connectionManager);
+
+	/**
+	 *
+	 * @param defaultModule
+	 */
+	public void setDefault(boolean defaultModule);
+
+	/**
+	 *
+	 * @param lablesLoader
+	 */
+	public void setLablesLoader(LablesLoader lablesLoader);
+
 	public void setModuleId(int moduleId);
-	public int getModuleId();
+
+	/*
+	 *
+	 */
+	public void setModuleName(String moduleName);
 
 }

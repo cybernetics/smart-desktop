@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.printing;
 
 import java.awt.Component;
@@ -13,54 +28,56 @@ import javax.swing.RepaintManager;
 import com.fs.commons.util.ExceptionUtil;
 
 public class PrintUtilities implements Printable {
-	private Component componentToBePrinted;
-
 	// //////////////////////////////////////////////////////////
-	public static void printComponent(Component c) {
-		new PrintUtilities(c).print();
+	public static void disableDoubleBuffering(final Component c) {
+		final RepaintManager currentManager = RepaintManager.currentManager(c);
+		currentManager.setDoubleBufferingEnabled(false);
 	}
 
 	// //////////////////////////////////////////////////////////
-	public PrintUtilities(Component componentToBePrinted) {
+	public static void enableDoubleBuffering(final Component c) {
+		final RepaintManager currentManager = RepaintManager.currentManager(c);
+		currentManager.setDoubleBufferingEnabled(true);
+	}
+	// //////////////////////////////////////////////////////////
+
+	// //////////////////////////////////////////////////////////
+	public static void printComponent(final Component c) {
+		new PrintUtilities(c).print();
+	}
+
+	private final Component componentToBePrinted;
+
+	// //////////////////////////////////////////////////////////
+	public PrintUtilities(final Component componentToBePrinted) {
 		this.componentToBePrinted = componentToBePrinted;
 	}
 
 	// //////////////////////////////////////////////////////////
 	public void print() {
-		PrinterJob printJob = PrinterJob.getPrinterJob();
+		final PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setPrintable(this);
-		if (printJob.printDialog())
+		if (printJob.printDialog()) {
 			try {
 				printJob.print();
-			} catch (PrinterException pe) {
+			} catch (final PrinterException pe) {
 				ExceptionUtil.handleException(pe);
 			}
-	}
-
-	// //////////////////////////////////////////////////////////
-	public int print(Graphics g, PageFormat pageFormat, int pageIndex) {
-		if (pageIndex > 0) {
-			return (NO_SUCH_PAGE);
-		} else {
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-			disableDoubleBuffering(componentToBePrinted);
-			componentToBePrinted.paint(g2d);
-			enableDoubleBuffering(componentToBePrinted);
-			return (PAGE_EXISTS);
 		}
 	}
 
 	// //////////////////////////////////////////////////////////
-	public static void disableDoubleBuffering(Component c) {
-		RepaintManager currentManager = RepaintManager.currentManager(c);
-		currentManager.setDoubleBufferingEnabled(false);
+	@Override
+	public int print(final Graphics g, final PageFormat pageFormat, final int pageIndex) {
+		if (pageIndex > 0) {
+			return NO_SUCH_PAGE;
+		} else {
+			final Graphics2D g2d = (Graphics2D) g;
+			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+			disableDoubleBuffering(this.componentToBePrinted);
+			this.componentToBePrinted.paint(g2d);
+			enableDoubleBuffering(this.componentToBePrinted);
+			return PAGE_EXISTS;
+		}
 	}
-
-	// //////////////////////////////////////////////////////////
-	public static void enableDoubleBuffering(Component c) {
-		RepaintManager currentManager = RepaintManager.currentManager(c);
-		currentManager.setDoubleBufferingEnabled(true);
-	}
-	// //////////////////////////////////////////////////////////
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.mysql;
 
 import java.io.ByteArrayOutputStream;
@@ -21,48 +36,76 @@ import com.fs.commons.dao.exception.RecordNotFoundException;
 
 public class MysqlAbstractDao extends AbstractDao {
 
+	// /////////////////////////////////////////////////////////////////////
+	public static byte[] blobToByteArray(final Blob blob) throws IOException, SQLException {
+		final InputStream inputStream = blob.getBinaryStream();
+		int inByte;
+		byte[] returnBytes;
+		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		while ((inByte = inputStream.read()) != -1) {
+			byteArrayOutputStream.write(inByte);
+		}
+		returnBytes = byteArrayOutputStream.toByteArray();
+		return returnBytes;
+	}
+
 	public MysqlAbstractDao() {
 		super();
 	}
 
-	public MysqlAbstractDao(DataSource connectionManager) {
+	public MysqlAbstractDao(final DataSource connectionManager) {
 		super(connectionManager);
 	}
 
-	public MysqlAbstractDao(Session session) {
+	public MysqlAbstractDao(final Session session) {
 		super(session);
 	}
 
+	// ///////////////////////////////////////////////////////////////////
+	@Override
+	public CachedRowSet executeQuery(final String query, final int fromRowIndex, final int toRowIndex) throws DaoException {
+		final String sql = "select * FROM (?) AS T  limit ?,?";
+		final String compiledSql = DaoUtil.compileSql(sql, new Object[] { query, fromRowIndex, toRowIndex - fromRowIndex });
+		return executeQuery(compiledSql);
+	}
+
+	@Override
+	// ///////////////////////////////////////////////////////////////////
+	public int getRowsCount(final String query) throws NumberFormatException, DaoException {
+		final String sql = "SELECT COUNT(*) FROM (" + query + ") as T";
+		// System.out.println(sql);
+		return new Integer(exeuteSingleOutputQuery(sql).toString());
+	}
 
 	@Override
 	public Timestamp getSystemDate() throws RecordNotFoundException, DaoException {
-		DaoFinder finder = new DaoFinder() {
-
-			@Override
-			public void setParamters(PreparedStatement ps) throws SQLException {
-			}
-
-			@Override
-			public Object populate(ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
-				Timestamp date = rs.getTimestamp(1);
-				return date;
-			}
+		final DaoFinder finder = new DaoFinder() {
 
 			@Override
 			public String getFinderSql() {
 				return "SELECT NOW()  ";
+			}
+
+			@Override
+			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+				final Timestamp date = rs.getTimestamp(1);
+				return date;
+			}
+
+			@Override
+			public void setParamters(final PreparedStatement ps) throws SQLException {
 			}
 		};
 		return (java.sql.Timestamp) findRecord(finder);
 	}
 
 	// /////////////////////////////////////////////////////////////////////
-	protected boolean isDuplicateKey(SQLException e) throws SQLException {
+	protected boolean isDuplicateKey(final SQLException e) throws SQLException {
 		return isDuplicateKey(e, true);
 	}
 
 	// /////////////////////////////////////////////////////////////////////
-	protected boolean isDuplicateKey(SQLException e, boolean throwException) throws SQLException {
+	protected boolean isDuplicateKey(final SQLException e, final boolean throwException) throws SQLException {
 		if (e.getErrorCode() == 1) {
 			return true;
 		}
@@ -70,34 +113,6 @@ public class MysqlAbstractDao extends AbstractDao {
 			throw e;
 		}
 		return false;
-	}
-
-	// /////////////////////////////////////////////////////////////////////
-	public static byte[] blobToByteArray(Blob blob) throws IOException, SQLException {
-		InputStream inputStream = blob.getBinaryStream();
-		int inByte;
-		byte[] returnBytes;
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		while ((inByte = inputStream.read()) != -1) {
-			byteArrayOutputStream.write(inByte);
-		}
-		returnBytes = byteArrayOutputStream.toByteArray();
-		return returnBytes;
-	}
-	
-	// ///////////////////////////////////////////////////////////////////
-	public CachedRowSet executeQuery(String query, int fromRowIndex, int toRowIndex) throws DaoException {
-		String sql = "select * FROM (?) AS T  limit ?,?";
-		String compiledSql = DaoUtil.compileSql(sql, new Object[]{query,fromRowIndex, toRowIndex-fromRowIndex});
-		return executeQuery(compiledSql);
-	}
-
-	@Override
-	// ///////////////////////////////////////////////////////////////////
-	public int getRowsCount(String query) throws NumberFormatException, DaoException {
-		String sql = "SELECT COUNT(*) FROM (" + query + ") as T";
-		// System.out.println(sql);
-		return new Integer(exeuteSingleOutputQuery(sql).toString());
 	}
 
 }

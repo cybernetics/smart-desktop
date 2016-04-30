@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.dao;
 
 import java.awt.event.ActionListener;
@@ -19,71 +34,73 @@ import com.fs.commons.desktop.swing.comp.FSComboBoxListCellRenderer;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.validation.Validator;
 
-public class DaoJList extends JList implements BindingComponent<String>{
+public class DaoJList extends JList implements BindingComponent<String> {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private String sql;
+	private final String sql;
 
 	DefaultListModel model = new DefaultListModel();
-	private FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
+	private final FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
 
 	private boolean transfer;
 
-
 	/**
-	 * 
+	 *
 	 * @param sql
 	 *            String
 	 * @throws DaoException
 	 */
-	public DaoJList(String sql) throws DaoException {
-		setModel(model);
+	public DaoJList(final String sql) throws DaoException {
+		setModel(this.model);
 		this.sql = sql;
 		init();
 		loadData();
 	}
 
-	/**
-	 * 
-	 */
-	void init() {
-		setCellRenderer(new FSComboBoxListCellRenderer());
-		addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-					transferFocus();
-				}
-			}
-		});
+	@Override
+	public void addActionListener(final ActionListener actionListener) {
+		// TODO Auto-generated method stub
 
 	}
 
-	/**
-	 * @throws DaoException
-	 * 
-	 */
-	public void loadData() throws DaoException {
-		List v = DaoUtil.createRecordsFromSQL(sql);
-		for (int i = 0; i < v.size(); i++) {
-			model.addElement(v.get(i));
-		}
+	@Override
+	public void addValidator(final Validator validator) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addValueChangeListener(final ValueChangeListener addValueChangeListener) {
+		this.fsWrapper.addValueChangeListsner(addValueChangeListener);
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void filterValues(final BindingComponent comp1) throws DaoException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public DataSource getDataSource() {
+		return this.fsWrapper.getDataSource();
+	}
+
+	@Override
+	public String getDefaultValue() {
+		return null;
 	}
 
 	/**
-	 * @throws DaoException
-	 * 
-	 */
-	public void reloadData() throws DaoException {
-		model.removeAllElements();
-		loadData();
-		setSelectedIndex(-1);
-	}
-
-	/**
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getSelectedIdValue() {
@@ -94,101 +111,101 @@ public class DaoJList extends JList implements BindingComponent<String>{
 	}
 
 	/**
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getSelectedIdValueAsInteger() {
 		return Integer.parseInt(getSelectedIdValue());
 	}
 
+	@Override
+	public String getValue() {
+		return getSelectedIdValue();
+	}
+
 	/**
-	 * 
+	 *
+	 */
+	void init() {
+		setCellRenderer(new FSComboBoxListCellRenderer());
+		addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(final KeyEvent e) {
+				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+					transferFocus();
+				}
+			}
+		});
+
+	}
+
+	@Override
+	public boolean isAutoTransferFocus() {
+		return this.transfer;
+	}
+
+	/**
+	 * @throws DaoException
+	 *
+	 */
+	public void loadData() throws DaoException {
+		final List v = DaoUtil.createRecordsFromSQL(this.sql);
+		for (int i = 0; i < v.size(); i++) {
+			this.model.addElement(v.get(i));
+		}
+	}
+
+	/**
+	 * @throws DaoException
+	 *
+	 */
+	public void reloadData() throws DaoException {
+		this.model.removeAllElements();
+		loadData();
+		setSelectedIndex(-1);
+	}
+
+	@Override
+	public void reset() {
+	}
+
+	@Override
+	public void setAutoTransferFocus(final boolean transfer) {
+		this.transfer = transfer;
+	}
+
+	@Override
+	public void setDataSource(final DataSource manager) {
+		this.fsWrapper.setDataSource(manager);
+	}
+
+	@Override
+	public void setDefaultValue(final String t) {
+	}
+
+	/**
+	 *
 	 * @param id
 	 *            int
 	 */
-	public void setSelectedIndexForId(String id) {
-		for (int i = 0; i < model.capacity(); i++) {
-			if (((IdValueRecord) model.getElementAt(i)).getId().equals(id)) {
+	public void setSelectedIndexForId(final String id) {
+		for (int i = 0; i < this.model.capacity(); i++) {
+			if (((IdValueRecord) this.model.getElementAt(i)).getId().equals(id)) {
 				setSelectedIndex(i);
 				break;
 			}
 		}
 	}
 
-	public String getValue() {
-		return getSelectedIdValue();
-	}
-
-	public void setValue(String value) {
+	@Override
+	public void setValue(final String value) {
 		setSelectedIndexForId(value);
-		
-	}
 
-	@Override
-	public String getDefaultValue() {
-		return null;
-	}
-
-	@Override
-	public void setDefaultValue(String t) {
-	}
-
-	@Override
-	public void reset() {		
-	}
-
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addValidator(Validator validator) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void validateValue() throws ValidationException {
 		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void filterValues(BindingComponent comp1) throws DaoException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setDataSource(DataSource manager) {
-		fsWrapper.setDataSource(manager);
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		return fsWrapper.getDataSource();
-	}
-
-	@Override
-	public void addValueChangeListener(ValueChangeListener addValueChangeListener) {
-		fsWrapper.addValueChangeListsner(addValueChangeListener);
-	}
-
-	@Override
-	public void addActionListener(ActionListener actionListener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setAutoTransferFocus(boolean transfer) {
-		this.transfer = transfer;
-	}
-
-	@Override
-	public boolean isAutoTransferFocus() {
-		return transfer;
 	}
 }

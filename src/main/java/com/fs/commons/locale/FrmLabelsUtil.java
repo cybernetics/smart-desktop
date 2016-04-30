@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.locale;
 
 import java.awt.event.ActionEvent;
@@ -19,148 +34,154 @@ import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
 
 public class FrmLabelsUtil extends JKFrame {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1382026294839748400L;
+
+	public static void main(final String[] args) {
+		new FrmLabelsUtil().setVisible(true);
+	}
+
 	JFileChooser chooser = new JFileChooser();
 	JKTextField txtFile1 = new JKTextField();
 	JKTextField txtFile2 = new JKTextField();
 	JKButton btnBrowseFile1 = new JKButton("Browse");
 	JKButton btnBrowseFile2 = new JKButton("Browse");
 	JKButton btnRemoveDuplicatesInTwoFiles = new JKButton("Remove Duplicates From Two Files");
-	JKButton btnRemoveDuplicatesFromSecondFile= new JKButton("Remove Duplicates From Second File");
+	JKButton btnRemoveDuplicatesFromSecondFile = new JKButton("Remove Duplicates From Second File");
 	JKButton btnRemoveKeysWithSpacesFromFile2 = new JKButton("Remove Keys with Spaces from file2");
+
 	JKButton btncaptilizeKeys = new JKButton("Captilise Keys On file2");
 
 	public FrmLabelsUtil() {
 		setSize(400, 200);
 		setLocationRelativeTo(null);
-		JKPanel pnl = new JKPanel();
-		pnl.add(new JKLabledComponent("First File", txtFile1));
-		pnl.add(btnBrowseFile1);
-		pnl.add(new JKLabledComponent("Second File", txtFile2));
-		pnl.add(btnBrowseFile2);
-		pnl.add(btnRemoveDuplicatesInTwoFiles);
-		pnl.add(btnRemoveDuplicatesFromSecondFile);
-		pnl.add(btnRemoveKeysWithSpacesFromFile2);
-		pnl.add(btncaptilizeKeys);
+		final JKPanel pnl = new JKPanel();
+		pnl.add(new JKLabledComponent("First File", this.txtFile1));
+		pnl.add(this.btnBrowseFile1);
+		pnl.add(new JKLabledComponent("Second File", this.txtFile2));
+		pnl.add(this.btnBrowseFile2);
+		pnl.add(this.btnRemoveDuplicatesInTwoFiles);
+		pnl.add(this.btnRemoveDuplicatesFromSecondFile);
+		pnl.add(this.btnRemoveKeysWithSpacesFromFile2);
+		pnl.add(this.btncaptilizeKeys);
 		add(pnl);
-		btnBrowseFile1.addActionListener(new ActionListener() {
+		this.btnBrowseFile1.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				chooser.showOpenDialog(FrmLabelsUtil.this);
-				File selectedFile = chooser.getSelectedFile();
+			public void actionPerformed(final ActionEvent e) {
+				FrmLabelsUtil.this.chooser.showOpenDialog(FrmLabelsUtil.this);
+				final File selectedFile = FrmLabelsUtil.this.chooser.getSelectedFile();
 				if (selectedFile != null) {
-					txtFile1.setText(selectedFile.getAbsolutePath());
+					FrmLabelsUtil.this.txtFile1.setText(selectedFile.getAbsolutePath());
 				}
 			}
 		});
-		btnBrowseFile2.addActionListener(new ActionListener() {
+		this.btnBrowseFile2.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				chooser.showOpenDialog(FrmLabelsUtil.this);
-				File selectedFile = chooser.getSelectedFile();
+			public void actionPerformed(final ActionEvent e) {
+				FrmLabelsUtil.this.chooser.showOpenDialog(FrmLabelsUtil.this);
+				final File selectedFile = FrmLabelsUtil.this.chooser.getSelectedFile();
 				if (selectedFile != null) {
-					txtFile2.setText(selectedFile.getAbsolutePath());
+					FrmLabelsUtil.this.txtFile2.setText(selectedFile.getAbsolutePath());
 				}
 			}
 		});
-		btnRemoveDuplicatesInTwoFiles.addActionListener(new ActionListener() {
+		this.btnRemoveDuplicatesInTwoFiles.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleRemoveReplicateInTwoFiles();
 			}
 		});
-		btnRemoveKeysWithSpacesFromFile2.addActionListener(new ActionListener() {
+		this.btnRemoveKeysWithSpacesFromFile2.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleRemoveKeysWithSpacesFromFile2();
 			}
 		});
-		btnRemoveDuplicatesFromSecondFile.addActionListener(new ActionListener() {
-			
+		this.btnRemoveDuplicatesFromSecondFile.addActionListener(new ActionListener() {
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleRemoveDuplicateFromSecondFile();				
+			public void actionPerformed(final ActionEvent e) {
+				handleRemoveDuplicateFromSecondFile();
 			}
 		});
 	}
 
 	/**
-	 * 
-	 */
-	protected void handleRemoveKeysWithSpacesFromFile2() {
-		try {
-			System.out.println("Start Processing ....");
-			txtFile2.checkEmpty();
-			Properties prop2 = GeneralUtility.readPropertyStream(new FileInputStream(txtFile2.getText()));
-			Enumeration<Object> keys = prop2.keys();
-			while (keys.hasMoreElements()) {
-				String key = (String) keys.nextElement();
-				if (key.contains(" ")&& !key.contains("CONCAT_WS")) {
-					Object removed = prop2.remove(key);
-					if (removed != null) {
-						System.out.println(key.toString() + " = " + removed + "  .::. Removed");
-					}
-				}				
-			}
-			prop2.store(new FileOutputStream(txtFile2.getText()), "");
-			System.out.println("Done ....");
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleRemoveReplicateInTwoFiles() {
-		try {
-			System.out.println("Start Processing ....");
-			txtFile1.checkEmpty();
-			txtFile2.checkEmpty();
-			Properties prop1 = GeneralUtility.readPropertyStream(new FileInputStream(txtFile1.getText()));
-			Properties prop2 = GeneralUtility.readPropertyStream(new FileInputStream(txtFile2.getText()));
-			Enumeration<Object> keys = prop1.keys();
-			while (keys.hasMoreElements()) {
-				Object key = keys.nextElement();
-				Object removed = prop2.remove(key);
-				if (removed != null) {
-					System.out.println(key.toString() + " = " + removed + "  .::. Removed");
-				}
-				prop2.store(new FileOutputStream(txtFile2.getText()), "");
-			}
-			System.out.println("Done ....");
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-		}
-
-	}
-	
-	/**
-	 * 
+	 *
 	 */
 	protected void handleRemoveDuplicateFromSecondFile() {
 		try {
 			System.out.println("Start Processing ....");
-			txtFile2.checkEmpty();
-			Properties prop2 = GeneralUtility.readPropertyStream(new FileInputStream(txtFile2.getText()));
-			Properties newProp=new Properties();
-			Enumeration<Object> keys = prop2.keys();
+			this.txtFile2.checkEmpty();
+			final Properties prop2 = GeneralUtility.readPropertyStream(new FileInputStream(this.txtFile2.getText()));
+			final Properties newProp = new Properties();
+			final Enumeration<Object> keys = prop2.keys();
 			while (keys.hasMoreElements()) {
-				String key = (String) keys.nextElement();
+				final String key = (String) keys.nextElement();
 				newProp.put(key, prop2.getProperty(key));
 			}
-			newProp.store(new FileOutputStream(txtFile2.getText()), "");
+			newProp.store(new FileOutputStream(this.txtFile2.getText()), "");
 			System.out.println("Done ....");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			ExceptionUtil.handleException(e);
 		}
 
 	}
 
-	public static void main(String[] args) {
-		new FrmLabelsUtil().setVisible(true);
+	/**
+	 *
+	 */
+	protected void handleRemoveKeysWithSpacesFromFile2() {
+		try {
+			System.out.println("Start Processing ....");
+			this.txtFile2.checkEmpty();
+			final Properties prop2 = GeneralUtility.readPropertyStream(new FileInputStream(this.txtFile2.getText()));
+			final Enumeration<Object> keys = prop2.keys();
+			while (keys.hasMoreElements()) {
+				final String key = (String) keys.nextElement();
+				if (key.contains(" ") && !key.contains("CONCAT_WS")) {
+					final Object removed = prop2.remove(key);
+					if (removed != null) {
+						System.out.println(key.toString() + " = " + removed + "  .::. Removed");
+					}
+				}
+			}
+			prop2.store(new FileOutputStream(this.txtFile2.getText()), "");
+			System.out.println("Done ....");
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleRemoveReplicateInTwoFiles() {
+		try {
+			System.out.println("Start Processing ....");
+			this.txtFile1.checkEmpty();
+			this.txtFile2.checkEmpty();
+			final Properties prop1 = GeneralUtility.readPropertyStream(new FileInputStream(this.txtFile1.getText()));
+			final Properties prop2 = GeneralUtility.readPropertyStream(new FileInputStream(this.txtFile2.getText()));
+			final Enumeration<Object> keys = prop1.keys();
+			while (keys.hasMoreElements()) {
+				final Object key = keys.nextElement();
+				final Object removed = prop2.remove(key);
+				if (removed != null) {
+					System.out.println(key.toString() + " = " + removed + "  .::. Removed");
+				}
+				prop2.store(new FileOutputStream(this.txtFile2.getText()), "");
+			}
+			System.out.println("Done ....");
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+		}
+
 	}
 }

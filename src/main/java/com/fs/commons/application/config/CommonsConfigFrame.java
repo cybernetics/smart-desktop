@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.application.config;
 
 import java.awt.BorderLayout;
@@ -15,7 +30,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 
 public class CommonsConfigFrame extends JFrame {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	JFileChooser chooser = SwingUtility.getDefaultFileChooser();
@@ -25,39 +40,91 @@ public class CommonsConfigFrame extends JFrame {
 	JKPanel mainPanel;
 
 	/**
-	 * 
+	 *
 	 */
 	public CommonsConfigFrame() {
 		init();
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
 	 */
-	private void init() {		
+	private JKPanel getButtonsPanel() {
+		final JKPanel pnl = new JKPanel();
+		pnl.add(this.btnNew);
+		pnl.add(this.btnLoad);
+		pnl.add(this.btnExit);
+		return pnl;
+	}
+
+	/**
+	 *
+	 */
+	protected void handleExit() {
+		System.exit(0);
+	}
+
+	/**
+	 *
+	 */
+	protected void handleLoad() {
+		final int choice = this.chooser.showOpenDialog(this);
+		if (choice == JFileChooser.APPROVE_OPTION) {
+			final File file = this.chooser.getSelectedFile();
+			if (file.isFile()) {
+				try {
+					final CommonsConfigManager configManager = new CommonsConfigManager(file.getAbsolutePath());
+					final CommonsConfigPanel configPanel = new CommonsConfigPanel(configManager);
+					showConfigPanel(configPanel);
+				} catch (final IOException e) {
+					SwingUtility.showErrorDialog(e.getMessage(), e);
+				}
+			} else {
+				SwingUtility.showUserErrorDialog("Only normal files are allowed");
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleNew() {
+		final CommonsConfigManager configManager = new CommonsConfigManager();
+		final CommonsConfigPanel configPanel = new CommonsConfigPanel(configManager);
+		showConfigPanel(configPanel);
+	}
+
+	/**
+	 *
+	 */
+	private void init() {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
 		add(getButtonsPanel(), BorderLayout.SOUTH);
 		packWindow();
-		btnNew.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
+		this.btnNew.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleNew();
 			}
 		});
-		btnLoad.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
+		this.btnLoad.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleLoad();
 			}
 		});
-		btnExit.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
+		this.btnExit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleExit();
 			}
 		});
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void packWindow() {
 		pack();
@@ -65,66 +132,17 @@ public class CommonsConfigFrame extends JFrame {
 	}
 
 	/**
-	 * 
-	 */
-	protected void handleExit() {
-		System.exit(0);
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleLoad() {
-		int choice=chooser.showOpenDialog(this);
-		if(choice==JFileChooser.APPROVE_OPTION){
-			 File file=chooser.getSelectedFile();
-			 if(file.isFile()){
-				 try {
-					CommonsConfigManager configManager=new CommonsConfigManager(file.getAbsolutePath());
-					CommonsConfigPanel configPanel=new CommonsConfigPanel(configManager);
-					showConfigPanel(configPanel);
-				} catch (IOException e) {
-					SwingUtility.showErrorDialog(e.getMessage(), e);
-				}
-			 }else{
-				 SwingUtility.showUserErrorDialog("Only normal files are allowed");
-			 }
-		}
-	}
-
-	/**
-	 * 
+	 *
 	 * @param configPanel
 	 */
-	private void showConfigPanel(CommonsConfigPanel configPanel) {
-		if(this.mainPanel!=null){
-			remove(mainPanel);
+	private void showConfigPanel(final CommonsConfigPanel configPanel) {
+		if (this.mainPanel != null) {
+			remove(this.mainPanel);
 		}
-		this.mainPanel=configPanel;
-		add(configPanel,BorderLayout.CENTER);
+		this.mainPanel = configPanel;
+		add(configPanel, BorderLayout.CENTER);
 		validate();
 		repaint();
-		packWindow();		
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleNew() {		
-		CommonsConfigManager configManager=new CommonsConfigManager();
-		CommonsConfigPanel configPanel=new CommonsConfigPanel(configManager);
-		showConfigPanel(configPanel);		
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private JKPanel getButtonsPanel() {
-		JKPanel pnl = new JKPanel();
-		pnl.add(btnNew);
-		pnl.add(btnLoad);
-		pnl.add(btnExit);
-		return pnl;
+		packWindow();
 	}
 }

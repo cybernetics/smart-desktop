@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui.tabular;
 
 import java.util.ArrayList;
@@ -15,214 +30,213 @@ import com.fs.commons.locale.Lables;
 
 public class DynMetaModel extends AbstractTableModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private final TableMeta meta;
-	private ArrayList<Record> records=new ArrayList<>();
-	private ArrayList<Record> deletedRecords = new ArrayList<Record>();
+	private ArrayList<Record> records = new ArrayList<>();
+	private final ArrayList<Record> deletedRecords = new ArrayList<Record>();
 	private DynamicDao dao;
 	private Record filterRecord;
 
 	// ////////////////////////////////////////////////////
-	public DynMetaModel(TableMeta meta,boolean loadRecords) throws RecordNotFoundException, DaoException {
-		this(meta, new DynamicDao(meta),loadRecords);
+	public DynMetaModel(final TableMeta meta, final boolean loadRecords) throws RecordNotFoundException, DaoException {
+		this(meta, new DynamicDao(meta), loadRecords);
 	}
 
 	// ////////////////////////////////////////////////////
-	public DynMetaModel(TableMeta meta, DynamicDao dynamicDao,boolean loadRecords) throws RecordNotFoundException, DaoException {
+	public DynMetaModel(final TableMeta meta, final DynamicDao dynamicDao, final boolean loadRecords) throws RecordNotFoundException, DaoException {
 		this.meta = meta;
-		dao = dynamicDao;
-		setFilterRecord(dao.createEmptyRecord(false));
-		if(loadRecords){
+		this.dao = dynamicDao;
+		setFilterRecord(this.dao.createEmptyRecord(false));
+		if (loadRecords) {
 			loadRecords();
 		}
 	}
 
-	/**
-	 * @return the filterRecord
-	 */
-	public Record getFilterRecord() {
-		return filterRecord;
+	public void clearRecords() {
+		this.records = new ArrayList();
 	}
 
 	/**
-	 * @param filterRecord
-	 *            the filterRecord to set
+	 *
+	 * @param numberOfRecords
 	 */
-	public void setFilterRecord(Record filterRecord) {
-		this.filterRecord = filterRecord;
+	public void createEmptyRecords(final int numberOfRecords) {
+		for (int i = 0; i < numberOfRecords; i++) {
+			this.records.add(this.dao.createEmptyRecord(true));
+		}
+		fireTableDataChanged();
+	}
+
+	/**
+	 *
+	 * @param selectedRow
+	 */
+	public void deleteRow(final int row) {
+		final Record record = this.records.remove(row);
+		record.setDeleted(true);
+		this.deletedRecords.add(record);
+		fireTableDataChanged();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<Record> getAllRecords() {
+		final ArrayList<Record> allRecords = new ArrayList<Record>(this.records);
+		allRecords.addAll(this.deletedRecords);
+		return allRecords;
+	}
+
+	public String getColumnActualName(final int column) {
+		return this.meta.getVisibleFields().get(column).getName();
+	}
+
+	@Override
+	public Class<?> getColumnClass(final int columnIndex) {
+		final FieldMeta fieldMeta = this.meta.getVisibleFields().get(columnIndex);
+		return fieldMeta.getFieldClass();
+	}
+
+	@Override
+	public int getColumnCount() {
+		return this.meta.getVisibleFieldsCount();
+	}
+
+	@Override
+	public String getColumnName(final int column) {
+		return Lables.get(getColumnActualName(column));
+	}
+
+	public double getColunmSum(final int col) {
+		double sum = 0;
+		for (int i = 0; i < getRowCount(); i++) {
+			sum += Integer.parseInt(getValueAt(i, col).toString());
+		}
+		return sum;
 	}
 
 	/**
 	 * @return the dao
 	 */
 	public DynamicDao getDao() {
-		return dao;
+		return this.dao;
+	}
+
+	/**
+	 * @return the filterRecord
+	 */
+	public Record getFilterRecord() {
+		return this.filterRecord;
+	}
+
+	// ////////////////////////////////////////////////////
+	public TableMeta getMeta() {
+		return this.meta;
+	}
+
+	public Record getRecord(final int row) {
+		return this.records.get(row);
+	}
+
+	/**
+	 * @return
+	 *
+	 */
+	public ArrayList<Record> getRecords() {
+		return this.records;
+
+	}
+
+	@Override
+	public int getRowCount() {
+		return this.records == null ? 0 : this.records.size();
+	}
+
+	@Override
+	public Object getValueAt(final int rowIndex, final int columnIndex) {
+		if (rowIndex >= this.records.size()) {
+			return null;
+		}
+		final FieldMeta fieldMeta = this.meta.getVisibleFields().get(columnIndex);
+		final Record record = this.records.get(rowIndex);
+		return record.getFieldValue(fieldMeta.getName());
+	}
+
+	/**
+	 *
+	 * @param column
+	 * @return
+	 */
+	public FieldMeta getVisibleField(final int column) {
+		return this.meta.getVisibleFields().get(column);
+	}
+
+	/**
+	 *
+	 * @param selectedRow
+	 * @return
+	 */
+	public boolean isNewRow(final int row) {
+		return this.records.get(row).isNewRecord();
+	}
+
+	// ////////////////////////////////////////////////////
+	private void loadRecords() throws RecordNotFoundException, DaoException {
+		this.records = this.dao.lstRecords(this.filterRecord);
+	}
+
+	/*
+	 *
+	 */
+	public void reload() throws RecordNotFoundException, DaoException {
+		this.records.clear();
+		this.deletedRecords.clear();
+		loadRecords();
+		fireTableDataChanged();
 	}
 
 	/**
 	 * @param dao
 	 *            the dao to set
 	 */
-	public void setDao(DynamicDao dao) {
+	public void setDao(final DynamicDao dao) {
 		this.dao = dao;
 	}
 
-	// ////////////////////////////////////////////////////
-	private void loadRecords() throws RecordNotFoundException, DaoException {
-		records = dao.lstRecords(filterRecord);
-	}
-
-	// ////////////////////////////////////////////////////
-	public TableMeta getMeta() {
-		return meta;
-	}
-
-	@Override
-	public int getColumnCount() {
-		return meta.getVisibleFieldsCount();
-	}
-
-	@Override
-	public int getRowCount() {
-		return records==null?0: records.size();
-	}
-
-	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		if (rowIndex >= records.size()) {
-			return null;
-		}
-		FieldMeta fieldMeta = meta.getVisibleFields().get(columnIndex);
-		Record record = records.get(rowIndex);
-		return record.getFieldValue(fieldMeta.getName());
-	}
-
-	@Override
-	public String getColumnName(int column) {
-		return Lables.get(getColumnActualName(column));
-	}
-
-	public String getColumnActualName(int column) {
-		return meta.getVisibleFields().get(column).getName();
-	}
-
-	@Override
-	public Class<?> getColumnClass(int columnIndex) {
-		FieldMeta fieldMeta = meta.getVisibleFields().get(columnIndex);
-		return fieldMeta.getFieldClass();
-	}
-
 	/**
-	 * 
-	 * @param column
-	 * @return
+	 * @param filterRecord
+	 *            the filterRecord to set
 	 */
-	public FieldMeta getVisibleField(int column) {
-		return meta.getVisibleFields().get(column);
-	}
-
-	@Override
-	public void setValueAt(Object newValue, int rowIndex, int columnIndex) {
-		if (rowIndex >= records.size()) {
-			// the record maybe deleted before stop editing , so we just ignore
-			// this call
-		} else {
-			Record record = records.get(rowIndex);
-			Field field = record.getField(meta.getVisibleFields().get(columnIndex).getName());
-			Object oldValue = field.getValueObject();
-			if ((newValue == null && oldValue!=null) 
-				|| (oldValue == null && newValue!=null)
-				|| (newValue != null && oldValue != null && !newValue.equals(oldValue))) {				
-				record.setModified(true);
-			}
-			field.setValue(newValue);
-		}
-		fireTableCellUpdated(rowIndex, columnIndex);
-	}
-
-	/**
-	 * 
-	 * @param numberOfRecords
-	 */
-	public void createEmptyRecords(int numberOfRecords) {
-		for (int i = 0; i < numberOfRecords; i++) {
-			records.add(dao.createEmptyRecord(true));
-		}
-		fireTableDataChanged();
-	}
-
-	/**
-	 * 
-	 * @param selectedRow
-	 * @return
-	 */
-	public boolean isNewRow(int row) {
-		return records.get(row).isNewRecord();
-	}
-
-	/**
-	 * 
-	 * @param selectedRow
-	 */
-	public void deleteRow(int row) {
-		Record record = records.remove(row);
-		record.setDeleted(true);
-		deletedRecords.add(record);
-		fireTableDataChanged();
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public ArrayList<Record> getAllRecords() {
-		ArrayList<Record> allRecords = new ArrayList<Record>(this.records);
-		allRecords.addAll(deletedRecords);
-		return allRecords;
-	}
-
-	/*
-	 * 
-	 */
-	public void reload() throws RecordNotFoundException, DaoException {
-		records.clear();
-		deletedRecords.clear();
-		loadRecords();
-		fireTableDataChanged();
-	}
-
-	/**
-	 * @return
-	 * 
-	 */
-	public ArrayList<Record> getRecords() {
-		return records;
-
+	public void setFilterRecord(final Record filterRecord) {
+		this.filterRecord = filterRecord;
 	}
 
 	/**
 	 * @param fieldName
 	 * @param trxId
 	 */
-	public void setFilterValue(String fieldName, String value) {
+	public void setFilterValue(final String fieldName, final String value) {
 		getFilterRecord().setFieldValue(fieldName, value);
 	}
 
-	public void clearRecords() {
-		records=new ArrayList();
-	}
-
-	public Record getRecord(int row) {
-		return records.get(row);
-	}
-
-	public double getColunmSum(int col) {
-		double sum=0;
-		for(int i=0;i<getRowCount();i++){
-			sum+=Integer.parseInt(getValueAt(i, col).toString());
+	@Override
+	public void setValueAt(final Object newValue, final int rowIndex, final int columnIndex) {
+		if (rowIndex >= this.records.size()) {
+			// the record maybe deleted before stop editing , so we just ignore
+			// this call
+		} else {
+			final Record record = this.records.get(rowIndex);
+			final Field field = record.getField(this.meta.getVisibleFields().get(columnIndex).getName());
+			final Object oldValue = field.getValueObject();
+			if (newValue == null && oldValue != null || oldValue == null && newValue != null
+					|| newValue != null && oldValue != null && !newValue.equals(oldValue)) {
+				record.setModified(true);
+			}
+			field.setValue(newValue);
 		}
-		return sum;
+		fireTableCellUpdated(rowIndex, columnIndex);
 	}
 }

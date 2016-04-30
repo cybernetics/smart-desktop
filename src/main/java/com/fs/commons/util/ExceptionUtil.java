@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.util;
 
 import java.io.File;
@@ -14,69 +29,69 @@ import com.fs.commons.application.exceptions.util.ExceptionLogging;
 
 public class ExceptionUtil {
 
-	private static String LOGS_FOLDER = GeneralUtility.getUserFolderPath(true)+ "logs";
+	private static String LOGS_FOLDER = GeneralUtility.getUserFolderPath(true) + "logs";
+
+	public static String getCallerInfo() {
+		return getCallerInfo(1);
+	}
+
+	public static String getCallerInfo(final int level) {
+		final Throwable e = new Throwable();
+		final String caller = e.getStackTrace()[level].getClassName() + "." + e.getStackTrace()[level].getMethodName();
+		return caller;
+	}
 
 	/**
-	 * 
+	 *
+	 * @return
+	 */
+	public static String getLogFileName() {
+		final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+		final String logFileName = LOGS_FOLDER + "/" + format.format(new Date()) + ".log";
+		return logFileName;
+	}
+
+	public static String getStackTraceAsString(final Throwable throwable) {
+		final Writer result = new StringWriter();
+		final PrintWriter printWriter = new PrintWriter(result);
+		throwable.printStackTrace(printWriter);
+		return result.toString();
+	}
+
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] getTodayLogFile() throws IOException {
+		try {
+			final byte[] file = GeneralUtility.readFile(new File(getLogFileName()));
+			return file;
+		} catch (final FileNotFoundException e) {
+			return new byte[] {};
+		}
+	}
+
+	public static void handleException(final Throwable e) {
+		System.err.println("Handling Exception: ");
+		e.printStackTrace(System.err);
+		ExceptionHandlerFactory.getExceptionHandler(e).handleException(e);
+	}
+
+	/**
+	 *
 	 * @throws FileNotFoundException
 	 */
 	public static void initExceptionLogging() throws FileNotFoundException {
 		// check if log folder exists
-		File file = new File(LOGS_FOLDER);
+		final File file = new File(LOGS_FOLDER);
 		if (!file.exists()) {
 			file.mkdir();
 		}
 		System.setErr(new ExceptionLogging(getLogFileName()));
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public static String getLogFileName() {
-		SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-		String logFileName = LOGS_FOLDER + "/" + format.format(new Date()) + ".log";
-		return logFileName;
-	}
-
-	/**
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	public static byte[] getTodayLogFile() throws IOException {
-		try {
-			byte[] file = GeneralUtility.readFile(new File(getLogFileName()));
-			return file;
-		} catch (FileNotFoundException e) {
-			return new byte[] {};
-		}
-	}
-
-	public static void handleException(Throwable e) {
-		System.err.println("Handling Exception: ");
-		e.printStackTrace(System.err);
-		ExceptionHandlerFactory.getExceptionHandler(e).handleException(e);
-	}
-
-	public static String getCallerInfo() {
-		return getCallerInfo(1);
-	}
-
-	public static String getCallerInfo(int level) {
-		Throwable e = new Throwable();
-		String caller = e.getStackTrace()[level].getClassName() + "." + e.getStackTrace()[level].getMethodName();
-		return caller;
-	}
-
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		System.out.println(getCallerInfo());
-	}
-
-	public static String getStackTraceAsString(Throwable throwable) {
-		final Writer result = new StringWriter();
-	    final PrintWriter printWriter = new PrintWriter(result);
-	    throwable.printStackTrace(printWriter);
-	    return result.toString();
 	}
 }

@@ -1,42 +1,17 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * Copyright 2002-2016 Jalal Kiswani.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The contents of this file are subject to the terms of either the GNU
- * General Public License Version 2 only ("GPL") or the Common
- * Development and Distribution License("CDDL") (collectively, the
- * "License"). You may not use this file except in compliance with the
- * License. You can obtain a copy of the License at
- * http://www.netbeans.org/cddl-gplv2.html
- * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
- * specific language governing permissions and limitations under the
- * License.  When distributing the software, include this License Header
- * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
- * accompanied this code. If applicable, add the following below the
- * License Header, with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Contributor(s):
- *
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
- * If you wish your version of this file to be governed by only the CDDL
- * or only the GPL Version 2, indicate your decision by adding
- * "[Contributor] elects to include this software in this distribution
- * under the [CDDL or GPL Version 2] license." If you do not indicate a
- * single choice of license, a recipient has the option to distribute
- * your version of this file under either the CDDL, the GPL Version 2 or
- * to extend the choice of license to its licensees as provided above.
- * However, if you add GPL Version 2 code and therefore, elected the GPL
- * Version 2 license, then the option applies only if the new code is
- * made subject to such option by the copyright holder.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.validation.ui;
 
@@ -53,86 +28,86 @@ import com.fs.commons.desktop.validation.Problem;
  */
 final class MulticastValidationUI implements ValidationUI {
 
-    private final Set<ValidationUI> real;
+	private final Set<ValidationUI> real;
 
-    MulticastValidationUI(ValidationUI... real) {
-        this.real = new HashSet<ValidationUI>(Arrays.asList(real));
-        assert validUIs(real);
-    }
+	MulticastValidationUI(final ValidationUI... real) {
+		this.real = new HashSet<ValidationUI>(Arrays.asList(real));
+		assert validUIs(real);
+	}
 
-    public void add(ValidationUI ui) {
-        if (ui == null) {
-            throw new NullPointerException();
-        }
-        assert EventQueue.isDispatchThread() : "Not on the event thread";
-        assert !contains(ui) : "Already a member: " + ui;
-        real.add (ui);
-    }
+	public void add(final ValidationUI ui) {
+		if (ui == null) {
+			throw new NullPointerException();
+		}
+		assert EventQueue.isDispatchThread() : "Not on the event thread";
+		assert !contains(ui) : "Already a member: " + ui;
+		this.real.add(ui);
+	}
 
-    public void remove(ValidationUI ui) {
-        if (ui == null) {
-            throw new NullPointerException();
-        }
-        assert EventQueue.isDispatchThread() : "Not on the event thread";
-        assert contains(ui) : "Not a member: " + ui;
-        real.remove(ui);
-    }
+	@Override
+	public void clearProblem() {
+		assert this.real != null;
+		for (final ValidationUI ui : this.real) {
+			ui.clearProblem();
+		}
+	}
 
-    public boolean contains(ValidationUI check) {
-        boolean result = real.contains(check);
-        if (!result) {
-            for (ValidationUI ui : real) {
-                if (ui instanceof MulticastValidationUI) {
-                    if (result = ((MulticastValidationUI) ui).contains(check)) {
-                        break;
-                    }
-                }
-            }
-        }
-        return result;
-    }
+	public boolean contains(final ValidationUI check) {
+		boolean result = this.real.contains(check);
+		if (!result) {
+			for (final ValidationUI ui : this.real) {
+				if (ui instanceof MulticastValidationUI) {
+					if (result = ((MulticastValidationUI) ui).contains(check)) {
+						break;
+					}
+				}
+			}
+		}
+		return result;
+	}
 
-    public void clearProblem() {
-        assert real != null;
-        for (ValidationUI ui : real) {
-            ui.clearProblem();
-        }
-    }
+	public void remove(final ValidationUI ui) {
+		if (ui == null) {
+			throw new NullPointerException();
+		}
+		assert EventQueue.isDispatchThread() : "Not on the event thread";
+		assert contains(ui) : "Not a member: " + ui;
+		this.real.remove(ui);
+	}
 
-    public void setProblem(Problem problem) {
-        assert real != null;
-        for (ValidationUI ui : real) {
-            ui.setProblem(problem);
-        }
-    }
+	public boolean removeUI(final ValidationGroupImpl owner) {
+		for (final ValidationUI ui : this.real) {
+			if (ui instanceof GroupSpecificValidationUI) {
+				final GroupSpecificValidationUI g = (GroupSpecificValidationUI) ui;
+				if (g.owner == owner) {
+					remove(ui);
+					return true;
+				}
+			} else if (ui instanceof MulticastValidationUI) {
+				final MulticastValidationUI m = (MulticastValidationUI) ui;
+				if (m.removeUI(owner)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    public boolean validUIs(ValidationUI[] uis) {
-        for (int i = 0; i < uis.length; i++) {
-            ValidationUI ui = uis[i];
-            if (ui == null) {
-                throw new NullPointerException("Element " + i + " of ui " +
-                        "array is null");
-            }
-        }
-        return true;
-    }
+	@Override
+	public void setProblem(final Problem problem) {
+		assert this.real != null;
+		for (final ValidationUI ui : this.real) {
+			ui.setProblem(problem);
+		}
+	}
 
-    public boolean removeUI(ValidationGroupImpl owner) {
-        for (ValidationUI ui : real) {
-            if (ui instanceof GroupSpecificValidationUI) {
-                GroupSpecificValidationUI g = (GroupSpecificValidationUI) ui;
-                if (g.owner == owner) {
-                    remove(ui);
-                    return true;
-                }
-            } else if (ui instanceof MulticastValidationUI) {
-                MulticastValidationUI m = (MulticastValidationUI) ui;
-                if (m.removeUI(owner)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+	public boolean validUIs(final ValidationUI[] uis) {
+		for (int i = 0; i < uis.length; i++) {
+			final ValidationUI ui = uis[i];
+			if (ui == null) {
+				throw new NullPointerException("Element " + i + " of ui " + "array is null");
+			}
+		}
+		return true;
+	}
 }
-

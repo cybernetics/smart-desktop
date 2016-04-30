@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.dao;
 
 import java.awt.BorderLayout;
@@ -63,13 +78,19 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 
 	private static final long serialVersionUID = 1L;
 
+	public static void main(final String[] args) {
+		final QueryJTable t = new QueryJTable("SELECT * FROM GEN_NATIONAL_NUMBERS");
+		t.setAllowFiltering(true);
+		SwingUtility.testPanel(t);
+	}
+
 	QueryTableModel model;
 
 	JKTable table = new JKTable();
-
 	// contains the record count and the user customised lables
 	JKPanel pnlSouthLables;
 	JKPanel pnlRecordsCount;
+
 	JKTextField txtCount = new JKTextField(5);
 
 	// TableFilterPanel[] filters;
@@ -79,16 +100,16 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 
 	JKRadioButton btnAsc = new JKRadioButton(Lables.get("ASC"));
 
-	JKRadioButton btnDesc = new JKRadioButton(Lables.get("DESCENDING"));
-
 	// private boolean renderersSet;
+
+	JKRadioButton btnDesc = new JKRadioButton(Lables.get("DESCENDING"));
 
 	Vector<RecordSelectionListener> listeners = new Vector<RecordSelectionListener>();
 
 	JKPanel pnlSouth = new JKPanel();
-
 	// print components
 	JKPanel pnlPrint;
+
 	JKPanel pnlExcel;
 
 	JKButton btnPrint = new JKButton("PRINT");
@@ -112,7 +133,6 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 	private JKPanel pnlSouthButtons;
 
 	private boolean showFilterButtons = true;
-
 	// ////////////////////////
 	// limit support
 	JKPanel pnlPaging = new JKPanel();
@@ -122,6 +142,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 	JKButton btnFirstPage = new JKButton("", "alt F");
 	JKButton btnNextPage = new JKButton("", "alt N");
 	JKButton btnPreviousePage = new JKButton("", "alt P");
+
 	JKButton btnLastPage = new JKButton("", "alt L");
 
 	private boolean allowPaging;
@@ -132,57 +153,8 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 		this("", "");
 	}
 
-	// /////////////////////////////////////////////////////////////////////////////
-	public QueryJTable(String sql, String title) {
-		this(sql, title, true);
-	}
-
-	public QueryJTable(String sql) {
-		this(sql, "", true);
-	}
-
 	/**
-	 * 
-	 * @param tableMeta
-	 */
-	public QueryJTable(TableMeta tableMeta) {
-		this(tableMeta, tableMeta.getTableId(), true);
-	}
-
-	public QueryJTable(TableMeta tableMeta, String title, boolean showFilters) {
-		this(title, tableMeta.getDataSource(), tableMeta.getReportSql(), showFilters);
-		setShowIdColunm(!tableMeta.isAutoIncrementId());
-		this.pageRowCount = tableMeta.getPageRowCount();
-		int[] filters = tableMeta.getFilters();
-		for (int i = 0; i < filters.length; i++) {
-			showFilterPanel(filters[i], isShowFilterButtons());
-		}
-
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private boolean isShowFilterButtons() {
-		return showFilterButtons;
-	}
-
-	/**
-	 * 
-	 * @param sql
-	 *            String
-	 * @param title
-	 *            String
-	 * @param allowFiltering
-	 *            boolean
-	 */
-	public QueryJTable(String sql, String title, boolean allowFiltering) {
-		this(new QueryTableModel(sql), title, allowFiltering);
-	}
-
-	/**
-	 * 
+	 *
 	 * @param model
 	 *            QueryTableModel
 	 * @param title
@@ -190,122 +162,820 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 	 * @param allowFiltering
 	 *            boolean
 	 */
-	public QueryJTable(QueryTableModel model, String title, boolean allowFiltering) {
-		table.setModel(model);
+	public QueryJTable(final QueryTableModel model, final String title, final boolean allowFiltering) {
+		this.table.setModel(model);
 		this.model = model;
 		setTitle(title);
 		init();
 		refreshComponents(); // to avoid requesting the query again since it
-		table.setPreferredScrollableViewportSize(new Dimension(600, 250));
+		this.table.setPreferredScrollableViewportSize(new Dimension(600, 250));
 		applyComponentOrientation(SwingUtility.getDefaultComponentOrientation());
 
 		setAllowFiltering(allowFiltering);
 	}
 
-	/**
-	 * @param title
-	 */
-	public void setTitle(String title) {
-		if (title != null && !title.equals("")) {
-			setBorder(SwingUtility.createTitledBorder(title));
-		}
+	public QueryJTable(final String sql) {
+		this(sql, "", true);
 	}
 
-	public QueryJTable(String title, DataSource resource, String sql, boolean allowFiltering) {
+	public QueryJTable(final String title, final DataSource resource, final String sql, final boolean allowFiltering) {
 		this(new QueryTableModel(resource, sql), title, allowFiltering);
 	}
 
-	public QueryJTable(TableMeta tableMeta, boolean allowFiltering) {
+	// /////////////////////////////////////////////////////////////////////////////
+	public QueryJTable(final String sql, final String title) {
+		this(sql, title, true);
+	}
+
+	/**
+	 *
+	 * @param sql
+	 *            String
+	 * @param title
+	 *            String
+	 * @param allowFiltering
+	 *            boolean
+	 */
+	public QueryJTable(final String sql, final String title, final boolean allowFiltering) {
+		this(new QueryTableModel(sql), title, allowFiltering);
+	}
+
+	/**
+	 *
+	 * @param tableMeta
+	 */
+	public QueryJTable(final TableMeta tableMeta) {
+		this(tableMeta, tableMeta.getTableId(), true);
+	}
+
+	public QueryJTable(final TableMeta tableMeta, final boolean allowFiltering) {
 		this(tableMeta, tableMeta.getTableId(), allowFiltering);
 	}
 
-	/**
-	 * 
-	 * @param sql
-	 *            String
-	 */
-	public void setQuery(String sql) {
-		setQuery(sql, model.getOrderByColunmIndex());
+	public QueryJTable(final TableMeta tableMeta, final String title, final boolean showFilters) {
+		this(title, tableMeta.getDataSource(), tableMeta.getReportSql(), showFilters);
+		setShowIdColunm(!tableMeta.isAutoIncrementId());
+		this.pageRowCount = tableMeta.getPageRowCount();
+		final int[] filters = tableMeta.getFilters();
+		for (final int filter : filters) {
+			showFilterPanel(filter, isShowFilterButtons());
+		}
+
 	}
 
 	/**
-	 * 
+	 *
+	 * @param btn
+	 */
+	public void addButtonToSouthButtonsPanel(final JKButton btn) {
+		this.pnlSouthButtons.add(btn);
+		this.pnlSouthButtons.validate();
+		this.pnlSouthButtons.repaint();
+	}
+
+	public void addCellFocusListener(final CellFocusListener cellFocusListener) {
+		this.table.addCellFocusListener(cellFocusListener);
+	}
+
+	/**
+	 *
+	 * @param columnName
+	 * @param columnType
+	 * @param displaySize
+	 */
+	public void addColunm(final String columnName, final int columnType, final int displaySize) {
+		invalidate();
+		repaint();
+	}
+
+	/**
+	 *
+	 * @param comp
+	 *            JComponent
+	 */
+	public void addComponentToLablesPanel(final JComponent comp) {
+		this.pnlSouthLables.add(comp);
+		this.pnlSouthLables.validate();
+		this.pnlSouthLables.repaint();
+	}
+
+	@Deprecated
+	/**
+	 * replaced with addRecordListener(new RecordSelectionListener() {
+	 */
+	public void addDaoRecordListener(final RecordActionListener recordActionListener) {
+		addRecordListener(new RecordSelectionListener() {
+			@Override
+			public void recordSelected(final int recordId) {
+				recordActionListener.recordSelected(recordId + "");
+			}
+		});
+	}
+
+	// /////////////////////////////////////////////////////////
+	private void addEmptyRowIfNeeded() {
+		if (this.table.getRowCount() == 0 && this.table.isEditable()) {
+			addRow();
+		}
+	}
+
+	@Override
+	public synchronized void addKeyListener(final KeyListener l) {
+		if (this.table != null) {
+			this.table.addKeyListener(l);
+		} else {
+			// if table==null this indicate that event has been set from super
+			// class before
+			// calling the constructor of this class
+			super.addKeyListener(l);
+		}
+
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public synchronized void addMouseListener(final MouseListener l) {
+		if (this.table != null) {
+			// if table==null this indicate that event has been set from super
+			// class before
+			// calling the constructor of this class
+			this.table.addMouseListener(l);
+		} else {
+			super.addMouseListener(l);
+		}
+	}
+
+	/**
+	 * @param listener
+	 *            DaoRecordListener
+	 */
+	public void addRecordListener(final RecordSelectionListener listener) {
+		this.listeners.add(listener);
+	}
+
+	public void addRow() {
+		this.table.addRow();
+	}
+
+	// private void checkShowPaging() {
+	// pnlPaging.setVisible(allowPaging && getModel().getRowCount() > 0 &&
+	// getModel().getRowCount() == getModel().getLimit());
+	// }
+
+	/**
+	 *
+	 * @param enable
+	 *            boolean
+	 */
+	public void allowMultipleSelections(final boolean enable) {
+		this.table.setAlowMutipleSelection(enable);
+	}
+
+	/**
+	 * buildFilterPanels
+	 *
+	 * @return Box
+	 */
+	private Box buildFilterPanels() {
+		this.filters.clear();
+		this.filtersBox.removeAll();
+		if (this.allowFiltering) {
+			this.filtersBox.setBorder(SwingUtility.createTitledBorder(""));
+			// filters = new TableFilterPanel[model.getColumnCount()];
+			for (int i = 0; i < this.model.getColumnCount(); i++) {
+				final TableFilterPanel filter = new TableFilterPanel(this.model, this.model.getActualColumnName(i), this);
+				this.filtersBox.add(filter);
+				this.filters.put(this.model.getColumnName(i), filter);
+			}
+			// if (allowFiltering) {
+			this.filtersBox.add(createOrderPanel());
+		}
+		this.filtersBox.revalidate();
+		// }
+		return this.filtersBox;
+	}
+
+	// /**
+	// *
+	// */
+	// public void resetPane() {
+	// SwingUtilities.invokeLater(new Runnable(){
+	// @Override
+	// public void run() {
+	// pane.getHorizontalScrollBar().setValue(0);
+	// }
+	// });
+	// }
+
+	public void checkEmptySelection() throws ValidationException {
+		if (getSelectedIdAsInteger() == -1) {
+			requestFocus();
+			throw new ValidationException("PLEASE_SELECT_RECORD");
+		}
+	}
+
+	public void checkSelectMoreThanOne() throws ValidationException {
+		checkEmptySelection();
+		final String[] selectedIds = getSelectedIds();
+		if (selectedIds.length > 1) {
+			requestFocus();
+			throw new ValidationException("PLEASE_SELECT_ONE_RECORD");
+		}
+
+	}
+
+	/**
+	 *
+	 *
+	 */
+	public void clearTable() {
+		this.table.resetRecords();
+	}
+
+	public void clearTableListeners() {
+		this.listeners.clear();
+	}
+
+	/**
+	 *
+	 * @return JKPanel
+	 */
+	private JKPanel createOrderPanel() {
+		if (this.pnlSorting == null) {
+			this.pnlSorting = new JKPanel(new FlowLayout(FlowLayout.LEADING));
+			this.pnlSorting.setVisible(false);
+			final JKPanel pnl1 = new JKPanel();
+			pnl1.setBorder(BorderFactory.createEtchedBorder());
+			final JKLabel lblSortDir = new JKLabel(Lables.get("ORDER"));
+			lblSortDir.setIcon("sort_az.png");
+
+			pnl1.add(lblSortDir);
+			// SwingUtility.setBoldFont(lblSortDir);
+
+			this.btnAsc.setFocusable(false);
+			this.btnDesc.setFocusable(false);
+			pnl1.add(this.btnAsc);
+			pnl1.add(this.btnDesc);
+
+			final ButtonGroup group = new ButtonGroup();
+
+			group.add(this.btnAsc);
+			group.add(this.btnDesc);
+
+			this.btnAsc.setSelected(true);
+
+			this.pnlSorting.add(pnl1);
+
+		}
+		return this.pnlSorting;
+	}
+
+	public void deleteRow(final int row) {
+		this.table.deleteRow(row);
+	}
+
+	/**
+	 *
+	 * @param panel
+	 *            TableFilterPanel
+	 */
+	@Override
+	public void filterUpdated(final TableFilterPanel panel) {
+		this.model.setExtraSQLCondition(panel.getFilterColunmName(), panel.getConditionString());
+		reloadData();
+		this.table.requestFocus();
+	}
+
+	/**
+	 * @param RecordId
+	 *            String
+	 */
+	protected void fireRecordSelectedEvent(final Object recordId) {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			int value = -1;
+			if (recordId != null) {
+				value = new Integer(recordId.toString());
+			}
+
+			this.listeners.get(i).recordSelected(value);
+		}
+	}
+
+	// /**
+	// * setTableColunmsRenderer
+	// */
+	// private void setTableColunmsRenderer() {
+	// table.setRenderers();
+	// }
+
+	public int[] getAllRecordIds() {
+		return getModel().getAllRecordIds();
+	}
+
+	// ////////////////////////////////////////////////////////////////////////
+	public int getColumnCount() {
+		return this.table.getColumnCount();
+	}
+
+	public double getColunmSum(final int col) {
+		return this.table.getColunmSum(col);
+	}
+
+	// ////////////////////////////////////////////////////////////////////////
+	public Vector<Vector> getData() {
+		return this.table.getData();
+	}
+
+	public Vector<FSTableRecord> getDeletedRecords() {
+		return this.table.getDeletedRecords();
+	}
+
+	// ////////////////////////////////////////////////////////////////////////
+	public Vector<Vector> getDeletedRows() {
+		return this.table.getDeletedRows();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	protected JKPanel getExcelPanel() {
+		if (this.pnlExcel == null) {
+			this.pnlExcel = new JKPanel();
+			this.pnlExcel.add(this.btnExportToExcel);
+			setAllowExcelExport(this.allowExcelExport);
+			this.btnExportToExcel.setIcon("excel_icon.gif");
+		}
+		return this.pnlExcel;
+	}
+
+	// //////////////////////////////////////////////////////
+	// implemented from RecordTraversePolicy
+	// //////////////////////////////////////////////////////
+	@Override
+	public int getFirstRecord() {
+		if (getTable().getRowCount() > 0) {
+			return getModel().getRecordIdAsInteger(0);
+		}
+		return -1;
+	}
+
+	@Override
+	public int getLastRecord() {
+		if (getTable().getRowCount() > 0) {
+			return getModel().getRecordIdAsInteger(getModel().getRowCount() - 1);
+		}
+		return -1;
+	}
+
+	public QueryTableModel getModel() {
+		return this.model;
+	}
+
+	public Vector<FSTableRecord> getModifiedRecords() {
+		return this.table.getModifiedRecords();
+	}
+
+	@Override
+	public int getNextRecord(final int recordId) {
+		final int row = getModel().getRowIndexForRecordId(recordId);
+		if (row + 1 == this.table.getRowCount()) {
+			return -1;
+		}
+		return getModel().getRecordIdAsInteger(row + 1);
+	}
+
+	private JKPanel getPagingPanel() {
+		this.btnFirstPage.setIcon(SwingUtility.isLeftOrientation() ? "first_button_commons_icon.gif" : "last_button_commons_icon.gif");
+		this.btnLastPage.setIcon(SwingUtility.isLeftOrientation() ? "last_button_commons_icon.gif" : "first_button_commons_icon.gif");
+		this.btnNextPage.setIcon(SwingUtility.isLeftOrientation() ? "next_button_commons_icon.gif" : "previous_button_commons_icon.gif");
+		this.btnPreviousePage.setIcon(SwingUtility.isLeftOrientation() ? "previous_button_commons_icon.gif" : "next_button_commons_icon.gif");
+		// pnlPaging.add(txtLimit);
+
+		//
+		this.txtAllRowsCount.setHorizontalAlignment(JKTextField.CENTER);
+		this.txtPagesCount.setHorizontalAlignment(JKTextField.CENTER);
+		this.pnlPaging.add(this.btnFirstPage);
+		this.pnlPaging.add(this.btnPreviousePage);
+		this.pnlPaging.add(this.txtAllRowsCount);
+		this.pnlPaging.add(this.txtPagesCount);
+		this.pnlPaging.add(this.btnNextPage);
+		this.pnlPaging.add(this.btnLastPage);
+		// txtLimit.setHorizontalAlignment(SwingConstants.CENTER);
+		return this.pnlPaging;
+	}
+
+	/**
+	 * @return the pane
+	 */
+	public JScrollPane getPane() {
+		return this.pane;
+	}
+
+	@Override
+	public int getPreviouseRecord(final int recordId) {
+		final int row = getModel().getRowIndexForRecordId(recordId);
+		if (row == 0) {
+			return -1;
+		}
+		return getModel().getRecordIdAsInteger(row - 1);
+	}
+
+	/**
+	 *
+	 * @return JKPanel
+	 */
+	JKPanel getPrintPanel() {
+		if (this.pnlPrint == null) {
+			this.pnlPrint = new JKPanel();
+			this.pnlPrint.add(this.btnPrint);
+			this.btnPrint.setIcon("fileprint.png");
+			this.pnlPrint.add(this.btnSelectPrintFields);
+			this.btnSelectPrintFields.setIcon("select.png");
+			// pnlPrint.add(btnExportToExcel);
+			// btnExportToExcel.setIcon("excel_commons_mod_icon.gif");
+			setAllowPrinting(this.allowPrinting); // to set it visible or
+													// invisiable
+		}
+		return this.pnlPrint;
+	}
+
+	public Object getRecordId(final int row) {
+		return this.model.getRecordId(row);
+	}
+
+	public int getRecordIdAsInteger(final int row) {
+		return ConversionUtil.toInteger(getRecordId(row));
+	}
+
+	public Vector<FSTableRecord> getRecords() {
+		return this.table.getRecords();
+	}
+
+	public int getRowCount() {
+		return this.table.getRowCount();
+	}
+
+	/**
+	 *
+	 * @return String
+	 */
+	public Object getSelectedId() {
+		final int row = this.table.getSelectedRow();
+		if (row != -1) {
+			return this.model.getRecordId(row);
+		}
+		return null;
+	}
+
+	/**
+	 *
+	 * @return int
+	 */
+	public int getSelectedIdAsInteger() {
+		final int selectedRow = getSelectedRow();
+		if (selectedRow == -1) {
+			return -1;
+		}
+		return this.model.getRecordIdAsInteger(selectedRow);
+	}
+
+	/**
+	 * @deprecated
+	 * @return String[]
+	 */
+	@Deprecated
+	public String[] getSelectedIds() {
+		final int[] rows = this.table.getSelectedRows();
+		final String ids[] = new String[rows.length];
+		for (int i = 0; i < rows.length; i++) {
+			ids[i] = this.model.getRecordId(rows[i]).toString();
+		}
+		return ids;
+	}
+
+	/**
+	 *
+	 * @return String[]
+	 */
+	public int[] getSelectedIdsAsInteger() {
+		final int[] rows = this.table.getSelectedRows();
+		final int ids[] = new int[rows.length];
+		for (int i = 0; i < rows.length; i++) {
+			ids[i] = this.model.getRecordIdAsInteger(rows[i]);
+		}
+		return ids;
+	}
+
+	public String getSelectedIdsAsIntegerAsCSV() {
+		final int ids[] = getSelectedIdsAsInteger();
+		final StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < ids.length; i++) {
+			buf.append(ids[i]);
+			if (i < ids.length - 1) {
+				buf.append(",");
+			}
+		}
+		return buf.toString();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public int getSelectedRow() {
+		return this.table.getSelectedRow();
+	}
+
+	private JKPanel getSouthButtonsPanel() {
+		if (this.pnlSouthButtons == null) {
+			this.pnlSouthButtons = new JKPanel();
+			this.pnlSouthButtons.add(getPrintPanel());
+			this.pnlSouthButtons.add(getExcelPanel());
+		}
+		return this.pnlSouthButtons;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	protected JKPanel getSouthLablesPanel() {
+		if (this.pnlSouthLables == null) {
+			this.pnlSouthLables = new JKPanel();
+			this.pnlSouthLables.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+			// txtCount.setEditable(false);
+			this.txtCount.setHorizontalAlignment(SwingConstants.CENTER);
+			this.pnlRecordsCount = new JKLabledComponent("RECORDS_COUNT", this.txtCount);
+			this.pnlSouthLables.add(this.pnlRecordsCount);
+		}
+		return this.pnlSouthLables;
+	}
+
+	public JKTable getTable() {
+		return this.table;
+	}
+
+	public TableModel getTableModel() {
+		return getTable().getModel();
+	}
+
+	public Object getValueAt(final int row, final int col) {
+		return this.table.getValueAt(row, col);
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	public Object getValueAt(final int row, final int col, final boolean includeInvisibleColumns) {
+		return this.table.getValueAt(row, col, includeInvisibleColumns);
+	}
+
+	public java.util.Date getValueAtAsDate(final int row, final int col) {
+		return this.table.getValueAtAsDate(row, col);
+	}
+
+	public double getValueAtAsDouble(final int i, final int j) {
+		return this.table.getValueAtAsDouble(i, j);
+	}
+
+	public int getValueAtAsInteger(final int i, final int j) {
+		return this.table.getValueAtAsInteger(i, j);
+	}
+
+	public Date getValueAtAsSqlDate(final int row, final int col) {
+		return this.table.getValueAtAsSqlDate(row, col);
+	}
+
+	public String getValueAtAsString(final int row, final int col) {
+		return this.table.getValueAtAsString(row, col);
+	}
+
+	private void handleCopyQuery() {
+		GeneralUtility.copyToClipboard(this.model.getSql());
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected void handleGoFirstPage() {
+		try {
+			this.model.moveToFirstPage();
+			refreshComponents();
+		} catch (final PagingException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected void handleGotoLastPage() {
+		try {
+			this.model.moveToLastPage();
+			refreshComponents();
+		} catch (final PagingException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	// private void handleLimitChanged(KeyEvent e) {
+	// if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+	// model.setPageRowsCount(txtLimit.getTextAsInteger());
+	// }
+	// }
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected void handleGotoNextPage() {
+		try {
+			this.model.moveToNextPage();
+			refreshComponents();
+		} catch (final PagingException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected void handleGotoPreviousePage() {
+		try {
+			this.model.moveToPreviousePage();
+			refreshComponents();
+		} catch (final PagingException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	/**
+	 *
+	 * @param e
+	 */
+	private void handleHeaderMouseClicked(final MouseEvent e) {
+		if (getRowCount() == 0) {
+			handleCopyQuery();
+			return;
+		}
+		final int colIndex = this.table.getTableHeader().columnAtPoint(e.getPoint());
+		if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+			showFilterPanel(colIndex);
+		} else if (e.getButton() == MouseEvent.BUTTON3 && e.getClickCount() == 1) {
+			final int oldOrderByColunmIndex = this.model.getOrderByColunmIndex();
+			if (oldOrderByColunmIndex != -1 && this.model.getVisibleColumnIndexFromActual(oldOrderByColunmIndex) == colIndex) {
+				toggleOrderBy();
+			} else {
+				handleSortColumn(colIndex);
+			}
+			// TableColumn tableColumn =
+			// table.getColumnModel().getColumn(colIndex);
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////////
+	private void handleKeyPress(final KeyEvent e) {
+		// System.out.println("Control : "+e.isControlDown());
+		// System.out.println("Char : "+e.getKeyCode());
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (this.table.getSelectedRow() != -1) {
+				fireRecordSelectedEvent(this.model.getRecordIdAsInteger(this.table.getSelectedRow()));
+			}
+		} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
+			this.table.transferFocus();
+		} else if (e.getKeyCode() == KeyEvent.VK_F11) {
+			// copy the selected record id to clipboard
+			if (this.table.getSelectedRow() != -1) {
+				GeneralUtility.copyToClipboard(this.model.getRecordId(this.table.getSelectedRow()) + "");
+			}
+		} else if (e.getKeyCode() == KeyEvent.VK_F12) {
+			handleCopyQuery();
+		} else if (e.getKeyCode() == KeyEvent.VK_F9) {
+			this.model.setShowIdColunm(true);
+			/** @todo refelct it on the filters panel */
+			reloadData();
+		} else if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_C) {
+			// copy the selected record id to clipboard
+			if (this.table.getSelectedRow() != -1) {
+				GeneralUtility.copyToClipboard(this.model.getValueAt(this.table.getSelectedRow(), 0).toString());
+				// to oevrride the default control c
+				e.consume();
+			}
+		} else if (e.getKeyCode() == KeyEvent.VK_F5) {
+			reloadData();
+		}
+	}
+
+	/**
+	 *
+	 */
+	void handlePrint() {
+		this.dynamicReportTitle = SwingUtility.showInputDialog("ENTER_REPORT_TITLE");
+		PrintUtil.printQueryModel(this.model, this.dynamicReportTitle);
+	}
+
+	/**
+	 *
+	 */
+	private void handleRowCountChanged() {
+		final int count = this.txtCount.getTextAsInteger();
+		setPagRowsCount(count);
+		reloadData();
+	}
+
+	// ////////////////////////////////////////////////////////////////////////
+	private void handleShowFields() {
+		final PnlQueryFields pnl = new PnlQueryFields(this.model);
+		SwingUtility.showPanelInDialog(pnl, "PRINT_FIELDS");
+		reloadData();
+	}
+
+	/**
+	 *
+	 */
+	private void handleSortAsc() {
+		this.model.setOrderDirection(OrderDirection.ASCENDING);
+		reloadData();
+	}
+
+	private void handleSortColumn(final int colIndex) {
+		// to get the actual column index
+		this.model.setOrderByColunmIndex(this.model.getActualColumnIndexFromVisible(colIndex));
+		reloadData();
+	}
+
+	/**
+	 *
 	 */
 	private void init() {
 		// setPreferredSize(new Dimension(500,300));
 		setLayout(new BorderLayout());
-		JKPanel pnl = new JKPanel();
+		final JKPanel pnl = new JKPanel();
 		pnl.setLayout(new BorderLayout());
 		// calcColunmWidthes();
-		pane = new JKScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.pane = new JKScrollPane(this.table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 		setBackground(SwingUtility.getDefaultBackgroundColor());
 
-		table.setPreferredScrollableViewportSize(getPreferredSize());
+		this.table.setPreferredScrollableViewportSize(getPreferredSize());
 
-		Color c = new Color(128, 128, 252);
+		final Color c = new Color(128, 128, 252);
 
-		pane.getVerticalScrollBar().setBackground(c);
-		pane.getHorizontalScrollBar().setBackground(c);
+		this.pane.getVerticalScrollBar().setBackground(c);
+		this.pane.getHorizontalScrollBar().setBackground(c);
 		// if (allowFiltering) {//to handle the show filter panel with no
 		// buttons
-		pnl.add(filtersBox, BorderLayout.NORTH);
+		pnl.add(this.filtersBox, BorderLayout.NORTH);
 		// }
-		pnl.add(pane, BorderLayout.CENTER);
+		pnl.add(this.pane, BorderLayout.CENTER);
 
 		// south components
 		// JKPanel pnl2=new JKPanel();
-		pnlSouth.setLayout(new BoxLayout(pnlSouth, BoxLayout.Y_AXIS));
-		pnlSouth.add(getSouthLablesPanel());
-		pnlSouth.add(getSouthButtonsPanel());
-		pnlSouth.add(getPagingPanel());
-		pnl.add(pnlSouth, BorderLayout.SOUTH);
+		this.pnlSouth.setLayout(new BoxLayout(this.pnlSouth, BoxLayout.Y_AXIS));
+		this.pnlSouth.add(getSouthLablesPanel());
+		this.pnlSouth.add(getSouthButtonsPanel());
+		this.pnlSouth.add(getPagingPanel());
+		pnl.add(this.pnlSouth, BorderLayout.SOUTH);
 
-		pane.setFocusable(false);
+		this.pane.setFocusable(false);
 		// txtCount.setFocusable(false);
 		pnl.setBorder(BorderFactory.createEtchedBorder());
 		add(pnl, BorderLayout.CENTER);
-		table.addKeyListener(new KeyAdapter() {
+		this.table.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 				handleKeyPress(e);
 			}
 
 		});
-		table.addMouseListener(new MouseAdapter() {
+		this.table.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					if (e.getClickCount() == 2) {
-						fireRecordSelectedEvent(model.getRecordIdAsInteger(table.getSelectedRow()));
+						fireRecordSelectedEvent(QueryJTable.this.model.getRecordIdAsInteger(QueryJTable.this.table.getSelectedRow()));
 					}
 				}
 			}
 		});
-		table.addComponentListener(new ComponentAdapter() {
+		this.table.addComponentListener(new ComponentAdapter() {
 			@Override
-			public void componentShown(ComponentEvent e) {
+			public void componentShown(final ComponentEvent e) {
 				System.out.println("component shown");
 			}
 		});
-		table.getTableHeader().addMouseListener(new MouseAdapter() {
+		this.table.getTableHeader().addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(final MouseEvent e) {
 				handleHeaderMouseClicked(e);
 			};
 		});
-		btnExportToExcel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ExcelUtil.buildExcelSheet(model);
+		this.btnExportToExcel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				ExcelUtil.buildExcelSheet(QueryJTable.this.model);
 			}
 		});
-		btnSelectPrintFields.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnSelectPrintFields.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleShowFields();
 			}
 		});
-		btnPrint.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnPrint.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handlePrint();
 			}
 		});
@@ -316,48 +986,50 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 		// handleLimitChanged(e);
 		// }
 		// });
-		btnFirstPage.addActionListener(new ActionListener() {
+		this.btnFirstPage.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleGoFirstPage();
 			}
 		});
-		btnNextPage.addActionListener(new ActionListener() {
+		this.btnNextPage.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleGotoNextPage();
 			}
 		});
-		btnPreviousePage.addActionListener(new ActionListener() {
+		this.btnPreviousePage.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleGotoPreviousePage();
 			}
 		});
-		btnLastPage.addActionListener(new ActionListener() {
+		this.btnLastPage.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleGotoLastPage();
 			}
 		});
-		btnAsc.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnAsc.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleSortAsc();
 			}
 		});
-		btnDesc.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				model.setOrderDirection(OrderDirection.DESCENDING);
+		this.btnDesc.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				QueryJTable.this.model.setOrderDirection(OrderDirection.DESCENDING);
 				reloadData();
 			}
 		});
-		txtCount.addFocusListener(new FocusAdapter() {
+		this.txtCount.addFocusListener(new FocusAdapter() {
 			@Override
-			public void focusLost(FocusEvent e) {
+			public void focusLost(final FocusEvent e) {
 				handleRowCountChanged();
 			}
 		});
@@ -370,81 +1042,87 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 		// });
 	}
 
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected void handleGotoPreviousePage() {
-		try {
-			model.moveToPreviousePage();
-			refreshComponents();
-		} catch (PagingException e) {
-			ExceptionUtil.handleException(e);
-		}
+	public boolean isAllowAddNew() {
+		return this.table.isAllowAddNew();
 	}
 
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected void handleGotoNextPage() {
-		try {
-			model.moveToNextPage();
-			refreshComponents();
-		} catch (PagingException e) {
-			ExceptionUtil.handleException(e);
-		}
+	public boolean isAllowDelete() {
+		return this.table.isAllowDelete();
 	}
 
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected void handleGotoLastPage() {
-		try {
-			model.moveToLastPage();
-			refreshComponents();
-		} catch (PagingException e) {
-			ExceptionUtil.handleException(e);
-		}
+	public boolean isAllowExcelExport() {
+		return this.allowExcelExport;
 	}
 
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected void handleGoFirstPage() {
-		try {
-			model.moveToFirstPage();
-			refreshComponents();
-		} catch (PagingException e) {
-			ExceptionUtil.handleException(e);
-		}
+	public boolean isAllowFiltering() {
+		return this.allowFiltering;
 	}
 
-	// ///////////////////////////////////////////////////////////////////////////////
+	public boolean isAllowPaging() {
+		return this.allowPaging;
+	}
 
-	private JKPanel getSouthButtonsPanel() {
-		if (pnlSouthButtons == null) {
-			pnlSouthButtons = new JKPanel();
-			pnlSouthButtons.add(getPrintPanel());
-			pnlSouthButtons.add(getExcelPanel());
-		}
-		return pnlSouthButtons;
+	public boolean isDataModified() {
+		return this.table.isDataModified();
+	}
+
+	public boolean isEditable() {
+		return this.table.isEditable();
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
-	protected JKPanel getSouthLablesPanel() {
-		if (pnlSouthLables == null) {
-			pnlSouthLables = new JKPanel();
-			pnlSouthLables.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-			// txtCount.setEditable(false);
-			txtCount.setHorizontalAlignment(SwingConstants.CENTER);
-			pnlRecordsCount = new JKLabledComponent("RECORDS_COUNT", txtCount);
-			pnlSouthLables.add(pnlRecordsCount);
-		}
-		return pnlSouthLables;
+	private boolean isShowFilterButtons() {
+		return this.showFilterButtons;
 	}
 
 	/**
-	 * 
+	 * @return
+	 */
+	public boolean isShowSortingPanel() {
+		return this.pnlSorting.isVisible();
+	}
+
+	/**
+	 * should be called after the data is loaded
+	 */
+	@Override
+	public void refreshComponents() {
+		this.btnExportToExcel.setShortcut("ctrl X", "Ctrl X");
+		this.txtCount.setText(this.model.getRowCount() + "");
+		// txtCount.setEditable(false);
+		this.btnExportToExcel.setEnabled(this.model.getRowCount() > 0);
+		this.btnPrint.setEnabled(this.model.getRowCount() > 0);
+		this.btnSelectPrintFields.setEnabled(this.model.getRowCount() > 0);
+
+		// txtAllRowsCount.setValue(model.getAllRowsCount());
+		this.txtPagesCount.setValue(this.model.getCurrentPage() + 1 + "/" + this.model.getPagesCount());
+		this.txtAllRowsCount.setValue(this.model.getAllRowsCount());
+		this.pnlPaging.setVisible(this.model.getPagesCount() > 1);
+
+		this.btnNextPage.setEnabled(this.model.getCurrentPage() < this.model.getPagesCount() - 1);
+		this.btnPreviousePage.setEnabled(this.model.getCurrentPage() > 0);
+		this.btnLastPage.setEnabled(this.model.getCurrentPage() < this.model.getPagesCount() - 1);
+		this.btnFirstPage.setEnabled(this.model.getCurrentPage() > 0);
+		// txtLimit.setValue(model.getPageRowsCount());
+		// if (!renderersSet) {
+		// table.setDefaultRenderer(String.class, new
+		// TableRenderers.CustomDataRenderer());
+		// renderersSet = true;
+		// }
+		// resetPane();
+	}
+
+	/**
+	 *
 	 */
 	public void reloadData() {
 		// the below validation is for performance issue
-		if (!model.getSql().equals("")) {
-			final int row = table.getSelectedRow();
-			model.loadData();
+		if (!this.model.getSql().equals("")) {
+			final int row = this.table.getSelectedRow();
+			this.model.loadData();
 			refreshComponents();
 			addEmptyRowIfNeeded();
 
@@ -468,259 +1146,11 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 
 	}
 
-	// private void checkShowPaging() {
-	// pnlPaging.setVisible(allowPaging && getModel().getRowCount() > 0 &&
-	// getModel().getRowCount() == getModel().getLimit());
-	// }
-
-	public void checkEmptySelection() throws ValidationException {
-		if (getSelectedIdAsInteger() == -1) {
-			requestFocus();
-			throw new ValidationException("PLEASE_SELECT_RECORD");
-		}
-	}
-
-	/**
-	 * should be called after the data is loaded
-	 */
-	public void refreshComponents() {
-		btnExportToExcel.setShortcut("ctrl X", "Ctrl X");
-		txtCount.setText(model.getRowCount() + "");
-		// txtCount.setEditable(false);
-		btnExportToExcel.setEnabled(model.getRowCount() > 0);
-		btnPrint.setEnabled(model.getRowCount() > 0);
-		btnSelectPrintFields.setEnabled(model.getRowCount() > 0);
-
-		// txtAllRowsCount.setValue(model.getAllRowsCount());
-		txtPagesCount.setValue((model.getCurrentPage() + 1) + "/" + model.getPagesCount());
-		txtAllRowsCount.setValue(model.getAllRowsCount());
-		pnlPaging.setVisible(model.getPagesCount() > 1);
-
-		btnNextPage.setEnabled(model.getCurrentPage() < model.getPagesCount() - 1);
-		btnPreviousePage.setEnabled(model.getCurrentPage() > 0);
-		btnLastPage.setEnabled(model.getCurrentPage() < model.getPagesCount() - 1);
-		btnFirstPage.setEnabled(model.getCurrentPage() > 0);
-		// txtLimit.setValue(model.getPageRowsCount());
-		// if (!renderersSet) {
-		// table.setDefaultRenderer(String.class, new
-		// TableRenderers.CustomDataRenderer());
-		// renderersSet = true;
-		// }
-		// resetPane();
-	}
-
-	// /**
-	// *
-	// */
-	// public void resetPane() {
-	// SwingUtilities.invokeLater(new Runnable(){
-	// @Override
-	// public void run() {
-	// pane.getHorizontalScrollBar().setValue(0);
-	// }
-	// });
-	// }
-
-	/**
-	 * @deprecated
-	 * @return String[]
-	 */
-	public String[] getSelectedIds() {
-		int[] rows = table.getSelectedRows();
-		String ids[] = new String[rows.length];
-		for (int i = 0; i < rows.length; i++) {
-			ids[i] = model.getRecordId(rows[i]).toString();
-		}
-		return ids;
-	}
-
-	/**
-	 * 
-	 * @return String[]
-	 */
-	public int[] getSelectedIdsAsInteger() {
-		int[] rows = table.getSelectedRows();
-		int ids[] = new int[rows.length];
-		for (int i = 0; i < rows.length; i++) {
-			ids[i] = model.getRecordIdAsInteger(rows[i]);
-		}
-		return ids;
-	}
-
-	/**
-	 * 
-	 * @return String
-	 */
-	public Object getSelectedId() {
-		int row = table.getSelectedRow();
-		if (row != -1) {
-			return model.getRecordId(row);
-		}
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param recordId
-	 *            int
-	 */
-	public void setSelectedRowByRecordId(final int recordId) {
-		setSelectedRowByRecordId(recordId, true);
-	}
-
-	/**
-	 * 
-	 * @return int
-	 */
-	public int getSelectedIdAsInteger() {
-		int selectedRow = getSelectedRow();
-		if (selectedRow == -1) {
-			return -1;
-		}
-		return model.getRecordIdAsInteger(selectedRow);
-	}
-
-	/**
-	 * 
-	 * @param enable
-	 *            boolean
-	 */
-	public void allowMultipleSelections(boolean enable) {
-		table.setAlowMutipleSelection(enable);
-	}
-
-	public JKTable getTable() {
-		return table;
-	}
-
-	public QueryTableModel getModel() {
-		return model;
-	}
-
-	// /**
-	// * setTableColunmsRenderer
-	// */
-	// private void setTableColunmsRenderer() {
-	// table.setRenderers();
-	// }
-
-	/**
-	 * 
-	 * @param panel
-	 *            TableFilterPanel
-	 */
-	public void filterUpdated(TableFilterPanel panel) {
-		model.setExtraSQLCondition(panel.getFilterColunmName(), panel.getConditionString());
-		reloadData();
-		table.requestFocus();
-	}
-
-	/**
-	 * buildFilterPanels
-	 * 
-	 * @return Box
-	 */
-	private Box buildFilterPanels() {
-		filters.clear();
-		filtersBox.removeAll();
-		if (allowFiltering) {
-			filtersBox.setBorder(SwingUtility.createTitledBorder(""));
-			// filters = new TableFilterPanel[model.getColumnCount()];
-			for (int i = 0; i < model.getColumnCount(); i++) {
-				TableFilterPanel filter = new TableFilterPanel(model, model.getActualColumnName(i), this);
-				filtersBox.add(filter);
-				filters.put(model.getColumnName(i), filter);
-			}
-			// if (allowFiltering) {
-			filtersBox.add(createOrderPanel());
-		}
-		filtersBox.revalidate();
-		// }
-		return filtersBox;
-	}
-
-	/**
-	 * 
-	 * @param colunmIndex
-	 *            int
-	 */
-	public void showFilterPanel(final int colunmIndex) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				showFilterPanel(colunmIndex, showFilterButtons);
-			}
-		});
-	}
-
-	/**
-	 * 
-	 * @param colunmIndex
-	 */
-	public void showFilterPanel(String filterName, boolean hideButtons) {
-		if (allowFiltering) {
-			int index = model.getColunmIndex(filterName);
-			if (index != -1) {
-				showFilterPanel(index, hideButtons);
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @return JKPanel
-	 */
-	private JKPanel createOrderPanel() {
-		if (pnlSorting == null) {
-			pnlSorting = new JKPanel(new FlowLayout(FlowLayout.LEADING));
-			pnlSorting.setVisible(false);
-			JKPanel pnl1 = new JKPanel();
-			pnl1.setBorder(BorderFactory.createEtchedBorder());
-			JKLabel lblSortDir = new JKLabel(Lables.get("ORDER"));
-			lblSortDir.setIcon("sort_az.png");
-
-			pnl1.add(lblSortDir);
-			// SwingUtility.setBoldFont(lblSortDir);
-
-			btnAsc.setFocusable(false);
-			btnDesc.setFocusable(false);
-			pnl1.add(btnAsc);
-			pnl1.add(btnDesc);
-
-			ButtonGroup group = new ButtonGroup();
-
-			group.add(btnAsc);
-			group.add(btnDesc);
-
-			btnAsc.setSelected(true);
-
-			pnlSorting.add(pnl1);
-
-		}
-		return pnlSorting;
-	}
-
-	/**
-	 * @return
-	 */
-	public boolean isShowSortingPanel() {
-		return pnlSorting.isVisible();
-	}
-
-	/**
-	 * @param showSortingPanel
-	 *            the showSortingPanel to set
-	 */
-	public void setShowSortingPanel(boolean showSortingPanel) {
-		if (pnlSorting != null) {
-			pnlSorting.setVisible(showSortingPanel);
-		}
-	}
-
 	@Override
 	public void requestFocus() {
 		super.requestFocus();
 		if (isAllowFiltering()) {
-			filtersBox.requestFocus();
+			this.filtersBox.requestFocus();
 			return;
 		}
 		// for (int i = 0; i < filters.length; i++) {
@@ -730,64 +1160,281 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 		// return;
 		// }
 		// }
-		table.requestFocus();
+		this.table.requestFocus();
+	}
+
+	public void setAllowAddNew(final boolean allowAddNew) {
+		this.table.setAllowAddNew(allowAddNew);
+	}
+
+	public void setAllowDelete(final boolean allowDelete) {
+		this.table.setAllowDelete(allowDelete);
 	}
 
 	/**
-	 * @param listener
-	 *            DaoRecordListener
+	 *
+	 * @param allowExcelExport
 	 */
-	public void addRecordListener(RecordSelectionListener listener) {
-		listeners.add(listener);
+	public void setAllowExcelExport(final boolean allowExcelExport) {
+		this.allowExcelExport = allowExcelExport;
+		this.pnlExcel.setVisible(allowExcelExport);
 	}
 
-	/**
-	 * @param RecordId
-	 *            String
-	 */
-	protected void fireRecordSelectedEvent(Object recordId) {
-		for (int i = 0; i < listeners.size(); i++) {
-			int value = -1;
-			if (recordId != null) {
-				value = new Integer(recordId.toString());
-			}
+	public void setAllowFiltering(final boolean allowFiltering) {
+		this.allowFiltering = allowFiltering;
+		buildFilterPanels();
+	}
 
-			listeners.get(i).recordSelected(value);
+	public void setAllowPaging(final boolean allow) {
+		if (allow) {
+			this.model.setPageRowsCount(-1);// read the default from the
+											// DataSource
+		} else {
+			this.model.setPageRowsCount(0);
 		}
 	}
 
 	/**
-	 * 
-	 * @param comp
-	 *            JComponent
+	 *
+	 * @param allow
+	 *            boolean
 	 */
-	public void addComponentToLablesPanel(JComponent comp) {
-		pnlSouthLables.add(comp);
-		pnlSouthLables.validate();
-		pnlSouthLables.repaint();
+	public void setAllowPrinting(final boolean allow) {
+		this.allowPrinting = allow;
+		this.btnPrint.setEnabled(allow);
+		this.pnlPrint.setVisible(allow);
+	}
+
+	public void setColumnDateFormat(final int col, final String format) {
+		this.table.setColumnDateFormat(col, format);
+	}
+
+	public void setColumnName(final int col, final String name) {
+		this.table.setColumnName(col, name);
+	}
+
+	public void setColumnNumberFormat(final int col, final String format) {
+		this.table.setColumnNumberFormat(col, format);
+	}
+
+	public void setColumnPrefereddWidth(final int row, final int col) {
+		this.table.setColumnPrefereddWidth(row, col);
+	}
+
+	public void setColunmEditor(final int col, final BindingComponent comp) {
+		this.table.setColunmEditor(col, comp);
+	}
+
+	public void setColunmRenderer(final int col, final BindingComponent comp) {
+		this.table.setColunmRenderer(col, comp);
+	}
+
+	@Override
+	public void setCurrentRecord(final int recordId) {
+		if (recordId == -1) {
+			setSelectedRow(-1);
+		}
+		setSelectedRowByRecordId(recordId);
+	}
+
+	public void setEditable(final boolean editable) {
+		this.table.setEditable(editable);
+	}
+
+	public void setEditable(final int col, final boolean editable) {
+		this.table.setEditable(col, editable);
+	}
+
+	public void setMasterTable() {
+		setAllowExcelExport(true);
+		setAllowFiltering(true);
+		setAllowPrinting(true);
+	}
+
+	public void setPagRowsCount(final int count) {
+		this.model.setPageRowsCount(count);
 	}
 
 	/**
-	 * 
-	 * @param btn
+	 *
+	 * @param sql
+	 *            String
 	 */
-	public void addButtonToSouthButtonsPanel(JKButton btn) {
-		pnlSouthButtons.add(btn);
-		pnlSouthButtons.validate();
-		pnlSouthButtons.repaint();
+	public void setQuery(final String sql) {
+		setQuery(sql, this.model.getOrderByColunmIndex());
 	}
 
 	/**
-	 * 
+	 *
+	 * @param sql
+	 * @param orderbyColunmIndex
+	 */
+	public void setQuery(final String sql, final int orderByColunmIndex) {
+		if (isVisible()) {
+			final String staticSql = this.model.getStaticWhere();
+			final DataSource manager = this.model.getReourceManager();
+			final int pagesRowsCount = this.model.getPageRowsCount();
+			final String oldSql = this.model.getSql();
+			final boolean showIdColunm = this.model.getShowIdColunm();
+
+			this.model = new QueryTableModel(manager, sql, orderByColunmIndex);
+			this.model.setPageRowsCount(pagesRowsCount);
+			this.model.setShowIdColunm(showIdColunm);
+			this.model.setStaticWhere(staticSql);
+
+			// when the model sql is empty string , then no fiter panels will be
+			// created
+			// so when updateing the sql the filter panels remains zero length
+			// array
+			// which will
+			// cause null pointer exception when user selects filter colunm
+			// Note : appeared at DynCrossDaoPanel
+			if (oldSql.equals("") && !sql.equals("")) {
+				buildFilterPanels();
+			}
+			// copy the old filter values
+			final Collection<TableFilterPanel> values = this.filters.values();
+			for (final TableFilterPanel tableFilterPanel : values) {
+				this.model.setExtraSQLCondition(tableFilterPanel.getFilterColunmName(), tableFilterPanel.getConditionString());
+			}
+			// for (int i = 0; i < filters.length; i++) {
+
+			// }
+			this.table.setModel(this.model);
+			reloadData();
+			// TODO : add event for the model change listener
+		}
+	}
+
+	public void setRequiredColumn(final int col, final boolean required) {
+		this.table.setRequiredColumn(col, required);
+	}
+
+	/**
+	 *
+	 * @param index
+	 */
+	public void setSelectedRow(final int index) {
+		this.table.setSelectedRow(index);
+	}
+
+	/**
+	 *
+	 * @param recordId
+	 *            int
+	 */
+	public void setSelectedRowByRecordId(final int recordId) {
+		setSelectedRowByRecordId(recordId, true);
+	}
+
+	public void setSelectedRowByRecordId(final int recordId, final boolean fireRecordSelected) {
+		final int rowIndex = this.model.getRowIndexForRecordId(recordId);
+		this.table.setSelectedRow(rowIndex);
+		if (fireRecordSelected) {
+			// SwingUtilities.invokeLater(new Runnable() {
+			//
+			// @Override
+			// public void run() {
+			fireRecordSelectedEvent(recordId);
+			// }
+			// });
+		}
+	}
+
+	public void setShowFilterButtons(final boolean showFilterButtons) {
+		this.showFilterButtons = showFilterButtons;
+	}
+
+	/**
+	 *
+	 * @param show
+	 *            boolean
+	 */
+	public void setShowIdColunm(final boolean show) {
+		this.model.setShowIdColunm(show);
+		buildFilterPanels();
+		this.model.fireTableStructureChanged();
+
+		// reloadData();
+	}
+
+	/**
+	 *
+	 * @param show
+	 *            boolean
+	 */
+	public void setShowRecordsCount(final boolean show) {
+		// txtCount.setVisible(show);
+		this.pnlRecordsCount.setVisible(show);
+	}
+
+	/**
+	 * @param showSortingPanel
+	 *            the showSortingPanel to set
+	 */
+	public void setShowSortingPanel(final boolean showSortingPanel) {
+		if (this.pnlSorting != null) {
+			this.pnlSorting.setVisible(showSortingPanel);
+		}
+	}
+
+	/**
+	 *
+	 * @param show
+	 */
+	public void setShowSouthButtonsPanel(final boolean show) {
+		this.pnlSouthButtons.setVisible(show);
+
+	}
+
+	public void setSqlFileName(final String fileName) {
+		setQuery(GeneralUtility.getSqlFile(fileName));
+	}
+
+	/**
+	 * @param title
+	 */
+	@Override
+	public void setTitle(final String title) {
+		if (title != null && !title.equals("")) {
+			setBorder(SwingUtility.createTitledBorder(title));
+		}
+	}
+
+	public void setValueAt(final Object aValue, final int row, final int column) {
+		this.table.setValueAt(aValue, row, column);
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	public void setVisible(final int col, final boolean visible) {
+		this.table.setVisible(col, visible);
+	}
+
+	/**
+	 *
+	 * @param colunmIndex
+	 *            int
+	 */
+	public void showFilterPanel(final int colunmIndex) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				showFilterPanel(colunmIndex, QueryJTable.this.showFilterButtons);
+			}
+		});
+	}
+
+	/**
+	 *
 	 * @param colunmIndex
 	 *            colIndex
 	 * @param hideButtons
 	 *            boolean
 	 */
-	public void showFilterPanel(int colunmIndex, boolean showButtons) {
-		if (allowFiltering) {
+	public void showFilterPanel(final int colunmIndex, final boolean showButtons) {
+		if (this.allowFiltering) {
 			if (colunmIndex != -1) {
-				TableFilterPanel tableFilterPanel = filters.get(model.getColumnName(colunmIndex));
+				final TableFilterPanel tableFilterPanel = this.filters.get(this.model.getColumnName(colunmIndex));
 				if (tableFilterPanel != null) {
 					tableFilterPanel.setVisible(true);
 					tableFilterPanel.showButtons(showButtons);
@@ -812,656 +1459,36 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 	}
 
 	/**
-	 * 
-	 * @param show
-	 *            boolean
+	 *
+	 * @param colunmIndex
 	 */
-	public void setShowRecordsCount(boolean show) {
-		// txtCount.setVisible(show);
-		pnlRecordsCount.setVisible(show);
-	}
-
-	/**
-	 * 
-	 * @return JKPanel
-	 */
-	JKPanel getPrintPanel() {
-		if (pnlPrint == null) {
-			pnlPrint = new JKPanel();
-			pnlPrint.add(btnPrint);
-			btnPrint.setIcon("fileprint.png");
-			pnlPrint.add(btnSelectPrintFields);
-			btnSelectPrintFields.setIcon("select.png");
-			// pnlPrint.add(btnExportToExcel);
-			// btnExportToExcel.setIcon("excel_commons_mod_icon.gif");
-			setAllowPrinting(allowPrinting); // to set it visible or invisiable
-		}
-		return pnlPrint;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	protected JKPanel getExcelPanel() {
-		if (pnlExcel == null) {
-			pnlExcel = new JKPanel();
-			pnlExcel.add(btnExportToExcel);
-			setAllowExcelExport(allowExcelExport);
-			btnExportToExcel.setIcon("excel_icon.gif");
-		}
-		return pnlExcel;
-	}
-
-	/**
-	 * 
-	 * @param allow
-	 *            boolean
-	 */
-	public void setAllowPrinting(boolean allow) {
-		this.allowPrinting = allow;
-		btnPrint.setEnabled(allow);
-		pnlPrint.setVisible(allow);
-	}
-
-	/**
-	 * 
-	 */
-	void handlePrint() {
-		dynamicReportTitle = SwingUtility.showInputDialog("ENTER_REPORT_TITLE");
-		PrintUtil.printQueryModel(model, dynamicReportTitle);
-	}
-
-	/**
-	 * 
-	 * @param show
-	 *            boolean
-	 */
-	public void setShowIdColunm(boolean show) {
-		model.setShowIdColunm(show);
-		buildFilterPanels();
-		model.fireTableStructureChanged();
-
-		// reloadData();
-	}
-
-	/**
-	 * 
-	 * 
-	 */
-	public void clearTable() {
-		table.resetRecords();
-	}
-
-	/**
-	 * @return the pane
-	 */
-	public JScrollPane getPane() {
-		return this.pane;
-	}
-
-	public boolean isAllowExcelExport() {
-		return allowExcelExport;
-	}
-
-	/**
-	 * 
-	 * @param allowExcelExport
-	 */
-	public void setAllowExcelExport(boolean allowExcelExport) {
-		this.allowExcelExport = allowExcelExport;
-		pnlExcel.setVisible(allowExcelExport);
-	}
-
-	/**
-	 * 
-	 * @param show
-	 */
-	public void setShowSouthButtonsPanel(boolean show) {
-		pnlSouthButtons.setVisible(show);
-
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getSelectedRow() {
-		return table.getSelectedRow();
-	}
-
-	/**
-	 * 
-	 * @param index
-	 */
-	public void setSelectedRow(final int index) {
-		table.setSelectedRow(index);
-	}
-
-	public boolean isAllowFiltering() {
-		return allowFiltering;
-	}
-
-	public void setAllowFiltering(boolean allowFiltering) {
-		this.allowFiltering = allowFiltering;
-		buildFilterPanels();
-	}
-
-	public String getSelectedIdsAsIntegerAsCSV() {
-		int ids[] = getSelectedIdsAsInteger();
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < ids.length; i++) {
-			buf.append(ids[i]);
-			if (i < ids.length - 1) {
-				buf.append(",");
+	public void showFilterPanel(final String filterName, final boolean hideButtons) {
+		if (this.allowFiltering) {
+			final int index = this.model.getColunmIndex(filterName);
+			if (index != -1) {
+				showFilterPanel(index, hideButtons);
 			}
 		}
-		return buf.toString();
 	}
 
-	public void setShowFilterButtons(boolean showFilterButtons) {
-		this.showFilterButtons = showFilterButtons;
-	}
-
-	/**
-	 * 
-	 * @param columnName
-	 * @param columnType
-	 * @param displaySize
-	 */
-	public void addColunm(String columnName, int columnType, int displaySize) {
-		invalidate();
-		repaint();
-	}
-
-	/**
-	 * 
-	 * @param sql
-	 * @param orderbyColunmIndex
-	 */
-	public void setQuery(String sql, int orderByColunmIndex) {
-		if (isVisible()) {
-			String staticSql = model.getStaticWhere();
-			DataSource manager = model.getReourceManager();
-			int pagesRowsCount = model.getPageRowsCount();
-			String oldSql = model.getSql();
-			boolean showIdColunm = model.getShowIdColunm();
-
-			model = new QueryTableModel(manager, sql, orderByColunmIndex);
-			model.setPageRowsCount(pagesRowsCount);
-			model.setShowIdColunm(showIdColunm);
-			model.setStaticWhere(staticSql);
-
-			// when the model sql is empty string , then no fiter panels will be
-			// created
-			// so when updateing the sql the filter panels remains zero length
-			// array
-			// which will
-			// cause null pointer exception when user selects filter colunm
-			// Note : appeared at DynCrossDaoPanel
-			if (oldSql.equals("") && !sql.equals("")) {
-				buildFilterPanels();
-			}
-			// copy the old filter values
-			Collection<TableFilterPanel> values = filters.values();
-			for (TableFilterPanel tableFilterPanel : values) {
-				model.setExtraSQLCondition(tableFilterPanel.getFilterColunmName(), tableFilterPanel.getConditionString());
-			}
-			// for (int i = 0; i < filters.length; i++) {
-
-			// }
-			table.setModel(model);
-			reloadData();
-			// TODO : add event for the model change listener
-		}
-	}
-
-	public void showFilterPanels(int[] filters) {
-		for (int filter : filters) {
+	public void showFilterPanels(final int[] filters) {
+		for (final int filter : filters) {
 			showFilterPanel(filter);
 		}
 	}
 
-	// //////////////////////////////////////////////////////
-	// implemented from RecordTraversePolicy
-	// //////////////////////////////////////////////////////
-	@Override
-	public int getFirstRecord() {
-		if (getTable().getRowCount() > 0) {
-			return getModel().getRecordIdAsInteger(0);
-		}
-		return -1;
-	}
-
-	@Override
-	public int getLastRecord() {
-		if (getTable().getRowCount() > 0) {
-			return this.getModel().getRecordIdAsInteger(getModel().getRowCount() - 1);
-		}
-		return -1;
-	}
-
-	@Override
-	public int getNextRecord(int recordId) {
-		int row = getModel().getRowIndexForRecordId(recordId);
-		if (row + 1 == table.getRowCount()) {
-			return -1;
-		}
-		return getModel().getRecordIdAsInteger(row + 1);
-	}
-
-	@Override
-	public int getPreviouseRecord(int recordId) {
-		int row = getModel().getRowIndexForRecordId(recordId);
-		if (row == 0) {
-			return -1;
-		}
-		return getModel().getRecordIdAsInteger(row - 1);
-	}
-
-	@Override
-	public void setCurrentRecord(int recordId) {
-		if (recordId == -1) {
-			setSelectedRow(-1);
-		}
-		setSelectedRowByRecordId(recordId);
-	}
-
-	public void setMasterTable() {
-		setAllowExcelExport(true);
-		setAllowFiltering(true);
-		setAllowPrinting(true);
-	}
-
-	private JKPanel getPagingPanel() {
-		btnFirstPage.setIcon(SwingUtility.isLeftOrientation() ? "first_button_commons_icon.gif" : "last_button_commons_icon.gif");
-		btnLastPage.setIcon(SwingUtility.isLeftOrientation() ? "last_button_commons_icon.gif" : "first_button_commons_icon.gif");
-		btnNextPage.setIcon(SwingUtility.isLeftOrientation() ? "next_button_commons_icon.gif" : "previous_button_commons_icon.gif");
-		btnPreviousePage.setIcon(SwingUtility.isLeftOrientation() ? "previous_button_commons_icon.gif" : "next_button_commons_icon.gif");
-		// pnlPaging.add(txtLimit);
-
-		//
-		txtAllRowsCount.setHorizontalAlignment(JKTextField.CENTER);
-		txtPagesCount.setHorizontalAlignment(JKTextField.CENTER);
-		pnlPaging.add(btnFirstPage);
-		pnlPaging.add(btnPreviousePage);
-		pnlPaging.add(txtAllRowsCount);
-		pnlPaging.add(txtPagesCount);
-		pnlPaging.add(btnNextPage);
-		pnlPaging.add(btnLastPage);
-		// txtLimit.setHorizontalAlignment(SwingConstants.CENTER);
-		return pnlPaging;
-	}
-
-	// private void handleLimitChanged(KeyEvent e) {
-	// if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-	// model.setPageRowsCount(txtLimit.getTextAsInteger());
-	// }
-	// }
-
-	public boolean isAllowPaging() {
-		return allowPaging;
-	}
-
-	public void checkSelectMoreThanOne() throws ValidationException {
-		checkEmptySelection();
-		String[] selectedIds = getSelectedIds();
-		if (selectedIds.length > 1) {
-			requestFocus();
-			throw new ValidationException("PLEASE_SELECT_ONE_RECORD");
-		}
-
-	}
-
-	public void setColumnPrefereddWidth(int row, int col) {
-		table.setColumnPrefereddWidth(row, col);
-	}
-
-	public void setColumnNumberFormat(int col, String format) {
-		table.setColumnNumberFormat(col, format);
-	}
-
-	public String getValueAtAsString(int row, int col) {
-		return table.getValueAtAsString(row, col);
-	}
-
-	public double getValueAtAsDouble(int i, int j) {
-		return table.getValueAtAsDouble(i, j);
-	}
-
-	public int getValueAtAsInteger(int i, int j) {
-		return table.getValueAtAsInteger(i, j);
-	}
-
-	public void addCellFocusListener(CellFocusListener cellFocusListener) {
-		table.addCellFocusListener(cellFocusListener);
-	}
-
-	public double getColunmSum(int col) {
-		return table.getColunmSum(col);
-	}
-
-	public int getRowCount() {
-		return table.getRowCount();
-	}
-
-	public Object getValueAt(int row, int col) {
-		return table.getValueAt(row, col);
-	}
-
-	public Vector<FSTableRecord> getDeletedRecords() {
-		return table.getDeletedRecords();
-	}
-
-	public Vector<FSTableRecord> getModifiedRecords() {
-		return table.getModifiedRecords();
-	}
-
-	public void addRow() {
-		table.addRow();
-	}
-
-	public void setEditable(boolean editable) {
-		table.setEditable(editable);
-	}
-
-	public void setEditable(int col, boolean editable) {
-		table.setEditable(col, editable);
-	}
-
-	public void setColunmRenderer(int col, BindingComponent comp) {
-		table.setColunmRenderer(col, comp);
-	}
-
-	public void setColunmEditor(int col, BindingComponent comp) {
-		table.setColunmEditor(col, comp);
-	}
-
-	public boolean isDataModified() {
-		return table.isDataModified();
-	}
-
-	public java.util.Date getValueAtAsDate(int row, int col) {
-		return table.getValueAtAsDate(row, col);
-	}
-
-	public Date getValueAtAsSqlDate(int row, int col) {
-		return table.getValueAtAsSqlDate(row, col);
-	}
-
-	public Vector<FSTableRecord> getRecords() {
-		return table.getRecords();
-	}
-
-	public TableModel getTableModel() {
-		return getTable().getModel();
-	}
-
-	public void setRequiredColumn(int col, boolean required) {
-		table.setRequiredColumn(col, required);
-	}
-
-	public void setColumnName(int col, String name) {
-		table.setColumnName(col, name);
-	}
-
-	// /////////////////////////////////////////////////////////
-	private void addEmptyRowIfNeeded() {
-		if (table.getRowCount() == 0 && table.isEditable()) {
-			addRow();
-		}
-	}
-
-	public boolean isEditable() {
-		return table.isEditable();
-	}
-
-	public void setValueAt(Object aValue, int row, int column) {
-		table.setValueAt(aValue, row, column);
-	}
-
-	@Override
-	public synchronized void addMouseListener(MouseListener l) {
-		if (table != null) {
-			// if table==null this indicate that event has been set from super
-			// class before
-			// calling the constructor of this class
-			table.addMouseListener(l);
-		} else {
-			super.addMouseListener(l);
-		}
-	}
-
-	@Override
-	public synchronized void addKeyListener(KeyListener l) {
-		if (table != null) {
-			table.addKeyListener(l);
-		} else {
-			// if table==null this indicate that event has been set from super
-			// class before
-			// calling the constructor of this class
-			super.addKeyListener(l);
-		}
-
-	}
-
-	@Deprecated
-	/**
-	 * replaced with 	addRecordListener(new RecordSelectionListener() {
-	 */
-	public void addDaoRecordListener(final RecordActionListener recordActionListener) {
-		addRecordListener(new RecordSelectionListener() {
-			@Override
-			public void recordSelected(int recordId) {
-				recordActionListener.recordSelected(recordId + "");
-			}
-		});
-	}
-
-	// ////////////////////////////////////////////////////////////////////////
-	public int getColumnCount() {
-		return table.getColumnCount();
-	}
-
-	// ////////////////////////////////////////////////////////////////////////
-	public Vector<Vector> getData() {
-		return table.getData();
-	}
-
-	// ////////////////////////////////////////////////////////////////////////
-	public Vector<Vector> getDeletedRows() {
-		return table.getDeletedRows();
-	}
-
-	// ////////////////////////////////////////////////////////////////////////
-	private void handleShowFields() {
-		PnlQueryFields pnl = new PnlQueryFields(model);
-		SwingUtility.showPanelInDialog(pnl, "PRINT_FIELDS");
-		reloadData();
-	}
-
-	// ////////////////////////////////////////////////////////////////////////
-	private void handleKeyPress(KeyEvent e) {
-		// System.out.println("Control : "+e.isControlDown());
-		// System.out.println("Char : "+e.getKeyCode());
-		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if (table.getSelectedRow() != -1) {
-				fireRecordSelectedEvent(model.getRecordIdAsInteger(table.getSelectedRow()));
-			}
-		} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
-			table.transferFocus();
-		} else if (e.getKeyCode() == KeyEvent.VK_F11) {
-			// copy the selected record id to clipboard
-			if (table.getSelectedRow() != -1) {
-				GeneralUtility.copyToClipboard(model.getRecordId(table.getSelectedRow()) + "");
-			}
-		} else if (e.getKeyCode() == KeyEvent.VK_F12) {
-			handleCopyQuery();
-		} else if (e.getKeyCode() == KeyEvent.VK_F9) {
-			model.setShowIdColunm(true);
-			/** @todo refelct it on the filters panel */
-			reloadData();
-		} else if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_C) {
-			// copy the selected record id to clipboard
-			if (table.getSelectedRow() != -1) {
-				GeneralUtility.copyToClipboard(model.getValueAt(table.getSelectedRow(), 0).toString());
-				// to oevrride the default control c
-				e.consume();
-			}
-		} else if (e.getKeyCode() == KeyEvent.VK_F5) {
-			reloadData();
-		}
-	}
-
-	private void handleCopyQuery() {
-		GeneralUtility.copyToClipboard(model.getSql());
-	}
-
-	// //////////////////////////////////////////////////////////////////////////
-	public void setVisible(int col, boolean visible) {
-		table.setVisible(col, visible);
-	}
-
-	// //////////////////////////////////////////////////////////////////////////
-	public Object getValueAt(int row, int col, boolean includeInvisibleColumns) {
-		return table.getValueAt(row, col, includeInvisibleColumns);
-	}
-
-	public static void main(String[] args) {
-		QueryJTable t = new QueryJTable("SELECT * FROM GEN_NATIONAL_NUMBERS");
-		t.setAllowFiltering(true);
-		SwingUtility.testPanel(t);
-	}
-
-	public void deleteRow(int row) {
-		table.deleteRow(row);
-	}
-
-	public void setAllowDelete(boolean allowDelete) {
-		table.setAllowDelete(allowDelete);
-	}
-
-	public boolean isAllowDelete() {
-		return table.isAllowDelete();
-	}
-
 	public void stopEditing() {
-		table.stopEditing();
-	}
-
-	public void setPagRowsCount(int count) {
-		model.setPageRowsCount(count);
-	}
-
-	public void setSqlFileName(String fileName) {
-		setQuery(GeneralUtility.getSqlFile(fileName));
-	}
-
-	public void setColumnDateFormat(int col, String format) {
-		table.setColumnDateFormat(col, format);
-	}
-
-	public void setAllowAddNew(boolean allowAddNew) {
-		table.setAllowAddNew(allowAddNew);
-	}
-
-	public boolean isAllowAddNew() {
-		return table.isAllowAddNew();
-	}
-
-	public void setAllowPaging(boolean allow) {
-		if (allow) {
-			model.setPageRowsCount(-1);// read the default from the DataSource
-		} else {
-			model.setPageRowsCount(0);
-		}
-	}
-
-	private void handleSortColumn(int colIndex) {
-		// to get the actual column index
-		model.setOrderByColunmIndex(model.getActualColumnIndexFromVisible(colIndex));
-		reloadData();
+		this.table.stopEditing();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void toggleOrderBy() {
-		if (btnAsc.isSelected()) {
-			btnDesc.doClick();
+		if (this.btnAsc.isSelected()) {
+			this.btnDesc.doClick();
 		} else {
-			btnAsc.doClick();
-		}
-	}
-
-	/**
-	 * 
-	 */
-	private void handleRowCountChanged() {
-		int count = txtCount.getTextAsInteger();
-		setPagRowsCount(count);
-		reloadData();
-	}
-
-	/**
-	 * 
-	 */
-	private void handleSortAsc() {
-		model.setOrderDirection(OrderDirection.ASCENDING);
-		reloadData();
-	}
-
-	/**
-	 * 
-	 * @param e
-	 */
-	private void handleHeaderMouseClicked(MouseEvent e) {
-		if (getRowCount() == 0) {
-			handleCopyQuery();
-			return;
-		}
-		int colIndex = table.getTableHeader().columnAtPoint(e.getPoint());
-		if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-			showFilterPanel(colIndex);
-		} else if (e.getButton() == MouseEvent.BUTTON3 && e.getClickCount() == 1) {
-			int oldOrderByColunmIndex = model.getOrderByColunmIndex();
-			if (oldOrderByColunmIndex != -1 && model.getVisibleColumnIndexFromActual(oldOrderByColunmIndex) == colIndex) {
-				toggleOrderBy();
-			} else {
-				handleSortColumn(colIndex);
-			}
-			// TableColumn tableColumn =
-			// table.getColumnModel().getColumn(colIndex);
-		}
-	}
-
-	public Object getRecordId(int row) {
-		return model.getRecordId(row);
-	}
-
-	public int getRecordIdAsInteger(int row) {
-		return ConversionUtil.toInteger(getRecordId(row));
-	}
-
-	public int[] getAllRecordIds() {
-		return getModel().getAllRecordIds();
-	}
-
-	public void clearTableListeners() {
-		listeners.clear();
-	}
-
-	public void setSelectedRowByRecordId(final int recordId, boolean fireRecordSelected) {
-		final int rowIndex = model.getRowIndexForRecordId(recordId);
-		table.setSelectedRow(rowIndex);
-		if (fireRecordSelected) {
-//			SwingUtilities.invokeLater(new Runnable() {
-//
-//				@Override
-//				public void run() {
-					fireRecordSelectedEvent(recordId);
-//				}
-//			});
+			this.btnAsc.doClick();
 		}
 	}
 }

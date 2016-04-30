@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop;
 
@@ -30,11 +42,10 @@ import com.fs.commons.reports.ReportManager;
 import com.fs.commons.reports.ReportUIPanel;
 import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
-import com.fs.commons.util.WebUtil;
 
 /**
  * @author u087
- * 
+ *
  */
 public class UIPanelFactoryImpl implements UIPanelFactory {
 	public static final String DYN_MASTER_DETAIL_CRUDL_PANEL = "com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailCRUDLPanel";
@@ -45,125 +56,29 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 
 	private final MenuItem menuItem;
 
-	public UIPanelFactoryImpl(MenuItem menuItem) {
+	public UIPanelFactoryImpl(final MenuItem menuItem) {
 		this.menuItem = menuItem;
 	}
 
 	/**
-	 * @param prop
+	 * @param detailTables
+	 * @param crossTables
 	 * @return
-	 * @throws UIOPanelCreationException
+	 * @throws TableMetaNotFoundException
 	 */
-	public UIPanel createPanel(Properties prop, boolean createNew) throws UIOPanelCreationException {
-		try {
-			// System.out.println(new Date());
-			if (!createNew && instance != null) {
-				return instance;
+	private ArrayList<ForiegnKeyFieldMeta> buildDetailFields(final String[] detailTables, final String[] detailFields, final String[] crossTables)
+			throws TableMetaNotFoundException {
+		final ArrayList<ForiegnKeyFieldMeta> list = new ArrayList<ForiegnKeyFieldMeta>();
+		for (int i = 0; i < detailTables.length; i++) {
+			// TODO : fix me
+			final TableMeta detailTable = AbstractTableMetaFactory.getTableMeta(getDataSource(), detailTables[i]);
+			if (crossTables != null) {
+				detailTable.setCrossTable(Boolean.parseBoolean(crossTables[i]));
 			}
-			String value;
-			if ((value = prop.getProperty("panel-factory")) != null) {
-				instance = createPanelFromPanelFactory(value, createNew, prop);
-			} else if ((value = prop.getProperty("report-name")) != null) {
-				instance = createReportPanel(value);
-			} else if ((value = prop.getProperty("table-meta")) != null) {
-				String tableMetaName = value;
-				try {
-					instance = createMasterDetailWithListPanel(tableMetaName, prop);
-				} catch (Exception e) {
-					e.printStackTrace();
-					throw new UIOPanelCreationException(e);
-				}
-			} else if ((value = prop.getProperty("panel-class")) != null) {
-				try {
-					instance = (UIPanel) Class.forName(value).newInstance();
-				} catch (Exception e) {
-					System.err.println(prop);
-					e.printStackTrace();
-					throw new UIOPanelCreationException(e);
-				}
-			} else if ((value = prop.getProperty("executor")) != null) {
-				try {
-					((Runnable) Class.forName(value).newInstance()).run();
-					instance = null;
-				} catch (Exception e) {
-					e.printStackTrace();
-					throw new UIOPanelCreationException(e);
-				}
-			} else if ((value = prop.getProperty("master-report")) != null) {
-				instance = createMasterReportPanel(prop);
-
-			} else if ((value = prop.getProperty("fs-url")) != null) {
-				// JKWebBrowser browser = new JKWebBrowser();
-				// browser.setHeaders(WebUtil.getDefaultHeaders());
-				// browser.setUrl(WebUtil.getFSWebServerUrl(value));
-				// instance=browser;
-				throw new IllegalStateException("We are working on new mechanism to view webpages inside the app,Please contact Jalal");
-
-			} else {
-				instance = new JKPanel();
-			}
-			return instance;
-		} catch (UIOPanelCreationException e) {
-			System.err.println("Unable to create panel with properties " + prop);
-			e.printStackTrace();
-			throw e;
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-			return null;
-		} finally {
-			// System.out.println(new Date());
+			final ForiegnKeyFieldMeta fieldMeta = (ForiegnKeyFieldMeta) detailTable.getField(detailFields[i]);
+			list.add(fieldMeta);
 		}
-	}
-
-	/**
-	 * @param prop
-	 * @return
-	 * @throws UIOPanelCreationException
-	 */
-	private UIPanel createMasterReportPanel(Properties prop) throws UIOPanelCreationException {
-		String sqlFile = prop.getProperty("sql-file-name");
-		String title = prop.getProperty("report-title", "Master Report");
-		if (sqlFile == null) {
-			throw new RuntimeException("master-report panels should have sql-file-name property set");
-		}
-		String sql = GeneralUtility.getSqlFile(sqlFile);
-		QueryJTable tbl = new QueryJTable(sql, title);
-		tbl.setMasterTable();
-		// tbl.setAllowExcelExport(true);
-		// tbl.setAllowFiltering(true);
-		// tbl.allowPrinting(true);
-		return tbl;
-	}
-
-	/**
-	 * @param value
-	 * @return
-	 * @throws UIOPanelCreationException
-	 */
-	private UIPanel createReportPanel(String value) throws UIOPanelCreationException {
-		try {
-			Report report = ReportManager.getReport(SwingUtility.getDefaultLocale() + "_" + value);
-			ReportUIPanel pnl = new ReportUIPanel(report);
-			return pnl;
-		} catch (Exception e) {
-			throw new UIOPanelCreationException(e);
-		}
-
-	}
-
-	/**
-	 * @param value
-	 * @param prop
-	 * @return
-	 * @throws UIOPanelCreationException
-	 */
-	private UIPanel createPanelFromPanelFactory(String value, boolean createNew, Properties prop) throws UIOPanelCreationException {
-		try {
-			UIPanelFactory factory = (UIPanelFactory) Class.forName(value).newInstance();
-			return factory.createPanel(prop, createNew);
-		} catch (Exception e) {
-			throw new UIOPanelCreationException(e);
-		}
+		return list;
 	}
 
 	/**
@@ -174,32 +89,163 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 	 * @throws DaoException
 	 * @throws UIOPanelCreationException
 	 */
-	public UIPanel createMasterDetailWithListPanel(String tableMetaName, Properties prop)
+	public UIPanel createMasterDetailWithListPanel(final String tableMetaName, final Properties prop)
 			throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
 		// TODO : fix me
-		TableMeta tableMeta = AbstractTableMetaFactory.getTableMeta(getDataSource(), tableMetaName);
+		final TableMeta tableMeta = AbstractTableMetaFactory.getTableMeta(getDataSource(), tableMetaName);
 		if (prop.getProperty("detail-tables") != null) {
-			String[] detailTables = prop.getProperty("detail-tables").split(",");
-			String[] detailFields = prop.getProperty("detail_fields").split(",");
+			final String[] detailTables = prop.getProperty("detail-tables").split(",");
+			final String[] detailFields = prop.getProperty("detail_fields").split(",");
 			String[] crossTables = null;
 			if (prop.getProperty("cross-table") != null) {
 				crossTables = prop.getProperty("cross-table").split(",");
 			}
-			ArrayList<ForiegnKeyFieldMeta> detailedFields = buildDetailFields(detailTables, detailFields, crossTables);
+			final ArrayList<ForiegnKeyFieldMeta> detailedFields = buildDetailFields(detailTables, detailFields, crossTables);
 			tableMeta.setDetailFields(detailedFields);
 		}
-		if (tableMeta.getMaxRecordsCount() == 1 || (prop.getProperty("single-record") != null && prop.getProperty("single-record").equals("true"))) {
-			String className = prop.getProperty("panel-class", DYN_SINGLE_MASTER_DETAIL_CRUDL_PANEL);
+		if (tableMeta.getMaxRecordsCount() == 1 || prop.getProperty("single-record") != null && prop.getProperty("single-record").equals("true")) {
+			final String className = prop.getProperty("panel-class", DYN_SINGLE_MASTER_DETAIL_CRUDL_PANEL);
 			return createSingleRecordPanel(className, tableMeta);
 
 		}
-		String className = prop.getProperty("panel-class", DYN_MASTER_DETAIL_CRUDL_PANEL);
-		boolean allowExcelExport = Boolean.parseBoolean(prop.getProperty("allow-excel-export", "true"));
-		DynMasterDetailCRUDLPanel panel = (DynMasterDetailCRUDLPanel) createPanelByClassName(className);
+		final String className = prop.getProperty("panel-class", DYN_MASTER_DETAIL_CRUDL_PANEL);
+		final boolean allowExcelExport = Boolean.parseBoolean(prop.getProperty("allow-excel-export", "true"));
+		final DynMasterDetailCRUDLPanel panel = (DynMasterDetailCRUDLPanel) createPanelByClassName(className);
 		panel.setTableMeta(tableMeta);
 		panel.getTable().setAllowExcelExport(allowExcelExport);
 		return panel;
 		// return new DynMasterDetailCRUDLPanel();
+	}
+
+	/**
+	 * @param prop
+	 * @return
+	 * @throws UIOPanelCreationException
+	 */
+	private UIPanel createMasterReportPanel(final Properties prop) throws UIOPanelCreationException {
+		final String sqlFile = prop.getProperty("sql-file-name");
+		final String title = prop.getProperty("report-title", "Master Report");
+		if (sqlFile == null) {
+			throw new RuntimeException("master-report panels should have sql-file-name property set");
+		}
+		final String sql = GeneralUtility.getSqlFile(sqlFile);
+		final QueryJTable tbl = new QueryJTable(sql, title);
+		tbl.setMasterTable();
+		// tbl.setAllowExcelExport(true);
+		// tbl.setAllowFiltering(true);
+		// tbl.allowPrinting(true);
+		return tbl;
+	}
+
+	/**
+	 * @param prop
+	 * @return
+	 * @throws UIOPanelCreationException
+	 */
+	@Override
+	public UIPanel createPanel(final Properties prop, final boolean createNew) throws UIOPanelCreationException {
+		try {
+			// System.out.println(new Date());
+			if (!createNew && this.instance != null) {
+				return this.instance;
+			}
+			String value;
+			if ((value = prop.getProperty("panel-factory")) != null) {
+				this.instance = createPanelFromPanelFactory(value, createNew, prop);
+			} else if ((value = prop.getProperty("report-name")) != null) {
+				this.instance = createReportPanel(value);
+			} else if ((value = prop.getProperty("table-meta")) != null) {
+				final String tableMetaName = value;
+				try {
+					this.instance = createMasterDetailWithListPanel(tableMetaName, prop);
+				} catch (final Exception e) {
+					e.printStackTrace();
+					throw new UIOPanelCreationException(e);
+				}
+			} else if ((value = prop.getProperty("panel-class")) != null) {
+				try {
+					this.instance = (UIPanel) Class.forName(value).newInstance();
+				} catch (final Exception e) {
+					System.err.println(prop);
+					e.printStackTrace();
+					throw new UIOPanelCreationException(e);
+				}
+			} else if ((value = prop.getProperty("executor")) != null) {
+				try {
+					((Runnable) Class.forName(value).newInstance()).run();
+					this.instance = null;
+				} catch (final Exception e) {
+					e.printStackTrace();
+					throw new UIOPanelCreationException(e);
+				}
+			} else if ((value = prop.getProperty("master-report")) != null) {
+				this.instance = createMasterReportPanel(prop);
+
+			} else if ((value = prop.getProperty("fs-url")) != null) {
+				// JKWebBrowser browser = new JKWebBrowser();
+				// browser.setHeaders(WebUtil.getDefaultHeaders());
+				// browser.setUrl(WebUtil.getFSWebServerUrl(value));
+				// instance=browser;
+				throw new IllegalStateException("We are working on new mechanism to view webpages inside the app,Please contact Jalal");
+
+			} else {
+				this.instance = new JKPanel();
+			}
+			return this.instance;
+		} catch (final UIOPanelCreationException e) {
+			System.err.println("Unable to create panel with properties " + prop);
+			e.printStackTrace();
+			throw e;
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+			return null;
+		} finally {
+			// System.out.println(new Date());
+		}
+	}
+
+	/**
+	 * @param className
+	 * @return
+	 */
+	private UIPanel createPanelByClassName(final String className) {
+		try {
+			return (UIPanel) Class.forName(className).newInstance();
+		} catch (final Exception e) {
+			throw new RuntimeException("Unable to instaniate class " + className, e);
+		}
+
+	}
+
+	/**
+	 * @param value
+	 * @param prop
+	 * @return
+	 * @throws UIOPanelCreationException
+	 */
+	private UIPanel createPanelFromPanelFactory(final String value, final boolean createNew, final Properties prop) throws UIOPanelCreationException {
+		try {
+			final UIPanelFactory factory = (UIPanelFactory) Class.forName(value).newInstance();
+			return factory.createPanel(prop, createNew);
+		} catch (final Exception e) {
+			throw new UIOPanelCreationException(e);
+		}
+	}
+
+	/**
+	 * @param value
+	 * @return
+	 * @throws UIOPanelCreationException
+	 */
+	private UIPanel createReportPanel(final String value) throws UIOPanelCreationException {
+		try {
+			final Report report = ReportManager.getReport(SwingUtility.getDefaultLocale() + "_" + value);
+			final ReportUIPanel pnl = new ReportUIPanel(report);
+			return pnl;
+		} catch (final Exception e) {
+			throw new UIOPanelCreationException(e);
+		}
+
 	}
 
 	/**
@@ -210,7 +256,7 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 	 * @throws TableMetaNotFoundException
 	 * @throws UIOPanelCreationException
 	 */
-	private UIPanel createSingleRecordPanel(String className, TableMeta tableMeta)
+	private UIPanel createSingleRecordPanel(final String className, final TableMeta tableMeta)
 			throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
 		// final DynMasterDetailPanel pnl = new DynMasterDetailPanel(tableMeta);
 		final DynMasterDetailPanel pnl = (DynMasterDetailPanel) createPanelByClassName(className);
@@ -226,54 +272,20 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 		try {
 			// Record record =
 			// pnl.getPnlMaster().getDao().getFirstRecordInTable();
-			Integer id = (Integer) DaoUtil.exeuteSingleOutputQuery(tableMeta.getDataSource(), tableMeta.getReportSql());
+			final Integer id = (Integer) DaoUtil.exeuteSingleOutputQuery(tableMeta.getDataSource(), tableMeta.getReportSql());
 			// if (record != null) {
 			if (id != null) {
 				pnl.getMasterPanel().handleFindRecord(id);
 			} else {
 				pnl.setMode(DynDaoMode.ADD);
 			}
-		} catch (RecordNotFoundException e) {
+		} catch (final RecordNotFoundException e) {
 			pnl.setMode(DynDaoMode.ADD);
 		}
 		return pnl;
 	}
 
-	/**
-	 * @param className
-	 * @return
-	 */
-	private UIPanel createPanelByClassName(String className) {
-		try {
-			return (UIPanel) Class.forName(className).newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to instaniate class " + className, e);
-		}
-
-	}
-
-	/**
-	 * @param detailTables
-	 * @param crossTables
-	 * @return
-	 * @throws TableMetaNotFoundException
-	 */
-	private ArrayList<ForiegnKeyFieldMeta> buildDetailFields(String[] detailTables, String[] detailFields, String[] crossTables)
-			throws TableMetaNotFoundException {
-		ArrayList<ForiegnKeyFieldMeta> list = new ArrayList<ForiegnKeyFieldMeta>();
-		for (int i = 0; i < detailTables.length; i++) {
-			// TODO : fix me
-			TableMeta detailTable = AbstractTableMetaFactory.getTableMeta(getDataSource(), detailTables[i]);
-			if (crossTables != null) {
-				detailTable.setCrossTable(Boolean.parseBoolean(crossTables[i]));
-			}
-			ForiegnKeyFieldMeta fieldMeta = (ForiegnKeyFieldMeta) detailTable.getField(detailFields[i]);
-			list.add(fieldMeta);
-		}
-		return list;
-	}
-
 	private DataSource getDataSource() {
-		return menuItem.getParentMenu().getParentModule().getDataSource();
+		return this.menuItem.getParentMenu().getParentModule().getDataSource();
 	}
 }

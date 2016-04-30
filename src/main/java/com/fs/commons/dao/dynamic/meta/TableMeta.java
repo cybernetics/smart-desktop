@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.meta;
 
 import java.io.Serializable;
@@ -20,6 +35,11 @@ import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
 
 public class TableMeta implements Serializable, QueryComponent {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 2829460516590650258L;
+
 	public static final int PAGE_ROW_COUNT = 25;
 
 	public static final boolean ALLOW_MANAGE = false;
@@ -116,6 +136,608 @@ public class TableMeta implements Serializable, QueryComponent {
 	// hint : add edit button to combo box
 
 	/**
+	 * @param field
+	 */
+	public void addDetailField(final ForiegnKeyFieldMeta field) {
+		if (this.detailFields.indexOf(field) == -1) {
+			this.detailFields.add(field);
+		}
+
+	}
+
+	public void addDetailTable(final TableMeta tableMeta) {
+		// adduming the foriegn key in the detail table is the same primary key
+		// name in master table
+		addDetailField((ForiegnKeyFieldMeta) tableMeta.getField(getIdField().getName()));
+	}
+
+	public void addDetailTables(final String... detailTableNames) {
+		for (final String tableMeta : detailTableNames) {
+			addDetailTable(AbstractTableMetaFactory.getTableMeta(tableMeta));
+		}
+	}
+
+	/**
+	 *
+	 * @param field
+	 */
+	public void addField(final FieldMeta field) {
+		// dont allow dupliacte fields
+		if (this.fields.get(field.getName()) != null) {
+			return;
+		}
+		field.setParentTable(this);
+		this.fields.put(field.getName(), field);
+		this.fieldList.add(field);
+	}
+
+	public void addFields(final ArrayList<ForiegnKeyFieldMeta> foriegnFields) {
+		for (int i = 0; i < foriegnFields.size(); i++) {
+			addField(foriegnFields.get(i));
+		}
+	}
+
+	// /////////////////////////////////////////////////////
+	public void addGroup(final FieldGroup group) {
+		this.groups.add(group);
+		final Vector<FieldMeta> fields = group.getFields();
+		for (final FieldMeta fieldMeta : fields) {
+			if (fieldMeta instanceof IdFieldMeta) {
+				setIdField((IdFieldMeta) fieldMeta);
+			} else {
+				addField(fieldMeta);
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param triggerName
+	 */
+	public void addTriggerName(final String triggerName) {
+		this.triggerNames.add(triggerName);
+	}
+
+	public TableMeta copy() throws Exception {
+		return (TableMeta) GeneralUtility.copy(this);
+	}
+
+	// //////////////////////////////////////////////////////
+	private FieldGroup createDefaultGroup() {
+		final FieldGroup group = new FieldGroup();
+		group.addField(this.idField);
+		final Vector<FieldMeta> fieldList = getFieldList();
+		for (final FieldMeta fieldMeta : fieldList) {
+			group.addField(fieldMeta);
+		}
+		return group;
+	}
+
+	public Record createEmptyRecord() {
+		return createEmptyRecord(false);
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public Record createEmptyRecord(final boolean setDefaultValues) {
+		final Record record = new Record(this);
+		record.setIdField(new Field(this.idField));
+		for (int i = 0; i < getFieldList().size(); i++) {
+			final Field field = new Field(getFieldList().get(i));
+			if (setDefaultValues) {
+				field.setValue(field.getMeta().getDefaultValue());
+			}
+			record.addField(field);
+		}
+		record.setNewRecord(true);
+		return record;
+	}
+
+	public Record createEmptyRecord(final boolean setDefaultValues, final Record defaults) {
+		final Record record = createEmptyRecord(setDefaultValues);
+		record.setValues(true, defaults);
+		return record;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		final TableMeta that = (TableMeta) obj;
+		return that.getTableName().equals(getTableName());
+	}
+
+	public Vector<FieldMeta> getAllFields() {
+		final Vector<FieldMeta> fields = new Vector();
+		fields.add(getIdField());
+		fields.addAll(getFieldList());
+		return fields;
+	}
+
+	public String getBeanName() {
+		return this.beanName;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getCaption() {
+		return this.caption == null || this.caption.equals("") ? getTableId() : this.caption;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<Constraint> getConstraints() {
+		return this.constraints;
+	}
+
+	// ///////////////////////////////////////////////////////////////////////
+	public DataSource getDataSource() {
+		if (this.dataSource == null) {
+			return DataSourceFactory.getDefaultDataSource();
+		}
+		return this.dataSource;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private String getDefaultSql() {
+		// return new MetaSqlBuilder(this).buildDefaultReportSql();
+		return "SELECT * FROM " + getTableName();
+	}
+
+	public int getDefaultUIRowCount() {
+		return this.defaultUIRowCount;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<ForiegnKeyFieldMeta> getDetailFields() {
+		return this.detailFields;
+	}
+
+	/**
+	 *
+	 * @param fieldName
+	 * @return
+	 */
+	public FieldMeta getField(final String fieldName) {
+		// return fields.get(fieldName);
+		return getField(fieldName, false);
+	}
+
+	/**
+	 * try return the field weather its id field or normal field
+	 *
+	 * @param fieldName
+	 * @param includingId
+	 * @return
+	 */
+	public FieldMeta getField(final String fieldName, final boolean includingId) {
+		if (includingId) {
+			if (this.idField != null && getIdField().getName().equalsIgnoreCase(fieldName)) {
+				return getIdField();
+			}
+		}
+		return this.fields.get(fieldName);
+	}
+
+	public Vector<FieldMeta> getFieldList() {
+		return this.fieldList;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public Hashtable<String, FieldMeta> getFields() {
+		return this.fields;
+	}
+
+	public int getFieldsCount() {
+		return getFieldList().size();
+	}
+
+	public int[] getFilters() {
+		return this.filters;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getFiltersAsString() {
+		String str = "";
+		for (int i = 0; i < this.filters.length; i++) {
+			if (i != 0) {
+				str += ",";
+			}
+			str += this.filters[i];
+		}
+		return str;
+	}
+
+	// //////////////////////////////////////////////////////
+	public Vector<FieldGroup> getGroups() {
+		if (this.groups.size() == 0) {
+			addGroup(createDefaultGroup());
+		}
+		return this.groups;
+	}
+
+	/**
+	 * @return the iconName
+	 */
+	public String getIconName() {
+		return this.iconName;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public IdFieldMeta getIdField() {
+		if (this.idField == null) {
+			throw new IllegalStateException("Primary field is required on table : " + getTableName());
+		}
+		return this.idField;
+	}
+
+	public String getListSql() {
+		// String sql=GeneralUtility.loadSqlFromDatabase("List_"+getTableId());
+		// if(sql!=null){
+		// return sql;
+		// }
+
+		if (this.listSql == null) {
+			return getShortReportSql();
+		}
+		return this.listSql;
+	}
+
+	public FieldMeta getLookupNumberField() {
+		if (getIdField().isLookupNumber()) {
+			return getIdField();
+		}
+		for (final FieldMeta field : this.fieldList) {
+			if (field.isLookupNumber()) {
+				return field;
+			}
+		}
+		// if no lookip field is set , then we choose the second field to be
+		// this field
+		// TODO : make the below smarter
+		return this.fieldList.get(0);
+	}
+
+	/**
+	 * @return the managePanelClassName
+	 */
+	public String getManagePanelClassName() {
+		return this.managePanelClassName;
+	}
+
+	public int getMaxRecordsCount() {
+		return this.maxRecordsCount;
+	}
+
+	/**
+	 * @return the pageRowCount
+	 */
+	public int getPageRowCount() {
+		return this.pageRowCount;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public String getPanelClassName() {
+		return this.panelClassName;
+	}
+
+	public Privilige getParentPrivilige() {
+		return this.parentPrivilige;
+	}
+
+	public Privilige getPrivilige() {
+		return new Privilige(getTableName().hashCode(), getTableName(), getParentPrivilige());
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public String getReportSql() {
+		// String
+		// sql=GeneralUtility.loadSqlFromDatabase("Report_"+getTableId());
+		// if(sql!=null){
+		// return sql;
+		// }
+		if (this.reportSql != null && this.reportSql.startsWith("@")) {
+			final String sql = GeneralUtility.getSqlFile(this.reportSql.substring(1));
+			if (sql != null) {
+				return sql;
+			} else {
+				return getDefaultSql();
+			}
+		}
+		if (this.reportSql == null || this.reportSql.equals("")) {
+			return getDefaultSql();
+		}
+		return this.reportSql;
+	}
+
+	public String getShortReportSql() {
+		final String sql = GeneralUtility.loadSqlFromDatabase("Short_" + getTableId());
+		if (sql != null) {
+			return sql;
+		}
+		if (this.shortReportSql == null) {
+			return new MetaSqlBuilder(this).buildDefaultShortSql();
+		}
+		return this.shortReportSql;
+	}
+
+	// //////////////////////////////////////////////////////
+	public String getSource() {
+		return this.source;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public TableDataValidator getTableDataValidator() {
+		if (this.tableDataValidator == null) {
+			this.tableDataValidator = TableDataValidatorFactory.createValidator();
+		}
+		return this.tableDataValidator;
+	}
+
+	/**
+	 * @return the tableId
+	 */
+	public String getTableId() {
+		return this.tableId == null ? getTableName() : this.tableId;
+	}
+
+	/*
+	 *
+	 */
+	public String getTableName() {
+		return this.tableName;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public HashSet<String> getTriggerNames() {
+		return this.triggerNames;
+	}
+
+	/**
+	 * @return the triggers
+	 */
+	public ArrayList<Trigger> getTriggers() {
+		if (this.triggers == null) {
+			this.triggers = new ArrayList<Trigger>();
+			if (this.triggerNames.size() > 0) {
+				for (final String triggerName : this.triggerNames) {
+					try {
+						final Trigger trigger = (Trigger) Class.forName(triggerName).newInstance();
+						this.triggers.add(trigger);
+					} catch (final Exception e) {
+						ExceptionUtil.handleException(e);
+					}
+				}
+			}
+		}
+		return this.triggers;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<FieldMeta> getVisibleFields() {
+		if (this.visibleFields == null) {
+			this.visibleFields = new ArrayList<FieldMeta>();
+			if (getIdField().isVisible()) {
+				this.visibleFields.add(getIdField());
+			}
+			for (final FieldMeta field : this.fieldList) {
+				if (field.isVisible()) {
+					this.visibleFields.add(field);
+				}
+			}
+		}
+		return this.visibleFields;
+
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public int getVisibleFieldsCount() {
+		return getVisibleFields().size();
+	}
+
+	/**
+	 * @return the allowAdd
+	 */
+	public boolean isAllowAdd() {
+		try {
+			// SecurityManager.checkAllowedPrivilige(new
+			// Privilige((getTableName() + ADD_RECORD_PRIVILIGE).hashCode(),
+			// "ADD", getPrivilige()));
+			return this.allowAdd;
+		} catch (final Exception e) {
+			return false;
+		}
+	}
+
+	/**
+	 * @return the allowDelete
+	 */
+	public boolean isAllowDelete() {
+		try {
+			// SecurityManager.checkAllowedPrivilige(new
+			// Privilige((getTableName() + DELETE_RECORD_PRIVILIGE).hashCode(),
+			// "DELETE", getPrivilige()));
+			return this.allowDelete;
+		} catch (final Exception e) {
+			return false;
+		}
+	}
+
+	public boolean isAllowDeleteAll() {
+		try {
+			// SecurityManager.checkAllowedPrivilige(getDeleteAllPriviligeId());
+			return isAllowDelete();
+		} catch (final Exception e) {
+			return false;
+		}
+
+	}
+
+	public boolean isAllowManage() {
+		return this.allowManage;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public boolean isAllowUpdate() {
+		try {
+			// SecurityManager.checkAllowedPrivilige(getUpdatePriviligeId());
+			return this.allowUpdate;
+		} catch (final Exception e) {
+			return false;
+		}
+	}
+
+	public boolean isAutoIncrementId() {
+		return getIdField() != null && getIdField().isAutoIncrement();
+	}
+
+	public boolean isCaptionNull() {
+		return this.caption == null || this.caption.trim().equals("");
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public boolean isCrossTable() {
+		return this.crossTable;
+	}
+
+	@Override
+	public boolean isInline() {
+		return true;
+	}
+
+	public boolean isListSqlNull() {
+		return this.listSql == null || this.listSql.equals("") || this.listSql.toUpperCase().equals(getDefaultSql().toUpperCase());
+	}
+
+	public boolean isReportSqlNull() {
+		return this.reportSql == null || this.reportSql.equals("") || this.reportSql.toUpperCase().equals(getDefaultSql().toUpperCase());
+	}
+
+	public boolean isShortSqlNull() {
+		return this.shortReportSql == null || this.shortReportSql.equals("")
+				|| this.shortReportSql.toUpperCase().equals(getDefaultSql().toUpperCase());
+	}
+
+	public boolean isSingleRecord() {
+		return getMaxRecordsCount() == 1;
+	}
+
+	public boolean isTableIdNull() {
+		return this.tableId == null || this.tableId.trim().equals("") || this.tableId.equals(getTableName());
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<ForiegnKeyFieldMeta> lstForiegnKeyFields() {
+		final ArrayList<ForiegnKeyFieldMeta> list = new ArrayList<ForiegnKeyFieldMeta>();
+		for (int i = 0; i < this.fieldList.size(); i++) {
+			if (this.fieldList.get(i) instanceof ForiegnKeyFieldMeta) {
+				list.add((ForiegnKeyFieldMeta) this.fieldList.get(i));
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * @param triggers
+	 *            the triggers to set
+	 */
+	// public void setTriggers(ArrayList<Trigger> triggers) {
+	// this.triggers = triggers;
+	// triggerNames=new ArrayList<String>();
+	// for (int i = 0; i < triggers.size(); i++) {
+	// String triggerName = triggers.get(i).getClass().getName();
+	// triggerNames.add(triggerName);
+	// }
+	// }
+
+	public Vector<FieldMeta> lstSummaryFields() {
+		final Vector<FieldMeta> summaryFields = new Vector<FieldMeta>();
+		for (int i = 0; i < this.fieldList.size(); i++) {
+			final FieldMeta field = this.fieldList.get(i);
+
+			if (field.isSummaryField()) {
+				summaryFields.add(field);
+			}
+		}
+		if (summaryFields.size() == 0) {
+			summaryFields.add(this.fieldList.get(0));
+		}
+		return summaryFields;
+	}
+
+	public void setAllowAdd(final boolean allowAdd) {
+		this.allowAdd = allowAdd;
+	}
+
+	public void setAllowDelete(final boolean allowDelete) {
+		this.allowDelete = allowDelete;
+	}
+
+	public void setAllowManage(final boolean allowManage) {
+		this.allowManage = allowManage;
+	}
+
+	public void setAllowUpdate(final boolean allowUpdate) {
+		this.allowUpdate = allowUpdate;
+	}
+
+	// /**
+	// *
+	// * @param trigger
+	// */
+	// public void addTrigger(Trigger trigger) {
+	// triggers.add(trigger);
+	// }
+
+	public void setBeanName(final String beanName) {
+		this.beanName = beanName;
+	}
+
+	/**
 	 * @param caption
 	 *            the caption to set
 	 */
@@ -127,629 +749,33 @@ public class TableMeta implements Serializable, QueryComponent {
 	}
 
 	/**
-	 * @return the iconName
-	 */
-	public String getIconName() {
-		return this.iconName;
-	}
-
-	/**
-	 * @param iconName
-	 *            the iconName to set
-	 */
-	public void setIconName(String iconName) {
-		this.iconName = iconName;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public ArrayList<ForiegnKeyFieldMeta> getDetailFields() {
-		return detailFields;
-	}
-
-	/**
-	 * 
-	 * @param detailFields
-	 */
-	public void setDetailFields(ArrayList<ForiegnKeyFieldMeta> detailFields) {
-		this.detailFields = detailFields;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Hashtable<String, FieldMeta> getFields() {
-		return fields;
-	}
-
-	/**
-	 * 
-	 * @param fields
-	 */
-	public void setFields(Hashtable<String, FieldMeta> fields) {
-		this.fields = fields;
-	}
-
-	/*
-	 * 
-	 */
-	public String getTableName() {
-		return tableName;
-	}
-
-	/**
-	 * 
-	 * @param tableName
-	 */
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
-
-	/**
-	 * 
-	 * @param field
-	 */
-	public void addField(FieldMeta field) {
-		// dont allow dupliacte fields
-		if (fields.get(field.getName()) != null) {
-			return;
-		}
-		field.setParentTable(this);
-		fields.put(field.getName(), field);
-		fieldList.add(field);
-	}
-
-	public Vector<FieldMeta> getFieldList() {
-		return fieldList;
-	}
-
-	/**
-	 * 
-	 * @param fieldName
-	 * @return
-	 */
-	public FieldMeta getField(String fieldName) {
-		// return fields.get(fieldName);
-		return getField(fieldName, false);
-	}
-
-	/**
-	 * try return the field weather its id field or normal field
-	 * 
-	 * @param fieldName
-	 * @param includingId
-	 * @return
-	 */
-	public FieldMeta getField(String fieldName, boolean includingId) {
-		if (includingId) {
-			if (idField != null && getIdField().getName().equalsIgnoreCase(fieldName)) {
-				return getIdField();
-			}
-		}
-		return fields.get(fieldName);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public IdFieldMeta getIdField() {
-		if (idField == null) {
-			throw new IllegalStateException("Primary field is required on table : " + getTableName());
-		}
-		return idField;
-	}
-
-	/**
-	 * 
-	 * @param idField
-	 */
-	public void setIdField(IdFieldMeta idField) {
-		this.idField = idField;
-		if (idField != null) {
-			idField.setParentTable(this);
-		}
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("Table name : " + tableName);
-		buf.append(" , " + idField);
-		buf.append(" ,\n\t " + fields);
-		return buf.toString();
-	}
-
-	public Record createEmptyRecord() {
-		return createEmptyRecord(false);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Record createEmptyRecord(boolean setDefaultValues) {
-		Record record = new Record(this);
-		record.setIdField(new Field(idField));
-		for (int i = 0; i < getFieldList().size(); i++) {
-			Field field = new Field(getFieldList().get(i));
-			if (setDefaultValues) {
-				field.setValue(field.getMeta().getDefaultValue());
-			}
-			record.addField(field);
-		}
-		record.setNewRecord(true);
-		return record;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getReportSql() {
-		// String
-		// sql=GeneralUtility.loadSqlFromDatabase("Report_"+getTableId());
-		// if(sql!=null){
-		// return sql;
-		// }
-		if (reportSql != null && reportSql.startsWith("@")) {
-			String sql = GeneralUtility.getSqlFile(reportSql.substring(1));
-			if (sql != null) {
-				return sql;
-			} else {
-				return getDefaultSql();
-			}
-		}
-		if (reportSql == null || reportSql.equals("")) {
-			return getDefaultSql();
-		}
-		return reportSql;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private String getDefaultSql() {
-		// return new MetaSqlBuilder(this).buildDefaultReportSql();
-		return "SELECT * FROM " + getTableName();
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getVisibleFieldsCount() {
-		return getVisibleFields().size();
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public ArrayList<FieldMeta> getVisibleFields() {
-		if (visibleFields == null) {
-			visibleFields = new ArrayList<FieldMeta>();
-			if (getIdField().isVisible()) {
-				visibleFields.add(getIdField());
-			}
-			for (FieldMeta field : fieldList) {
-				if (field.isVisible()) {
-					visibleFields.add(field);
-				}
-			}
-		}
-		return visibleFields;
-
-	}
-
-	/**
-	 * 
-	 * @param reportSql
-	 */
-	public void setReportSql(String reportSql) {
-		this.reportSql = reportSql;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public TableDataValidator getTableDataValidator() {
-		if (tableDataValidator == null) {
-			tableDataValidator = TableDataValidatorFactory.createValidator();
-		}
-		return tableDataValidator;
-	}
-
-	/**
-	 * 
-	 * @param tableDataValidator
-	 */
-	public void setTableDataValidator(TableDataValidator tableDataValidator) {
-		this.tableDataValidator = tableDataValidator;
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws ValidationException
-	 */
-	public void validateData(Record record) throws ValidationException {
-		getTableDataValidator().validate(this, record);
-	}
-
-	/**
-	 * 
+	 *
 	 * @param constraints
 	 */
-	public void setConstraints(ArrayList<Constraint> constraints) {
+	public void setConstraints(final ArrayList<Constraint> constraints) {
 		this.constraints = constraints;
 
 	}
 
 	/**
-	 * 
-	 * @return
+	 *
+	 *
 	 */
-	public ArrayList<Constraint> getConstraints() {
-		return constraints;
-	}
-
-	/**
-	 * 
-	 * @param strings
-	 */
-	public void setFilters(String[] strings) {
-		filters = new int[strings.length];
-		for (int i = 0; i < strings.length; i++) {
-			filters[i] = Integer.parseInt(strings[i]);
-		}
-
-	}
-
-	public int[] getFilters() {
-		return filters;
-	}
-
-	public int getMaxRecordsCount() {
-		return maxRecordsCount;
-	}
-
-	public void setMaxRecordsCount(int maxRecordsCount) {
-		this.maxRecordsCount = maxRecordsCount;
-	}
-
-	public TableMeta copy() throws Exception {
-		return (TableMeta) GeneralUtility.copy(this);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public ArrayList<ForiegnKeyFieldMeta> lstForiegnKeyFields() {
-		ArrayList<ForiegnKeyFieldMeta> list = new ArrayList<ForiegnKeyFieldMeta>();
-		for (int i = 0; i < fieldList.size(); i++) {
-			if (fieldList.get(i) instanceof ForiegnKeyFieldMeta) {
-				list.add((ForiegnKeyFieldMeta) fieldList.get(i));
-			}
-		}
-		return list;
-	}
-
-	/**
-	 * 
-	 * 
-	 */
-	public void setCorssTable(boolean crossTable) {
+	public void setCorssTable(final boolean crossTable) {
 		this.crossTable = crossTable;
 	}
 
 	/**
-	 * 
-	 * @return
-	 */
-	public boolean isCrossTable() {
-		return crossTable;
-	}
-
-	/**
-	 * 
+	 *
 	 * @param crossTable
 	 */
-	public void setCrossTable(boolean crossTable) {
+	public void setCrossTable(final boolean crossTable) {
 		this.crossTable = crossTable;
 	}
 
-	public boolean isListSqlNull() {
-		return listSql == null || listSql.equals("") || listSql.toUpperCase().equals(getDefaultSql().toUpperCase());
-	}
-
-	public boolean isReportSqlNull() {
-		return reportSql == null || reportSql.equals("") || reportSql.toUpperCase().equals(getDefaultSql().toUpperCase());
-	}
-
-	public boolean isShortSqlNull() {
-		return shortReportSql == null || shortReportSql.equals("") || shortReportSql.toUpperCase().equals(getDefaultSql().toUpperCase());
-	}
-
-	public String getListSql() {
-		// String sql=GeneralUtility.loadSqlFromDatabase("List_"+getTableId());
-		// if(sql!=null){
-		// return sql;
-		// }
-
-		if (listSql == null) {
-			return getShortReportSql();
-		}
-		return listSql;
-	}
-
-	public void setListSql(String listSql) {
-		this.listSql = listSql;
-	}
-
-	public String getShortReportSql() {
-		String sql = GeneralUtility.loadSqlFromDatabase("Short_" + getTableId());
-		if (sql != null) {
-			return sql;
-		}
-		if (shortReportSql == null) {
-			return new MetaSqlBuilder(this).buildDefaultShortSql();
-		}
-		return shortReportSql;
-	}
-
-	public void setShortReportSql(String shortReportSql) {
-		this.shortReportSql = shortReportSql;
-	}
-
-	public void setFieldList(Vector<FieldMeta> fieldList) {
-		this.fieldList = fieldList;
-		for (int i = 0; i < fieldList.size(); i++) {
-			FieldMeta meta = fieldList.get(i);
-			meta.setParentTable(this);
-			fields.put(meta.getName(), meta);
-		}
-	}
-
-	public void addFields(ArrayList<ForiegnKeyFieldMeta> foriegnFields) {
-		for (int i = 0; i < foriegnFields.size(); i++) {
-			addField(foriegnFields.get(i));
-		}
-	}
-
-	public boolean isAllowManage() {
-		return allowManage;
-	}
-
-	public void setAllowManage(boolean allowManage) {
-		this.allowManage = allowManage;
-	}
-
-	public boolean isCaptionNull() {
-		return caption == null || caption.trim().equals("");
-	}
-
-	/**
-	 * @return
-	 */
-	public String getCaption() {
-		return caption == null || caption.equals("") ? getTableId() : caption;
-	}
-
-	/**
-	 * @return the pageRowCount
-	 */
-	public int getPageRowCount() {
-		return this.pageRowCount;
-	}
-
-	/**
-	 * @param pageRowCount
-	 *            the pageRowCount to set
-	 */
-	public void setPageRowCount(int pageRowCount) {
-		this.pageRowCount = pageRowCount;
-	}
-
-	/**
-	 * @param field
-	 */
-	public void addDetailField(ForiegnKeyFieldMeta field) {
-		if (detailFields.indexOf(field) == -1) {
-			detailFields.add(field);
-		}
-
-	}
-
-	/**
-	 * @return
-	 */
-	public String getFiltersAsString() {
-		String str = "";
-		for (int i = 0; i < filters.length; i++) {
-			if (i != 0) {
-				str += ",";
-			}
-			str += filters[i];
-		}
-		return str;
-	}
-
-	public int getDefaultUIRowCount() {
-		return this.defaultUIRowCount;
-	}
-
-	public void setDefaultUIRowCount(int defaultUIRowCount) {
-		this.defaultUIRowCount = defaultUIRowCount;
-	}
-
-	/**
-	 * 
-	 * @param panelClassName
-	 */
-	public void setPanelClassName(String panelClassName) {
-		this.panelClassName = panelClassName;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getPanelClassName() {
-		return panelClassName;
-	}
-
-	public void setAllowDelete(boolean allowDelete) {
-		this.allowDelete = allowDelete;
-	}
-
-	public void setAllowAdd(boolean allowAdd) {
-		this.allowAdd = allowAdd;
-	}
-
-	/**
-	 * @return the allowDelete
-	 */
-	public boolean isAllowDelete() {
-		try {
-			// SecurityManager.checkAllowedPrivilige(new
-			// Privilige((getTableName() + DELETE_RECORD_PRIVILIGE).hashCode(),
-			// "DELETE", getPrivilige()));
-			return allowDelete;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	/**
-	 * @return the allowAdd
-	 */
-	public boolean isAllowAdd() {
-		try {
-			// SecurityManager.checkAllowedPrivilige(new
-			// Privilige((getTableName() + ADD_RECORD_PRIVILIGE).hashCode(),
-			// "ADD", getPrivilige()));
-			return allowAdd;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	public Privilige getPrivilige() {
-		return new Privilige(getTableName().hashCode(), getTableName(), getParentPrivilige());
-	}
-
-	public void setTableId(String tableId) {
-		this.tableId = tableId;
-	}
-
-	public boolean isTableIdNull() {
-		return tableId == null || tableId.trim().equals("") || tableId.equals(getTableName());
-	}
-
-	/**
-	 * @return the tableId
-	 */
-	public String getTableId() {
-		return tableId == null ? getTableName() : tableId;
-	}
-
-	/**
-	 * 
-	 * @param triggerName
-	 */
-	public void addTriggerName(String triggerName) {
-		triggerNames.add(triggerName);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public HashSet<String> getTriggerNames() {
-		return triggerNames;
-	}
-
-	/**
-	 * 
-	 * @param triggerNames
-	 */
-	public void setTriggerNames(HashSet<String> triggerNames) {
-		this.triggerNames = triggerNames;
-	}
-
-	// /**
-	// *
-	// * @param trigger
-	// */
-	// public void addTrigger(Trigger trigger) {
-	// triggers.add(trigger);
-	// }
-
-	/**
-	 * @return the triggers
-	 */
-	public ArrayList<Trigger> getTriggers() {
-		if (triggers == null) {
-			triggers = new ArrayList<Trigger>();
-			if (triggerNames.size() > 0) {
-				for (String triggerName : triggerNames) {
-					try {
-						Trigger trigger = (Trigger) Class.forName(triggerName).newInstance();
-						triggers.add(trigger);
-					} catch (Exception e) {
-						ExceptionUtil.handleException(e);
-					}
-				}
-			}
-		}
-		return triggers;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isAllowUpdate() {
-		try {
-			// SecurityManager.checkAllowedPrivilige(getUpdatePriviligeId());
-			return allowUpdate;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	public boolean isAllowDeleteAll() {
-		try {
-			// SecurityManager.checkAllowedPrivilige(getDeleteAllPriviligeId());
-			return isAllowDelete();
-		} catch (Exception e) {
-			return false;
-		}
-
-	}
-
-	public void setAllowUpdate(boolean allowUpdate) {
-		this.allowUpdate = allowUpdate;
-	}
-
-	public boolean isSingleRecord() {
-		return getMaxRecordsCount() == 1;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		TableMeta that = (TableMeta) obj;
-		return that.getTableName().equals(this.getTableName());
+	// ///////////////////////////////////////////////////////////////////////
+	public void setDataSource(final DataSource connectionManager) {
+		this.dataSource = connectionManager;
 	}
 
 	// /**
@@ -783,78 +809,145 @@ public class TableMeta implements Serializable, QueryComponent {
 	// detailFields.clear();
 	// }
 
-	public Record createEmptyRecord(boolean setDefaultValues, Record defaults) {
-		Record record = createEmptyRecord(setDefaultValues);
-		record.setValues(true, defaults);
-		return record;
+	public void setDefaultUIRowCount(final int defaultUIRowCount) {
+		this.defaultUIRowCount = defaultUIRowCount;
 	}
 
 	/**
-	 * @return the managePanelClassName
+	 *
+	 * @param detailFields
 	 */
-	public String getManagePanelClassName() {
-		return managePanelClassName;
+	public void setDetailFields(final ArrayList<ForiegnKeyFieldMeta> detailFields) {
+		this.detailFields = detailFields;
+	}
+
+	public void setFieldList(final Vector<FieldMeta> fieldList) {
+		this.fieldList = fieldList;
+		for (int i = 0; i < fieldList.size(); i++) {
+			final FieldMeta meta = fieldList.get(i);
+			meta.setParentTable(this);
+			this.fields.put(meta.getName(), meta);
+		}
+	}
+
+	/**
+	 *
+	 * @param fields
+	 */
+	public void setFields(final Hashtable<String, FieldMeta> fields) {
+		this.fields = fields;
+	}
+
+	/**
+	 *
+	 * @param strings
+	 */
+	public void setFilters(final String[] strings) {
+		this.filters = new int[strings.length];
+		for (int i = 0; i < strings.length; i++) {
+			this.filters[i] = Integer.parseInt(strings[i]);
+		}
+
+	}
+
+	/**
+	 * @param iconName
+	 *            the iconName to set
+	 */
+	public void setIconName(final String iconName) {
+		this.iconName = iconName;
+	}
+
+	/**
+	 *
+	 * @param idField
+	 */
+	public void setIdField(final IdFieldMeta idField) {
+		this.idField = idField;
+		if (idField != null) {
+			idField.setParentTable(this);
+		}
+	}
+
+	public void setListSql(final String listSql) {
+		this.listSql = listSql;
 	}
 
 	/**
 	 * @param managePanelClassName
 	 *            the managePanelClassName to set
 	 */
-	public void setManagePanelClassName(String managePanelClassName) {
+	public void setManagePanelClassName(final String managePanelClassName) {
 		this.managePanelClassName = managePanelClassName;
 	}
 
-	// ///////////////////////////////////////////////////////////////////////
-	public DataSource getDataSource() {
-		if (dataSource == null) {
-			return DataSourceFactory.getDefaultDataSource();
-		}
-		return dataSource;
-	}
-
-	// ///////////////////////////////////////////////////////////////////////
-	public void setDataSource(DataSource connectionManager) {
-		this.dataSource = connectionManager;
+	public void setMaxRecordsCount(final int maxRecordsCount) {
+		this.maxRecordsCount = maxRecordsCount;
 	}
 
 	/**
-	 * @param triggers
-	 *            the triggers to set
+	 * @param pageRowCount
+	 *            the pageRowCount to set
 	 */
-	// public void setTriggers(ArrayList<Trigger> triggers) {
-	// this.triggers = triggers;
-	// triggerNames=new ArrayList<String>();
-	// for (int i = 0; i < triggers.size(); i++) {
-	// String triggerName = triggers.get(i).getClass().getName();
-	// triggerNames.add(triggerName);
-	// }
-	// }
-
-	public Vector<FieldMeta> lstSummaryFields() {
-		Vector<FieldMeta> summaryFields = new Vector<FieldMeta>();
-		for (int i = 0; i < fieldList.size(); i++) {
-			FieldMeta field = fieldList.get(i);
-
-			if (field.isSummaryField()) {
-				summaryFields.add(field);
-			}
-		}
-		if (summaryFields.size() == 0) {
-			summaryFields.add(fieldList.get(0));
-		}
-		return summaryFields;
+	public void setPageRowCount(final int pageRowCount) {
+		this.pageRowCount = pageRowCount;
 	}
 
-	public int getFieldsCount() {
-		return getFieldList().size();
+	/**
+	 *
+	 * @param panelClassName
+	 */
+	public void setPanelClassName(final String panelClassName) {
+		this.panelClassName = panelClassName;
 	}
 
-	public String getBeanName() {
-		return beanName;
+	public void setParentPrivilige(final Privilige parentPrivilige) {
+		this.parentPrivilige = parentPrivilige;
 	}
 
-	public void setBeanName(String beanName) {
-		this.beanName = beanName;
+	/**
+	 *
+	 * @param reportSql
+	 */
+	public void setReportSql(final String reportSql) {
+		this.reportSql = reportSql;
+	}
+
+	public void setShortReportSql(final String shortReportSql) {
+		this.shortReportSql = shortReportSql;
+	}
+
+	// //////////////////////////////////////////////////////
+	public void setSource(final String source) {
+		this.source = source;
+	}
+
+	/**
+	 *
+	 * @param tableDataValidator
+	 */
+	public void setTableDataValidator(final TableDataValidator tableDataValidator) {
+		this.tableDataValidator = tableDataValidator;
+	}
+
+	public void setTableId(final String tableId) {
+		this.tableId = tableId;
+	}
+
+	/**
+	 *
+	 * @param tableName
+	 */
+	public void setTableName(final String tableName) {
+		this.tableName = tableName;
+	}
+
+	/**
+	 *
+	 * @param triggerNames
+	 */
+	public void setTriggerNames(final HashSet<String> triggerNames) {
+		this.triggerNames = triggerNames;
 	}
 
 	@Override
@@ -862,97 +955,25 @@ public class TableMeta implements Serializable, QueryComponent {
 		return getTableName();
 	}
 
-	public boolean isAutoIncrementId() {
-		return getIdField() != null && getIdField().isAutoIncrement();
-	}
-
+	/**
+	 *
+	 */
 	@Override
-	public boolean isInline() {
-		return true;
+	public String toString() {
+		final StringBuffer buf = new StringBuffer();
+		buf.append("Table name : " + this.tableName);
+		buf.append(" , " + this.idField);
+		buf.append(" ,\n\t " + this.fields);
+		return buf.toString();
 	}
 
-	public FieldMeta getLookupNumberField() {
-		if (getIdField().isLookupNumber()) {
-			return getIdField();
-		}
-		for (FieldMeta field : this.fieldList) {
-			if (field.isLookupNumber()) {
-				return field;
-			}
-		}
-		// if no lookip field is set , then we choose the second field to be
-		// this field
-		// TODO : make the below smarter
-		return fieldList.get(0);
-	}
-
-	// //////////////////////////////////////////////////////
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	// //////////////////////////////////////////////////////
-	public String getSource() {
-		return source;
-	}
-
-	// //////////////////////////////////////////////////////
-	public Vector<FieldGroup> getGroups() {
-		if (groups.size() == 0) {
-			addGroup(createDefaultGroup());
-		}
-		return groups;
-	}
-
-	// //////////////////////////////////////////////////////
-	private FieldGroup createDefaultGroup() {
-		FieldGroup group = new FieldGroup();
-		group.addField(idField);
-		Vector<FieldMeta> fieldList = getFieldList();
-		for (FieldMeta fieldMeta : fieldList) {
-			group.addField(fieldMeta);
-		}
-		return group;
-	}
-
-	// /////////////////////////////////////////////////////
-	public void addGroup(FieldGroup group) {
-		groups.add(group);
-		Vector<FieldMeta> fields = group.getFields();
-		for (FieldMeta fieldMeta : fields) {
-			if (fieldMeta instanceof IdFieldMeta) {
-				setIdField((IdFieldMeta) fieldMeta);
-			} else {
-				addField(fieldMeta);
-			}
-		}
-	}
-
-	public Privilige getParentPrivilige() {
-		return parentPrivilige;
-	}
-
-	public void setParentPrivilige(Privilige parentPrivilige) {
-		this.parentPrivilige = parentPrivilige;
-	}
-
-	public Vector<FieldMeta> getAllFields() {
-		Vector<FieldMeta> fields = new Vector();
-		fields.add(getIdField());
-		fields.addAll(getFieldList());
-		return fields;
-	}
-
-	public void addDetailTables(String... detailTableNames) {
-		for (String tableMeta : detailTableNames) {
-			addDetailTable(AbstractTableMetaFactory.getTableMeta(tableMeta));
-		}
-	}
-
-	public void addDetailTable(TableMeta tableMeta) {
-		// adduming the foriegn key in the detail table is the same primary key
-		// name in master table
-		addDetailField((ForiegnKeyFieldMeta) tableMeta.getField(getIdField().getName()));
+	/**
+	 *
+	 * @param record
+	 * @throws ValidationException
+	 */
+	public void validateData(final Record record) throws ValidationException {
+		getTableDataValidator().validate(this, record);
 	}
 
 }

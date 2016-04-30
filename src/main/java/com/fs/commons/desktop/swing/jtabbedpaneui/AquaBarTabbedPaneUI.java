@@ -1,4 +1,20 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.jtabbedpaneui;
+
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.GradientPaint;
@@ -18,195 +34,6 @@ import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
 public class AquaBarTabbedPaneUI extends BasicTabbedPaneUI {
 
-	private static final int HEIGHT = 40;
-	private static final Insets NO_INSETS = new Insets(0, 0, 0, 0);
-	private ColorSet selectedColorSet;
-	private ColorSet defaultColorSet;
-	private ColorSet hoverColorSet;
-	private boolean contentTopBorderDrawn = true;
-	private Color lineColor = new Color(158, 158, 158);
-	private Color dividerColor = new Color(200, 200, 200);
-	private Insets contentInsets = new Insets(10, 10, 10, 10);
-	private int lastRollOverTab = -1;
-
-	public static ComponentUI createUI(JComponent c) {
-		return new AquaBarTabbedPaneUI();
-	}
-
-	public AquaBarTabbedPaneUI() {
-
-		selectedColorSet = new ColorSet();
-		selectedColorSet.topGradColor1 = new Color(233, 237, 248);
-		selectedColorSet.topGradColor2 = new Color(158, 199, 240);
-
-		selectedColorSet.bottomGradColor1 = new Color(112, 173, 239);
-		selectedColorSet.bottomGradColor2 = new Color(183, 244, 253);
-
-		defaultColorSet = new ColorSet();
-		defaultColorSet.topGradColor1 = new Color(253, 253, 253);
-		defaultColorSet.topGradColor2 = new Color(237, 237, 237);
-
-		defaultColorSet.bottomGradColor1 = new Color(222, 222, 222);
-		defaultColorSet.bottomGradColor2 = new Color(255, 255, 255);
-
-		hoverColorSet = new ColorSet();
-		hoverColorSet.topGradColor1 = new Color(244, 244, 244);
-		hoverColorSet.topGradColor2 = new Color(223, 223, 223);
-
-		hoverColorSet.bottomGradColor1 = new Color(211, 211, 211);
-		hoverColorSet.bottomGradColor2 = new Color(235, 235, 235);
-
-		maxTabHeight = HEIGHT;
-
-		setContentInsets(0);
-	}
-
-	public void setContentTopBorderDrawn(boolean b) {
-		contentTopBorderDrawn = b;
-	}
-
-	public void setContentInsets(Insets i) {
-		contentInsets = i;
-	}
-
-	public void setContentInsets(int i) {
-		contentInsets = new Insets(i, i, i, i);
-	}
-
-	public int getTabRunCount(JTabbedPane pane) {
-		return 1;
-	}
-
-	protected void installDefaults() {
-		super.installDefaults();
-
-		RollOverListener l = new RollOverListener();
-		tabPane.addMouseListener(l);
-		tabPane.addMouseMotionListener(l);
-
-		tabAreaInsets = NO_INSETS;
-		tabInsets = new Insets(0, 0, 0, 1);
-	}
-
-	protected boolean scrollableTabLayoutEnabled() {
-		return false;
-	}
-
-	protected Insets getContentBorderInsets(int tabPlacement) {
-		return contentInsets;
-	}
-
-	protected int calculateTabHeight(int tabPlacement, int tabIndex,
-			int fontHeight) {
-		return 21;
-	}
-
-	protected int calculateTabWidth(int tabPlacement, int tabIndex,
-			FontMetrics metrics) {
-		int w = super.calculateTabWidth(tabPlacement, tabIndex, metrics);
-		int wid = metrics.charWidth('M');
-		w += wid * 2;
-		return w;
-	}
-
-	protected int calculateMaxTabHeight(int tabPlacement) {
-		return HEIGHT;
-	}
-
-	protected void paintTabArea(Graphics g, int tabPlacement, int selectedIndex) {
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setPaint(new GradientPaint(0, 0, defaultColorSet.topGradColor1, 0,
-				10, defaultColorSet.topGradColor2));
-		g2d.fillRect(0, 0, tabPane.getWidth(), HEIGHT/2);
-
-		g2d.setPaint(new GradientPaint(0, HEIGHT/2, defaultColorSet.bottomGradColor1,
-				0, HEIGHT+1, defaultColorSet.bottomGradColor2));
-		g2d.fillRect(0, HEIGHT/2, tabPane.getWidth(), (HEIGHT/2)+1);
-		super.paintTabArea(g, tabPlacement, selectedIndex);
-
-		if (contentTopBorderDrawn) {
-			g2d.setColor(lineColor);
-			g2d.drawLine(0, HEIGHT, tabPane.getWidth() - 1, HEIGHT);
-		}
-	}
-
-	protected void paintTabBackground(Graphics g, int tabPlacement,
-			int tabIndex, int x, int y, int w, int h, boolean isSelected) {
-		Graphics2D g2d = (Graphics2D) g;
-		ColorSet colorSet;
-
-		Rectangle rect = rects[tabIndex];
-
-		if (isSelected) {
-			colorSet = selectedColorSet;
-		} else if (getRolloverTab() == tabIndex) {
-			colorSet = hoverColorSet;
-		} else {
-			colorSet = defaultColorSet;
-		}
-
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-
-		int width = rect.width;
-		int xpos = rect.x;
-		if (tabIndex > 0) {
-			width--;
-			xpos++;
-		}
-
-		g2d.setPaint(new GradientPaint(xpos, 0, colorSet.topGradColor1, xpos,
-				10, colorSet.topGradColor2));
-		g2d.fillRect(xpos, 0, width, HEIGHT/2);
-
-		g2d.setPaint(new GradientPaint(0, HEIGHT/2, colorSet.bottomGradColor1, 0, HEIGHT+1,
-				colorSet.bottomGradColor2));
-		g2d.fillRect(xpos, HEIGHT/2, width, (HEIGHT/2)+1);
-
-		if (contentTopBorderDrawn) {
-			g2d.setColor(lineColor);
-			g2d.drawLine(rect.x, HEIGHT, rect.x + rect.width - 1, HEIGHT);
-		}
-	}
-
-	protected void paintTabBorder(Graphics g, int tabPlacement, int tabIndex,
-			int x, int y, int w, int h, boolean isSelected) {
-		Rectangle rect = getTabBounds(tabIndex, new Rectangle(x, y, w, h));
-		g.setColor(dividerColor);
-		g.drawLine(rect.x + rect.width, 0, rect.x + rect.width, HEIGHT);
-	}
-
-	protected void paintContentBorderTopEdge(Graphics g, int tabPlacement,
-			int selectedIndex, int x, int y, int w, int h) {
-
-	}
-
-	protected void paintContentBorderRightEdge(Graphics g, int tabPlacement,
-			int selectedIndex, int x, int y, int w, int h) {
-		// Do nothing
-	}
-
-	protected void paintContentBorderLeftEdge(Graphics g, int tabPlacement,
-			int selectedIndex, int x, int y, int w, int h) {
-		// Do nothing
-	}
-
-	protected void paintContentBorderBottomEdge(Graphics g, int tabPlacement,
-			int selectedIndex, int x, int y, int w, int h) {
-		// Do nothing
-	}
-
-	protected void paintFocusIndicator(Graphics g, int tabPlacement,
-			Rectangle[] rects, int tabIndex, Rectangle iconRect,
-			Rectangle textRect, boolean isSelected) {
-		// Do nothing
-	}
-
-	protected int getTabLabelShiftY(int tabPlacement, int tabIndex,
-			boolean isSelected) {
-		return 0;
-	}
-
 	private class ColorSet {
 		Color topGradColor1;
 		Color topGradColor2;
@@ -215,40 +42,245 @@ public class AquaBarTabbedPaneUI extends BasicTabbedPaneUI {
 		Color bottomGradColor2;
 	}
 
-	private class RollOverListener implements MouseMotionListener,
-			MouseListener {
-
-		public void mouseDragged(MouseEvent e) {
-		}
-
-		public void mouseMoved(MouseEvent e) {
-			checkRollOver();
-		}
-
-		public void mouseClicked(MouseEvent e) {
-		}
-
-		public void mousePressed(MouseEvent e) {
-		}
-
-		public void mouseReleased(MouseEvent e) {
-		}
-
-		public void mouseEntered(MouseEvent e) {
-			checkRollOver();
-		}
-
-		public void mouseExited(MouseEvent e) {
-			tabPane.repaint();
-		}
+	private class RollOverListener implements MouseMotionListener, MouseListener {
 
 		private void checkRollOver() {
-			int currentRollOver = getRolloverTab();
-			if (currentRollOver != lastRollOverTab) {
-				lastRollOverTab = currentRollOver;
-				Rectangle tabsRect = new Rectangle(0, 0, tabPane.getWidth(), HEIGHT);
-				tabPane.repaint(tabsRect);
+			final int currentRollOver = getRolloverTab();
+			if (currentRollOver != AquaBarTabbedPaneUI.this.lastRollOverTab) {
+				AquaBarTabbedPaneUI.this.lastRollOverTab = currentRollOver;
+				final Rectangle tabsRect = new Rectangle(0, 0, AquaBarTabbedPaneUI.this.tabPane.getWidth(), HEIGHT);
+				AquaBarTabbedPaneUI.this.tabPane.repaint(tabsRect);
 			}
 		}
+
+		@Override
+		public void mouseClicked(final MouseEvent e) {
+		}
+
+		@Override
+		public void mouseDragged(final MouseEvent e) {
+		}
+
+		@Override
+		public void mouseEntered(final MouseEvent e) {
+			checkRollOver();
+		}
+
+		@Override
+		public void mouseExited(final MouseEvent e) {
+			AquaBarTabbedPaneUI.this.tabPane.repaint();
+		}
+
+		@Override
+		public void mouseMoved(final MouseEvent e) {
+			checkRollOver();
+		}
+
+		@Override
+		public void mousePressed(final MouseEvent e) {
+		}
+
+		@Override
+		public void mouseReleased(final MouseEvent e) {
+		}
+	}
+
+	private static final int HEIGHT = 40;
+	private static final Insets NO_INSETS = new Insets(0, 0, 0, 0);
+
+	public static ComponentUI createUI(final JComponent c) {
+		return new AquaBarTabbedPaneUI();
+	}
+
+	private final ColorSet selectedColorSet;
+	private final ColorSet defaultColorSet;
+	private final ColorSet hoverColorSet;
+	private boolean contentTopBorderDrawn = true;
+	private final Color lineColor = new Color(158, 158, 158);
+
+	private final Color dividerColor = new Color(200, 200, 200);
+
+	private Insets contentInsets = new Insets(10, 10, 10, 10);
+
+	private int lastRollOverTab = -1;
+
+	public AquaBarTabbedPaneUI() {
+
+		this.selectedColorSet = new ColorSet();
+		this.selectedColorSet.topGradColor1 = new Color(233, 237, 248);
+		this.selectedColorSet.topGradColor2 = new Color(158, 199, 240);
+
+		this.selectedColorSet.bottomGradColor1 = new Color(112, 173, 239);
+		this.selectedColorSet.bottomGradColor2 = new Color(183, 244, 253);
+
+		this.defaultColorSet = new ColorSet();
+		this.defaultColorSet.topGradColor1 = new Color(253, 253, 253);
+		this.defaultColorSet.topGradColor2 = new Color(237, 237, 237);
+
+		this.defaultColorSet.bottomGradColor1 = new Color(222, 222, 222);
+		this.defaultColorSet.bottomGradColor2 = new Color(255, 255, 255);
+
+		this.hoverColorSet = new ColorSet();
+		this.hoverColorSet.topGradColor1 = new Color(244, 244, 244);
+		this.hoverColorSet.topGradColor2 = new Color(223, 223, 223);
+
+		this.hoverColorSet.bottomGradColor1 = new Color(211, 211, 211);
+		this.hoverColorSet.bottomGradColor2 = new Color(235, 235, 235);
+
+		this.maxTabHeight = HEIGHT;
+
+		setContentInsets(0);
+	}
+
+	@Override
+	protected int calculateMaxTabHeight(final int tabPlacement) {
+		return HEIGHT;
+	}
+
+	@Override
+	protected int calculateTabHeight(final int tabPlacement, final int tabIndex, final int fontHeight) {
+		return 21;
+	}
+
+	@Override
+	protected int calculateTabWidth(final int tabPlacement, final int tabIndex, final FontMetrics metrics) {
+		int w = super.calculateTabWidth(tabPlacement, tabIndex, metrics);
+		final int wid = metrics.charWidth('M');
+		w += wid * 2;
+		return w;
+	}
+
+	@Override
+	protected Insets getContentBorderInsets(final int tabPlacement) {
+		return this.contentInsets;
+	}
+
+	@Override
+	protected int getTabLabelShiftY(final int tabPlacement, final int tabIndex, final boolean isSelected) {
+		return 0;
+	}
+
+	@Override
+	public int getTabRunCount(final JTabbedPane pane) {
+		return 1;
+	}
+
+	@Override
+	protected void installDefaults() {
+		super.installDefaults();
+
+		final RollOverListener l = new RollOverListener();
+		this.tabPane.addMouseListener(l);
+		this.tabPane.addMouseMotionListener(l);
+
+		this.tabAreaInsets = NO_INSETS;
+		this.tabInsets = new Insets(0, 0, 0, 1);
+	}
+
+	@Override
+	protected void paintContentBorderBottomEdge(final Graphics g, final int tabPlacement, final int selectedIndex, final int x, final int y,
+			final int w, final int h) {
+		// Do nothing
+	}
+
+	@Override
+	protected void paintContentBorderLeftEdge(final Graphics g, final int tabPlacement, final int selectedIndex, final int x, final int y,
+			final int w, final int h) {
+		// Do nothing
+	}
+
+	@Override
+	protected void paintContentBorderRightEdge(final Graphics g, final int tabPlacement, final int selectedIndex, final int x, final int y,
+			final int w, final int h) {
+		// Do nothing
+	}
+
+	@Override
+	protected void paintContentBorderTopEdge(final Graphics g, final int tabPlacement, final int selectedIndex, final int x, final int y, final int w,
+			final int h) {
+
+	}
+
+	@Override
+	protected void paintFocusIndicator(final Graphics g, final int tabPlacement, final Rectangle[] rects, final int tabIndex,
+			final Rectangle iconRect, final Rectangle textRect, final boolean isSelected) {
+		// Do nothing
+	}
+
+	@Override
+	protected void paintTabArea(final Graphics g, final int tabPlacement, final int selectedIndex) {
+		final Graphics2D g2d = (Graphics2D) g;
+		g2d.setPaint(new GradientPaint(0, 0, this.defaultColorSet.topGradColor1, 0, 10, this.defaultColorSet.topGradColor2));
+		g2d.fillRect(0, 0, this.tabPane.getWidth(), HEIGHT / 2);
+
+		g2d.setPaint(new GradientPaint(0, HEIGHT / 2, this.defaultColorSet.bottomGradColor1, 0, HEIGHT + 1, this.defaultColorSet.bottomGradColor2));
+		g2d.fillRect(0, HEIGHT / 2, this.tabPane.getWidth(), HEIGHT / 2 + 1);
+		super.paintTabArea(g, tabPlacement, selectedIndex);
+
+		if (this.contentTopBorderDrawn) {
+			g2d.setColor(this.lineColor);
+			g2d.drawLine(0, HEIGHT, this.tabPane.getWidth() - 1, HEIGHT);
+		}
+	}
+
+	@Override
+	protected void paintTabBackground(final Graphics g, final int tabPlacement, final int tabIndex, final int x, final int y, final int w,
+			final int h, final boolean isSelected) {
+		final Graphics2D g2d = (Graphics2D) g;
+		ColorSet colorSet;
+
+		final Rectangle rect = this.rects[tabIndex];
+
+		if (isSelected) {
+			colorSet = this.selectedColorSet;
+		} else if (getRolloverTab() == tabIndex) {
+			colorSet = this.hoverColorSet;
+		} else {
+			colorSet = this.defaultColorSet;
+		}
+
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		int width = rect.width;
+		int xpos = rect.x;
+		if (tabIndex > 0) {
+			width--;
+			xpos++;
+		}
+
+		g2d.setPaint(new GradientPaint(xpos, 0, colorSet.topGradColor1, xpos, 10, colorSet.topGradColor2));
+		g2d.fillRect(xpos, 0, width, HEIGHT / 2);
+
+		g2d.setPaint(new GradientPaint(0, HEIGHT / 2, colorSet.bottomGradColor1, 0, HEIGHT + 1, colorSet.bottomGradColor2));
+		g2d.fillRect(xpos, HEIGHT / 2, width, HEIGHT / 2 + 1);
+
+		if (this.contentTopBorderDrawn) {
+			g2d.setColor(this.lineColor);
+			g2d.drawLine(rect.x, HEIGHT, rect.x + rect.width - 1, HEIGHT);
+		}
+	}
+
+	@Override
+	protected void paintTabBorder(final Graphics g, final int tabPlacement, final int tabIndex, final int x, final int y, final int w, final int h,
+			final boolean isSelected) {
+		final Rectangle rect = getTabBounds(tabIndex, new Rectangle(x, y, w, h));
+		g.setColor(this.dividerColor);
+		g.drawLine(rect.x + rect.width, 0, rect.x + rect.width, HEIGHT);
+	}
+
+	protected boolean scrollableTabLayoutEnabled() {
+		return false;
+	}
+
+	public void setContentInsets(final Insets i) {
+		this.contentInsets = i;
+	}
+
+	public void setContentInsets(final int i) {
+		this.contentInsets = new Insets(i, i, i, i);
+	}
+
+	public void setContentTopBorderDrawn(final boolean b) {
+		this.contentTopBorderDrawn = b;
 	}
 }

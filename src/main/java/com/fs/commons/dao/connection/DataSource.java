@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.connection;
 
 import java.sql.Connection;
@@ -24,30 +39,12 @@ public interface DataSource {
 	public static final int DEFAULT_LIMIT = 5000;
 
 	/**
-	 * @return
-	 * @throws DaoException
-	 */
-	public Connection getConnection() throws DaoException;
-
-	/**
 	 * @param con
 	 */
 	public void close(Connection con);
 
 	/**
-	 * 
-	 * @param stmt
-	 */
-	public void close(Statement stmt);
-
-	/**
-	 * 
-	 * @param rs
-	 */
-	public void close(ResultSet rs);
-
-	/**
-	 * 
+	 *
 	 * @param connection
 	 * @param commit
 	 * @throws DaoException
@@ -55,7 +52,19 @@ public interface DataSource {
 	public void close(Connection connection, boolean commit) throws DaoException;
 
 	/**
-	 * 
+	 *
+	 * @param rs
+	 */
+	public void close(ResultSet rs);
+
+	/**
+	 *
+	 * @param stmt
+	 */
+	public void close(Statement stmt);
+
+	/**
+	 *
 	 * @return
 	 * @throws DaoException
 	 */
@@ -63,13 +72,16 @@ public interface DataSource {
 
 	/**
 	 * @return
+	 * @throws DaoException
 	 */
-	public String getPassword();
+	public Connection getConnection() throws DaoException;
+
+	public DataBaseAnaylser getDatabaseAnasyaler() throws DaoException, SQLException;
 
 	/**
 	 * @return
 	 */
-	public String getUsername();
+	public String getDatabaseHost();
 
 	/**
 	 * @return
@@ -81,28 +93,31 @@ public interface DataSource {
 	 */
 	public int getDatabasePort();
 
-	/**
-	 * @return
-	 */
-	public String getDatabaseHost();
+	public String getDatabaseUrl();
 
-	void setDatabaseName(String databseName);
-
-	public int getQueryLimit();
-
-	public String getProperty(String property, String defaultValue);
-
-	public Properties getProperties();
-
-	public Connection getQueryConnection() throws DaoException;
+	public String getDefaultDatabaseName();
 
 	public String getDriverName();
 
-	public String getDatabaseUrl();
+	/**
+	 * @return
+	 */
+	public String getPassword();
 
-	public DataBaseAnaylser getDatabaseAnasyaler() throws DaoException, SQLException;
+	public Properties getProperties();
 
-	public String getDefaultDatabaseName();
-	
+	public String getProperty(String property, String defaultValue);
+
+	public Connection getQueryConnection() throws DaoException;
+
+	public int getQueryLimit();
+
 	public String getTestQuery();
+
+	/**
+	 * @return
+	 */
+	public String getUsername();
+
+	void setDatabaseName(String databseName);
 }

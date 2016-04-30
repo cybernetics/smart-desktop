@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.security.ui.privileges;
 
 import java.awt.BorderLayout;
@@ -20,37 +35,31 @@ import com.fs.commons.util.GeneralUtility;
 
 public class PnlResetPrivilegs extends JKMainPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private QueryJTable tblPrivileges = new QueryJTable(AbstractTableMetaFactory.getTableMeta("sec_privileges"));
+	private final QueryJTable tblPrivileges = new QueryJTable(AbstractTableMetaFactory.getTableMeta("sec_privileges"));
 
 	public PnlResetPrivilegs() {
 		init();
 	}
 
-	private void init() {
-		setLayout(new BorderLayout());
-		add(tblPrivileges, BorderLayout.CENTER);
-		add(getButtonsPnl(), BorderLayout.SOUTH);
-	}
-
 	private JKPanel<?> getButtonsPnl() {
-		JKPanel<?> panel = new JKPanel<Object>();
-		JKButton clearBtn = new JKButton("CLEAR");
+		final JKPanel<?> panel = new JKPanel<Object>();
+		final JKButton clearBtn = new JKButton("CLEAR");
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleClear();
 			}
 
 		});
 		clearBtn.setIcon(new ImageIcon(GeneralUtility.getIconURL("agt_action_fail.png")));
 
-		JKButton resetBtn = new JKButton("RESET");
+		final JKButton resetBtn = new JKButton("RESET");
 		resetBtn.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				// handleReset();
 			}
 		});
@@ -58,6 +67,27 @@ public class PnlResetPrivilegs extends JKMainPanel {
 		panel.add(clearBtn);
 		panel.add(resetBtn);
 		return panel;
+	}
+
+	private void handleClear() {
+		if (SwingUtility.showConfirmationDialog("THIS_WILL_DELETE_ALL_ROLES_AND_ROLE_PRIVLIGES_ARE_YOU_SURE?")) {
+			final DynamicDao dao = new DynamicDao("sec_privileges");
+			final DynamicDao rolesDao = new DynamicDao("sec_role_privileges");
+			try {
+				try {
+					rolesDao.deleteAllRecords();
+				} catch (final RecordNotFoundException e) {
+				}
+				try {
+					dao.deleteAllRecords();
+				} catch (final RecordNotFoundException e) {
+				}
+			} catch (final DaoException e) {
+				ExceptionUtil.handleException(e);
+			} finally {
+				this.tblPrivileges.reloadData();
+			}
+		}
 	}
 
 	// private void handleReset() {
@@ -122,25 +152,10 @@ public class PnlResetPrivilegs extends JKMainPanel {
 	// return buf.toString();
 	// }
 
-	private void handleClear() {
-		if (SwingUtility.showConfirmationDialog("THIS_WILL_DELETE_ALL_ROLES_AND_ROLE_PRIVLIGES_ARE_YOU_SURE?")) {
-			DynamicDao dao = new DynamicDao("sec_privileges");
-			DynamicDao rolesDao = new DynamicDao("sec_role_privileges");
-			try {
-				try {
-					rolesDao.deleteAllRecords();
-				} catch (RecordNotFoundException e) {
-				}
-				try {
-					dao.deleteAllRecords();
-				} catch (RecordNotFoundException e) {
-				}
-			} catch (DaoException e) {
-				ExceptionUtil.handleException(e);
-			} finally {
-				tblPrivileges.reloadData();
-			}
-		}
+	private void init() {
+		setLayout(new BorderLayout());
+		add(this.tblPrivileges, BorderLayout.CENTER);
+		add(getButtonsPnl(), BorderLayout.SOUTH);
 	}
 
 }

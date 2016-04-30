@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.apps.templates.beans;
 
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
@@ -13,62 +28,62 @@ public class Variable {
 	private Query query;
 
 	// ///////////////////////////////////////////////////////////////
-	public int getVarId() {
-		return varId;
+	public String getFieldName() {
+		return this.fieldName;
 	}
 
-	// ///////////////////////////////////////////////////////////////
-	public void setVarId(int varId) {
-		this.varId = varId;
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public String getVarName() {
-		return varName;
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public void setVarName(String varName) {
-		this.varName = varName;
+	public Query getQuery() {
+		return this.query;
 	}
 
 	// ///////////////////////////////////////////////////////////////
 	public String getTableName() {
-		return tableName;
+		return this.tableName;
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
+	public int getVarId() {
+		return this.varId;
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public String getFieldName() {
-		return fieldName;
+	public String getVarName() {
+		return this.varName;
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public void setFieldName(String fieldName) {
+	public void setFieldName(final String fieldName) {
 		this.fieldName = fieldName;
 	}
 
-	// ///////////////////////////////////////////////////////////////
-	public FieldMeta toFieldMeta() {
-		TableMeta tableMeta = AbstractTableMetaFactory.getTableMeta(getTableName());
-		 FieldMeta field = tableMeta.getField(getFieldName(), true);
-		 if(field==null){
-			 throw new IllegalArgumentException(getFieldName()+" is not available at table "+getTableName());
-		 }
-		 return field;
-	}
-
-	public void setQuery(Query query) {
+	public void setQuery(final Query query) {
 		this.query = query;
 
 	}
 
-	public Query getQuery() {
-		return query;
+	// ///////////////////////////////////////////////////////////////
+	public void setTableName(final String tableName) {
+		this.tableName = tableName;
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public void setVarId(final int varId) {
+		this.varId = varId;
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public void setVarName(final String varName) {
+		this.varName = varName;
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public FieldMeta toFieldMeta() {
+		final TableMeta tableMeta = AbstractTableMetaFactory.getTableMeta(getTableName());
+		final FieldMeta field = tableMeta.getField(getFieldName(), true);
+		if (field == null) {
+			throw new IllegalArgumentException(getFieldName() + " is not available at table " + getTableName());
+		}
+		return field;
 	}
 
 }

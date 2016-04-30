@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.application.config;
 
 import java.awt.BorderLayout;
@@ -21,7 +36,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 
 public class CommonsConfigPanel extends JKPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	// key : property name
@@ -30,98 +45,50 @@ public class CommonsConfigPanel extends JKPanel {
 
 	JKButton btnSave = new JKButton("Save");
 	JKButton btnReload = new JKButton("Reload");
-	JKButton btnAddProperty=new JKButton("Add Property");
-	JFileChooser chooser=SwingUtility.getDefaultFileChooser();
+	JKButton btnAddProperty = new JKButton("Add Property");
+	JFileChooser chooser = SwingUtility.getDefaultFileChooser();
 	private JKPanel mainPanel;
 
 	/**
-	 * 
+	 *
 	 */
-	public CommonsConfigPanel(CommonsConfigManager configManager) {
+	public CommonsConfigPanel(final CommonsConfigManager configManager) {
 		this.configManager = configManager;
 		init();
 		populateData();
 	}
 
 	/**
-	 * 
-	 */
-	private void init() {
-		setBorder(BorderFactory.createRaisedBevelBorder());
-		JKPanel containerPanel = new JKPanel();
-		containerPanel.setBorder(SwingUtility.createTitledBorder("Config Properties"));
-		containerPanel.setLayout(new BorderLayout());
-		mainPanel = new JKPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		Properties prop = configManager.getProperties();
-		Enumeration keys = prop.propertyNames();
-		while (keys.hasMoreElements()) {
-			String key = (String) keys.nextElement();
-			prop.getProperty(key);
-			buildPropertyPanel(mainPanel, key);
-		}
-		containerPanel.add(mainPanel, BorderLayout.CENTER);
-		containerPanel.add(getButtonsPanel(), BorderLayout.SOUTH);
-
-		add(containerPanel);
-
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleSave();
-			}
-		});
-		btnReload.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				populateData();
-			}
-		});
-		btnAddProperty.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleAddProperyt();
-			}
-		});
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleAddProperyt() {		
-		String property=SwingUtility.showInputDialog("Enter new property name");
-		if(property!=null && !property.equals("")){
-			buildPropertyPanel(mainPanel, property);
-			SwingUtility.packJFrameWindow(this);
-		}
-	}
-
-	/**
-	 * 
+	 *
 	 * @param mainPanel
 	 * @param key
 	 * @return
 	 */
-	private JKTextField buildPropertyPanel(JKPanel mainPanel, String key) {
-		JKPanel pnl = new JKPanel();
+	private JKTextField buildPropertyPanel(final JKPanel mainPanel, final String key) {
+		final JKPanel pnl = new JKPanel();
 
 		final JKTextField txt = new JKTextField(20);
-		JKButton btnEncode = new JKButton("Encode");
-		JKButton btnDecode = new JKButton("Decode");
+		final JKButton btnEncode = new JKButton("Encode");
+		final JKButton btnDecode = new JKButton("Decode");
 
 		pnl.add(new JKLabledComponent(key, txt));
 		pnl.add(btnEncode);
 		pnl.add(btnDecode);
 		mainPanel.add(pnl);
 		mainPanel.add(Box.createVerticalStrut(3));
-		components.put(key, txt);		
+		this.components.put(key, txt);
 		btnEncode.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String result = CommonsConfigManager.encode(txt.getText());
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final String result = CommonsConfigManager.encode(txt.getText());
 				txt.setText(result);
 			}
 		});
 
 		btnDecode.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String result = CommonsConfigManager.decode(txt.getText());
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final String result = CommonsConfigManager.decode(txt.getText());
 				txt.setText(result);
 			}
 		});
@@ -129,53 +96,106 @@ public class CommonsConfigPanel extends JKPanel {
 	}
 
 	/**
-	 * 
-	 */
-	protected void populateData() {
-		Enumeration keys = components.keys();
-		while (keys.hasMoreElements()) {
-			String key = (String) keys.nextElement();
-			String originalValue = configManager.getProperty(key, "");
-			components.get(key).setValue(originalValue);
-		}
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleSave() {
-		Enumeration keys = components.keys();
-		while (keys.hasMoreElements()) {
-			String key = (String) keys.nextElement();
-			String value=components.get(key).getValue();
-			configManager.setProperty(key, value);			
-		}
-		try {
-			int choice=chooser.showSaveDialog(null);
-			if(choice==JFileChooser.APPROVE_OPTION){
-				String fileName=chooser.getSelectedFile().getAbsolutePath();
-				configManager.storeToXML(fileName);
-				SwingUtility.showSuccessDialog("File has been saved succesfully");				
-			}
-		} catch (Exception e) {			
-			SwingUtility.showUserErrorDialog("Error saving file:"+e.getMessage(),e);
-		}
-	}
-
-	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private JKPanel getButtonsPanel() {
-		JKPanel panel = new JKPanel();
-		panel.add(btnSave);
-		panel.add(btnReload);
-		panel.add(btnAddProperty);
+		final JKPanel panel = new JKPanel();
+		panel.add(this.btnSave);
+		panel.add(this.btnReload);
+		panel.add(this.btnAddProperty);
 		return panel;
 	}
 
 	/**
-	 * 
+	 *
+	 */
+	protected void handleAddProperyt() {
+		final String property = SwingUtility.showInputDialog("Enter new property name");
+		if (property != null && !property.equals("")) {
+			buildPropertyPanel(this.mainPanel, property);
+			SwingUtility.packJFrameWindow(this);
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleSave() {
+		final Enumeration keys = this.components.keys();
+		while (keys.hasMoreElements()) {
+			final String key = (String) keys.nextElement();
+			final String value = this.components.get(key).getValue();
+			this.configManager.setProperty(key, value);
+		}
+		try {
+			final int choice = this.chooser.showSaveDialog(null);
+			if (choice == JFileChooser.APPROVE_OPTION) {
+				final String fileName = this.chooser.getSelectedFile().getAbsolutePath();
+				this.configManager.storeToXML(fileName);
+				SwingUtility.showSuccessDialog("File has been saved succesfully");
+			}
+		} catch (final Exception e) {
+			SwingUtility.showUserErrorDialog("Error saving file:" + e.getMessage(), e);
+		}
+	}
+
+	/**
+	 *
+	 */
+	private void init() {
+		setBorder(BorderFactory.createRaisedBevelBorder());
+		final JKPanel containerPanel = new JKPanel();
+		containerPanel.setBorder(SwingUtility.createTitledBorder("Config Properties"));
+		containerPanel.setLayout(new BorderLayout());
+		this.mainPanel = new JKPanel();
+		this.mainPanel.setLayout(new BoxLayout(this.mainPanel, BoxLayout.Y_AXIS));
+		final Properties prop = this.configManager.getProperties();
+		final Enumeration keys = prop.propertyNames();
+		while (keys.hasMoreElements()) {
+			final String key = (String) keys.nextElement();
+			prop.getProperty(key);
+			buildPropertyPanel(this.mainPanel, key);
+		}
+		containerPanel.add(this.mainPanel, BorderLayout.CENTER);
+		containerPanel.add(getButtonsPanel(), BorderLayout.SOUTH);
+
+		add(containerPanel);
+
+		this.btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleSave();
+			}
+		});
+		this.btnReload.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				populateData();
+			}
+		});
+		this.btnAddProperty.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleAddProperyt();
+			}
+		});
+	}
+
+	/**
+	 *
+	 */
+	protected void populateData() {
+		final Enumeration keys = this.components.keys();
+		while (keys.hasMoreElements()) {
+			final String key = (String) keys.nextElement();
+			final String originalValue = this.configManager.getProperty(key, "");
+			this.components.get(key).setValue(originalValue);
+		}
+	}
+
+	/**
+	 *
 	 * @param key
 	 * @param value
 	 * @return

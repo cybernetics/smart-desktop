@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui.tabular;
 
 import java.awt.Component;
@@ -20,58 +35,60 @@ public class DynCellFactory {
 	static class DynFieldEditor extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
 
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 		private JComponent component;
 
 		/**
-		 * 
+		 *
 		 * @param field
 		 */
-		public DynFieldEditor(FieldMeta field) {
+		public DynFieldEditor(final FieldMeta field) {
 			try {
-				component = (JComponent) ComponentFactory.createComponent(field,true);
-				component.setPreferredSize(null);								
-			} catch (DaoException e) {
+				this.component = (JComponent) ComponentFactory.createComponent(field, true);
+				this.component.setPreferredSize(null);
+			} catch (final DaoException e) {
 				ExceptionUtil.handleException(e);
 			}
 		}
 
 		@Override
-		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-			((BindingComponent<Object>) component).setValue(value);
-			if (isSelected) {
-				component.setBackground(Colors.CELL_EDITOR_BG);
-			} else {
-				component.setBackground(Colors.TABLE_ODD_ROW);
-			}
-			return component;
-		}
-
-		@Override
 		public Object getCellEditorValue() {
-			return ((BindingComponent<?>) component).getValue();
+			return ((BindingComponent<?>) this.component).getValue();
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			((BindingComponent<Object>) component).setValue(value);
+		public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row,
+				final int column) {
+			((BindingComponent<Object>) this.component).setValue(value);
 			if (isSelected) {
-				component.setBackground(Colors.JK_LABEL_BG);
+				this.component.setBackground(Colors.CELL_EDITOR_BG);
 			} else {
-				component.setBackground(Colors.TABLE_ODD_ROW);
+				this.component.setBackground(Colors.TABLE_ODD_ROW);
+			}
+			return this.component;
+		}
+
+		@Override
+		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus,
+				final int row, final int column) {
+			((BindingComponent<Object>) this.component).setValue(value);
+			if (isSelected) {
+				this.component.setBackground(Colors.JK_LABEL_BG);
+			} else {
+				this.component.setBackground(Colors.TABLE_ODD_ROW);
 			}
 
-			if (hasFocus ){
-				JKTable jkTable = (JKTable) table;
-				if(jkTable.isEditable(column)) {
+			if (hasFocus) {
+				final JKTable jkTable = (JKTable) table;
+				if (jkTable.isEditable(column)) {
 					table.editCellAt(row, column);
-				}else{
+				} else {
 					jkTable.transferFocusToNextColunm();
-				}				
+				}
 			}
-			return component;
+			return this.component;
 		}
 
 	}

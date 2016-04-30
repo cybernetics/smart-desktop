@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.application.xml;
 
 import java.io.InputStream;
@@ -19,10 +34,10 @@ import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
 
 public class ModuleMenuXmlParser {
-	
+
 	private final Module parentModule;
 
-	public ModuleMenuXmlParser(Module parentModule) {
+	public ModuleMenuXmlParser(final Module parentModule) {
 		this.parentModule = parentModule;
 	}
 
@@ -31,26 +46,26 @@ public class ModuleMenuXmlParser {
 	 * @return
 	 * @throws JKXmlException
 	 */
-	public ArrayList<Menu> parse(InputStream in) throws JKXmlException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	public ArrayList<Menu> parse(final InputStream in) throws JKXmlException {
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
 		try {
 			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(in);
-			ArrayList<Menu> menus=new ArrayList<Menu>();
-			NodeList menuNodes = doc.getElementsByTagName("menu");
+			final Document doc = builder.parse(in);
+			final ArrayList<Menu> menus = new ArrayList<Menu>();
+			final NodeList menuNodes = doc.getElementsByTagName("menu");
 			for (int i = 0; i < menuNodes.getLength(); i++) {
-				Node node = menuNodes.item(i);					
+				final Node node = menuNodes.item(i);
 				if (node instanceof Element) {
-					Element e = (Element) node;
-					Menu menu = parseMenu(e);					
-					menu.setParentModule(parentModule);
+					final Element e = (Element) node;
+					final Menu menu = parseMenu(e);
+					menu.setParentModule(this.parentModule);
 					menu.init();
 					menus.add(menu);
-				}				
+				}
 			}
 			return menus;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new JKXmlException(e);
 		}
 	}
@@ -62,22 +77,22 @@ public class ModuleMenuXmlParser {
 	 * @throws InstantiationException
 	 * @throws TableMetaNotFoundException
 	 */
-	private Menu parseMenu(Element e1) throws InstantiationException, IllegalAccessException {
-		Menu menu = Menu.class.newInstance();
+	private Menu parseMenu(final Element e1) throws InstantiationException, IllegalAccessException {
+		final Menu menu = Menu.class.newInstance();
 		menu.setName(e1.getAttribute("name").trim());
 		if (!e1.getAttribute("icon-name").trim().equals("")) {
 			menu.setIconName(e1.getAttribute("icon-name").trim());
 		}
-//		if (!e1.getAttribute("privlige-id").trim().equals("")) {
-//			menu.setPriviligeId(Integer.parseInt(e1.getAttribute("privlige-id").trim()));
-//		}
-		NodeList list = e1.getChildNodes();
+		// if (!e1.getAttribute("privlige-id").trim().equals("")) {
+		// menu.setPriviligeId(Integer.parseInt(e1.getAttribute("privlige-id").trim()));
+		// }
+		final NodeList list = e1.getChildNodes();
 		for (int i = 0; i < list.getLength(); i++) {
-			Node node = list.item(i);
+			final Node node = list.item(i);
 			if (node instanceof Element) {
-				Element element = (Element) node;
+				final Element element = (Element) node;
 				if (element.getNodeName().trim().equals("menu-item")) {
-					MenuItem item = parseMenuItem(element);
+					final MenuItem item = parseMenuItem(element);
 					item.setParentMenu(menu);
 					menu.add(item);
 				}
@@ -87,22 +102,22 @@ public class ModuleMenuXmlParser {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private MenuItem parseMenuItem(Element e) throws InstantiationException, IllegalAccessException {
-		MenuItem item = MenuItem.class.newInstance();
+	private MenuItem parseMenuItem(final Element e) throws InstantiationException, IllegalAccessException {
+		final MenuItem item = MenuItem.class.newInstance();
 		item.setName(e.getAttribute("name").trim());
 		if (!e.getAttribute("icon-name").trim().equals("")) {
 			item.setIconName(e.getAttribute("icon-name"));
 		}
-//		if (!e.getAttribute("privlige-id").trim().equals("")) {
-//			item.setPriviligeId(Integer.parseInt(e.getAttribute("privlige-id").trim()));
-//		}
+		// if (!e.getAttribute("privlige-id").trim().equals("")) {
+		// item.setPriviligeId(Integer.parseInt(e.getAttribute("privlige-id").trim()));
+		// }
 		if (!e.getAttribute("cache").trim().equals("")) {
 			item.setCachePanel(Boolean.parseBoolean(e.getAttribute("cache").trim()));
 		}
 
-		NodeList nodeList = e.getChildNodes();
+		final NodeList nodeList = e.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
-			Node node = nodeList.item(i);
+			final Node node = nodeList.item(i);
 			if (node.getNodeName().equals("properties")) {
 				item.setProperties(parseProperties(node));
 			}
@@ -114,13 +129,13 @@ public class ModuleMenuXmlParser {
 	 * @param node
 	 * @return
 	 */
-	private Properties parseProperties(Node node) {
-		Properties properties = new Properties();
-		NodeList propList = node.getChildNodes();
+	private Properties parseProperties(final Node node) {
+		final Properties properties = new Properties();
+		final NodeList propList = node.getChildNodes();
 		for (int i = 0; i < propList.getLength(); i++) {
 			if (propList.item(i).getNodeName().equals("property")) {
-				Element e = (Element) propList.item(i);
-				String propertyName = e.getAttribute("name").trim();
+				final Element e = (Element) propList.item(i);
+				final String propertyName = e.getAttribute("name").trim();
 				if (!e.getAttribute("value").trim().equals("")) {
 					// add simple record
 					properties.setProperty(propertyName, e.getAttribute("value").trim());

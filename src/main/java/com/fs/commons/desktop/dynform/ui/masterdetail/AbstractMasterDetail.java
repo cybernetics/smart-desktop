@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui.masterdetail;
 
 import java.util.ArrayList;
@@ -29,17 +44,17 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 		private final DetailPanel pnlDetail;
 
 		// ///////////////////////////////////////////////////////////////////////////////
-		public DetailDaoAdpater(DetailPanel pnlDetail) {
+		public DetailDaoAdpater(final DetailPanel pnlDetail) {
 			this.pnlDetail = pnlDetail;
 		}
 
 		@Override
-		public void afterAddRecord(Record record) {
-			if (pnlDetail instanceof DetailOneToOnePanel) {
+		public void afterAddRecord(final Record record) {
+			if (this.pnlDetail instanceof DetailOneToOnePanel) {
 				try {
-					pnlDetail.handleFind(record.getIdValue());
+					this.pnlDetail.handleFind(record.getIdValue());
 					navigateNext();
-				} catch (DaoException e) {
+				} catch (final DaoException e) {
 					ExceptionUtil.handleException(e);
 				}
 			}
@@ -56,26 +71,13 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 				@Override
 				public void run() {
 					try {
-						pnlMaster.handleFindRecord(record.getIdValue());
+						AbstractMasterDetail.this.pnlMaster.handleFindRecord(record.getIdValue());
 						navigateNext();
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						ExceptionUtil.handleException(e);
 					}
 				}
 			});
-		}
-
-		// ///////////////////////////////////////////////////////////////////////////////
-		public void handleAfterRecordDuplicated(Record newRecord) {
-			// Make deep duplicate for the record
-			if (pnlMaster.getMode() == DynDaoMode.DUPLICATE) {
-				DynamicDao dao = pnlMaster.getDao();
-				try {
-					dao.cloneDetails(pnlMaster.getDuplicatedRecord().getIdValue(), newRecord.getIdValue());
-				} catch (DaoException e) {
-					ExceptionUtil.handleException(e);
-				}
-			}
 		}
 
 		@Override
@@ -84,40 +86,58 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 			navigateToPanelAtIndex(0);
 		}
 
+		// ///////////////////////////////////////////////////////////////////////////////
+		public void handleAfterRecordDuplicated(final Record newRecord) {
+			// Make deep duplicate for the record
+			if (AbstractMasterDetail.this.pnlMaster.getMode() == DynDaoMode.DUPLICATE) {
+				final DynamicDao dao = AbstractMasterDetail.this.pnlMaster.getDao();
+				try {
+					dao.cloneDetails(AbstractMasterDetail.this.pnlMaster.getDuplicatedRecord().getIdValue(), newRecord.getIdValue());
+				} catch (final DaoException e) {
+					ExceptionUtil.handleException(e);
+				}
+			}
+		}
+
+		// ///////////////////////////////////////////////////////////////////////////////
+		private void handleFindInDetail(final Record masterRecord) {
+			try {
+				for (int i = 0; i < AbstractMasterDetail.this.detailPanels.size(); i++) {
+					final DetailPanel pnlDetail = AbstractMasterDetail.this.detailPanels.get(i);
+					pnlDetail.setMasterIdValue(masterRecord.getIdValue());
+				}
+			} catch (final DaoException e) {
+				ExceptionUtil.handleException(e);
+			}
+		}
+
 		@Override
 		public void onRecordFound(final Record masterRecord) {
 			handleFindInDetail(masterRecord);
 		}
 
 		@Override
-		public void onRecordNotFound(Object recordId, DaoException e) {
+		public void onRecordNotFound(final Object recordId, final DaoException e) {
 			resetDetailPanels();
 		}
 
 		// ///////////////////////////////////////////////////////////////////////////////
-		private void handleFindInDetail(Record masterRecord) {
-			try {
-				for (int i = 0; i < detailPanels.size(); i++) {
-					DetailPanel pnlDetail = detailPanels.get(i);
-					pnlDetail.setMasterIdValue(masterRecord.getIdValue());
-				}
-			} catch (DaoException e) {
-				ExceptionUtil.handleException(e);
-			}
-		}
-
-		// ///////////////////////////////////////////////////////////////////////////////
 		private void resetDetailPanels() {
-			for (int i = 0; i < detailPanels.size(); i++) {
-				DetailPanel pnl = (DetailPanel) detailPanels.get(i);
+			for (int i = 0; i < AbstractMasterDetail.this.detailPanels.size(); i++) {
+				final DetailPanel pnl = AbstractMasterDetail.this.detailPanels.get(i);
 				try {
 					pnl.setMasterIdValue(null);
-				} catch (DaoException e) {
+				} catch (final DaoException e) {
 					ExceptionUtil.handleException(e);
 				}
 			}
 		}
 	}
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 698408470223965950L;
 
 	// ///////////////////////////////////////////////////////////////////////////////
 	private TableMeta tableMeta;
@@ -131,20 +151,73 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	public AbstractMasterDetail(TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public AbstractMasterDetail(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
 		setTableMeta(tableMeta);
 	}
 
+	public abstract void addComponent(JComponent comp);
+
 	// /////////////////////////////////////////////////////////////////
-	public void addDetailDaoActionListener(DynDaoActionListener listener) {
-		for (int i = 0; i < detailPanels.size(); i++) {
-			detailPanels.get(i).addDynDaoActionListener(listener);
+	public void addDetailDaoActionListener(final DynDaoActionListener listener) {
+		for (int i = 0; i < this.detailPanels.size(); i++) {
+			this.detailPanels.get(i).addDynDaoActionListener(listener);
 		}
 	}
 
 	// /////////////////////////////////////////////////////////////////
-	public void addMasterDaoActionListener(DynDaoActionListener listener) {
+	public void addMasterDaoActionListener(final DynDaoActionListener listener) {
 		getMasterPanel().addDynDaoActionListener(listener);
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected void addPanelsToContainer() {
+		addPanelToView(getTableMeta().getCaption(), getTableMeta().getIconName(), this.pnlMaster);
+		for (int i = 0; i < this.detailPanels.size(); i++) {
+			final TableMeta detailTable = getDetailFields().get(i).getParentTable();
+			// try {
+			// SecurityManager.checkAllowedPrivilige(detailTable.getPriviligeId());
+			addPanelToView(detailTable.getCaption(), detailTable.getIconName(), (JKPanel) this.detailPanels.get(i));
+			// } catch (NotAllowedOperationException e) {
+			// // its safe to eat this exception
+			// } catch (SecurityException e) {
+			// ExceptionUtil.handleException(e);
+			// }
+		}
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected abstract void addPanelToView(String title, String icon, JKPanel pnl);
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected DetailPanel createDetailPanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws DaoException, UIOPanelCreationException {
+		final DetailPanel pnlDetail = DetailPanelFactory.createDetailPanel(foriegnKeyFieldMeta);
+		pnlDetail.addDynDaoActionListener(new DetailDaoAdpater(pnlDetail));
+		return pnlDetail;
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected DynDaoPanel createMasterPanel(final TableMeta tableMeta) throws DaoException {
+		final DynDaoPanel dynDaoPanel = new DynDaoPanel(tableMeta);
+		dynDaoPanel.addDynDaoActionListener(new MasterDynActionListener());
+		dynDaoPanel.setAllowDuplicate(true);
+		return dynDaoPanel;
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected abstract int getCurrentPanelIndex();
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	protected ArrayList<ForiegnKeyFieldMeta> getDetailFields() {
+		return this.tableMeta.getDetailFields();
+	}
+
+	public DetailPanel getDetailPanel(final String name) {
+		for (final DetailPanel detialPanel : this.detailPanels) {
+			if (detialPanel.getName().equals(name)) {
+				return detialPanel;
+			}
+		}
+		return null;
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
@@ -154,7 +227,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 
 	// ///////////////////////////////////////////////////////////////////////////////
 	public DynDaoPanel getMasterPanel() {
-		return pnlMaster;
+		return this.pnlMaster;
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
@@ -168,63 +241,15 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void handleClosePanel() {
 		SwingUtility.closePanelWindow(this);
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	public void handleFind(Object masterId) throws DaoException {
+	public void handleFind(final Object masterId) throws DaoException {
 		getMasterPanel().handleFind(masterId.toString(), true);
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	public void navigateNext() {
-		navigateToPanelAtIndex(getCurrentPanelIndex() + 1);
-	}
-
-	@Override
-	public void requestFocus() {
-		navigateToPanelAtIndex(0);
-		getMasterPanel().requestFocusInWindow();
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	public void setMode(DynDaoMode mode) throws DaoException {
-		pnlMaster.setMode(mode);
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	public void setTableMeta(TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
-		this.tableMeta = tableMeta;
-		// init();
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected abstract void addPanelToView(String title, String icon, JKPanel pnl);
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected DetailPanel createDetailPanel(ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws DaoException, UIOPanelCreationException {
-		DetailPanel pnlDetail = DetailPanelFactory.createDetailPanel(foriegnKeyFieldMeta);
-		pnlDetail.addDynDaoActionListener(new DetailDaoAdpater(pnlDetail));
-		return pnlDetail;
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected DynDaoPanel createMasterPanel(TableMeta tableMeta) throws DaoException {
-		DynDaoPanel dynDaoPanel = new DynDaoPanel(tableMeta);
-		dynDaoPanel.addDynDaoActionListener(new MasterDynActionListener());
-		dynDaoPanel.setAllowDuplicate(true);
-		return dynDaoPanel;
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected abstract int getCurrentPanelIndex();
-
-	// ///////////////////////////////////////////////////////////////////////////////
-	protected ArrayList<ForiegnKeyFieldMeta> getDetailFields() {
-		return tableMeta.getDetailFields();
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
@@ -237,50 +262,45 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	protected void addPanelsToContainer() {
-		addPanelToView(getTableMeta().getCaption(), getTableMeta().getIconName(), pnlMaster);
-		for (int i = 0; i < detailPanels.size(); i++) {
-			TableMeta detailTable = getDetailFields().get(i).getParentTable();
-			// try {
-			// SecurityManager.checkAllowedPrivilige(detailTable.getPriviligeId());
-			addPanelToView(detailTable.getCaption(), detailTable.getIconName(), (JKPanel) detailPanels.get(i));
-			// } catch (NotAllowedOperationException e) {
-			// // its safe to eat this exception
-			// } catch (SecurityException e) {
-			// ExceptionUtil.handleException(e);
-			// }
-		}
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////
 	protected void initPanel() throws DaoException, UIOPanelCreationException {
-		pnlMaster = createMasterPanel(tableMeta);
+		this.pnlMaster = createMasterPanel(this.tableMeta);
 		for (int i = 0; i < getDetailFields().size(); i++) {
-			ForiegnKeyFieldMeta foriegnKeyFieldMeta = getDetailFields().get(i);
-			DetailPanel pnlDetail = createDetailPanel(foriegnKeyFieldMeta);
+			final ForiegnKeyFieldMeta foriegnKeyFieldMeta = getDetailFields().get(i);
+			final DetailPanel pnlDetail = createDetailPanel(foriegnKeyFieldMeta);
 			pnlDetail.setName(foriegnKeyFieldMeta.getParentTable().getTableId());
-			detailPanels.add(pnlDetail);
+			this.detailPanels.add(pnlDetail);
 		}
-	}
-	
-	public DetailPanel getDetailPanel(String name){
-		for(DetailPanel detialPanel:detailPanels){
-			if(detialPanel.getName().equals(name)){
-				return detialPanel;
-			}
-		}
-		return null;		
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
 	protected abstract void initUI();
 
 	// ///////////////////////////////////////////////////////////////////////////////
+	public void navigateNext() {
+		navigateToPanelAtIndex(getCurrentPanelIndex() + 1);
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
 	protected abstract void navigateToPanelAtIndex(int panelIndex);
 
-	public abstract void addComponent(JComponent comp);
+	@Override
+	public void requestFocus() {
+		navigateToPanelAtIndex(0);
+		getMasterPanel().requestFocusInWindow();
+	}
 
-	public void setRecordTraversePolicy(RecordTraversePolicy traversePolicy) {
-		pnlMaster.setTraversePolicy(traversePolicy);
+	// ///////////////////////////////////////////////////////////////////////////////
+	public void setMode(final DynDaoMode mode) throws DaoException {
+		this.pnlMaster.setMode(mode);
+	}
+
+	public void setRecordTraversePolicy(final RecordTraversePolicy traversePolicy) {
+		this.pnlMaster.setTraversePolicy(traversePolicy);
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////
+	public void setTableMeta(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+		this.tableMeta = tableMeta;
+		// init();
 	}
 }

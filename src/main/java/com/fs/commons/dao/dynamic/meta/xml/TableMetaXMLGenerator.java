@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.meta.xml;
 
 import java.util.List;
@@ -12,38 +27,144 @@ import com.fs.commons.logging.Logger;
 
 public class TableMetaXMLGenerator {
 	/**
-	 * 
+	 *
 	 */
 	public TableMetaXMLGenerator() {
 	}
 
 	/**
-	 * 
-	 * @param tables
+	 *
+	 * @param constraint
 	 * @return
 	 */
-	public String generateTablesMetaXml(List<TableMeta> tables) {
-		StringBuffer buf = new StringBuffer();
-		buf.append("<tables>\n");
-		for (int i = 0; i < tables.size(); i++) {
-			TableMeta tableMeta = tables.get(i);
-			buf.append("<!-- ///////////////////////////////////////////////////////////////////////////// -->\n");
-			buf.append("<!-- Table Meta for : -" + tableMeta.getTableName() + "-with id : -" + tableMeta.getTableId() + "- -->\n");
-			buf.append("<!-- ///////////////////////////////////////////////////////////////////////////// -->\n");
-			buf.append(generateTableMetaXML(tableMeta));
+	private Object buildConstraint(final Constraint constraint) {
+		final StringBuffer buf = new StringBuffer();
+		buf.append("<constraint ");
+		buf.append("name='" + constraint.getName() + "' type='" + constraint.getTypeString() + "' ");
+		if (constraint instanceof DataRangeConstraint) {
+			buf.append(" value-from='" + ((DataRangeConstraint) constraint).getValueFrom() + "' ");
+			buf.append(" value-to='" + ((DataRangeConstraint) constraint).getValueTo() + "' ");
 		}
-		buf.append("</tables>");
+		buf.append(" >");
+		for (int i = 0; i < constraint.getFields().size(); i++) {
+			// TODO : check the following condition
+			if (constraint.getFields().get(i) != null) {
+				buf.append("<field name='" + constraint.getFields().get(i).getName() + "' />");
+			}
+		}
+		buf.append("</constraint>");
+		return buf;
+	}
+
+	/**
+	 *
+	 * @param fieldMeta
+	 * @param buf
+	 */
+	private void buildFieldsAttributes(final FieldMeta fieldMeta, final StringBuffer buf) {
+		buf.append(" name='" + fieldMeta.getName() + "' ");
+		if (fieldMeta.getType() != FieldMeta.FIELD_TYPE) {
+			buf.append(" type='" + fieldMeta.getType() + "' ");
+		}
+		if (fieldMeta.getMaxLength() != FieldMeta.MAX_LENGHT) {
+			buf.append(" max-length='" + fieldMeta.getMaxLength() + "' ");
+		}
+		if (fieldMeta.isRequired() != FieldMeta.REQUIRED) {
+			buf.append(" required='" + fieldMeta.isRequired() + "' ");
+		}
+		if (fieldMeta.isAllowUpdate() != FieldMeta.ALLOW_UPDATE) {
+			buf.append(" allow-update='" + fieldMeta.isAllowUpdate() + "' ");
+		}
+		if (fieldMeta.isVisible() != FieldMeta.VISIBLE) {
+			buf.append(" visible='" + fieldMeta.isVisible() + "' ");
+		}
+		if (fieldMeta.isEnabled() != FieldMeta.ENABLED) {
+			buf.append(" enabled='" + fieldMeta.isEnabled() + "'");
+		}
+		if (fieldMeta.getDefaultValue() != null && !fieldMeta.getDefaultValue().equals("")) {
+			buf.append(" default-value='" + fieldMeta.getDefaultValue() + "'");
+		}
+		if (fieldMeta.isSummaryField()) {
+			buf.append(" summary-field='" + fieldMeta.isSummaryField() + "'");
+		}
+	}
+
+	/**
+	 * @param fieldMeta
+	 * @return
+	 */
+	private String buildFieldXml(final FieldMeta fieldMeta) {
+		if (fieldMeta instanceof ForiegnKeyFieldMeta) {
+			return buildForiegnKeyFieldXML((ForiegnKeyFieldMeta) fieldMeta);
+		}
+		final StringBuffer buf = new StringBuffer();
+		buf.append("<field ");
+		buildFieldsAttributes(fieldMeta, buf);
+		buf.append("/>\n");
 		return buf.toString();
 	}
 
 	/**
-	 * 
+	 *
+	 * @param fieldMeta
+	 * @return
+	 */
+	private String buildForiegnKeyFieldXML(final ForiegnKeyFieldMeta fieldMeta) {
+		final StringBuffer buf = new StringBuffer();
+		buf.append("<field ");
+		buildFieldsAttributes(fieldMeta, buf);
+		buf.append(" reference_table='" + fieldMeta.getReferenceTable() + "' ");
+		buf.append(" reference_field='" + fieldMeta.getReferenceField() + "' ");
+		if (fieldMeta.getViewMode() != ForiegnKeyFieldMeta.DEFAULT_VIEW_MODE) {
+			buf.append(" view-mode='" + fieldMeta.getViewMode() + "' ");
+		}
+		if (fieldMeta.getRelation() != ForiegnKeyFieldMeta.DEFAULT_RELATION) {
+			buf.append(" relation='" + fieldMeta.getRelation() + "' ");
+		}
+		buf.append("/>\n");
+		return buf.toString();
+	}
+
+	/**
+	 *
 	 * @param tableMeta
 	 * @return
 	 */
-	private String generateTableMetaXML(TableMeta tableMeta) {
+	private String buildIdFieldXML(final TableMeta tableMeta) {
+		final StringBuffer buf = new StringBuffer();
+		final IdFieldMeta id = tableMeta.getIdField();
+		if (id != null) {
+			buf.append("<id-field ");
+			if (id.isAutoIncrement() != IdFieldMeta.DEFAULT_AUTO_INCREMENT) {
+				buf.append(" auto-increment='" + id.isAutoIncrement() + "' ");
+			}
+			buildFieldsAttributes(id, buf);
+			buf.append("/>\n");
+		}
+		return buf.toString();
+	}
+
+	/**
+	 *
+	 * @param trigger
+	 * @return
+	 */
+	private String buildTrigger(final String triggerName) {
+		final StringBuffer buf = new StringBuffer();
+		buf.append("<trigger>");
+		buf.append(triggerName);
+		buf.append("</trigger>");
+		return buf.toString();
+	}
+
+	/**
+	 *
+	 * @param tableMeta
+	 * @return
+	 */
+	private String generateTableMetaXML(final TableMeta tableMeta) {
 		Logger.info("Generating tableMeta for table : " + tableMeta.getTableName());
-		StringBuffer buf = new StringBuffer();
+		final StringBuffer buf = new StringBuffer();
 		buf.append("<table ");
 		buf.append("name='" + tableMeta.getTableName() + "' ");
 		buf.append("icon-image='" + tableMeta.getTableName() + ".png' ");
@@ -98,7 +219,7 @@ public class TableMetaXMLGenerator {
 		}
 		if (tableMeta.getTriggerNames().size() > 0) {
 			buf.append("<triggers>\n");
-			for (String triggerName : tableMeta.getTriggerNames()) {
+			for (final String triggerName : tableMeta.getTriggerNames()) {
 				buf.append(buildTrigger(triggerName) + "\n");
 			}
 			buf.append("</triggers>\n");
@@ -123,127 +244,21 @@ public class TableMetaXMLGenerator {
 	}
 
 	/**
-	 * 
-	 * @param trigger
+	 *
+	 * @param tables
 	 * @return
 	 */
-	private String buildTrigger(String triggerName) {
-		StringBuffer buf = new StringBuffer();
-		buf.append("<trigger>");
-		buf.append(triggerName);
-		buf.append("</trigger>");
+	public String generateTablesMetaXml(final List<TableMeta> tables) {
+		final StringBuffer buf = new StringBuffer();
+		buf.append("<tables>\n");
+		for (int i = 0; i < tables.size(); i++) {
+			final TableMeta tableMeta = tables.get(i);
+			buf.append("<!-- ///////////////////////////////////////////////////////////////////////////// -->\n");
+			buf.append("<!-- Table Meta for : -" + tableMeta.getTableName() + "-with id : -" + tableMeta.getTableId() + "- -->\n");
+			buf.append("<!-- ///////////////////////////////////////////////////////////////////////////// -->\n");
+			buf.append(generateTableMetaXML(tableMeta));
+		}
+		buf.append("</tables>");
 		return buf.toString();
-	}
-
-	/**
-	 * 
-	 * @param constraint
-	 * @return
-	 */
-	private Object buildConstraint(Constraint constraint) {
-		StringBuffer buf = new StringBuffer();
-		buf.append("<constraint ");
-		buf.append("name='" + constraint.getName() + "' type='" + constraint.getTypeString() + "' ");
-		if (constraint instanceof DataRangeConstraint) {
-			buf.append(" value-from='" + ((DataRangeConstraint) constraint).getValueFrom() + "' ");
-			buf.append(" value-to='" + ((DataRangeConstraint) constraint).getValueTo() + "' ");
-		}
-		buf.append(" >");
-		for (int i = 0; i < constraint.getFields().size(); i++) {
-			// TODO : check the following condition
-			if (constraint.getFields().get(i) != null) {
-				buf.append("<field name='" + constraint.getFields().get(i).getName() + "' />");
-			}
-		}
-		buf.append("</constraint>");
-		return buf;
-	}
-
-	/**
-	 * @param fieldMeta
-	 * @return
-	 */
-	private String buildFieldXml(FieldMeta fieldMeta) {
-		if (fieldMeta instanceof ForiegnKeyFieldMeta) {
-			return buildForiegnKeyFieldXML((ForiegnKeyFieldMeta) fieldMeta);
-		}
-		StringBuffer buf = new StringBuffer();
-		buf.append("<field ");
-		buildFieldsAttributes(fieldMeta, buf);
-		buf.append("/>\n");
-		return buf.toString();
-	}
-
-	/**
-	 * 
-	 * @param tableMeta
-	 * @return
-	 */
-	private String buildIdFieldXML(TableMeta tableMeta) {
-		StringBuffer buf = new StringBuffer();
-		IdFieldMeta id = tableMeta.getIdField();
-		if (id != null) {
-			buf.append("<id-field ");
-			if (id.isAutoIncrement() != IdFieldMeta.DEFAULT_AUTO_INCREMENT) {
-				buf.append(" auto-increment='" + id.isAutoIncrement() + "' ");
-			}
-			buildFieldsAttributes(id, buf);
-			buf.append("/>\n");
-		}
-		return buf.toString();
-	}
-
-	/**
-	 * 
-	 * @param fieldMeta
-	 * @return
-	 */
-	private String buildForiegnKeyFieldXML(ForiegnKeyFieldMeta fieldMeta) {
-		StringBuffer buf = new StringBuffer();
-		buf.append("<field ");
-		buildFieldsAttributes(fieldMeta, buf);
-		buf.append(" reference_table='" + fieldMeta.getReferenceTable() + "' ");
-		buf.append(" reference_field='" + fieldMeta.getReferenceField() + "' ");
-		if (fieldMeta.getViewMode() != ForiegnKeyFieldMeta.DEFAULT_VIEW_MODE) {
-			buf.append(" view-mode='" + fieldMeta.getViewMode() + "' ");
-		}
-		if (fieldMeta.getRelation() != ForiegnKeyFieldMeta.DEFAULT_RELATION) {
-			buf.append(" relation='" + fieldMeta.getRelation() + "' ");
-		}
-		buf.append("/>\n");
-		return buf.toString();
-	}
-
-	/**
-	 * 
-	 * @param fieldMeta
-	 * @param buf
-	 */
-	private void buildFieldsAttributes(FieldMeta fieldMeta, StringBuffer buf) {
-		buf.append(" name='" + fieldMeta.getName() + "' ");
-		if (fieldMeta.getType() != FieldMeta.FIELD_TYPE) {
-			buf.append(" type='" + fieldMeta.getType() + "' ");
-		}
-		if (fieldMeta.getMaxLength() != FieldMeta.MAX_LENGHT) {
-			buf.append(" max-length='" + fieldMeta.getMaxLength() + "' ");
-		}
-		if (fieldMeta.isRequired() != FieldMeta.REQUIRED) {
-			buf.append(" required='" + fieldMeta.isRequired() + "' ");
-		}
-		if (fieldMeta.isAllowUpdate() != FieldMeta.ALLOW_UPDATE) {
-			buf.append(" allow-update='" + fieldMeta.isAllowUpdate() + "' ");
-		}
-		if (fieldMeta.isVisible() != FieldMeta.VISIBLE) {
-			buf.append(" visible='" + fieldMeta.isVisible() + "' ");
-		}
-		if (fieldMeta.isEnabled() != FieldMeta.ENABLED) {
-			buf.append(" enabled='" + fieldMeta.isEnabled() + "'");
-		}
-		if (fieldMeta.getDefaultValue() != null && !fieldMeta.getDefaultValue().equals("")) {
-			buf.append(" default-value='" + fieldMeta.getDefaultValue() + "'");
-		}
-		if (fieldMeta.isSummaryField()) {
-			buf.append(" summary-field='" + fieldMeta.isSummaryField() + "'");
-		}
 	}
 }

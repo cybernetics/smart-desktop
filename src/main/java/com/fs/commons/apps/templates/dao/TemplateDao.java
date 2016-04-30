@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.apps.templates.dao;
 
 import java.sql.PreparedStatement;
@@ -15,102 +30,71 @@ import com.fs.commons.dao.DaoFinder;
 import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.dao.exception.RecordNotFoundException;
 
-public class TemplateDao extends AbstractDao{
-	////////////////////////////////////////////////////////////////////////////////////
-	public Variable findVariable(final int varId) throws RecordNotFoundException, DaoException{
-		DaoFinder finder = new DaoFinder() {
-			
-			@Override
-			public void setParamters(PreparedStatement ps) throws SQLException {
-				ps.setInt(1,varId);
-				
-			}
-			
-			@Override
-			public Object populate(ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
-				Variable variable = new Variable();
-				variable.setVarId(rs.getInt("var_id"));
-				variable.setVarName(rs.getString("var_name"));
-				variable.setTableName(rs.getString("table_name"));
-				variable.setFieldName(rs.getString("field_name"));
-				if(rs.getInt("query_id")!=0){
-					variable.setQuery(findQuery(rs.getInt("query_id")));
-				}
-				return variable;
-			}
-			
-			@Override
-			public String getFinderSql() {
-				return "SELECT * FROM conf_vars WHERE var_id=?";
-			}
-		};
-		  return (Variable) findRecord(finder);
-	}
-
+public class TemplateDao extends AbstractDao {
 	////////////////////////////////////////////////////////////////////////////////////
 	public Query findQuery(final int queryId) throws RecordNotFoundException, DaoException {
-		DaoFinder finder=new DaoFinder() {
-			
+		final DaoFinder finder = new DaoFinder() {
+
 			@Override
-			public void setParamters(PreparedStatement ps) throws SQLException {
-				ps.setInt(1, queryId);
+			public String getFinderSql() {
+				return "SELECT * FROM conf_queries WHERE query_id=?";
 			}
-			
+
 			@Override
-			public Object populate(ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
-				Query query=new Query();
+			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+				final Query query = new Query();
 				query.setQueryId(rs.getInt("query_id"));
 				query.setDesc(rs.getString("desc"));
 				query.setQueryType(findQueryType(rs.getInt("query_type_id")));
 				query.setQueryText(rs.getString("query_text"));
 				return query;
 			}
-			
+
 			@Override
-			public String getFinderSql() {
-				return "SELECT * FROM conf_queries WHERE query_id=?";
+			public void setParamters(final PreparedStatement ps) throws SQLException {
+				ps.setInt(1, queryId);
 			}
 		};
 		return (Query) findRecord(finder);
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////////
 	protected QueryType findQueryType(final int typeId) throws RecordNotFoundException, DaoException {
-		DaoFinder finder=new DaoFinder() {
-			
+		final DaoFinder finder = new DaoFinder() {
+
 			@Override
-			public void setParamters(PreparedStatement ps) throws SQLException {
-				ps.setInt(1, typeId);
+			public String getFinderSql() {
+				return "SELECT  * FROM conf_query_types WHERE query_type_id=?";
 			}
-			
+
 			@Override
-			public Object populate(ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
-				QueryType type=new QueryType();
+			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+				final QueryType type = new QueryType();
 				type.setId(rs.getInt(1));
 				type.setName(rs.getString(2));
 				return type;
 			}
-			
+
 			@Override
-			public String getFinderSql() {				
-				return "SELECT  * FROM conf_query_types WHERE query_type_id=?";
+			public void setParamters(final PreparedStatement ps) throws SQLException {
+				ps.setInt(1, typeId);
 			}
 		};
 		return (QueryType) findRecord(finder);
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public Template findTemplate(final int tempId) throws RecordNotFoundException, DaoException{
-		DaoFinder finder = new DaoFinder() {
-			
+	public Template findTemplate(final int tempId) throws RecordNotFoundException, DaoException {
+		final DaoFinder finder = new DaoFinder() {
+
 			@Override
-			public void setParamters(PreparedStatement ps) throws SQLException {
-				ps.setInt(1, tempId);			
+			public String getFinderSql() {
+				return "SELECT * FROM conf_templates WHERE template_id=? ";
 			}
-			
+
 			@Override
-			public Object populate(ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
-				Template template = new Template();
+			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+				final Template template = new Template();
 				template.setTempId(rs.getInt("template_id"));
 				template.setTempName(rs.getString("template_name"));
 				template.setTempTitle(rs.getString("template_title"));
@@ -118,42 +102,71 @@ public class TemplateDao extends AbstractDao{
 				template.setVariables(lstTemplateVariables(tempId));
 				return template;
 			}
-			
+
 			@Override
-			public String getFinderSql() {
-				return "SELECT * FROM conf_templates WHERE template_id=? ";
+			public void setParamters(final PreparedStatement ps) throws SQLException {
+				ps.setInt(1, tempId);
 			}
 		};
 		return (Template) findRecord(finder);
 	}
 
-	// ///////////////////////////////////////////////////////////////
-	public ArrayList<TemplateVariable> lstTemplateVariables(final int tempId) throws RecordNotFoundException, DaoException{
-		DaoFinder finder = new DaoFinder() {
-			
+	////////////////////////////////////////////////////////////////////////////////////
+	public Variable findVariable(final int varId) throws RecordNotFoundException, DaoException {
+		final DaoFinder finder = new DaoFinder() {
+
 			@Override
-			public void setParamters(PreparedStatement ps) throws SQLException {
-				ps.setInt(1, tempId);
-				
+			public String getFinderSql() {
+				return "SELECT * FROM conf_vars WHERE var_id=?";
 			}
-			
+
 			@Override
-			public Object populate(ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
-				TemplateVariable var = new TemplateVariable();
+			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+				final Variable variable = new Variable();
+				variable.setVarId(rs.getInt("var_id"));
+				variable.setVarName(rs.getString("var_name"));
+				variable.setTableName(rs.getString("table_name"));
+				variable.setFieldName(rs.getString("field_name"));
+				if (rs.getInt("query_id") != 0) {
+					variable.setQuery(findQuery(rs.getInt("query_id")));
+				}
+				return variable;
+			}
+
+			@Override
+			public void setParamters(final PreparedStatement ps) throws SQLException {
+				ps.setInt(1, varId);
+
+			}
+		};
+		return (Variable) findRecord(finder);
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public ArrayList<TemplateVariable> lstTemplateVariables(final int tempId) throws RecordNotFoundException, DaoException {
+		final DaoFinder finder = new DaoFinder() {
+
+			@Override
+			public String getFinderSql() {
+				return "SELECT * FROM conf_template_vars WHERE template_id=? ORDER BY var_index";
+			}
+
+			@Override
+			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+				final TemplateVariable var = new TemplateVariable();
 				var.setTempVarId(rs.getInt("template_var_id"));
-				//var.setTemp(findTemplate(rs.getInt("template_id")));
+				// var.setTemp(findTemplate(rs.getInt("template_id")));
 				var.setVarIndex(rs.getInt("var_index"));
 				var.setVar(findVariable(rs.getInt("var_id")));
 				return var;
 			}
-			
+
 			@Override
-			public String getFinderSql() {
-				return "SELECT * FROM conf_template_vars WHERE template_id=? ORDER BY var_index";
+			public void setParamters(final PreparedStatement ps) throws SQLException {
+				ps.setInt(1, tempId);
+
 			}
 		};
 		return lstRecords(finder);
 	}
 }
-
-	

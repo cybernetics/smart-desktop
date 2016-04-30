@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.bean.binding;
 
 import java.awt.Container;
@@ -18,85 +33,85 @@ import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.validation.Validator;
 
 public interface BindingComponent<T> extends DaoComponent, FormField, Serializable {
+	public void addActionListener(ActionListener actionListener);
+
+	public void addFocusListener(FocusListener l);
+
+	public void addKeyListener(KeyListener listener);
+
 	// /////////////////////////////////////////////////////////////////////
-	public void setValue(T value);
+	public void addValidator(Validator validator);
+
+	public void addValueChangeListener(ValueChangeListener listener);
+
+	// /////////////////////////////////////////////////////////////////////
+	public void clear();
+
+	public void filterValues(BindingComponent comp1) throws DaoException;
+
+	public ActionMap getActionMap();
+
+	// /////////////////////////////////////////////////////////////////////
+	public Border getBorder();
+
+	public int getComponentCount();
+
+	// /////////////////////////////////////////////////////////////////////
+	public T getDefaultValue();
+
+	public FocusListener[] getFocusListeners();
+
+	public InputMap getInputMap(int whenInFocusedWindow);
+
+	// /////////////////////////////////////////////////////////////////////
+	public String getName();
+
+	public Container getParent();
+
+	// /////////////////////////////////////////////////////////////////////
+	public String getToolTipText();
 
 	// /////////////////////////////////////////////////////////////////////
 	public T getValue();//
 	// /////////////////////////////////////////////////////////////////////
 
-	public void setDefaultValue(T t);
-
-	// /////////////////////////////////////////////////////////////////////
-	public T getDefaultValue();
-
-	// /////////////////////////////////////////////////////////////////////
-	public void reset();
-
-	// /////////////////////////////////////////////////////////////////////
-	public void clear();
-
-	// /////////////////////////////////////////////////////////////////////
-	public void addValidator(Validator validator);
-
-	// /////////////////////////////////////////////////////////////////////
-	public void validateValue() throws ValidationException;
-
-	// /////////////////////////////////////////////////////////////////////
-	public String getName();
-
-	// /////////////////////////////////////////////////////////////////////
-	public void requestFocus();
-
-	// /////////////////////////////////////////////////////////////////////
-	public Border getBorder();
-
-	// /////////////////////////////////////////////////////////////////////
-	public void setBorder(Border border);
-
-	// /////////////////////////////////////////////////////////////////////
-	public void setToolTipText(String text);
-
-	// /////////////////////////////////////////////////////////////////////
-	public String getToolTipText();
-
-	public void filterValues(BindingComponent comp1) throws DaoException;
-
-	public void addFocusListener(FocusListener l);
-
-	public void setName(String name);
-
-	public int getComponentCount();
-
-	public void setEnabled(boolean enable);
-
-	public void transferFocus();
+	public boolean isAutoTransferFocus();
 
 	public boolean isEnabled();
 
 	public boolean isVisible();
 
+	// /////////////////////////////////////////////////////////////////////
+	public void requestFocus();
+
+	// /////////////////////////////////////////////////////////////////////
+	public void reset();
+
+	public void setAutoTransferFocus(boolean transfer);
+
+	// /////////////////////////////////////////////////////////////////////
+	public void setBorder(Border border);
+
+	public void setDefaultValue(T t);
+
+	public void setEnabled(boolean enable);
+
 	public void setFocusable(boolean b);
-
-	public void setPreferredSize(Dimension dim1);
-
-	public void addKeyListener(KeyListener listener);
-
-	public ActionMap getActionMap();
-
-	public InputMap getInputMap(int whenInFocusedWindow);
 
 	public void setFont(java.awt.Font font);
 
-	public void addValueChangeListener(ValueChangeListener listener);
+	public void setName(String name);
 
-	public Container getParent();
+	public void setPreferredSize(Dimension dim1);
 
-	public FocusListener[] getFocusListeners();
+	// /////////////////////////////////////////////////////////////////////
+	public void setToolTipText(String text);
 
-	public void addActionListener(ActionListener actionListener);
+	// /////////////////////////////////////////////////////////////////////
+	public void setValue(T value);
 
-	public void setAutoTransferFocus(boolean transfer);
-	
-	public boolean isAutoTransferFocus();
+	public void transferFocus();
+
+	// /////////////////////////////////////////////////////////////////////
+	public void validateValue() throws ValidationException;
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Color;
@@ -12,7 +27,6 @@ import javax.swing.JLabel;
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
 import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.desktop.graphics.GraphicsFactory;
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
@@ -22,34 +36,52 @@ import com.fs.commons.util.GeneralUtility;
 
 public class JKLabel extends JLabel implements BindingComponent<String> {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
-
 	static Font font = new Font("Arial", Font.BOLD, 12);
 
 	static Color BG_COLOR = Colors.JK_LABEL_BG;// new Color(191, 215, 255);
+
 	static Color FG_COLOR = Colors.JK_LABEL_FG;// new Color(191, 215, 255);
+	private final FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
 
 	private String defaultValue;
 	private boolean captilize;
 	private boolean transfer;
 
 	/**
-	 * 
+	 *
+	 */
+	public JKLabel() {
+		init();
+	}
+
+	public JKLabel(final Icon image) {
+		this();
+		setIcon(image);
+	}
+
+	public JKLabel(final Icon image, final int horizontalAlignment) {
+		this();
+		setIcon(image);
+		setHorizontalAlignment(horizontalAlignment);
+	}
+
+	/**
+	 *
 	 * @param lableKey
 	 */
-	public JKLabel(String lableKey) {
+	public JKLabel(final String lableKey) {
 		this(lableKey, true);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param lableKey
 	 * @param setSize
 	 */
-	public JKLabel(String lableKey, boolean setSize) {
+	public JKLabel(final String lableKey, final boolean setSize) {
 		super(Lables.get(lableKey, true));
 		if (setSize) {
 			setPreferredSize(new Dimension(80, 30));
@@ -57,33 +89,58 @@ public class JKLabel extends JLabel implements BindingComponent<String> {
 		init();
 	}
 
-	/**
-	 * 
-	 */
-	public JKLabel() {
-		init();
-	}
-
-	public JKLabel(Icon image, int horizontalAlignment) {
-		this();
-		setIcon(image);
-		setHorizontalAlignment(horizontalAlignment);
-	}
-
-	public JKLabel(Icon image) {
-		this();
-		setIcon(image);
-	}
-
-	public JKLabel(String text, Icon icon, int horizontalAlignment) {
+	public JKLabel(final String text, final Icon icon, final int horizontalAlignment) {
 		this(text);
 		setIcon(icon);
 		setHorizontalAlignment(horizontalAlignment);
 	}
 
-	public JKLabel(String text, int horizontalAlignment) {
+	public JKLabel(final String text, final int horizontalAlignment) {
 		this(text);
 		setHorizontalAlignment(horizontalAlignment);
+	}
+
+	@Override
+	public void addActionListener(final ActionListener actionListener) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addValidator(final Validator validator) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addValueChangeListener(final ValueChangeListener listener) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void clear() {
+		setText("");
+	}
+
+	@Override
+	public void filterValues(final BindingComponent component) {
+
+	}
+
+	@Override
+	public DataSource getDataSource() {
+		return this.fsWrapper.getDataSource();
+	}
+
+	@Override
+	public String getDefaultValue() {
+		return this.defaultValue;
+	}
+
+	@Override
+	public String getValue() {
+		return getText().trim();
 	}
 
 	void init() {
@@ -94,28 +151,25 @@ public class JKLabel extends JLabel implements BindingComponent<String> {
 		setLocale(SwingUtility.getDefaultLocale());
 		setFocusable(false);
 		setHorizontalAlignment(JLabel.CENTER);
-//		setFont(font);
-	}
-
-	public String getValue() {
-		return getText().trim();
-	}
-
-	public void setValue(String value) {
-		setText(value.trim());
+		// setFont(font);
 	}
 
 	@Override
-	public void setText(String text) {
-		String txt = Lables.get(text,captilize);
-		super.setText(txt);
-		setToolTipText(text);
+	public boolean isAutoTransferFocus() {
+		return this.transfer;
 	}
 
-	public void setIcon(String iconName) {
-		if (GeneralUtility.getIconURL(iconName) != null) {
-			setIcon(GeneralUtility.getIcon(iconName));
+	@Override
+	public void paint(final Graphics g) {
+		if (isOpaque()) {
+			// setOpaque(false);
+			// GraphicsFactory.makeGradient(this, g, getBackground());
+			super.paint(g);
+			// setOpaque(true);
+		} else {
+			super.paint(g);
 		}
+
 	}
 
 	public void removeIcon() {
@@ -123,88 +177,50 @@ public class JKLabel extends JLabel implements BindingComponent<String> {
 	}
 
 	@Override
-	public void paint(Graphics g) {
-		if (isOpaque()) {
-//			setOpaque(false);
-//			GraphicsFactory.makeGradient(this, g, getBackground());
-			super.paint(g);
-//			setOpaque(true);
-		} else {
-			super.paint(g);
-		}
-
+	public void reset() {
+		setText(this.defaultValue);
 	}
 
 	@Override
-	public String getDefaultValue() {
-		return defaultValue;
+	public void setAutoTransferFocus(final boolean transfer) {
+		this.transfer = transfer;
+	}
+
+	public void setCaptilize(final boolean captilize) {
+		this.captilize = captilize;
 	}
 
 	@Override
-	public void setDefaultValue(String defaultValue) {
+	public void setDataSource(final DataSource manager) {
+		this.fsWrapper.setDataSource(manager);
+	}
+
+	@Override
+	public void setDefaultValue(final String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
 
-	@Override
-	public void reset() {
-		setText(defaultValue);
+	public void setIcon(final String iconName) {
+		if (GeneralUtility.getIconURL(iconName) != null) {
+			setIcon(GeneralUtility.getIcon(iconName));
+		}
 	}
 
 	@Override
-	public void clear() {
-		setText("");
+	public void setText(final String text) {
+		final String txt = Lables.get(text, this.captilize);
+		super.setText(txt);
+		setToolTipText(text);
 	}
 
 	@Override
-	public void filterValues(BindingComponent component) {
-
-	}
-
-	@Override
-	public void addValidator(Validator validator) {
-		// TODO Auto-generated method stub
-
+	public void setValue(final String value) {
+		setText(value.trim());
 	}
 
 	@Override
 	public void validateValue() throws ValidationException {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void setDataSource(DataSource manager) {
-		fsWrapper.setDataSource(manager);
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		return fsWrapper.getDataSource();
-	}
-
-	@Override
-	public void addValueChangeListener(ValueChangeListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addActionListener(ActionListener actionListener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setCaptilize(boolean captilize) {
-		this.captilize = captilize;		
-	}
-
-	@Override
-	public void setAutoTransferFocus(boolean transfer) {
-		this.transfer = transfer;
-	}
-
-	@Override
-	public boolean isAutoTransferFocus() {
-		return transfer;
 	}
 }

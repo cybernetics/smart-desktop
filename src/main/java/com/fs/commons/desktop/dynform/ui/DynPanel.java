@@ -1,11 +1,17 @@
-/**
- * Modification history
- * ====================================================
- * Version    Date         Developer        Purpose 
- * ====================================================
- * 1.1      11/11/2008     Jamil Shreet    -Add methods : callBeforeDeleteEventOnTriggers(), callAfterDeleteEventOnTriggers().
- * 										   -Modify method : handleDeleteEvent().
- * 1.2      11/11/2008     Jamil Shreet    -Modify method : handleDeleteEvent().
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.fs.commons.desktop.dynform.ui;
@@ -77,46 +83,19 @@ public class DynPanel extends DataPanel {
 	int uIColunmCount;
 
 	/**
-	 * 
+	 *
 	 */
 	public DynPanel() {
 	}
 
 	/**
-	 * @param tableMeta
-	 * @param visibleFieldNames
-	 * @throws TableMetaNotFoundException
+	 *
+	 * @param tableMetaName
 	 * @throws DaoException
-	 */
-	public DynPanel(TableMeta tableMeta, String[] visibleFieldNames) throws TableMetaNotFoundException, DaoException {
-		this(tableMeta, false);
-		this.visibleFieldNames = visibleFieldNames;
-		init();
-	}
-
-	/**
-	 * @param tableMeta
-	 * @param visibleFieldNames
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
 	 */
-	public DynPanel(TableMeta tableMeta, int uIColunmCount) throws TableMetaNotFoundException, DaoException {
-		this(tableMeta, false);
-		this.uIColunmCount = uIColunmCount;
-		init();
-	}
-
-	/**
-	 * @param tableMeta
-	 * @param visibleFieldNames
-	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
-	 */
-	public DynPanel(TableMeta tableMeta, String[] visibleFieldNames, int uIColunmCount) throws TableMetaNotFoundException, DaoException {
-		this(tableMeta, false);
-		this.visibleFieldNames = visibleFieldNames;
-		this.uIColunmCount = uIColunmCount;
-		init();
+	public DynPanel(final String tableMetaName) throws TableMetaNotFoundException, DaoException {
+		this(AbstractTableMetaFactory.getTableMeta(tableMetaName));
 	}
 
 	/**
@@ -124,29 +103,30 @@ public class DynPanel extends DataPanel {
 	 * @throws TableMetaNotFoundException
 	 * @throws DaoException
 	 */
-	public DynPanel(TableMeta tableMeta) throws TableMetaNotFoundException, DaoException {
+	public DynPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException {
 		this(tableMeta, true);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param tableMeta
 	 * @throws TableMetaNotFoundException
 	 * @throws DaoException
 	 */
-	public DynPanel(TableMeta tableMeta, boolean init) throws TableMetaNotFoundException, DaoException {
+	public DynPanel(final TableMeta tableMeta, final boolean init) throws TableMetaNotFoundException, DaoException {
 		this.tableMeta = tableMeta;
-		dao = DaoFactory.createDynamicDao(tableMeta);
+		this.dao = DaoFactory.createDynamicDao(tableMeta);
 
-		compId = ComponentFactory.createComponent(tableMeta.getIdField(), false);
-		Vector<FieldMeta> fields = tableMeta.getFieldList();
+		this.compId = ComponentFactory.createComponent(tableMeta.getIdField(), false);
+		final Vector<FieldMeta> fields = tableMeta.getFieldList();
 		for (int i = 0; i < fields.size(); i++) {
-			FieldMeta field = fields.get(i);
-			BindingComponent comp = ComponentFactory.createComponent(field, false);
+			final FieldMeta field = fields.get(i);
+			final BindingComponent comp = ComponentFactory.createComponent(field, false);
 			// regFieldEventHandler(comp, new FieldEventHandler(field));
 			// addEventHandlers(comp);
 			comp.setName(field.getName());
-			components.put(field.getName(), comp);// add for local refernece
+			this.components.put(field.getName(), comp);// add for local
+														// refernece
 			if (field.getFilteredBy() != null) {
 				attachFilters(field);
 			}
@@ -158,42 +138,50 @@ public class DynPanel extends DataPanel {
 	}
 
 	/**
-	 * 
-	 * @param tableMetaName
-	 * @throws DaoException
+	 * @param tableMeta
+	 * @param visibleFieldNames
 	 * @throws TableMetaNotFoundException
+	 * @throws DaoException
 	 */
-	public DynPanel(String tableMetaName) throws TableMetaNotFoundException, DaoException {
-		this(AbstractTableMetaFactory.getTableMeta(tableMetaName));
+	public DynPanel(final TableMeta tableMeta, final int uIColunmCount) throws TableMetaNotFoundException, DaoException {
+		this(tableMeta, false);
+		this.uIColunmCount = uIColunmCount;
+		init();
 	}
 
 	/**
-	 * 
-	 * @param field
+	 * @param tableMeta
+	 * @param visibleFieldNames
+	 * @throws TableMetaNotFoundException
 	 * @throws DaoException
 	 */
-	private void attachFilters(FieldMeta field) throws DaoException {
-		FieldMeta filteredBy = getTableMeta().getField(field.getFilteredBy());
-		if(filteredBy==null){
-			System.err.println("Filtered by contains invalid field name : "+field.getName()+" in table :"+getTableMeta().getTableId());
-			return ;
+	public DynPanel(final TableMeta tableMeta, final String[] visibleFieldNames) throws TableMetaNotFoundException, DaoException {
+		this(tableMeta, false);
+		this.visibleFieldNames = visibleFieldNames;
+		init();
+	}
+
+	/**
+	 * @param tableMeta
+	 * @param visibleFieldNames
+	 * @throws TableMetaNotFoundException
+	 * @throws DaoException
+	 */
+	public DynPanel(final TableMeta tableMeta, final String[] visibleFieldNames, final int uIColunmCount)
+			throws TableMetaNotFoundException, DaoException {
+		this(tableMeta, false);
+		this.visibleFieldNames = visibleFieldNames;
+		this.uIColunmCount = uIColunmCount;
+		init();
+	}
+
+	@Override
+	public void addComponents() {
+		addComponent(this.compId, this.tableMeta.getIdField().getName());
+		final Set<String> keys = this.components.keySet();
+		for (final Object object : keys) {
+			addComponent(this.components.get(object), (String) object);
 		}
-		final BindingComponent comp1 = components.get(filteredBy.getName());
-		final BindingComponent comp2 = components.get(field.getName());
-
-		comp2.filterValues(comp1);// to set initial value
-		comp1.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					comp2.filterValues(comp1);
-				} catch (DaoException e1) {
-					ExceptionUtil.handleException(e1);
-				}
-			}
-		});
-
 	}
 
 	//
@@ -236,11 +224,422 @@ public class DynPanel extends DataPanel {
 	// }
 
 	/**
-	 * 
+	 *
+	 * @param listener
+	 */
+	public void addDynDaoActionListener(final DynDaoActionListener listener) {
+		this.listeners.add(listener);
+	}
+
+	/**
+	 * @param record
+	 * @return
+	 * @throws DaoException
+	 */
+	protected String addRecord(final Record record) throws DaoException {
+		record.setGui(GeneralUtility.toXml(this));
+		return this.dao.insertRecord(record);
+	}
+
+	/**
+	 *
+	 * @param field
+	 * @throws DaoException
+	 */
+	private void attachFilters(final FieldMeta field) throws DaoException {
+		final FieldMeta filteredBy = getTableMeta().getField(field.getFilteredBy());
+		if (filteredBy == null) {
+			System.err.println("Filtered by contains invalid field name : " + field.getName() + " in table :" + getTableMeta().getTableId());
+			return;
+		}
+		final BindingComponent comp1 = this.components.get(filteredBy.getName());
+		final BindingComponent comp2 = this.components.get(field.getName());
+
+		comp2.filterValues(comp1);// to set initial value
+		comp1.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					comp2.filterValues(comp1);
+				} catch (final DaoException e1) {
+					ExceptionUtil.handleException(e1);
+				}
+			}
+		});
+
+	}
+
+	/**
+	 * By default the close button has nothing to do , it would be decided by
+	 * outer listener
+	 */
+	public void close() {
+		fireBeforeClose();
+		fireAfterClose();
+	}
+
+	/**
+	 * @param record
+	 * @throws RecordNotFoundException
+	 * @throws DaoException
+	 */
+	protected void deleteRecord(final Record record) throws RecordNotFoundException, DaoException {
+		record.setGui(GeneralUtility.toXml(this));
+		this.dao.deleteRecord(record);
+	}
+
+	// /**
+	// */
+	// private boolean isAddMode() {
+	// return currentRecord == null;
+	// }
+
+	@Override
+	public boolean enableDataFields(final boolean enable) {
+		super.enableDataFields(enable);
+		if (enable) {
+			final Record record = this.tableMeta.createEmptyRecord();
+			for (int i = 0; i < record.getFieldsCount(); i++) {
+				final Field field = record.getField(i);
+				final BindingComponent comp = this.components.get(field.getMeta().getName());
+				if (!field.getMeta().isEnabled()) {
+					comp.setEnabled(false);
+				} else if (this.currentRecord != null) {// edit mode
+					comp.setEnabled(field.getMeta().isAllowUpdate());
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @param id
+	 * @return
+	 * @throws RecordNotFoundException
+	 * @throws DaoException
+	 */
+	protected Record findRecord(final Object id) throws RecordNotFoundException, DaoException {
+		return this.dao.findRecord(id);
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	void fireAfterAddRecord(final Record record) throws DaoException {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			final DynDaoActionListener listsner = this.listeners.get(i);
+			listsner.afterAddRecord(record);
+		}
+	}
+
+	/**
+	 *
+	 */
+	void fireAfterClose() {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).afterClosePanel();
+
+		}
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	void fireAfterDeleteRecord(final Record record) throws DaoException {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).afterDeleteRecord(record);
+		}
+	}
+
+	/**
+	 *
+	 */
+	void fireAfterResetComponents() {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			this.listeners.get(i).afterResetComponents();
+
+		}
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	void fireAfterUpdateRecord(final Record record) throws DaoException {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).afterUpdateRecord(record);
+		}
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	void fireBeforeAddRecord(final Record record) throws DaoException {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).beforeAddRecord(record);
+		}
+	}
+
+	/**
+	 *
+	 */
+	void fireBeforeClose() {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).beforeClosePanel();
+
+		}
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	void fireBeforeDeleteRecord(final Record record) throws DaoException {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).beforeDeleteRecord(record);
+
+		}
+	}
+
+	/**
+	 *
+	 */
+	void fireBeforeResetComponents() {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			this.listeners.get(i).beforeResetComponents(viewToRecord());
+
+		}
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	void fireBeforeUpdateRecord(final Record record) throws DaoException {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).beforeUpdateRecord(record);
+		}
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @param ex
+	 */
+	void fireOnException(final Record record, final DaoException ex) {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).onDaoException(record, ex);
+
+		}
+	}
+
+	/**
+	 *
+	 * @param record
+	 */
+	void fireRecordFound(final Record record) {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).onRecordFound(record);
+		}
+	}
+
+	/**
+	 *
+	 * @param recordId
+	 * @param ex
+	 */
+	void fireRecordNotFound(final Object recordId, final DaoException ex) {
+		for (int i = this.listeners.size() - 1; i >= 0; i--) {
+			this.listeners.get(i).onRecordNotFound(recordId, ex);
+		}
+	}
+
+	public Date getComponentValueAsDate(final String fieldName) {
+		return ConversionUtil.toDate(getFieldComponent(fieldName).getValue());
+	}
+
+	public double getComponentValueAsDouble(final String fieldName) {
+		return ConversionUtil.toDouble(getFieldComponent(fieldName).getValue());
+	}
+
+	public int getComponentValueAsInteger(final String fieldName) {
+		return ConversionUtil.toInteger(getFieldComponent(fieldName).getValue());
+	}
+
+	public String getComponentValueAsString(final String fieldName) {
+		return ConversionUtil.toString(getFieldComponent(fieldName).getValue());
+	}
+
+	/**
+	 * @return the currentRecord
+	 */
+	public Record getCurrentRecord() {
+		return this.currentRecord;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public DynamicDao getDao() {
+		return this.dao;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private int getDefaultUIRowsCount() {
+		if (this.uIColunmCount > 0) {
+			return this.uIColunmCount;
+		}
+		return this.tableMeta.getDefaultUIRowCount();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<DynDaoActionListener> getDynDaoActionListener() {
+		return this.listeners;
+	}
+
+	/**
+	 * @param field
+	 * @return
+	 */
+	private String getFieldCaption(final FieldMeta field) {
+		String caption = Lables.get(field.getCaption());
+		if (field.isRequired()) {
+			caption = caption + " *";
+		}
+		return caption;
+	}
+
+	/**
+	 *
+	 * @param fieldName
+	 * @return
+	 */
+	public BindingComponent getFieldComponent(final String fieldName) {
+		return this.components.get(fieldName);
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<DynDaoActionListener> getListeners() {
+		return this.listeners;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public TableMeta getTableMeta() {
+		return this.tableMeta;
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public String handleAddEvent() throws DaoException {
+		final Record record = viewToRecord();
+		fireBeforeAddRecord(record);
+		try {
+			String id = addRecord(record);
+			if (record.getIdValue() == null && getIdField().isVisible()) {
+				// in case of not autoinrement , we should depends on this value
+				id = getIdValue();
+			}
+			record.setIdValue(id);
+			fireAfterAddRecord(record);
+			return id;
+		} catch (final DuplicateDataException e) {
+			fireOnException(record, e);
+			throw e;
+		} catch (final DaoException e) {
+			ExceptionUtil.handleException(e);
+			throw e;
+		}
+	}
+
+	/**
+	 * @1.1 @1.2
+	 */
+	@Override
+	public void handleDeleteEvent() throws DaoException {
+		fireBeforeDeleteRecord(this.currentRecord);
+		final Record record = this.currentRecord;
+		deleteRecord(record);
+		fireAfterDeleteRecord(this.currentRecord);
+
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void handleFindEvent(final Object id) throws DaoException {
+		handleFindEvent(id, true);
+	}
+
+	/**
+	 * @param id
+	 * @throws DaoException
+	 */
+	protected void handleFindEvent(final Object id, final boolean fireEvents) throws DaoException {
+		setIdValue(id);
+		try {
+			final Record record = findRecord(id);
+			this.currentRecord = record;
+			recordToView(record, true);
+			if (fireEvents) {
+				fireRecordFound(record);
+			}
+		} catch (final DaoException e) {
+			fireRecordNotFound(id, e);
+			throw e;
+		}
+	}
+
+	public void handleFindEventByField(final String fieldName, final Object value) throws DaoException {
+		final ArrayList<Record> records = this.dao.findByFieldValue(fieldName, value);
+		if (records.size() > 0) {
+			handleFindEvent(records.get(0).getIdValue());
+		}
+
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void handleSaveEvent() throws DaoException {
+		final Record record = viewToRecord();
+		fireBeforeUpdateRecord(record);
+		updateRecord(record);
+		fireAfterUpdateRecord(record);
+	}
+
+	/**
+	 *
 	 * @param tableMeta
 	 */
 	private void init() {
-		int defaultRows = getDefaultUIRowsCount();
+		final int defaultRows = getDefaultUIRowsCount();
 		// int count = tableMeta.getVisibleFieldsCount();
 		// int col = (count / defaultRows + 1);
 		// int rowCount = count < defaultRows ? count : defaultRows;
@@ -255,25 +654,25 @@ public class DynPanel extends DataPanel {
 		// \test
 		// ArrayList<FieldMeta> fields;
 		// setBorder(SwingUtility.createTitledBorder(tableMeta.getCaption()));
-		if (tableMeta.getIdField().isVisible() && !tableMeta.getIdField().isAutoIncrement()) {
-			colunm.add(new JKLabledComponent(tableMeta.getIdField().getCaption(), compId));
+		if (this.tableMeta.getIdField().isVisible() && !this.tableMeta.getIdField().isAutoIncrement()) {
+			colunm.add(new JKLabledComponent(this.tableMeta.getIdField().getCaption(), this.compId));
 			rowsCounter++;
 		}
 		// fields = tableMeta.getFieldList();
 		// int counter = 0;
-		Vector<FieldGroup> groups = tableMeta.getGroups();
-		for (FieldGroup group : groups) {
+		final Vector<FieldGroup> groups = this.tableMeta.getGroups();
+		for (final FieldGroup group : groups) {
 			if (group.getFields().size() > 0) {
-				int maxRowsCount = group.getRowCount() != 0 ? group.getRowCount() : defaultRows;
-				JKPanel pnlGroup = new JKPanel();
+				final int maxRowsCount = group.getRowCount() != 0 ? group.getRowCount() : defaultRows;
+				final JKPanel pnlGroup = new JKPanel();
 				pnlGroup.setBorder(BorderFactory.createTitledBorder(group.getName()));
-				for (FieldMeta field : group.getFields()) {
+				for (final FieldMeta field : group.getFields()) {
 					if (isVisible(field)) {
-						String fieldCaption = getFieldCaption(field);
-						BindingComponent comp = components.get(field.getName());
+						final String fieldCaption = getFieldCaption(field);
+						final BindingComponent comp = this.components.get(field.getName());
 						if (comp instanceof JKScrollable) {
 							colunm.add(new JKLabel(fieldCaption));
-							JKScrollPane pane = new JKScrollPane((Component) comp);
+							final JKScrollPane pane = new JKScrollPane((Component) comp);
 							pane.setPreferredSize(new Dimension(field.getVisibleWidth(), field.getVisibleHeight()));
 							// comp.setPreferredSize(new Dimension(300,200));
 							colunm.add(pane);
@@ -285,7 +684,7 @@ public class DynPanel extends DataPanel {
 						// colunm.add(new JKSeparator());
 					}
 					if (rowsCounter == maxRowsCount) {
-						JKPanel temp = new JKPanel();
+						final JKPanel temp = new JKPanel();
 						temp.add(colunm);
 						pnlGroup.add(temp);
 						colunm = new JKPanel();
@@ -294,7 +693,7 @@ public class DynPanel extends DataPanel {
 					}
 				}
 				if (rowsCounter != 0) {
-					JKPanel temp = new JKPanel();
+					final JKPanel temp = new JKPanel();
 					temp.add(colunm);
 					pnlGroup.add(temp);
 				}
@@ -304,478 +703,22 @@ public class DynPanel extends DataPanel {
 	}
 
 	/**
-	 * @param field
-	 * @return
-	 */
-	private String getFieldCaption(FieldMeta field) {
-		String caption = Lables.get(field.getCaption());
-		if (field.isRequired()) {
-			caption = caption + " *";
-		}
-		return caption;
-	}
-
-	/**
 	 * if visible field names set , only fields in this array will be shown ,
 	 * otherwise , the field visible will be used
-	 * 
+	 *
 	 * @param field
 	 * @return
 	 */
-	private boolean isVisible(FieldMeta field) {
-		if (visibleFieldNames != null) {
-			for (int i = 0; i < visibleFieldNames.length; i++) {
-				if (field.getName().equals(visibleFieldNames[i])) {
+	private boolean isVisible(final FieldMeta field) {
+		if (this.visibleFieldNames != null) {
+			for (final String visibleFieldName : this.visibleFieldNames) {
+				if (field.getName().equals(visibleFieldName)) {
 					return true;
 				}
 			}
 			return false;
 		}
 		return field.isVisible();
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private int getDefaultUIRowsCount() {
-		if (uIColunmCount > 0) {
-			return uIColunmCount;
-		}
-		return tableMeta.getDefaultUIRowCount();
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void validateAddData(boolean validateId) throws ValidationException, DaoException {
-		Record record = viewToRecord();
-		// if (validateId) {
-		// SwingValidator.checkEmpty((UIComponent) compId);
-		// }
-		// for (int i = 0; i < record.getFieldsCount(); i++) {
-		// Field field = record.getField(i);
-		// JComponent comp = components.get(field.getMeta().getName());
-		// if (field.getMeta().isRequired()) {
-		// SwingValidator.checkEmpty((UIComponent) comp);
-		// }
-		// }
-		// // business validation
-		// if (isAddMode() && validateId) {
-		// if (dao.isIdExists(record.getIdValue())) {
-		// throw new ValidationException(record.getIdValue() + " " +
-		// Lables.get("ALREADY_EXISTS"), (UIComponent) getIdField());
-		// }
-		// }
-		try {
-			tableMeta.validateData(record);
-		} catch (ValidationException ex) {
-			if (ex.getField() != null) {
-				components.get(ex.getField().getMeta().getName()).requestFocus();
-			}
-			throw ex;
-		}
-	}
-
-	// /**
-	// */
-	// private boolean isAddMode() {
-	// return currentRecord == null;
-	// }
-
-	@Override
-	public void validateUpdateData() throws ValidationException, DaoException {
-		validateAddData(false);
-	}
-
-	/**
-	 * 
-	 */
-	public String handleAddEvent() throws DaoException {
-		Record record = viewToRecord();
-		fireBeforeAddRecord(record);
-		try {
-			String id = addRecord(record);
-			if (record.getIdValue() == null && getIdField().isVisible()) {
-				// in case of not autoinrement , we should depends on this value
-				id = getIdValue();
-			}
-			record.setIdValue(id);
-			fireAfterAddRecord(record);
-			return id;
-		} catch (DuplicateDataException e) {
-			fireOnException(record, e);
-			throw e;
-		} catch (DaoException e) {
-			ExceptionUtil.handleException(e);
-			throw e;
-		}
-	}
-
-	/**
-	 * @param record
-	 * @return
-	 * @throws DaoException
-	 */
-	protected String addRecord(Record record) throws DaoException {
-		record.setGui(GeneralUtility.toXml(this));
-		return dao.insertRecord(record);
-	}
-
-	/**
-	 * @1.1
-	 * @1.2
-	 */
-	public void handleDeleteEvent() throws DaoException {
-		fireBeforeDeleteRecord(currentRecord);
-		Record record = currentRecord;
-		deleteRecord(record);
-		fireAfterDeleteRecord(currentRecord);
-
-	}
-
-	/**
-	 * @param record
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
-	 */
-	protected void deleteRecord(Record record) throws RecordNotFoundException, DaoException {
-		record.setGui(GeneralUtility.toXml(this));
-		dao.deleteRecord(record);
-	}
-
-	/**
-	 * 
-	 */
-	public void handleFindEvent(Object id) throws DaoException {
-		handleFindEvent(id, true);
-	}
-
-	/**
-	 * @param id
-	 * @throws DaoException
-	 */
-	protected void handleFindEvent(Object id, boolean fireEvents) throws DaoException {
-		setIdValue(id);
-		try {
-			Record record = findRecord(id);
-			this.currentRecord = record;
-			recordToView(record, true);
-			if (fireEvents) {
-				fireRecordFound(record);
-			}
-		} catch (DaoException e) {
-			fireRecordNotFound(id, e);
-			throw e;
-		}
-	}
-
-	/**
-	 * @param id
-	 * @return
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
-	 */
-	protected Record findRecord(Object id) throws RecordNotFoundException, DaoException {
-		return dao.findRecord(id);
-	}
-
-	/**
-	 * @return the currentRecord
-	 */
-	public Record getCurrentRecord() {
-		return currentRecord;
-	}
-
-	/**
-	 * 
-	 */
-	public void handleSaveEvent() throws DaoException {
-		Record record = viewToRecord();
-		fireBeforeUpdateRecord(record);
-		updateRecord(record);
-		fireAfterUpdateRecord(record);
-	}
-
-	/**
-	 * @param record
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
-	 */
-	protected void updateRecord(Record record) throws RecordNotFoundException, DaoException {
-		if (System.getProperty("security.audit.gui.enabled", "true").toLowerCase().equals("false")) {
-			record.setGui(GeneralUtility.toXml(this));
-		}
-		dao.updateRecord(record);
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @param ex
-	 */
-	void fireOnException(Record record, DaoException ex) {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).onDaoException(record, ex);
-
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 */
-	void fireRecordFound(Record record) {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).onRecordFound((record));
-		}
-	}
-
-	/**
-	 * 
-	 * @param recordId
-	 * @param ex
-	 */
-	void fireRecordNotFound(Object recordId, DaoException ex) {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).onRecordNotFound(recordId, ex);
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	void fireBeforeAddRecord(Record record) throws DaoException {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).beforeAddRecord(record);
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	void fireAfterAddRecord(Record record) throws DaoException {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			DynDaoActionListener listsner = listeners.get(i);
-			listsner.afterAddRecord(record);
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	void fireAfterDeleteRecord(Record record) throws DaoException {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).afterDeleteRecord(record);
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	void fireBeforeUpdateRecord(Record record) throws DaoException {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).beforeUpdateRecord(record);
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	void fireAfterUpdateRecord(Record record) throws DaoException {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).afterUpdateRecord(record);
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	void fireBeforeDeleteRecord(Record record) throws DaoException {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).beforeDeleteRecord(record);
-
-		}
-	}
-
-	/**
-	 * 
-	 */
-	void fireAfterClose() {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).afterClosePanel();
-
-		}
-	}
-
-	/**
-	 * 
-	 */
-	void fireBeforeClose() {
-		for (int i = listeners.size() - 1; i >= 0; i--) {
-			listeners.get(i).beforeClosePanel();
-
-		}
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Record viewToRecord() {
-		Record record = tableMeta.createEmptyRecord();
-		record.setModified(true);
-		record.getIdField().setValue(((BindingComponent) compId).getValue());
-		for (int i = 0; i < record.getFieldsCount(); i++) {
-			Field field = record.getField(i);
-			BindingComponent comp = (BindingComponent) components.get(field.getMeta().getName());
-			field.setValue(comp.getValue());
-		}
-		return record;
-
-	}
-
-	/**
-	 * 
-	 * @param record
-	 */
-	private void recordToView(Record record, boolean update) {
-		((BindingComponent) getIdField()).setValue(record.getIdValue());
-		for (int i = 0; i < record.getFieldsCount(); i++) {
-			Field field = record.getField(i);
-			BindingComponent comp = (BindingComponent) components.get(field.getMeta().getName());
-			comp.setValue(field.getValueObject());
-		}
-	}
-
-	@Override
-	public boolean enableDataFields(boolean enable) {
-		super.enableDataFields(enable);
-		if (enable) {
-			Record record = tableMeta.createEmptyRecord();
-			for (int i = 0; i < record.getFieldsCount(); i++) {
-				Field field = record.getField(i);
-				BindingComponent comp = components.get(field.getMeta().getName());
-				if (!field.getMeta().isEnabled()) {
-					comp.setEnabled(false);
-				} else if (currentRecord != null) {// edit mode
-					comp.setEnabled(field.getMeta().isAllowUpdate());
-				}
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public void resetComponents() throws DaoException {
-		// will be used to set the current values
-		Record latestRecord = viewToRecord();
-		fireBeforeResetComponents();
-
-		super.resetComponents();
-
-		currentRecord = null;
-		fireAfterResetComponents();
-
-		setLastValues(latestRecord.getFields());
-	}
-
-	/**
-	 * @param fields2
-	 * 
-	 */
-	private void setLastValues(List<Field> fields) {
-		if (fields != null) {
-			for (Field field : fields) {
-				if (field.getMeta().isKeepLastValue()) {
-					setComponentValue(field.getFieldName(), field.getValueObject());
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
-	 */
-	void fireBeforeResetComponents() {
-		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).beforeResetComponents(viewToRecord());
-
-		}
-	}
-
-	/**
-	 * 
-	 */
-	void fireAfterResetComponents() {
-		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).afterResetComponents();
-
-		}
-	}
-
-	@Override
-	public void addComponents() {
-		addComponent(compId, tableMeta.getIdField().getName());
-		Set<String> keys = components.keySet();
-		for (Object object : keys) {
-			addComponent(components.get(object), (String) object);
-		}
-	}
-
-	/**
-	 * 
-	 * @param fieldName
-	 * @return
-	 */
-	public BindingComponent getFieldComponent(String fieldName) {
-		return components.get(fieldName);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public ArrayList<DynDaoActionListener> getDynDaoActionListener() {
-		return listeners;
-	}
-
-	/**
-	 * 
-	 * @param listener
-	 */
-	public void addDynDaoActionListener(DynDaoActionListener listener) {
-		listeners.add(listener);
-	}
-
-	/**
-	 * By default the close button has nothing to do , it would be decided by
-	 * outer listener
-	 */
-	public void close() {
-		fireBeforeClose();
-		fireAfterClose();
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public DynamicDao getDao() {
-		return dao;
 	}
 
 	//
@@ -789,37 +732,54 @@ public class DynPanel extends DataPanel {
 	// }
 
 	/**
-	 * 
-	 * @return
+	 *
+	 * @param record
 	 */
-	public TableMeta getTableMeta() {
-		return tableMeta;
+	private void recordToView(final Record record, final boolean update) {
+		getIdField().setValue(record.getIdValue());
+		for (int i = 0; i < record.getFieldsCount(); i++) {
+			final Field field = record.getField(i);
+			final BindingComponent comp = this.components.get(field.getMeta().getName());
+			comp.setValue(field.getValueObject());
+		}
 	}
 
 	/**
-	 * 
-	 * @return
-	 */
-	public ArrayList<DynDaoActionListener> getListeners() {
-		return listeners;
-	}
-
-	/**
-	 * 
+	 *
 	 */
 	public void reFind() {
 	}
 
-	public void setComponentValue(String componentName, Object value) {
-		((BindingComponent) getFieldComponent(componentName)).setValue(value);
+	@Override
+	public void resetComponents() throws DaoException {
+		// will be used to set the current values
+		final Record latestRecord = viewToRecord();
+		fireBeforeResetComponents();
+
+		super.resetComponents();
+
+		this.currentRecord = null;
+		fireAfterResetComponents();
+
+		setLastValues(latestRecord.getFields());
 	}
 
-	public void handleFindEventByField(String fieldName, Object value) throws DaoException {
-		ArrayList<Record> records = dao.findByFieldValue(fieldName, value);
-		if (records.size() > 0) {
-			handleFindEvent(records.get(0).getIdValue());
-		}
+	public void setComponentValue(final String componentName, final Object value) {
+		getFieldComponent(componentName).setValue(value);
+	}
 
+	/**
+	 * @param fields2
+	 *
+	 */
+	private void setLastValues(final List<Field> fields) {
+		if (fields != null) {
+			for (final Field field : fields) {
+				if (field.getMeta().isKeepLastValue()) {
+					setComponentValue(field.getFieldName(), field.getValueObject());
+				}
+			}
+		}
 	}
 
 	//
@@ -840,20 +800,71 @@ public class DynPanel extends DataPanel {
 	// this.componentToFieldEventHandler.put(comp, fieldEventHandler);
 	// }
 
-	public double getComponentValueAsDouble(String fieldName) {
-		return ConversionUtil.toDouble(getFieldComponent(fieldName).getValue());
+	/**
+	 * @param record
+	 * @throws RecordNotFoundException
+	 * @throws DaoException
+	 */
+	protected void updateRecord(final Record record) throws RecordNotFoundException, DaoException {
+		if (System.getProperty("security.audit.gui.enabled", "true").toLowerCase().equals("false")) {
+			record.setGui(GeneralUtility.toXml(this));
+		}
+		this.dao.updateRecord(record);
 	}
 
-	public int getComponentValueAsInteger(String fieldName) {
-		return ConversionUtil.toInteger(getFieldComponent(fieldName).getValue());
+	/**
+	 *
+	 */
+	@Override
+	public void validateAddData(final boolean validateId) throws ValidationException, DaoException {
+		final Record record = viewToRecord();
+		// if (validateId) {
+		// SwingValidator.checkEmpty((UIComponent) compId);
+		// }
+		// for (int i = 0; i < record.getFieldsCount(); i++) {
+		// Field field = record.getField(i);
+		// JComponent comp = components.get(field.getMeta().getName());
+		// if (field.getMeta().isRequired()) {
+		// SwingValidator.checkEmpty((UIComponent) comp);
+		// }
+		// }
+		// // business validation
+		// if (isAddMode() && validateId) {
+		// if (dao.isIdExists(record.getIdValue())) {
+		// throw new ValidationException(record.getIdValue() + " " +
+		// Lables.get("ALREADY_EXISTS"), (UIComponent) getIdField());
+		// }
+		// }
+		try {
+			this.tableMeta.validateData(record);
+		} catch (final ValidationException ex) {
+			if (ex.getField() != null) {
+				this.components.get(ex.getField().getMeta().getName()).requestFocus();
+			}
+			throw ex;
+		}
 	}
 
-	public Date getComponentValueAsDate(String fieldName) {
-		return ConversionUtil.toDate(getFieldComponent(fieldName).getValue());
+	@Override
+	public void validateUpdateData() throws ValidationException, DaoException {
+		validateAddData(false);
 	}
 
-	public String getComponentValueAsString(String fieldName) {
-		return ConversionUtil.toString(getFieldComponent(fieldName).getValue());
+	/**
+	 *
+	 * @return
+	 */
+	public Record viewToRecord() {
+		final Record record = this.tableMeta.createEmptyRecord();
+		record.setModified(true);
+		record.getIdField().setValue(this.compId.getValue());
+		for (int i = 0; i < record.getFieldsCount(); i++) {
+			final Field field = record.getField(i);
+			final BindingComponent comp = this.components.get(field.getMeta().getName());
+			field.setValue(comp.getValue());
+		}
+		return record;
+
 	}
 
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.security.ui.dialogs;
 
 import java.awt.BorderLayout;
@@ -42,40 +57,14 @@ public class AuthenicationDialog extends JKDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	JKTextField txtUserName = new JKTextField(new TextDocument(14), 15);
-
-	JKPasswordField txtPassword = new JKPasswordField(14, 15);
-
-	JKButton btnAuthenticate = new JKButton("AUTHENTICATE");
-
-	JKButton btnCancel = new JKButton("CLOSE");
-
-	private User user;
-
-	boolean cancelled;
-
-	/**
-	 * @return
-	 */
-	public boolean isCancelled() {
-		return cancelled;
-	}
-
-	/**
-	 * @param cancelled
-	 */
-	public void setCancelled(boolean cancelled) {
-		this.cancelled = cancelled;
-	}
-
 	/**
 	 * @param parent
 	 * @param title
 	 * @return
 	 * @throws SecurityException
 	 */
-	public static User authenticateUser(JFrame parent, String title, int maxRetries) throws InvalidUserException {
-		AuthenicationDialog dlg = new AuthenicationDialog(parent, title);
+	public static User authenticateUser(final JFrame parent, final String title, final int maxRetries) throws InvalidUserException {
+		final AuthenicationDialog dlg = new AuthenicationDialog(parent, title);
 		for (int i = 0; i < maxRetries; i++) {
 			dlg.reset();
 			dlg.setVisible(true);
@@ -90,134 +79,74 @@ public class AuthenicationDialog extends JKDialog {
 		throw new InvalidUserException("INVALID_USER");
 	}
 
-	/**
-	 * 
-	 */
-	private void reset() {
-		txtUserName.setText("");
-		txtPassword.setText("");
+	public static void main(final String[] args) throws SecurityException {
+		final User info = authenticateUser(null, "Test", 3);
+		System.out.println(info);
+
 	}
 
-	/**
-	 * 
-	 * @param parent
-	 * @param title
-	 */
-	public AuthenicationDialog(Dialog parent, String title) {
-		super(parent, title);
-		initUI();
-	}
+	JKTextField txtUserName = new JKTextField(new TextDocument(14), 15);
+
+	JKPasswordField txtPassword = new JKPasswordField(14, 15);
+
+	JKButton btnAuthenticate = new JKButton("AUTHENTICATE");
+
+	JKButton btnCancel = new JKButton("CLOSE");
+
+	private User user;
+
+	boolean cancelled;
 
 	/**
-	 * 
+	 *
 	 * @param parent
 	 */
-	public AuthenicationDialog(Dialog parent) {
+	public AuthenicationDialog(final Dialog parent) {
 		super(parent, "AUTHINECATION");
 		initUI();
 	}
 
 	/**
-	 * 
+	 *
 	 * @param parent
 	 * @param title
 	 */
-	public AuthenicationDialog(Frame parent, String title) {
+	public AuthenicationDialog(final Dialog parent, final String title) {
 		super(parent, title);
 		initUI();
 	}
 
 	/**
-	 * 
+	 *
 	 * @param parent
 	 */
-	public AuthenicationDialog(Frame parent) {
+	public AuthenicationDialog(final Frame parent) {
 		this(parent, "AUTHINECATION");
 		initUI();
 	}
 
 	/**
-	 * 
+	 *
+	 * @param parent
+	 * @param title
 	 */
-	private void initUI() {
-		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		setModal(true);
-		JKPanel<?> pnlInfo = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
-		pnlInfo.setLayout(new GridLayout(2, 1, 5, 2));
-		pnlInfo.setBorder(BorderFactory.createTitledBorder("USER_CRED"));
-		pnlInfo.add(new JKLabledComponent("USER_NAME", 85, txtUserName));
-		pnlInfo.add(new JKLabledComponent("PASSWORD", 85, txtPassword));
-
-		JKPanel<?> pnlButtons = new JKPanel<Object>(new FlowLayout(FlowLayout.CENTER));
-
-		btnAuthenticate.setIcon("unlock.png");
-		btnCancel.setIcon("cancel.png");
-		pnlButtons.add(btnAuthenticate);
-		pnlButtons.add(btnCancel);
-		JKPanel<?> container = new JKMainPanel(new BorderLayout());
-
-		container.add(pnlInfo, BorderLayout.CENTER);
-		container.add(pnlButtons, BorderLayout.SOUTH);
-		add(container);
-		pack();
-		setLocationRelativeTo(null);
-
-		txtUserName.grabFocus();
-		btnAuthenticate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleAuthenticate();
-			}
-		});
-
-		btnCancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleClose();
-			}
-
-		});
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				handleClose();
-			}
-		});
-		txtUserName.requestFocusInWindow();
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				handleClose();
-			}
-		});
-		txtPassword.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					btnAuthenticate.doClick();
-				}
-			}
-		});
+	public AuthenicationDialog(final Frame parent, final String title) {
+		super(parent, title);
+		initUI();
 	}
 
 	/**
-	 * 
+	 * @return the authenticationInfo
 	 */
-	private void handleClose() {
-		setCancelled(true);
-		dispose();
-	}
-
-	public static void main(String[] args) throws SecurityException {
-		User info = authenticateUser(null, "Test", 3);
-		System.out.println(info);
-
+	public User getUser() {
+		return this.user;
 	}
 
 	private void handleAuthenticate() {
 		try {
 			validateInput();
-			User user = viewToModel();
-			SecurityFacade facade = new SecurityFacade();
+			final User user = viewToModel();
+			final SecurityFacade facade = new SecurityFacade();
 			try {
 				if (facade.isValidUser(user)) {
 					if (user.isDisabled()) {
@@ -229,52 +158,141 @@ public class AuthenicationDialog extends JKDialog {
 					}
 				} else {
 					SwingUtilities.invokeLater(new Runnable() {
+						@Override
 						public void run() {
-							txtUserName.requestFocus();
+							AuthenicationDialog.this.txtUserName.requestFocus();
 						}
 					});
 					SwingUtility.showUserErrorDialog("INVAILD_USER_NAME_OR_PASSWORD", false);
 				}
-			} catch (DaoException e) {
+			} catch (final DaoException e) {
 				ExceptionUtil.handleException(e);
 			}
-		} catch (ValidationException e) {
+		} catch (final ValidationException e) {
 			ExceptionUtil.handleException(e);
 		}
 	}
 
 	/**
-	 * 
+	 *
+	 */
+	private void handleClose() {
+		setCancelled(true);
+		dispose();
+	}
+
+	/**
+	 *
+	 */
+	private void initUI() {
+		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setModal(true);
+		final JKPanel<?> pnlInfo = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
+		pnlInfo.setLayout(new GridLayout(2, 1, 5, 2));
+		pnlInfo.setBorder(BorderFactory.createTitledBorder("USER_CRED"));
+		pnlInfo.add(new JKLabledComponent("USER_NAME", 85, this.txtUserName));
+		pnlInfo.add(new JKLabledComponent("PASSWORD", 85, this.txtPassword));
+
+		final JKPanel<?> pnlButtons = new JKPanel<Object>(new FlowLayout(FlowLayout.CENTER));
+
+		this.btnAuthenticate.setIcon("unlock.png");
+		this.btnCancel.setIcon("cancel.png");
+		pnlButtons.add(this.btnAuthenticate);
+		pnlButtons.add(this.btnCancel);
+		final JKPanel<?> container = new JKMainPanel(new BorderLayout());
+
+		container.add(pnlInfo, BorderLayout.CENTER);
+		container.add(pnlButtons, BorderLayout.SOUTH);
+		add(container);
+		pack();
+		setLocationRelativeTo(null);
+
+		this.txtUserName.grabFocus();
+		this.btnAuthenticate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleAuthenticate();
+			}
+		});
+
+		this.btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleClose();
+			}
+
+		});
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(final WindowEvent e) {
+				handleClose();
+			}
+		});
+		this.txtUserName.requestFocusInWindow();
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(final WindowEvent e) {
+				handleClose();
+			}
+		});
+		this.txtPassword.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					AuthenicationDialog.this.btnAuthenticate.doClick();
+				}
+			}
+		});
+	}
+
+	/**
 	 * @return
 	 */
-	private User viewToModel() {
-		User user = new User();
-		user.setUserId(txtUserName.getText());
-		user.setPassword(GeneralUtility.encode(txtPassword.getText()));
-		return user;
+	public boolean isCancelled() {
+		return this.cancelled;
 	}
 
 	/**
-	 * @throws ValidationException
-	 * 
+	 *
 	 */
-	private void validateInput() throws ValidationException {
-		SwingValidator.checkEmpty(txtUserName);
-		SwingValidator.checkEmpty(txtPassword);
+	private void reset() {
+		this.txtUserName.setText("");
+		this.txtPassword.setText("");
 	}
 
 	/**
-	 * @return the authenticationInfo
+	 * @param cancelled
 	 */
-	public User getUser() {
-		return this.user;
+	public void setCancelled(final boolean cancelled) {
+		this.cancelled = cancelled;
 	}
 
 	/**
 	 * @param authenticationInfo
 	 *            the authenticationInfo to set
 	 */
-	public void setUser(User user) {
+	public void setUser(final User user) {
 		this.user = user;
+	}
+
+	/**
+	 * @throws ValidationException
+	 *
+	 */
+	private void validateInput() throws ValidationException {
+		SwingValidator.checkEmpty(this.txtUserName);
+		SwingValidator.checkEmpty(this.txtPassword);
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private User viewToModel() {
+		final User user = new User();
+		user.setUserId(this.txtUserName.getText());
+		user.setPassword(GeneralUtility.encode(this.txtPassword.getText()));
+		return user;
 	}
 }

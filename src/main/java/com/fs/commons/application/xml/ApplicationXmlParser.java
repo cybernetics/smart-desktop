@@ -1,5 +1,19 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.application.xml;
-
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,127 +37,126 @@ import com.fs.commons.locale.LablesLoader;
 import com.fs.commons.util.ReflicationUtil;
 
 public class ApplicationXmlParser {
-	
+
 	/**
-	 * 
+	 *
 	 * @param in
 	 * @return
-	 * @throws JKXmlException 
+	 * @throws JKXmlException
 	 */
-	public Application parseApplication(InputStream in) throws JKXmlException{
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	public Application parseApplication(final InputStream in) throws JKXmlException {
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
 		try {
 			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(in);
-			Node root = doc.getFirstChild();
-			NodeList list = root.getChildNodes();
-			Application application=new Application();
-			ArrayList<Module> modules=new ArrayList<Module>();
+			final Document doc = builder.parse(in);
+			final Node root = doc.getFirstChild();
+			final NodeList list = root.getChildNodes();
+			final Application application = new Application();
+			final ArrayList<Module> modules = new ArrayList<Module>();
 			for (int i = 0; i < list.getLength(); i++) {
-				Node node = list.item(i);
-				String text = node.getTextContent().trim();
+				final Node node = list.item(i);
+				final String text = node.getTextContent().trim();
 				if (node.getNodeName().equals("name")) {
 					application.setApplicationName(text);
-				}else if (node.getNodeName().equals("id")) {
-					application.setApplicationId(Integer.parseInt(text));					
-				}else if (node.getNodeName().equals("config-file")) {
+				} else if (node.getNodeName().equals("id")) {
+					application.setApplicationId(Integer.parseInt(text));
+				} else if (node.getNodeName().equals("config-file")) {
 					application.setConfigFileName(text);
-				}else if (node.getNodeName().equals("splash-img")) {
+				} else if (node.getNodeName().equals("splash-img")) {
 					application.setSplashImage(text);
-//				}else if (node.getNodeName().equals("date-format")) {
-//					JKDate.setDefaultDateFormat(text);
-				}else if (node.getNodeName().equals("view-modules")) {
+					// }else if (node.getNodeName().equals("date-format")) {
+					// JKDate.setDefaultDateFormat(text);
+				} else if (node.getNodeName().equals("view-modules")) {
 					application.setViewModules(Boolean.parseBoolean(text));
-				}else if (node.getNodeName().equals("home-img")) {					
+				} else if (node.getNodeName().equals("home-img")) {
 					application.setHomeImage(text);
-				}else if (node.getNodeName().equals("locale")) {
-					application.setLocale(text,true);					
-				}else if (node.getNodeName().equals("auto-logout-interval")) {
+				} else if (node.getNodeName().equals("locale")) {
+					application.setLocale(text, true);
+				} else if (node.getNodeName().equals("auto-logout-interval")) {
 					application.setAutoLogoutInterval(text);
 				} else if (node.getNodeName().equals("module")) {
-					Module module = parseModule(list.item(i));
+					final Module module = parseModule(list.item(i));
 					module.setApplication(application);
 					modules.add(module);
 				} else if (node.getNodeName().equals("listener")) {
-					ApplicationListener listener = parseListener(list.item(i));
+					final ApplicationListener listener = parseListener(list.item(i));
 					application.addListener(listener);
 				}
 			}
 			application.setModules(modules);
 			return application;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new JKXmlException(e);
 		}
-		
+
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////
+	private LablesLoader parseLablesLoader(final String lablesLoaderClass) throws Exception {
+		final ReflicationUtil<LablesLoader> reflicationUtil = new ReflicationUtil<LablesLoader>();
+		return reflicationUtil.getInstance(lablesLoaderClass, LablesLoader.class);
+	}
 
 	/**
-	 * 
+	 *
 	 * @param item
 	 * @return
-	 * @throws ClassNotFoundException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
-	private ApplicationListener parseListener(Node item) throws Exception {
-		Element e = (Element) item;
-		ApplicationListener listener=null;
+	private ApplicationListener parseListener(final Node item) throws Exception {
+		final Element e = (Element) item;
+		ApplicationListener listener = null;
 		if (!e.getAttribute("class").equals("")) {
-			String className=e.getAttribute("class");
-			ReflicationUtil<ApplicationListener> reflicationUtil = new ReflicationUtil<ApplicationListener>();
+			final String className = e.getAttribute("class");
+			final ReflicationUtil<ApplicationListener> reflicationUtil = new ReflicationUtil<ApplicationListener>();
 			listener = reflicationUtil.getInstance(className, ApplicationListener.class);
 		}
 		return listener;
 	}
 
 	/**
-	 * 
+	 *
 	 * @param item
 	 * @return
-	 * @throws ClassNotFoundException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @throws IOException 
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws IOException
 	 */
-	protected Module parseModule(Node item) throws Exception {
-		Element e = (Element) item;
-		Module module=null;
+	protected Module parseModule(final Node item) throws Exception {
+		final Element e = (Element) item;
+		Module module = null;
 		if (!e.getAttribute("class").equals("")) {
-			String className=e.getAttribute("class");
-			module=(Module)Class.forName(className).newInstance();
-		}else if(!e.getAttribute("config-path").equals("")){
-			DefaultModule defaultModule = new DefaultModule();
+			final String className = e.getAttribute("class");
+			module = (Module) Class.forName(className).newInstance();
+		} else if (!e.getAttribute("config-path").equals("")) {
+			final DefaultModule defaultModule = new DefaultModule();
 			defaultModule.setConfigPath(e.getAttribute("config-path"));
-			module=defaultModule;
+			module = defaultModule;
 		}
-		if(!e.getAttribute("id").equals("")){
+		if (!e.getAttribute("id").equals("")) {
 			module.setModuleId(Integer.parseInt(e.getAttribute("id")));
 		}
-		if(!e.getAttribute("default").trim().equals("")){
+		if (!e.getAttribute("default").trim().equals("")) {
 			module.setDefault(Boolean.parseBoolean(e.getAttribute("default")));
 		}
-		if(!e.getAttribute("datasource-config").trim().equals("")){
+		if (!e.getAttribute("datasource-config").trim().equals("")) {
 			module.setDataSource(new PoolingDataSource(e.getAttribute("datasource-config")));
 		}
-		if(!e.getAttribute("lables-loader").trim().equals("")){
+		if (!e.getAttribute("lables-loader").trim().equals("")) {
 			module.setLablesLoader(parseLablesLoader(e.getAttribute("lables-loader")));
-		}				
+		}
 		module.setModuleName(e.getAttribute("name"));
-				
-		NodeList list = item.getChildNodes();
+
+		final NodeList list = item.getChildNodes();
 		for (int i = 0; i < list.getLength(); i++) {
 			if (list.item(i).getNodeName().equals("paramters")) {
 			}
 		}
-		
-		return module;
-	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////
-	private LablesLoader parseLablesLoader(String lablesLoaderClass) throws Exception {
-		ReflicationUtil<LablesLoader> reflicationUtil = new ReflicationUtil<LablesLoader>();
-		return reflicationUtil.getInstance(lablesLoaderClass, LablesLoader.class);
+		return module;
 	}
 }

@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.reports;
 
@@ -20,41 +32,62 @@ import com.fs.commons.util.ExceptionUtil;
 
 /**
  * @author u087
- * 
+ *
  */
 public class ReportManagerPanel extends JKPanel<Object> {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private ReportUIPanel mainPanel;
 
 	/**
-	 * 
+	 *
 	 */
 	public ReportManagerPanel() {
 		init();
 	}
 
 	/**
-	 * 
+	 * @param report
+	 */
+	protected void handleShowReport(final Report report) {
+		try {
+			final ReportUIPanel pnl = new ReportUIPanel(report);
+			if (this.mainPanel != null) {
+				remove(this.mainPanel);
+			}
+			this.mainPanel = pnl;
+			add(this.mainPanel, BorderLayout.CENTER);
+			validate();
+			repaint();
+		} catch (final TableMetaNotFoundException e) {
+			ExceptionUtil.handleException(e);
+		} catch (final DaoException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	/**
+	 *
 	 */
 	private void init() {
 		setLayout(new BorderLayout());
-		ArrayList<Report> reports = ReportManager.getReports();
-		JKPanel<?> pnlMenu = new JKPanel<Object>();
+		final ArrayList<Report> reports = ReportManager.getReports();
+		final JKPanel<?> pnlMenu = new JKPanel<Object>();
 		pnlMenu.setBorder(SwingUtility.createTitledBorder("AVAILABLE_REPORTS"));
 		pnlMenu.setPreferredSize(new Dimension(180, 800));
 		// pnlMenu.setLayout(new BoxLayout(pnlMenu, BoxLayout.Y_AXIS));
 		for (int i = 0; i < reports.size(); i++) {
 			final Report report = reports.get(i);
 			if (report.isVisible()) {
-				JKMenuItem btn = new JKMenuItem(report.getTitle());
+				final JKMenuItem btn = new JKMenuItem(report.getTitle());
 				// btn.setPreferredSize(new Dimension(400, 30));
 				pnlMenu.add(btn);
 				pnlMenu.add(Box.createVerticalStrut(2));
 				btn.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
 						handleShowReport(report);
 					}
 				});
@@ -62,25 +95,5 @@ public class ReportManagerPanel extends JKPanel<Object> {
 		}
 		add(pnlMenu, BorderLayout.LINE_START);
 
-	}
-
-	/**
-	 * @param report
-	 */
-	protected void handleShowReport(Report report) {
-		try {
-			ReportUIPanel pnl = new ReportUIPanel(report);
-			if (mainPanel != null) {
-				remove(mainPanel);
-			}
-			mainPanel = pnl;
-			add(mainPanel, BorderLayout.CENTER);
-			validate();
-			repaint();
-		} catch (TableMetaNotFoundException e) {
-			ExceptionUtil.handleException(e);
-		} catch (DaoException e) {
-			ExceptionUtil.handleException(e);
-		}
 	}
 }

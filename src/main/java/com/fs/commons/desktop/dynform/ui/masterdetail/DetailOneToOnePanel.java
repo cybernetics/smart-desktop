@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.dynform.ui.masterdetail;
 
@@ -22,11 +34,11 @@ import com.fs.commons.util.ExceptionUtil;
 
 /**
  * @author u087
- * 
+ *
  */
 public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private final ForiegnKeyFieldMeta foriegnKeyFieldMeta;
@@ -36,113 +48,41 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 	/**
 	 * @throws TableMetaNotFoundException
 	 * @throws DaoException
-	 * 
+	 *
 	 */
-	public DetailOneToOnePanel(ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws TableMetaNotFoundException, DaoException {
+	public DetailOneToOnePanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws TableMetaNotFoundException, DaoException {
 		this.foriegnKeyFieldMeta = foriegnKeyFieldMeta;
 		this.foriegnKeyFieldMeta.setEnabled(false);
-		pnlDetail = new DynDaoPanel(getDetailTableMeta());
-		pnlDetail.setAllowClose(false);
-		pnlDetail.setAllowClear(false);
-		init();		
+		this.pnlDetail = new DynDaoPanel(getDetailTableMeta());
+		this.pnlDetail.setAllowClose(false);
+		this.pnlDetail.setAllowClear(false);
+		init();
 		setMasterIdValue(null);
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	private void init() {
-		addDynDaoActionListener(new DynDaoActionAdapter(){
-			@Override
-			public void afterAddRecord(Record record) {
-				try {
-					setMasterIdValue(masterIdValue);
-					//change to find mode
-				} catch (DaoException e) {
-					ExceptionUtil.handleException(e);
-				}
-			}
-			@Override
-			public void afterDeleteRecord(Record record) {
-				//without the following call , the dynPanel will lost the old master value
-				try {
-					setMasterIdValue(masterIdValue);
-				} catch (DaoException e) {
-					ExceptionUtil.handleException(e);
-				}
-			}
-		});
-		add(pnlDetail, BorderLayout.NORTH);
-	}
+	@Override
+	public void addDynDaoActionListener(final DynDaoActionListener listener) {
+		this.pnlDetail.addDynDaoActionListener(listener);
 
-	/**
-	 * 
-	 */
-	public void setMasterIdValue(Object masterIdValue) throws DaoException {
-		if(masterIdValue==null || masterIdValue.toString().trim().equals("")){
-			this.masterIdValue=null;
-			pnlDetail.resetComponents();
-			setMode(DynDaoMode.ADD);
-			setEnabled(false);
-		}else{
-			this.masterIdValue=masterIdValue;
-			//we enable it , the internal enable disable fnctioanlity will manged locally inside that class
-			//pnlDetail.setEnabled(true);
-			setEnabled(true);
-			try{				
-				Record record= findByMasterId(masterIdValue);
-				handleFind(record.getIdValue());
-			}catch(RecordNotFoundException e){				
-				setMode(DynDaoMode.ADD);
-				pnlDetail.setComponentValue(foriegnKeyFieldMeta.getName(), masterIdValue);
-			}			
-		}
 	}
 
 	/**
 	 * @param masterIdValue2
-	 * @return 
-	 * @throws DaoException 
+	 * @return
+	 * @throws DaoException
 	 */
-	private Record findByMasterId(Object masterIdValue) throws RecordNotFoundException,DaoException {
-		DynamicDao dao=new DynamicDao(getDetailTableMeta());
-		ArrayList<Record> records=dao.findByFieldValue(foriegnKeyFieldMeta.getName(),masterIdValue);
-		if(records.size()==0){
+	private Record findByMasterId(final Object masterIdValue) throws RecordNotFoundException, DaoException {
+		final DynamicDao dao = new DynamicDao(getDetailTableMeta());
+		final ArrayList<Record> records = dao.findByFieldValue(this.foriegnKeyFieldMeta.getName(), masterIdValue);
+		if (records.size() == 0) {
 			throw new RecordNotFoundException();
 		}
-		//Guaranteed to be only one record because it is OneToOne relation , right?
+		// Guaranteed to be only one record because it is OneToOne relation ,
+		// right?
 		return records.get(0);
-	}
-
-	/**
-	 * 
-	 */
-	public void setMode(DynDaoMode mode) {
-		pnlDetail.setMode(mode);
-	}
-
-	/**
-	 * 
-	 */
-	public void addDynDaoActionListener(DynDaoActionListener listener) {
-		pnlDetail.addDynDaoActionListener(listener);
-
-	}
-	
-	/**
-	 * 
-	 */
-	public void handleFind(Object idValue) throws DaoException {
-		pnlDetail.handleFindRecord(idValue);
-		pnlDetail.setMode(DynDaoMode.VIEW);//TODO : check the purpose of this statement
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void resetComponents() throws DaoException {
-		setMasterIdValue(null);
 	}
 
 	/**
@@ -151,17 +91,98 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 	public DynDaoPanel getDetailPanel() {
 		return this.pnlDetail;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private TableMeta getDetailTableMeta() {
-		return foriegnKeyFieldMeta.getParentTable();
+		return this.foriegnKeyFieldMeta.getParentTable();
 	}
 
-	public void setShowButtons(boolean show) {
-		pnlDetail.setShowButtons(show);
+	/**
+	 *
+	 */
+	@Override
+	public void handleFind(final Object idValue) throws DaoException {
+		this.pnlDetail.handleFindRecord(idValue);
+		this.pnlDetail.setMode(DynDaoMode.VIEW);// TODO : check the purpose of
+												// this statement
 	}
-	
+
+	/**
+	 *
+	 */
+	private void init() {
+		addDynDaoActionListener(new DynDaoActionAdapter() {
+			@Override
+			public void afterAddRecord(final Record record) {
+				try {
+					setMasterIdValue(DetailOneToOnePanel.this.masterIdValue);
+					// change to find mode
+				} catch (final DaoException e) {
+					ExceptionUtil.handleException(e);
+				}
+			}
+
+			@Override
+			public void afterDeleteRecord(final Record record) {
+				// without the following call , the dynPanel will lost the old
+				// master value
+				try {
+					setMasterIdValue(DetailOneToOnePanel.this.masterIdValue);
+				} catch (final DaoException e) {
+					ExceptionUtil.handleException(e);
+				}
+			}
+		});
+		add(this.pnlDetail, BorderLayout.NORTH);
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void resetComponents() throws DaoException {
+		setMasterIdValue(null);
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void setMasterIdValue(final Object masterIdValue) throws DaoException {
+		if (masterIdValue == null || masterIdValue.toString().trim().equals("")) {
+			this.masterIdValue = null;
+			this.pnlDetail.resetComponents();
+			setMode(DynDaoMode.ADD);
+			setEnabled(false);
+		} else {
+			this.masterIdValue = masterIdValue;
+			// we enable it , the internal enable disable fnctioanlity will
+			// manged locally inside that class
+			// pnlDetail.setEnabled(true);
+			setEnabled(true);
+			try {
+				final Record record = findByMasterId(masterIdValue);
+				handleFind(record.getIdValue());
+			} catch (final RecordNotFoundException e) {
+				setMode(DynDaoMode.ADD);
+				this.pnlDetail.setComponentValue(this.foriegnKeyFieldMeta.getName(), masterIdValue);
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void setMode(final DynDaoMode mode) {
+		this.pnlDetail.setMode(mode);
+	}
+
+	public void setShowButtons(final boolean show) {
+		this.pnlDetail.setShowButtons(show);
+	}
+
 }

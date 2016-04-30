@@ -1,42 +1,17 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * Copyright 2002-2016 Jalal Kiswani.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The contents of this file are subject to the terms of either the GNU
- * General Public License Version 2 only ("GPL") or the Common
- * Development and Distribution License("CDDL") (collectively, the
- * "License"). You may not use this file except in compliance with the
- * License. You can obtain a copy of the License at
- * http://www.netbeans.org/cddl-gplv2.html
- * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
- * specific language governing permissions and limitations under the
- * License.  When distributing the software, include this License Header
- * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
- * accompanied this code. If applicable, add the following below the
- * License Header, with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Contributor(s):
- *
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
- * If you wish your version of this file to be governed by only the CDDL
- * or only the GPL Version 2, indicate your decision by adding
- * "[Contributor] elects to include this software in this distribution
- * under the [CDDL or GPL Version 2] license." If you do not indicate a
- * single choice of license, a recipient has the option to distribute
- * your version of this file under either the CDDL, the GPL Version 2 or
- * to extend the choice of license to its licensees as provided above.
- * However, if you add GPL Version 2 code and therefore, elected the GPL
- * Version 2 license, then the option applies only if the new code is
- * made subject to such option by the copyright holder.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.validation.builtin;
 
@@ -48,71 +23,67 @@ import com.fs.commons.desktop.validation.Validator;
  * @author Tim Boudreau
  */
 final class ValidHostNameOrIPValidator implements Validator<String> {
-    private final HostNameValidator hostVal;
-    private final IpAddressValidator ipVal = new IpAddressValidator();
-    ValidHostNameOrIPValidator(boolean allowPort) {
-        hostVal = new HostNameValidator(allowPort);
-    }
+	private final HostNameValidator hostVal;
+	private final IpAddressValidator ipVal = new IpAddressValidator();
 
-    ValidHostNameOrIPValidator() {
-        this(true);
-    }
+	ValidHostNameOrIPValidator() {
+		this(true);
+	}
 
-    public boolean validate(Problems problems, String compName, String model) {
-        String[] parts = model.split ("\\.");
-        boolean hasIntParts = false;
-        boolean hasNonIntParts = false;
-        if (model.indexOf(" ") > 0 || model.indexOf ("\t") > 0) {
-            problems.add (NbBundle.getMessage(ValidHostNameOrIPValidator.class,
-                    "HOST_MAY_NOT_CONTAIN_WHITESPACE", compName, model)); //NOI18N
-            return false;
-        }
-        if (parts.length == 0) { //the string "."
-            problems.add (NbBundle.getMessage(ValidHostNameOrIPValidator.class,
-                    "INVALID_HOST_OR_IP", compName, model)); //NOI18N
-            return false;
-        }
-        for (int i = 0; i < parts.length; i++) {
-            String s = parts[i];
-            if (i == parts.length - 1 && s.contains(":")) { //NOI18N
-                String[] partAndPort = s.split(":"); //NOI18N
-                if (partAndPort.length > 2) {
-                    problems.add (NbBundle.getMessage(ValidHostNameOrIPValidator.class,
-                            "TOO_MANY_COLONS", compName, model)); //NOI18N
-                    return false;
-                }
-                if (partAndPort.length == 0) { //the string ":"
-                    problems.add (NbBundle.getMessage(ValidHostNameOrIPValidator.class,
-                            "INVALID_HOST_OR_IP", compName, model)); //NOI18N
-                    return false;
-                }
-                s = partAndPort[0];
-                if (partAndPort.length == 2) {
-                    try {
-                        Integer.parseInt (partAndPort[1]);
-                    } catch (NumberFormatException nfe) {
-                        problems.add (NbBundle.getMessage(ValidHostNameOrIPValidator.class,
-                            "INVALID_PORT", compName, partAndPort[1])); //NOI18N
-                        return false;
-                    }
-                }
-            }
-            try {
-                Integer.parseInt (s);
-                hasIntParts = true;
-            } catch (NumberFormatException nfe) {
-                hasNonIntParts = true;
-            }
-            if (hasIntParts && hasNonIntParts) {
-                problems.add(NbBundle.getMessage (ValidHostNameOrIPValidator.class,
-                        "ADDRESS_CONTAINS_INT_AND_NON_INT_LABELS", compName, model)); //NOI18N
-                return false;
-            }
-        }
+	ValidHostNameOrIPValidator(final boolean allowPort) {
+		this.hostVal = new HostNameValidator(allowPort);
+	}
 
-        boolean validHost = hasNonIntParts && hostVal.validate(problems, compName, model);
-        boolean validIp = hasIntParts && ipVal.validate(problems, compName, model);
-        return validHost || validIp;
-    }
+	@Override
+	public boolean validate(final Problems problems, final String compName, final String model) {
+		final String[] parts = model.split("\\.");
+		boolean hasIntParts = false;
+		boolean hasNonIntParts = false;
+		if (model.indexOf(" ") > 0 || model.indexOf("\t") > 0) {
+			problems.add(NbBundle.getMessage(ValidHostNameOrIPValidator.class, "HOST_MAY_NOT_CONTAIN_WHITESPACE", compName, model)); // NOI18N
+			return false;
+		}
+		if (parts.length == 0) { // the string "."
+			problems.add(NbBundle.getMessage(ValidHostNameOrIPValidator.class, "INVALID_HOST_OR_IP", compName, model)); // NOI18N
+			return false;
+		}
+		for (int i = 0; i < parts.length; i++) {
+			String s = parts[i];
+			if (i == parts.length - 1 && s.contains(":")) { // NOI18N
+				final String[] partAndPort = s.split(":"); // NOI18N
+				if (partAndPort.length > 2) {
+					problems.add(NbBundle.getMessage(ValidHostNameOrIPValidator.class, "TOO_MANY_COLONS", compName, model)); // NOI18N
+					return false;
+				}
+				if (partAndPort.length == 0) { // the string ":"
+					problems.add(NbBundle.getMessage(ValidHostNameOrIPValidator.class, "INVALID_HOST_OR_IP", compName, model)); // NOI18N
+					return false;
+				}
+				s = partAndPort[0];
+				if (partAndPort.length == 2) {
+					try {
+						Integer.parseInt(partAndPort[1]);
+					} catch (final NumberFormatException nfe) {
+						problems.add(NbBundle.getMessage(ValidHostNameOrIPValidator.class, "INVALID_PORT", compName, partAndPort[1])); // NOI18N
+						return false;
+					}
+				}
+			}
+			try {
+				Integer.parseInt(s);
+				hasIntParts = true;
+			} catch (final NumberFormatException nfe) {
+				hasNonIntParts = true;
+			}
+			if (hasIntParts && hasNonIntParts) {
+				problems.add(NbBundle.getMessage(ValidHostNameOrIPValidator.class, "ADDRESS_CONTAINS_INT_AND_NON_INT_LABELS", compName, model)); // NOI18N
+				return false;
+			}
+		}
+
+		final boolean validHost = hasNonIntParts && this.hostVal.validate(problems, compName, model);
+		final boolean validIp = hasIntParts && this.ipVal.validate(problems, compName, model);
+		return validHost || validIp;
+	}
 
 }

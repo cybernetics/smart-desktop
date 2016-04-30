@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Font;
@@ -17,32 +32,32 @@ import com.fs.commons.locale.Lables;
  * <p>
  * Title:
  * </p>
- * 
+ *
  * <p>
  * Description:
  * </p>
- * 
+ *
  * <p>
  * Copyright: Copyright (c) 2007
  * </p>
- * 
+ *
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
 public class JKRadioButton extends JRadioButton implements BindingComponent<Object> {
 
-	/**
-	 * 
-	 */
-	private FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
-
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 *
+	 */
+	private final FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
 	private boolean defaultValue;
-	private Font font = new Font("Arial", Font.PLAIN, 10);
+	private final Font font = new Font("Arial", Font.PLAIN, 10);
 
 	private boolean transfer;
 
@@ -54,25 +69,67 @@ public class JKRadioButton extends JRadioButton implements BindingComponent<Obje
 	 * @param caption
 	 *            String
 	 */
-	public JKRadioButton(String caption) {
+	public JKRadioButton(final String caption) {
 		super(caption, true);
 		setPreferredSize(null);
 		setOpaque(false);
 		init();
 	}
 
-	public JKRadioButton(String string, boolean focusable) {
+	public JKRadioButton(final String string, final boolean focusable) {
 		this(string);
 		setFocusable(focusable);
 	}
 
+	@Override
+	public void addValidator(final Validator validator) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addValueChangeListener(final ValueChangeListener listener) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void clear() {
+		setSelected(false);
+	}
+
+	@Override
+	public void filterValues(final BindingComponent comp1) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public DataSource getDataSource() {
+		return this.fsWrapper.getDataSource();
+	}
+
+	@Override
+	public Boolean getDefaultValue() {
+		return this.defaultValue;
+	}
+
 	/**
-	 * 
+	 *
+	 */
+	@Override
+	public Boolean getValue() {
+		return isSelected();
+	}
+
+	/**
+	 *
 	 */
 	void init() {
-		setFont(font);
+		setFont(this.font);
 		addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
+			@Override
+			public void keyTyped(final KeyEvent e) {
 				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
 					transferFocus();
 				}
@@ -80,16 +137,24 @@ public class JKRadioButton extends JRadioButton implements BindingComponent<Obje
 		});
 	}
 
-	/**
-	 * 
-	 */
-	public Boolean getValue() {
-		return isSelected();
+	@Override
+	public boolean isAutoTransferFocus() {
+		return this.transfer;
 	}
 
 	@Override
-	public Boolean getDefaultValue() {
-		return defaultValue;
+	public void reset() {
+		setSelected(this.defaultValue);
+	}
+
+	@Override
+	public void setAutoTransferFocus(final boolean transfer) {
+		this.transfer = transfer;
+	}
+
+	@Override
+	public void setDataSource(final DataSource manager) {
+		this.fsWrapper.setDataSource(manager);
 	}
 
 	@Override
@@ -106,68 +171,20 @@ public class JKRadioButton extends JRadioButton implements BindingComponent<Obje
 	}
 
 	@Override
-	public void reset() {
-		setSelected(defaultValue);
+	public void setText(final String text) {
+		super.setText(Lables.get(text));
 	}
 
 	@Override
-	public void clear() {
-		setSelected(false);
-	}
-
-	@Override
-	public void setValue(Object value) {
+	public void setValue(final Object value) {
 		if (value != null) {
 			setSelected(Boolean.parseBoolean(value.toString()));
 		}
 	}
 
 	@Override
-	public void addValidator(Validator validator) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void validateValue() throws ValidationException {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void filterValues(BindingComponent comp1) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setText(String text) {
-		super.setText(Lables.get(text));
-	}
-
-	@Override
-	public void setDataSource(DataSource manager) {
-		fsWrapper.setDataSource(manager);
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		return fsWrapper.getDataSource();
-	}
-
-	@Override
-	public void addValueChangeListener(ValueChangeListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setAutoTransferFocus(boolean transfer) {
-		this.transfer = transfer;
-	}
-
-	@Override
-	public boolean isAutoTransferFocus() {
-		return transfer;
 	}
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.dialogs;
 
 import java.awt.BorderLayout;
@@ -16,119 +31,126 @@ import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.util.ExceptionUtil;
 
-public class DlgInput extends JKPanel<Object>{
+public class DlgInput extends JKPanel<Object> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	final JKTextField txtValue = new JKTextField(new FloatDocument(5), 20);
-	JKButton btnOk=new JKButton("OK");
-	JKButton btnCancel=new JKButton("CANCEL");
-	private Float amount;
-	private final String title;
-	private final Float rangeTo;
-	private final Float rangeFrom;
-	
+
 	/**
-	 * 
-	 * @return
+	 *
+	 * @param args
 	 */
-	public static Float showInputDialog(String title){
-		return showInputDialog(title,"");
+	public static void main(final String[] args) {
+		showInputDialog("Fees");
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
+	 */
+	public static Float showInputDialog(final String title) {
+		return showInputDialog(title, "");
+	}
+
+	/**
+	 *
 	 * @param string
 	 * @param string2
 	 */
-	public static Float showInputDialog(String title, String defaultValue) {
-		return showInputDialog(title,defaultValue,null,null);
+	public static Float showInputDialog(final String title, final String defaultValue) {
+		return showInputDialog(title, defaultValue, null, null);
 	}
-	
-	/*p
-	 * 
+
+	/*
+	 * p
+	 *
 	 */
-	public static float showInputDialog(String title, String defaultValue, Float rangeFrom, Float rangeTo) {
-		DlgInput pnl=new DlgInput(defaultValue,title,rangeFrom,rangeTo);
+	public static float showInputDialog(final String title, final String defaultValue, final Float rangeFrom, final Float rangeTo) {
+		final DlgInput pnl = new DlgInput(defaultValue, title, rangeFrom, rangeTo);
 		SwingUtility.showPanelInDialog(pnl, "INPUT_DIALOG");
 		return pnl.amount;
 	}
 
-	
+	final JKTextField txtValue = new JKTextField(new FloatDocument(5), 20);
+	JKButton btnOk = new JKButton("OK");
+	JKButton btnCancel = new JKButton("CANCEL");
+
+	private Float amount;
+
+	private final String title;
+
+	private final Float rangeTo;
+
+	private final Float rangeFrom;
+
 	/**
-	 * @param defaultValue 
-	 * @param title 
-	 * 
+	 * @param defaultValue
+	 * @param title
+	 *
 	 */
-	private DlgInput(String defaultValue, String title, Float rangeFrom, Float rangeTo) {
+	private DlgInput(final String defaultValue, final String title, final Float rangeFrom, final Float rangeTo) {
 		this.title = title;
 		this.rangeFrom = rangeFrom;
 		this.rangeTo = rangeTo;
 		init();
-		txtValue.setText(defaultValue);
-	}
-	
-	/**
-	 * 
-	 */
-	void init(){
-		setLayout(new BorderLayout());
-		JKPanel<?> pnlInfo=new JKPanel<Object>();
-		pnlInfo.setBorder(SwingUtility.createTitledBorder("SET_VALUE"));
-		pnlInfo.add(new JKLabledComponent(title, txtValue));
-		
-		JKPanel<?> pnlButtons=new JKPanel<Object>();
-		pnlButtons.add(btnOk);
-		pnlButtons.add(btnCancel);
-		
-		add(pnlInfo,BorderLayout.CENTER);
-		add(pnlButtons,BorderLayout.SOUTH);
-		
-		btnOk.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				handleOk();
-			}
-		});
-		btnCancel.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				amount=null;
-				SwingUtility.closePanelDialog(DlgInput.this);
-			}
-		});		
-		txtValue.addKeyListener(new KeyAdapter(){
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode()==KeyEvent.VK_ENTER){
-					btnOk.doClick();
-				}
-			}
-		});
+		this.txtValue.setText(defaultValue);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void handleOk() {
 		try {
-			SwingValidator.checkEmpty(txtValue);
-			if(rangeFrom!=null && rangeTo!=null){
-				SwingValidator.checkValidRange(txtValue, rangeFrom, rangeTo);
+			SwingValidator.checkEmpty(this.txtValue);
+			if (this.rangeFrom != null && this.rangeTo != null) {
+				SwingValidator.checkValidRange(this.txtValue, this.rangeFrom, this.rangeTo);
 			}
-			amount=txtValue.getTextAsFloat();
+			this.amount = this.txtValue.getTextAsFloat();
 			SwingUtility.closePanelDialog(this);
-		} catch (ValidationException e) {
+		} catch (final ValidationException e) {
 			ExceptionUtil.handleException(e);
-		}		
+		}
 	}
-	
+
 	/**
-	 * 
-	 * @param args
+	 *
 	 */
-	public static void main(String[] args) {
-		showInputDialog("Fees");
+	void init() {
+		setLayout(new BorderLayout());
+		final JKPanel<?> pnlInfo = new JKPanel<Object>();
+		pnlInfo.setBorder(SwingUtility.createTitledBorder("SET_VALUE"));
+		pnlInfo.add(new JKLabledComponent(this.title, this.txtValue));
+
+		final JKPanel<?> pnlButtons = new JKPanel<Object>();
+		pnlButtons.add(this.btnOk);
+		pnlButtons.add(this.btnCancel);
+
+		add(pnlInfo, BorderLayout.CENTER);
+		add(pnlButtons, BorderLayout.SOUTH);
+
+		this.btnOk.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleOk();
+			}
+		});
+		this.btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				DlgInput.this.amount = null;
+				SwingUtility.closePanelDialog(DlgInput.this);
+			}
+		});
+		this.txtValue.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					DlgInput.this.btnOk.doClick();
+				}
+			}
+		});
 	}
 
 }

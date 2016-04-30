@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Component;
@@ -47,24 +62,39 @@ import com.fs.commons.util.DateTimeUtil;
 import com.fs.commons.util.GeneralUtility;
 
 public class JKTable extends JTable {
-	private final TableFocusListener tableFocusListener = new TableFocusListener();
+	class TableFocusListener extends FocusAdapter {
+		@Override
+		public void focusGained(final FocusEvent e) {
+			// focused = true;
+		}
+
+		@Override
+		public void focusLost(final FocusEvent e) {
+			// focused = false;
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					stopEditing();
+				}
+			});
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
+	private final TableFocusListener tableFocusListener = new TableFocusListener();
 	// ArrayList<Integer> editableColumns = new ArrayList<Integer>();
 	Vector<CellFocusListener> focusListsner = new Vector<CellFocusListener>();
 	// Vector<FSTableColumn> fsTableColunms;
 	// private Vector<FSTableColumn> visibleColumns;
-	private boolean confirmDelete = true;
+	private final boolean confirmDelete = true;
 	private int lastSelectedRow;
 	private int lastSelectedColunm;
-	// private boolean focused;
-	private boolean allowAddNew;
 
 	// private FSTableModel model;
 
-	// ////////////////////////////////////////////////////////////////////////////
-	public JKTable() {
-		this(new FSTableModel());
-	}
+	// private boolean focused;
+	private boolean allowAddNew;
 
 	// //
 	// ////////////////////////////////////////////////////////////////////////////
@@ -96,9 +126,8 @@ public class JKTable extends JTable {
 	// }
 
 	// ////////////////////////////////////////////////////////////////////////////
-	public JKTable(TableModel dm) {
-		super(dm);
-		init();
+	public JKTable() {
+		this(new FSTableModel());
 	}
 
 	// //
@@ -109,11 +138,419 @@ public class JKTable extends JTable {
 	// }
 
 	// ////////////////////////////////////////////////////////////////////////////
-	private void init() {
-		initTableHeader();		
+	public JKTable(final TableModel dm) {
+		super(dm);
+		init();
+	}
 
-//		putClientProperty("JTable.autoStartsEdit", Boolean.TRUE);
-//		putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+	// ///////////////////////////////////////////////////////////////////
+	public void addCellFocusListener(final CellFocusListener cellFocusListener) {
+		this.focusListsner.add(cellFocusListener);
+	}
+
+	// @Override
+	// public void setModel(TableModel model) {
+	// super.setModel(model);
+	// }
+
+	public void addFSTableColumn(final FSTableColumn col) {
+		getFsModel().addFSTableColumn(col);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public void addRow() {
+		addRows(1);
+	}
+
+	public void addRows(final int size) {
+		for (int i = 0; i < size; i++) {
+			final TableModel model = getModel();
+			if (model instanceof FSTableModel) {
+				final FSTableModel defaultModel = (FSTableModel) model;
+				defaultModel.addRecord();
+				setSelectedRow(model.getRowCount() - 1);
+				setSelectedColumn(0);
+			}
+		}
+
+	}
+
+	// //
+	// ////////////////////////////////////////////////////////////////////////////
+	// @Override
+	// public void requestFocus() {
+	// if (getRowCount() > 0) {
+	// super.requestFocus();
+	// } else {
+	// transferFocus();
+	// }
+	// }
+
+	// ///////////////////////////////////////////////////////////////
+	private void checkCellFocusChanged() {
+		final int selectedRow = getSelectedRow();
+		final int selectedColunm = getSelectedColumn();
+		if (selectedRow != this.lastSelectedRow || selectedColunm != this.lastSelectedColunm) {
+			this.lastSelectedRow = getSelectedRow();
+			final int focusLostColumn = this.lastSelectedColunm;
+			this.lastSelectedColunm = getSelectedColumn();
+			// if we put the above statment after fireCellFocusLost call , focus
+			// lost will be called inifinitly
+			fireCellFocusLost(this.lastSelectedRow, focusLostColumn);
+			if (this.lastSelectedColunm == -1 || this.lastSelectedColunm == -1) {
+				return;
+			}
+			fireCellFocusGained(this.lastSelectedRow, this.lastSelectedColunm);
+			// if (selectedColunm != -1 && selectedRow != -1) {
+			// if (isCellEditable(selectedColunm, selectedColunm)) {
+			// editCellAt(selectedRow, selectedColunm);
+			// }
+			// }
+		}
+	}
+
+	public void clearRecords() {
+		getFsModel().clearRecords();
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public void deleteRow(final int row) {
+		getFsModel().deleteRow(row);
+	}
+
+	@Override
+	public boolean editCellAt(final int row, final int column) {
+		final boolean editCellAt = super.editCellAt(row, column);
+		if (editCellAt) {
+			// getEditorComponent().requestFocus();
+		}
+		return editCellAt;
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	private void fireCellFocusGained(final int row, final int col) {
+		for (final CellFocusListener f : this.focusListsner) {
+			f.focusGained(new CellFocusEvent(JKTable.this, row, col));
+		}
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	private void fireCellFocusLost(final int row, final int col) {
+		for (final CellFocusListener f : this.focusListsner) {
+			f.focusLost(new CellFocusEvent(JKTable.this, row, col));
+		}
+	}
+
+	public void fireTableCellUpdated(final int row, final int col) {
+		getFsModel().fireTableCellUpdated(row, col);
+	}
+
+	public void fireTableColumnDataChanged(final int col) {
+		getFsModel().fireTableColumnDataChanged(col);
+	}
+
+	public void fireTableDataChanged() {
+		getFsModel().fireTableDataChanged();
+	}
+
+	// /**
+	// *
+	// */
+	// protected void handleTabPressed() {
+	// stopEditing();
+	// transferFocus();
+	// }
+
+	public void fireTableStructureChanged() {
+		getFsModel().fireTableStructureChanged();
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////
+	private void fixWidth(final int column, final Component comp) {
+		if (getColumnCount() <= column) {
+			// TODO : check me
+			return;
+		}
+		final int userColunmWidth = getFsModel().getPrefferedWidth(column);
+		final TableColumn tableColumn = getColumnModel().getColumn(column);
+		if (userColunmWidth > 0 && userColunmWidth > tableColumn.getPreferredWidth()) {
+			tableColumn.setPreferredWidth(userColunmWidth);
+		} else {
+			comp.setPreferredSize(null);// to ignore value set by the caller
+			final int compWidth = comp.getPreferredSize().width + 10;
+			if (compWidth > tableColumn.getPreferredWidth()) {
+				// we add one for the fraction loss purpose
+				tableColumn.setPreferredWidth(compWidth);
+			}
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////
+	@Override
+	public TableCellEditor getCellEditor(final int row, final int column) {
+		final TableCellEditor editor = getFsModel().getCellEditor(column);
+		if (editor != null) {
+			return editor;
+		}
+		return super.getCellEditor(row, column);
+
+		// TableCellEditor editor;
+		// if (getModel().getColumnClass(column) == Integer.class) {
+		// editor = new DefaultCellEditor(new JKTextField(new
+		// NumberDocument()));
+		// }
+		// if (getModel().getColumnClass(column) == Float.class) {
+		// editor = new DefaultCellEditor(new JKTextField(new FloatDocument()));
+		// } else {
+		// editor = super.getCellEditor(row, column);
+		// }
+		// return editor;
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////
+	@Override
+	public TableCellRenderer getCellRenderer(final int row, final int column) {
+		final TableCellRenderer renderer = getFsModel().getCellRenderer(column);
+		if (renderer != null) {
+			return renderer;
+		}
+		// System.out.println(getColumnClass(column));
+		return super.getCellRenderer(row, column);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public double getColunmSum(final int col) {
+		double sum = 0;
+		for (int i = 0; i < getRowCount(); i++) {
+			sum += getValueAtAsDouble(i, col);
+		}
+		return sum;
+
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
+	public Vector<Vector> getData() {
+		return getFsModel().getRecordsAsDataVector();
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public Vector<FSTableRecord> getDeletedRecords() {
+		return getFsModel().getDeletedRecords();
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
+	public Vector<Vector> getDeletedRows() {
+		return getFsModel().getDeletedRecordsAsDataVector();
+	}
+
+	// // ///////////////////////////////////////////////////////////////////
+	// private Format getColumnFormat(int col) {
+	// Format format = getFsModel().getFormatter(col);
+	// if (format != null) {
+	// return format;
+	// }
+	// // make this method smart
+	// return null;
+	// }
+
+	// ///////////////////////////////////////////////////////////
+	public FSTableModel getFsModel() {
+		if (getModel() instanceof FSTableModel) {
+			return (FSTableModel) getModel();
+		}
+		throw new IllegalStateException(getModel().getClass().getName() + " is not instanceof FSTableModel");
+	}
+
+	public Vector<FSTableRecord> getModifiedRecords() {
+		final Vector<FSTableRecord> modeifiedRecords = new Vector<FSTableRecord>();
+		final Vector<FSTableRecord> records = getRecords();
+		for (final FSTableRecord fsTableRecord : records) {
+			if (fsTableRecord.getStatus().equals(RecordStatus.MODIFIED)) {
+				modeifiedRecords.add(fsTableRecord);
+			}
+		}
+		return modeifiedRecords;
+	}
+
+	public FSTableRecord getRecord(final int row) {
+		return getFsModel().getRecord(row);
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public Vector<FSTableRecord> getRecords() {
+		return getFsModel().getRecords();
+	}
+
+	public Object getValueAt(final int row, final int col, final boolean includeVisibleColumns) {
+		if (includeVisibleColumns) {
+			return getFsModel().getRecord(row).getColumnValue(col);
+		}
+		return getValueAt(row, col);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public Date getValueAtAsDate(final int row, final int column) {
+		final Object valueAt = getValueAt(row, column);
+		if (valueAt == null) {
+			return null;
+		}
+		if (valueAt instanceof Date) {
+			return (Date) valueAt;
+		}
+		try {
+			return DateTimeUtil.parseShortDate(valueAt.toString());
+		} catch (final ParseException e) {
+			return null;
+		}
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public double getValueAtAsDouble(final int i, final int col) {
+		final Object valueAt = getValueAtAsString(i, col);
+		if (valueAt == null) {
+			return 0;
+		}
+		return new Double(valueAt.toString());
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public int getValueAtAsInteger(final int row, final int col) {
+		final Object valueAt = getValueAt(row, col);
+		if (valueAt == null) {
+			return 0;
+		}
+		if (valueAt instanceof Boolean) {
+			return (Boolean) valueAt == true ? 1 : 0;
+		}
+		return new Integer(valueAt.toString());
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public java.sql.Date getValueAtAsSqlDate(final int row, final int col) {
+		final Date date = getValueAtAsDate(row, col);
+		if (date == null) {
+			return null;
+		}
+		return new java.sql.Date(date.getTime());
+	}
+
+	public String getValueAtAsString(final int row, final int column) {
+		final Object valueAt = getValueAt(row, column);
+		if (valueAt == null || valueAt.toString().trim().equals("")) {
+			return null;
+		}
+		return valueAt.toString().trim();
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	protected void handleDeleteRow() {
+		if (isAllowDelete()) {
+			final TableModel model = getModel();
+			if (model instanceof FSTableModel) {
+				final FSTableModel defaultModel = (FSTableModel) model;
+				final int[] selectedRows = getSelectedRows();
+				if (!isConfirmDelete()
+						|| isConfirmDelete() && SwingUtility.showConfirmationDialog("YOU_ARE_ABOUT_TO_DELETE_THIS_ROW,ARE_YOU_SURE?")) {
+					defaultModel.deleteRows(selectedRows);
+					// for (int selectedRow : selectedRows) {
+					// if (selectedRow >= 0) {
+					// defaultModel.deleteRow(selectedRow);
+					// setSelectedRow(selectedRow);
+					// setSelectedColumn(0);
+					// // if (defaultModel.getRowCount() == 1 &&
+					// // isEditable())
+					// // {
+					// // addRow();
+					// // }
+					// }
+					// }
+				}
+			}
+		}
+	}
+
+	private void handleFocusGained() {
+		// focused = true;
+		checkCellFocusChanged();
+		// if (getSelectedRow() == -1 && getRowCount() > 0) {
+		// setRowSelectionInterval(0, 0);
+		// changeSelection(0, 0, false, false);
+		// }
+	}
+
+	// // ///////////////////////////////////////////////////////////
+	protected void handleFocusLost() {
+		checkCellFocusChanged();
+		// focused = false;
+		// stopEditing();
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	protected void handleInsertRow() {
+		if (isEditable()) {
+			if (isAddNewRow()) {
+				final TableModel model = getModel();
+				if (model instanceof FSTableModel) {
+					final FSTableModel defaultModel = (FSTableModel) model;
+					final int selectedRow = getSelectedRow();
+					defaultModel.insertRecord(selectedRow);
+					setSelectedRow(selectedRow);
+					setSelectedColumn(0);
+				}
+			}
+		}
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	protected void handleKeyDownPressed() {
+		if (isEditable()) {
+			// if last row
+			if (getSelectedRow() == getModel().getRowCount() - 1) {
+				if (isAddNewRow()) {
+					addRow();
+				}
+			}
+		}
+	}
+
+	// // ///////////////////////////////////////////////////////////////
+	private void handleKeyReleased(final KeyEvent e) {
+		// int keyCode = e.getKeyCode();
+		// if (keyCode == KeyEvent.VK_DOWN) {
+		// handleKeyDownPressed();
+		// }
+		// if (keyCode == KeyEvent.VK_DELETE && e.isControlDown()) {
+		// handleDeleteRow();
+		// }
+		// if (keyCode == KeyEvent.VK_INSERT) {
+		// handleInsertRow();
+		// }
+		checkCellFocusChanged();
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	protected void handleMouseClicked() {
+		checkCellFocusChanged();
+	}
+
+	/**
+	 *
+	 */
+	protected void handleTableStuctorChanged() {
+		final FSTableModel model = getFsModel();
+		for (int i = 0; i < model.getColumnCount(); i++) {
+			final TableColumn column = getColumnModel().getColumn(i);
+			column.setMinWidth(SwingUtility.getTextWidth(model.getColumnName(i), true) + 15);
+			// column.setPreferredWidth(column.getWidth()+20);
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////
+	private void init() {
+		initTableHeader();
+
+		// putClientProperty("JTable.autoStartsEdit", Boolean.TRUE);
+		// putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 		// setSurrendersFocusOnKeystroke(true);
 		setAutoResizeMode(AUTO_RESIZE_OFF);
 		// setFillsViewportHeight(true);
@@ -125,24 +562,25 @@ public class JKTable extends JTable {
 
 		addFocusListener(new FocusAdapter() {
 			@Override
-			public void focusGained(FocusEvent e) {
+			public void focusGained(final FocusEvent e) {
 				handleFocusGained();
 			}
 
 			@Override
-			public void focusLost(FocusEvent e) {
+			public void focusLost(final FocusEvent e) {
 				handleFocusLost();
 			}
 		});
 		addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
+			@Override
+			public void keyReleased(final KeyEvent e) {
 				handleKeyReleased(e);
 			}
 		});
 		getModel().addTableModelListener(new TableModelListener() {
 
 			@Override
-			public void tableChanged(TableModelEvent e) {
+			public void tableChanged(final TableModelEvent e) {
 				if (e.getType() == TableModelEvent.HEADER_ROW) {
 					handleTableStuctorChanged();
 				}
@@ -183,34 +621,85 @@ public class JKTable extends JTable {
 
 	private void initTableHeader() {
 		getTableHeader().setDefaultRenderer(new FSTableHeaderRendere());
-//		getTableHeader().setPreferredSize(new Dimension(0,30));
+		// getTableHeader().setPreferredSize(new Dimension(0,30));
 		getTableHeader().setBackground(Colors.MAIN_PANEL_BG);
 	}
 
-	// @Override
-	// public void setModel(TableModel model) {
-	// super.setModel(model);
-	// }
-
-	// ///////////////////////////////////////////////////////////
-	public FSTableModel getFsModel() {
-		if (getModel() instanceof FSTableModel) {
-			return (FSTableModel) getModel();
+	// ///////////////////////////////////////////////////////////////
+	private boolean isAddNewRow() {
+		if (getRowCount() > 0) {
+			final boolean validData = getFsModel().isAllDataValid();
+			return validData;
 		}
-		throw new IllegalStateException(getModel().getClass().getName() + " is not instanceof FSTableModel");
+		return isAllowAddNew();
 	}
 
-	// // ///////////////////////////////////////////////////////////
-	protected void handleFocusLost() {
-		checkCellFocusChanged();
-		// focused = false;
-		// stopEditing();
+	public boolean isAllowAddNew() {
+		return this.allowAddNew;
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public boolean isAllowDelete() {
+		return getFsModel().isAllowDelete();
+	}
+
+	@Override
+	public boolean isCellEditable(final int row, final int column) {
+		return getFsModel().isEditable(row, column);
+		// return getFsModel().isEditable(column);
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public boolean isConfirmDelete() {
+		return this.confirmDelete;
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public boolean isDataModified() {
+		return getFsModel().isDataModified();
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public boolean isEditable() {
+		return getFsModel().isEditable();
+	}
+
+	public boolean isEditable(final int column) {
+		return getFsModel().isEditable(column);
+	}
+
+	/**
+	 * Move selection to first row , this method called by
+	 * transferFocusToNextColunm which calculate the next ,
+	 *
+	 * @param row
+	 * @param column
+	 */
+	protected void moveSelectionToRow(final int row, final int column) {
+		setSelectionRow(row, column);
+	}
+
+	@Override
+	public Component prepareEditor(final TableCellEditor editor, final int row, final int column) {
+		final Component field = super.prepareEditor(editor, row, column);
+		fixWidth(column, field);
+		final FocusListener[] focusListeners = field.getFocusListeners();
+		boolean listenerRegistred = false;
+		for (final FocusListener focusListener : focusListeners) {
+			if (focusListener instanceof TableFocusListener) {
+				listenerRegistred = true;
+			}
+		}
+		if (!listenerRegistred) {
+			field.addFocusListener(this.tableFocusListener);
+		}
+		return field;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
 	@Override
 	public Component prepareRenderer(final TableCellRenderer renderer, final int row, final int column) {
-		Component comp = super.prepareRenderer(renderer, row, column);
+		final Component comp = super.prepareRenderer(renderer, row, column);
 		fixWidth(column, comp);
 		// if (comp instanceof JComponent) {
 		// JComponent component = (JComponent) comp;
@@ -224,80 +713,8 @@ public class JKTable extends JTable {
 		return comp;
 	}
 
-	// //
-	// ////////////////////////////////////////////////////////////////////////////
-	// @Override
-	// public void requestFocus() {
-	// if (getRowCount() > 0) {
-	// super.requestFocus();
-	// } else {
-	// transferFocus();
-	// }
-	// }
-
-	// ////////////////////////////////////////////////////////////////////////////
 	@Override
-	public TableCellRenderer getCellRenderer(int row, int column) {
-		TableCellRenderer renderer = getFsModel().getCellRenderer(column);
-		if (renderer != null) {
-			return renderer;
-		}
-		// System.out.println(getColumnClass(column));
-		return super.getCellRenderer(row, column);
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////
-	@Override
-	public TableCellEditor getCellEditor(int row, int column) {
-		TableCellEditor editor = getFsModel().getCellEditor(column);
-		if (editor != null) {
-			return editor;
-		}
-		return super.getCellEditor(row, column);
-
-		// TableCellEditor editor;
-		// if (getModel().getColumnClass(column) == Integer.class) {
-		// editor = new DefaultCellEditor(new JKTextField(new
-		// NumberDocument()));
-		// }
-		// if (getModel().getColumnClass(column) == Float.class) {
-		// editor = new DefaultCellEditor(new JKTextField(new FloatDocument()));
-		// } else {
-		// editor = super.getCellEditor(row, column);
-		// }
-		// return editor;
-	}
-
-	@Override
-	public Component prepareEditor(TableCellEditor editor, int row, int column) {
-		final Component field = super.prepareEditor(editor, row, column);
-		fixWidth(column, field);
-		FocusListener[] focusListeners = field.getFocusListeners();
-		boolean listenerRegistred = false;
-		for (FocusListener focusListener : focusListeners) {
-			if (focusListener instanceof TableFocusListener) {
-				listenerRegistred = true;
-			}
-		}
-		if (!listenerRegistred) {
-			field.addFocusListener(tableFocusListener);
-		}
-		return field;
-	}
-
-	@Override
-	public boolean isCellEditable(int row, int column) {
-		return getFsModel().isEditable(row, column);
-		// return getFsModel().isEditable(column);
-	}
-
-	@Override
-	public void tableChanged(TableModelEvent e) {
-		super.tableChanged(e);
-	}
-
-	@Override
-	public boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+	public boolean processKeyBinding(final KeyStroke ks, final KeyEvent e, final int condition, final boolean pressed) {
 		if (!SwingUtility.isLeftOrientation()) {// Switch right and left arrows
 												// for arabic support
 			if (ks == KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)) {
@@ -330,25 +747,160 @@ public class JKTable extends JTable {
 		return super.processKeyBinding(ks, e, condition, pressed);
 	}
 
-	/**
-	 * 
-	 */
-	public void stopEditing() {
-		if (getCellEditor() != null) {
-			getCellEditor().stopCellEditing();
-		}
+	public void resetRecords() {
+		getFsModel().resetRecords();
+	}
+
+	public void setAllowAddNew(final boolean allowAddNew) {
+		this.allowAddNew = allowAddNew;
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public void setAllowDelete(final boolean allowDelete) {
+		getFsModel().setAllowDelete(allowDelete);
 	}
 
 	/*
-	 * 
+	 *
 	 */
-	public void setAlowMutipleSelection(boolean enable) {
+	public void setAlowMutipleSelection(final boolean enable) {
 		getSelectionModel().setSelectionMode(enable ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION : ListSelectionModel.SINGLE_SELECTION);
 
 	}
 
+	public void setColumnDateFormat(final int col, final String format) {
+		getFsModel().setFormatter(col, new SimpleDateFormat(format));
+	}
+
+	private void setColumnFormat(final int col, final Format format) {
+		getFsModel().setFormatter(col, format);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public void setColumnName(final int col, final String name) {
+		getColumnModel().getColumn(col).setHeaderValue(name);
+	}
+
+	public void setColumnNumberFormat(final int col, final String pattern) {
+		final DecimalFormat format = new DecimalFormat(pattern);
+		setColumnFormat(col, format);
+
+	}
+
+	public void setColumnPrefereddWidth(final int col, final int width) {
+		getFsModel().setPreferredWidth(col, width);
+	}
+
+	public void setColumnValue(final int row, final int col, final Object value) {
+		setColumnValue(row, col, value, true);
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
+
+	public void setColumnValue(final int row, final int col, final Object value, final boolean visibleIndex) {
+		getFsModel().setColumnValue(row, col, value, visibleIndex);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public boolean setColunmEditor(final int colunm, final BindingComponent comp) {
+		final FSBindingComponentEditor cellEditor = new FSBindingComponentEditor(comp);
+		getFsModel().setEditor(colunm, cellEditor);
+		final BindingComponent copy = (BindingComponent) GeneralUtility.copy(comp);
+		if (copy != null) {
+			setColunmRenderer(colunm, copy);
+			return true;
+		}
+		return false;
+		// getTableHeader().getColumnModel().getColumn(colunm).setCellEditor(cellEditor2);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public void setColunmRenderer(final int col, final BindingComponent component) {
+		final FSBindingComponentRenderer cellRenderer = new FSBindingComponentRenderer(component);
+		getFsModel().setRenderer(col, cellRenderer);
+		// getTableHeader().getColumnModel().getColumn(col).setCellRenderer(cellRenderer);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	private void setDefaultEditors() {
+		final FSTextField txtInteger = new FSTextField();
+		final FSTextField txtAmount = new FSTextField(new FloatDocument());
+		final FSTextField txt = new FSTextField();
+
+		setDefaultEditor(Date.class, new FSBindingComponentEditor(new FSDate()));
+		setDefaultEditor(Boolean.class, new FSBindingComponentEditor(new FSCheckBox()));
+		txtInteger.setNumbersOnly(true);
+		setDefaultEditor(Integer.class, new FSBindingComponentEditor(txtInteger));
+
+		setDefaultEditor(Double.class, new FSBindingComponentEditor(txtAmount));
+		setDefaultEditor(BigDecimal.class, new FSBindingComponentEditor(txtAmount));
+		setDefaultEditor(String.class, new FSBindingComponentEditor(txt));
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	protected void setDefaultRenderers() {
+		final FSDefaultTableRenderer fsDefaultTableRenderer = new FSDefaultTableRenderer();
+		setDefaultRenderer(Object.class, fsDefaultTableRenderer);
+		setDefaultRenderer(Number.class, fsDefaultTableRenderer);
+		setDefaultRenderer(Float.class, fsDefaultTableRenderer);
+		setDefaultRenderer(Double.class, fsDefaultTableRenderer);
+		setDefaultRenderer(Date.class, fsDefaultTableRenderer);
+		setDefaultRenderer(Icon.class, fsDefaultTableRenderer);
+		setDefaultRenderer(ImageIcon.class, fsDefaultTableRenderer);
+		setDefaultRenderer(Boolean.class, fsDefaultTableRenderer);
+		setDefaultRenderer(BigDecimal.class, fsDefaultTableRenderer);
+		setDefaultRenderer(String.class, fsDefaultTableRenderer);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public void setEditable(final boolean editable) {
+		getFsModel().setEditable(editable);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	public void setEditable(final int column, final boolean editable) {
+		getFsModel().setEditable(column, editable);
+	}
+
 	/**
-	 * 
+	 * set editable in the cell level
+	 *
+	 * @param row
+	 * @param col
+	 * @param enable
+	 */
+	public void setEditable(final int row, final int col, final boolean enable) {
+		getFsModel().setEditable(row, col, enable);
+	}
+
+	@Override
+	public void setModel(final TableModel model) {
+		if (!(model instanceof FSTableModel)) {
+			throw new IllegalStateException("FSTable only accept FSTableModel");
+		}
+		super.setModel(model);
+		handleTableStuctorChanged();
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	public void setRequiredColumn(final int col, final boolean required) {
+		getFsModel().setRequired(col, required);
+	}
+
+	// ///////////////////////////////////////////////////////////////////
+	private void setSelectedColumn(final int col) {
+		setColumnSelectionInterval(col, col);
+	}
+
+	/**
+	 * @param column
+	 */
+	private void setSelectedColunm(final int column) {
+		setColumnSelectionInterval(column, column);
+	}
+
+	/**
+	 *
 	 * @param index
 	 */
 	public void setSelectedRow(final int index) {
@@ -373,50 +925,14 @@ public class JKTable extends JTable {
 		});
 	}
 
-	// /**
-	// *
-	// */
-	// protected void handleTabPressed() {
-	// stopEditing();
-	// transferFocus();
-	// }
-
 	/**
-	 * 
-	 */
-	public void transferFocusToNextColunm() {
-		int row = getSelectedRow();
-		int column = getSelectedColumn() + 1;
-		if (column == getColumnCount()) {
-			column = 0;
-			if (++row == getRowCount()) {
-				row = 0;
-			}
-		}
-		// if(isCellEditable(row, column)){
-		// editCellAt(row, column);
-		// }
-		moveSelectionToRow(row, column);
-	}
-
-	/**
-	 * Move selection to first row , this method called by
-	 * transferFocusToNextColunm which calculate the next ,
-	 * 
-	 * @param row
-	 * @param column
-	 */
-	protected void moveSelectionToRow(int row, int column) {
-		setSelectionRow(row, column);
-	}
-
-	/**
-	 * 
+	 *
 	 * @param row
 	 * @param column
 	 */
 	private void setSelectionRow(final int row, final int column) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				if (row >= getModel().getRowCount() || row == -1) {
 					if (getModel().getRowCount() > 0) {
@@ -437,539 +953,41 @@ public class JKTable extends JTable {
 		});
 	}
 
-	/**
-	 * @param column
-	 */
-	private void setSelectedColunm(int column) {
-		setColumnSelectionInterval(column, column);
-	}
-
-	@Override
-	public boolean editCellAt(int row, int column) {
-		boolean editCellAt = super.editCellAt(row, column);
-		if (editCellAt) {
-			// getEditorComponent().requestFocus();
-		}
-		return editCellAt;
-	}
-
-	public void setColumnPrefereddWidth(int col, int width) {
-		getFsModel().setPreferredWidth(col, width);
-	}
-
-	public void setColumnNumberFormat(int col, String pattern) {
-		DecimalFormat format = new DecimalFormat(pattern);
-		setColumnFormat(col, format);
-
-	}
-
-	private void setColumnFormat(int col, Format format) {
-		getFsModel().setFormatter(col, format);
-	}
-
-	// // ///////////////////////////////////////////////////////////////////
-	// private Format getColumnFormat(int col) {
-	// Format format = getFsModel().getFormatter(col);
-	// if (format != null) {
-	// return format;
-	// }
-	// // make this method smart
-	// return null;
-	// }
-
 	// ///////////////////////////////////////////////////////////////////
-	public double getValueAtAsDouble(int i, int col) {
-		Object valueAt = getValueAtAsString(i, col);
-		if (valueAt == null) {
-			return 0;
-		}
-		return new Double(valueAt.toString());
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public int getValueAtAsInteger(int row, int col) {
-		Object valueAt = getValueAt(row, col);
-		if (valueAt == null) {
-			return 0;
-		}
-		if (valueAt instanceof Boolean) {
-			return ((Boolean) valueAt) == true ? 1 : 0;
-		}
-		return new Integer(valueAt.toString());
-	}
-
-	public String getValueAtAsString(int row, int column) {
-		Object valueAt = getValueAt(row, column);
-		if (valueAt == null || valueAt.toString().trim().equals("")) {
-			return null;
-		}
-		return valueAt.toString().trim();
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public Date getValueAtAsDate(int row, int column) {
-		Object valueAt = getValueAt(row, column);
-		if (valueAt == null) {
-			return null;
-		}
-		if (valueAt instanceof Date) {
-			return (Date) valueAt;
-		}
-		try {
-			return DateTimeUtil.parseShortDate(valueAt.toString());
-		} catch (ParseException e) {
-			return null;
-		}
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public java.sql.Date getValueAtAsSqlDate(int row, int col) {
-		Date date = getValueAtAsDate(row, col);
-		if (date == null) {
-			return null;
-		}
-		return new java.sql.Date(date.getTime());
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public Vector<FSTableRecord> getDeletedRecords() {
-		return getFsModel().getDeletedRecords();
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public void setColumnName(int col, String name) {
-		getColumnModel().getColumn(col).setHeaderValue(name);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public void addCellFocusListener(CellFocusListener cellFocusListener) {
-		focusListsner.add(cellFocusListener);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public double getColunmSum(int col) {
-		double sum = 0;
-		for (int i = 0; i < getRowCount(); i++) {
-			sum += getValueAtAsDouble(i, col);
-		}
-		return sum;
-
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public void addRow() {
-		addRows(1);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	private void setSelectedColumn(int col) {
-		setColumnSelectionInterval(col, col);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public void setEditable(boolean editable) {
-		getFsModel().setEditable(editable);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public void setEditable(int column, boolean editable) {
-		getFsModel().setEditable(column, editable);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public void setColunmRenderer(int col, BindingComponent component) {
-		FSBindingComponentRenderer cellRenderer = new FSBindingComponentRenderer(component);
-		getFsModel().setRenderer(col, cellRenderer);
-		// getTableHeader().getColumnModel().getColumn(col).setCellRenderer(cellRenderer);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public boolean setColunmEditor(int colunm, BindingComponent comp) {
-		FSBindingComponentEditor cellEditor = new FSBindingComponentEditor(comp);
-		getFsModel().setEditor(colunm, cellEditor);
-		BindingComponent copy = (BindingComponent) GeneralUtility.copy(comp);
-		if (copy != null) {
-			setColunmRenderer(colunm, copy);
-			return true;
-		}
-		return false;
-		// getTableHeader().getColumnModel().getColumn(colunm).setCellEditor(cellEditor2);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public boolean isDataModified() {
-		return getFsModel().isDataModified();
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public Vector<FSTableRecord> getRecords() {
-		return getFsModel().getRecords();
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public void setRequiredColumn(int col, boolean required) {
-		getFsModel().setRequired(col, required);
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	private void fireCellFocusGained(final int row, final int col) {
-		for (final CellFocusListener f : focusListsner) {
-			f.focusGained(new CellFocusEvent(JKTable.this, row, col));
-		}
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	private void fireCellFocusLost(final int row, final int col) {
-		for (final CellFocusListener f : focusListsner) {
-			f.focusLost(new CellFocusEvent(JKTable.this, row, col));
-		}
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	private void checkCellFocusChanged() {
-		int selectedRow = getSelectedRow();
-		int selectedColunm = getSelectedColumn();
-		if (selectedRow != lastSelectedRow || selectedColunm != lastSelectedColunm) {
-			lastSelectedRow = getSelectedRow();
-			int focusLostColumn = lastSelectedColunm;
-			lastSelectedColunm = getSelectedColumn();
-			// if we put the above statment after fireCellFocusLost call , focus
-			// lost will be called inifinitly
-			fireCellFocusLost(lastSelectedRow, focusLostColumn);
-			if (lastSelectedColunm == -1 || lastSelectedColunm == -1) {
-				return;
-			}
-			fireCellFocusGained(lastSelectedRow, lastSelectedColunm);
-			// if (selectedColunm != -1 && selectedRow != -1) {
-			// if (isCellEditable(selectedColunm, selectedColunm)) {
-			// editCellAt(selectedRow, selectedColunm);
-			// }
-			// }
-		}
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////////
-	private void fixWidth(final int column, Component comp) {
-		if (getColumnCount() <= column) {
-			// TODO : check me
-			return;
-		}
-		int userColunmWidth = getFsModel().getPrefferedWidth(column);
-		TableColumn tableColumn = getColumnModel().getColumn(column);
-		if (userColunmWidth > 0 && userColunmWidth > tableColumn.getPreferredWidth()) {
-			tableColumn.setPreferredWidth(userColunmWidth);
-		} else {
-			comp.setPreferredSize(null);// to ignore value set by the caller
-			int compWidth = comp.getPreferredSize().width+10 ;
-			if (compWidth > tableColumn.getPreferredWidth()) {
-				// we add one for the fraction loss purpose
-				tableColumn.setPreferredWidth(compWidth);
-			}
-		}
-	}
-
-	// // ///////////////////////////////////////////////////////////////
-	private void handleKeyReleased(KeyEvent e) {
-		// int keyCode = e.getKeyCode();
-		// if (keyCode == KeyEvent.VK_DOWN) {
-		// handleKeyDownPressed();
-		// }
-		// if (keyCode == KeyEvent.VK_DELETE && e.isControlDown()) {
-		// handleDeleteRow();
-		// }
-		// if (keyCode == KeyEvent.VK_INSERT) {
-		// handleInsertRow();
-		// }
-		checkCellFocusChanged();
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	protected void handleKeyDownPressed() {
-		if (isEditable()) {
-			// if last row
-			if (getSelectedRow() == getModel().getRowCount() - 1) {
-				if (isAddNewRow()) {
-					addRow();
-				}
-			}
-		}
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public boolean isEditable() {
-		return getFsModel().isEditable();
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	private boolean isAddNewRow() {
-		if (getRowCount() > 0) {
-			boolean validData = getFsModel().isAllDataValid();
-			return validData;
-		}
-		return isAllowAddNew();
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	protected void handleMouseClicked() {
-		checkCellFocusChanged();
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	protected void handleDeleteRow() {
-		if (isAllowDelete()) {
-			TableModel model = getModel();
-			if (model instanceof FSTableModel) {
-				FSTableModel defaultModel = (FSTableModel) model;
-				int[] selectedRows = getSelectedRows();
-				if (!isConfirmDelete()
-						|| (isConfirmDelete() && SwingUtility.showConfirmationDialog("YOU_ARE_ABOUT_TO_DELETE_THIS_ROW,ARE_YOU_SURE?"))) {
-					defaultModel.deleteRows(selectedRows);
-					// for (int selectedRow : selectedRows) {
-					// if (selectedRow >= 0) {
-					// defaultModel.deleteRow(selectedRow);
-					// setSelectedRow(selectedRow);
-					// setSelectedColumn(0);
-					// // if (defaultModel.getRowCount() == 1 &&
-					// // isEditable())
-					// // {
-					// // addRow();
-					// // }
-					// }
-					// }
-				}
-			}
-		}
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public boolean isAllowDelete() {
-		return getFsModel().isAllowDelete();
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public void setAllowDelete(boolean allowDelete) {
-		getFsModel().setAllowDelete(allowDelete);
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public void deleteRow(int row) {
-		getFsModel().deleteRow(row);
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	public boolean isConfirmDelete() {
-		return confirmDelete;
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	protected void handleInsertRow() {
-		if (isEditable()) {
-			if (isAddNewRow()) {
-				TableModel model = getModel();
-				if (model instanceof FSTableModel) {
-					FSTableModel defaultModel = (FSTableModel) model;
-					int selectedRow = getSelectedRow();
-					defaultModel.insertRecord(selectedRow);
-					setSelectedRow(selectedRow);
-					setSelectedColumn(0);
-				}
-			}
-		}
-	}
-
-	public boolean isEditable(int column) {
-		return getFsModel().isEditable(column);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	private void setDefaultEditors() {
-		FSTextField txtInteger = new FSTextField();
-		FSTextField txtAmount = new FSTextField(new FloatDocument());
-		FSTextField txt = new FSTextField();
-
-		setDefaultEditor(Date.class, new FSBindingComponentEditor(new FSDate()));
-		setDefaultEditor(Boolean.class, new FSBindingComponentEditor(new FSCheckBox()));
-		txtInteger.setNumbersOnly(true);
-		setDefaultEditor(Integer.class, new FSBindingComponentEditor(txtInteger));
-
-		setDefaultEditor(Double.class, new FSBindingComponentEditor(txtAmount));
-		setDefaultEditor(BigDecimal.class, new FSBindingComponentEditor(txtAmount));
-		setDefaultEditor(String.class, new FSBindingComponentEditor(txt));
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	protected void setDefaultRenderers() {
-		FSDefaultTableRenderer fsDefaultTableRenderer = new FSDefaultTableRenderer();
-		setDefaultRenderer(Object.class, fsDefaultTableRenderer);
-		setDefaultRenderer(Number.class, fsDefaultTableRenderer);
-		setDefaultRenderer(Float.class, fsDefaultTableRenderer);
-		setDefaultRenderer(Double.class, fsDefaultTableRenderer);
-		setDefaultRenderer(Date.class, fsDefaultTableRenderer);
-		setDefaultRenderer(Icon.class, fsDefaultTableRenderer);
-		setDefaultRenderer(ImageIcon.class, fsDefaultTableRenderer);
-		setDefaultRenderer(Boolean.class, fsDefaultTableRenderer);
-		setDefaultRenderer(BigDecimal.class, fsDefaultTableRenderer);
-		setDefaultRenderer(String.class, fsDefaultTableRenderer);
-	}
-
-	// ///////////////////////////////////////////////////////////////////
-	public void setVisible(int col, boolean visible) {
+	public void setVisible(final int col, final boolean visible) {
 		getFsModel().setVisible(col, visible);
 	}
 
-	// ///////////////////////////////////////////////////////////////////////////////////////
-	public Vector<Vector> getData() {
-		return getFsModel().getRecordsAsDataVector();
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////////////
-	public Vector<Vector> getDeletedRows() {
-		return getFsModel().getDeletedRecordsAsDataVector();
-	}
-
-	public void resetRecords() {
-		getFsModel().resetRecords();
-	}
-
-	public Object getValueAt(int row, int col, boolean includeVisibleColumns) {
-		if (includeVisibleColumns) {
-			return getFsModel().getRecord(row).getColumnValue(col);
+	/**
+	 *
+	 */
+	public void stopEditing() {
+		if (getCellEditor() != null) {
+			getCellEditor().stopCellEditing();
 		}
-		return getValueAt(row, col);
 	}
 
-	private void handleFocusGained() {
-		// focused = true;
-		checkCellFocusChanged();
-		// if (getSelectedRow() == -1 && getRowCount() > 0) {
-		// setRowSelectionInterval(0, 0);
-		// changeSelection(0, 0, false, false);
+	@Override
+	public void tableChanged(final TableModelEvent e) {
+		super.tableChanged(e);
+	}
+
+	/**
+	 *
+	 */
+	public void transferFocusToNextColunm() {
+		int row = getSelectedRow();
+		int column = getSelectedColumn() + 1;
+		if (column == getColumnCount()) {
+			column = 0;
+			if (++row == getRowCount()) {
+				row = 0;
+			}
+		}
+		// if(isCellEditable(row, column)){
+		// editCellAt(row, column);
 		// }
+		moveSelectionToRow(row, column);
 	}
-
-	// ///////////////////////////////////////////////////////////////////////////////////////
-
-	class TableFocusListener extends FocusAdapter {
-		@Override
-		public void focusLost(FocusEvent e) {
-			// focused = false;
-			SwingUtilities.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-					stopEditing();
-				}
-			});
-		}
-
-		@Override
-		public void focusGained(FocusEvent e) {
-			// focused = true;
-		}
-	}
-
-	public void setColumnDateFormat(int col, String format) {
-		getFsModel().setFormatter(col, new SimpleDateFormat(format));
-	}
-
-	public boolean isAllowAddNew() {
-		return allowAddNew;
-	}
-
-	public void setAllowAddNew(boolean allowAddNew) {
-		this.allowAddNew = allowAddNew;
-	}
-
-	public void fireTableColumnDataChanged(int col) {
-		getFsModel().fireTableColumnDataChanged(col);
-	}
-
-	public void fireTableCellUpdated(int row, int col) {
-		getFsModel().fireTableCellUpdated(row, col);
-	}
-
-	public void setColumnValue(int row, int col, Object value) {
-		setColumnValue(row, col, value, true);
-	}
-
-	public void setColumnValue(int row, int col, Object value, boolean visibleIndex) {
-		getFsModel().setColumnValue(row, col, value, visibleIndex);
-	}
-
-	/**
-	 * set editable in the cell level
-	 * 
-	 * @param row
-	 * @param col
-	 * @param enable
-	 */
-	public void setEditable(int row, int col, boolean enable) {
-		getFsModel().setEditable(row, col, enable);
-	}
-
-	public void fireTableDataChanged() {
-		getFsModel().fireTableDataChanged();
-	}
-
-	public void addFSTableColumn(FSTableColumn col) {
-		getFsModel().addFSTableColumn(col);
-	}
-
-	public void clearRecords() {
-		getFsModel().clearRecords();
-	}
-
-	public void addRows(int size) {
-		for (int i = 0; i < size; i++) {
-			TableModel model = getModel();
-			if (model instanceof FSTableModel) {
-				FSTableModel defaultModel = (FSTableModel) model;
-				defaultModel.addRecord();
-				setSelectedRow(model.getRowCount() - 1);
-				setSelectedColumn(0);
-			}
-		}
-
-	}
-
-	public void setModel(TableModel model) {
-		if (!(model instanceof FSTableModel)) {
-			throw new IllegalStateException("FSTable only accept FSTableModel");
-		}
-		super.setModel(model);
-		handleTableStuctorChanged();
-	}
-
-	public void fireTableStructureChanged() {
-		getFsModel().fireTableStructureChanged();
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleTableStuctorChanged() {
-		FSTableModel model = getFsModel();
-		for (int i = 0; i < model.getColumnCount(); i++) {
-			TableColumn column = getColumnModel().getColumn(i);
-			column.setMinWidth(SwingUtility.getTextWidth(model.getColumnName(i),true)+15);
-			// column.setPreferredWidth(column.getWidth()+20);
-		}
-	}
-
-	public FSTableRecord getRecord(int row) {
-		return getFsModel().getRecord(row);
-	}
-
-	public Vector<FSTableRecord> getModifiedRecords() {
-		Vector<FSTableRecord> modeifiedRecords = new Vector<FSTableRecord>();
-		Vector<FSTableRecord> records = getRecords();
-		for (FSTableRecord fsTableRecord : records) {
-			if(fsTableRecord.getStatus().equals(RecordStatus.MODIFIED)){
-				modeifiedRecords.add(fsTableRecord);
-			}
-		}
-		return modeifiedRecords;
-	}
-
 
 }

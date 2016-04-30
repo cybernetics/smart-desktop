@@ -1,10 +1,17 @@
-/**
- * Modification history
- * ====================================================
- * Version    Date         Developer        Purpose 
- * ====================================================
- *  1.1      21/08/2008     ahmad ali       - add this class
- *  1.2      29/12/2008     Jamil Shreet    -Add icons to the buttons
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.security.ui;
 
@@ -29,72 +36,58 @@ import com.fs.security.facade.SecurityFacade;
 public class PnlResetPassword extends JKPanel<Object> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private JKTextField txtUserName = new JKTextField(12, 20,false);
-	private JKPasswordField txtOldPassword = new JKPasswordField(20,20);
-	private JKPasswordField txtNewPassword = new JKPasswordField(12,20);
-	private JKPasswordField txtConfirmPassword = new JKPasswordField(12,20);
-	private JKButton btnSave = new JKButton("SAVE");
-	private JKButton btnCancel = new JKButton("CLOSE_PANEL");
-	private User user;
-	
+	private final JKTextField txtUserName = new JKTextField(12, 20, false);
+	private final JKPasswordField txtOldPassword = new JKPasswordField(20, 20);
+	private final JKPasswordField txtNewPassword = new JKPasswordField(12, 20);
+	private final JKPasswordField txtConfirmPassword = new JKPasswordField(12, 20);
+	private final JKButton btnSave = new JKButton("SAVE");
+	private final JKButton btnCancel = new JKButton("CLOSE_PANEL");
+	private final User user;
+
 	/**
-	 * 
+	 *
 	 */
 	public PnlResetPassword() {
 		this(SecurityManager.getCurrentUser());
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	public PnlResetPassword(User user) {
+	public PnlResetPassword(final User user) {
 		this.user = user;
 		init();
 		modelToView();
 	}
 
 	/**
-	 * @1.2
+	 * @return
 	 */
-	private void init() {
-		JKPanel<?> container=new JKPanel<Object>(new BorderLayout());
-		container.setBorder(SwingUtility.createTitledBorder(""));
-		container.add(getUserInfoPanel(),BorderLayout.CENTER);
-		container.add(getButtonsPanel(),BorderLayout.SOUTH);
-		btnSave.setIcon("small_filesave.png");
-		btnCancel.setIcon("close_x_red_commons_model_icon.png");
-		add(container);
-		
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleSave();
-			}
-		});
-		btnCancel.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				handleCancel();
-			}
-		});
+	protected void checkValues() throws ValidationException {
+		this.txtUserName.checkEmpty();
+		this.txtOldPassword.checkEmpty();
+		this.txtNewPassword.checkEmpty();
+		this.txtConfirmPassword.checkEmpty();
+
+		if (!this.txtOldPassword.getText().equals(this.user.getPassword())) {
+			throw new ValidationException("OLD_PASSWORD_INCORRECT", this.txtOldPassword);
+		}
+		if (!this.txtNewPassword.getText().equals(this.txtConfirmPassword.getText())) {
+			throw new ValidationException("CONFIRM_PASSWORD_MISMATCH", this.txtNewPassword);
+		}
 	}
 
 	/**
-	 * 
-	 */
-	protected void handleCancel() {
-		SwingUtility.closePanel(this);
-	}
-
-	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private JKPanel<?> getButtonsPanel() {
-		JKPanel<?> panel=new JKPanel<Object>();
-		panel.add(btnSave);
-		panel.add(btnCancel);
+		final JKPanel<?> panel = new JKPanel<Object>();
+		panel.add(this.btnSave);
+		panel.add(this.btnCancel);
 		return panel;
 	}
 
@@ -102,81 +95,97 @@ public class PnlResetPassword extends JKPanel<Object> {
 	 * @return
 	 */
 	private JKPanel<?> getUserInfoPanel() {
-		JKPanel<?> pnlInfo = new JKPanel<Object>(new GridLayout(4,1,3,2));
+		final JKPanel<?> pnlInfo = new JKPanel<Object>(new GridLayout(4, 1, 3, 2));
 		pnlInfo.setBorder(SwingUtility.createTitledBorder("USER_INFO"));
-		//pnlInfo.setLayout(new BoxLayout(pnlInfo, BoxLayout.Y_AXIS));
-		pnlInfo.add(new JKLabledComponent("USER_NAME", txtUserName));
-		pnlInfo.add(new JKLabledComponent("OLD_PASSWORD", txtOldPassword));
-		pnlInfo.add(new JKLabledComponent("NEW_PASSWORD", txtNewPassword));
-		pnlInfo.add(new JKLabledComponent("_CONFIRM_PASSWORD",txtConfirmPassword));
+		// pnlInfo.setLayout(new BoxLayout(pnlInfo, BoxLayout.Y_AXIS));
+		pnlInfo.add(new JKLabledComponent("USER_NAME", this.txtUserName));
+		pnlInfo.add(new JKLabledComponent("OLD_PASSWORD", this.txtOldPassword));
+		pnlInfo.add(new JKLabledComponent("NEW_PASSWORD", this.txtNewPassword));
+		pnlInfo.add(new JKLabledComponent("_CONFIRM_PASSWORD", this.txtConfirmPassword));
 		return pnlInfo;
 	}
-	
+
+	/**
+	 *
+	 */
+	protected void handleCancel() {
+		SwingUtility.closePanel(this);
+	}
+
+	/**
+	 * @throws DaoException
+	 */
+	protected void handleSave() {
+		try {
+			checkValues();
+			final User user = viewToModel();
+			final SecurityFacade facade = new SecurityFacade();
+			facade.updateUser(user);
+			SwingUtility.showSuccessDialog("PASSWORD_CHANGED_SUCC");
+			SwingUtility.closePanel(this);
+		} catch (final ValidationException e) {
+			ExceptionUtil.handleException(e);
+		} catch (final DaoException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	/**
+	 * @1.2
+	 */
+	private void init() {
+		final JKPanel<?> container = new JKPanel<Object>(new BorderLayout());
+		container.setBorder(SwingUtility.createTitledBorder(""));
+		container.add(getUserInfoPanel(), BorderLayout.CENTER);
+		container.add(getButtonsPanel(), BorderLayout.SOUTH);
+		this.btnSave.setIcon("small_filesave.png");
+		this.btnCancel.setIcon("close_x_red_commons_model_icon.png");
+		add(container);
+
+		this.btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleSave();
+			}
+		});
+		this.btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleCancel();
+			}
+		});
+	}
+
 	/**
 	 * @param employee
 	 * @throws DaoException
 	 */
-	public void modelToView()  {
-		txtUserName.setText(user.getUserId());
+	public void modelToView() {
+		this.txtUserName.setText(this.user.getUserId());
 	}
+
 	/**
+	 *
 	 * @return
 	 */
-	protected void checkValues()throws ValidationException{
-		txtUserName.checkEmpty();
-		txtOldPassword.checkEmpty();
-		txtNewPassword.checkEmpty();
-		txtConfirmPassword.checkEmpty();
-		
-		if(!txtOldPassword.getText().equals(user.getPassword())){
-			throw new ValidationException("OLD_PASSWORD_INCORRECT",txtOldPassword);
-		}
-		if(!txtNewPassword.getText().equals(txtConfirmPassword.getText())){
-			throw new ValidationException("CONFIRM_PASSWORD_MISMATCH",txtNewPassword);
-		}
-	}
-	
-	/**
-	 * @throws DaoException
-	 */
-	protected void handleSave(){
-		try {
-			checkValues();
-			User user=viewToModel();
-			SecurityFacade facade=new SecurityFacade();
-			facade.updateUser(user);
-			SwingUtility.showSuccessDialog("PASSWORD_CHANGED_SUCC");
-			SwingUtility.closePanel(this);
-		} catch (ValidationException e) {
-			ExceptionUtil.handleException(e);
-		} catch (DaoException e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private User viewToModel() {		
-		user.setPassword(txtNewPassword.getText());
-		return user;
+	private User viewToModel() {
+		this.user.setPassword(this.txtNewPassword.getText());
+		return this.user;
 	}
 
 	/**
 	 * @param args
 	 */
-//	public static void main(String[] args) {
-//		User user=new User();
-//		user.setUserRecordId(1);
-//		user.setUserId("admin");
-//		user.setFullName("admin");
-//		user.setPassword("admin");
-//		user.setStatus(0);
-//			
-//	  //  user =SecurityManager.getCurrentUser();
-//		SwingUtility.setDefaultComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-//		SwingUtility.showPanelInDialog(new PnlResetPassword(user),"TEST");
-//	}
+	// public static void main(String[] args) {
+	// User user=new User();
+	// user.setUserRecordId(1);
+	// user.setUserId("admin");
+	// user.setFullName("admin");
+	// user.setPassword("admin");
+	// user.setStatus(0);
+	//
+	// // user =SecurityManager.getCurrentUser();
+	// SwingUtility.setDefaultComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+	// SwingUtility.showPanelInDialog(new PnlResetPassword(user),"TEST");
+	// }
 }
-

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.apps.templates.ui;
 
 import java.awt.event.ActionEvent;
@@ -23,7 +38,7 @@ import com.fs.commons.util.ExceptionUtil;
 
 public class PnlTemplateTest extends JKPanel<Object> {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	DaoComboBox cmbTemplates = new DaoComboBox(AbstractTableMetaFactory.getTableMeta("conf_templates"));
@@ -38,61 +53,17 @@ public class PnlTemplateTest extends JKPanel<Object> {
 		handleTemplateChanged();
 	}
 
-	private void init() {
-		JKPanel<?> container = new JKPanel<Object>();
-		
-		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-		container.add(new JKLabledComponent("TEMPLATE", cmbTemplates));
-		// add(new JKLabledComponent("RECORD_ID", txtId));
-		container.add(pnlVariablesPanel);
-		container.add(btnTest);
-
-		add(container);
-		container.setBorder(SwingUtility.createTitledBorder(""));
-		pnlVariablesPanel.setBorder(SwingUtility.createTitledBorder("VARIABLES"));
-		
-		cmbTemplates.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleTemplateChanged();
-			}
-		});
-		btnTest.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleTest();
-			}
-		});
-	}
-
-	// ////////////////////////////////////////////////////
-	protected void handleTemplateChanged() {
-		int templateId = cmbTemplates.getSelectedIdValueAsInteger();
-		if (templateId != -1) {
-			TemplateFacade facade = new TemplateFacade();
-			try {
-				template = facade.findTemplate(templateId);
-			} catch (Exception e) {
-				ExceptionUtil.handleException(e);
-			}
-		} else {
-			template = null;
-		}
-		buildVariablesPanel();
-	}
-
 	// ////////////////////////////////////////////////////
 	private void buildVariablesPanel() {
-		pnlVariablesPanel.removeAll();
-		if (template != null) {
-			ArrayList<TemplateVariable> variables = template.getVariables();
-			pnlVariablesPanel.setLayout(new BoxLayout(pnlVariablesPanel, BoxLayout.Y_AXIS));
-			variablesList = new ArrayList<JKTextField>();
-			for (TemplateVariable templateVariable : variables) {
-				JKTextField comp = new JKTextField(10);
-				variablesList.add(comp);
-				pnlVariablesPanel.add(new JKLabledComponent(templateVariable.getVar().getVarName(), comp));
+		this.pnlVariablesPanel.removeAll();
+		if (this.template != null) {
+			final ArrayList<TemplateVariable> variables = this.template.getVariables();
+			this.pnlVariablesPanel.setLayout(new BoxLayout(this.pnlVariablesPanel, BoxLayout.Y_AXIS));
+			this.variablesList = new ArrayList<JKTextField>();
+			for (final TemplateVariable templateVariable : variables) {
+				final JKTextField comp = new JKTextField(10);
+				this.variablesList.add(comp);
+				this.pnlVariablesPanel.add(new JKLabledComponent(templateVariable.getVar().getVarName(), comp));
 
 			}
 		}
@@ -101,23 +72,67 @@ public class PnlTemplateTest extends JKPanel<Object> {
 	}
 
 	// ////////////////////////////////////////////////////
+	protected void handleTemplateChanged() {
+		final int templateId = this.cmbTemplates.getSelectedIdValueAsInteger();
+		if (templateId != -1) {
+			final TemplateFacade facade = new TemplateFacade();
+			try {
+				this.template = facade.findTemplate(templateId);
+			} catch (final Exception e) {
+				ExceptionUtil.handleException(e);
+			}
+		} else {
+			this.template = null;
+		}
+		buildVariablesPanel();
+	}
+
+	// ////////////////////////////////////////////////////
 	protected void handleTest() {
 		try {
-			if (template != null) {
+			if (this.template != null) {
 				// txtId.checkEmpty();
-				Object[] variableValues=new Object[variablesList.size()];
-				for(int i=0;i<variablesList.size();i++){
-					JKTextField txt=variablesList.get(i);
-					variableValues[i]=txt.getValue();
+				final Object[] variableValues = new Object[this.variablesList.size()];
+				for (int i = 0; i < this.variablesList.size(); i++) {
+					final JKTextField txt = this.variablesList.get(i);
+					variableValues[i] = txt.getValue();
 				}
-				String compiled = TemplateManager.compile(template, variableValues);
+				final String compiled = TemplateManager.compile(this.template, variableValues);
 				// int recordId = txtId.getTextAsInteger();
 				JOptionPane.showMessageDialog(SwingUtility.getDefaultMainFrame(), compiled);
 				// System.out.println(compiled);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			ExceptionUtil.handleException(e);
 		}
+	}
+
+	private void init() {
+		final JKPanel<?> container = new JKPanel<Object>();
+
+		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+		container.add(new JKLabledComponent("TEMPLATE", this.cmbTemplates));
+		// add(new JKLabledComponent("RECORD_ID", txtId));
+		container.add(this.pnlVariablesPanel);
+		container.add(this.btnTest);
+
+		add(container);
+		container.setBorder(SwingUtility.createTitledBorder(""));
+		this.pnlVariablesPanel.setBorder(SwingUtility.createTitledBorder("VARIABLES"));
+
+		this.cmbTemplates.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleTemplateChanged();
+			}
+		});
+		this.btnTest.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleTest();
+			}
+		});
 	}
 
 }

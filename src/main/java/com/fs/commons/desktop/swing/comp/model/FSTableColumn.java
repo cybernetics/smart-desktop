@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp.model;
 
 import java.math.BigDecimal;
@@ -31,84 +46,81 @@ public class FSTableColumn {
 	private int maxLength;
 	private Object defaultValue;
 
-	public String getName() {
-		return name;
+	public Class getColumnClass() {
+		return this.columnClass == null ? Object.class : this.columnClass;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-		setHumanName(Lables.get(name, true));
+	public String getColumnClassName() {
+		return this.columnClassName;
 	}
 
-	public boolean isRequired() {
-		return required;
+	public int getColumnType() {
+		// Handle this on appropriate way
+		return this.columnType;
 	}
 
-	public void setRequired(boolean required) {
-		this.required = required;
-	}
-
-	public boolean isEditable() {
-		return editable && isVisible();
-	}
-
-	public void setEditable(boolean editable) {
-		this.editable = editable;
-	}
-
-	public void setHumanName(String humanName) {
-		this.humanName = humanName;
-	}
-
-	public String getHumanName() {
-		return humanName;
-	}
-
-	public Format getFormatter() {
-		return formatter;
-	}
-
-	public void setFormatter(Format formatter) {
-		this.formatter = formatter;
-	}
-
-	public void setPreferredWidth(int preferredWidth) {
-		this.preferredWidth = preferredWidth;
-	}
-
-	public void setRenderer(TableCellRenderer cellRenderer) {
-		this.cellRenderer = cellRenderer;
-	}
-
-	public TableCellRenderer getRenderer() {
-		return cellRenderer;
-	}
-
-	public void setEditor(TableCellEditor cellEditor) {
-		this.cellEditor = cellEditor;
+	public String getColumnTypeName() {
+		return this.columnTypeName;
 	}
 
 	public TableCellEditor getEditor() {
-		return cellEditor;
+		return this.cellEditor;
+	}
+
+	public Format getFormatter() {
+		return this.formatter;
+	}
+
+	public String getHumanName() {
+		return this.humanName;
+	}
+
+	public int getIndex() {
+		return this.index;
+	}
+
+	public int getMaxLength() {
+		return this.maxLength;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public int getPreferredWidth() {
+		return this.preferredWidth;
+	}
+
+	public TableCellRenderer getRenderer() {
+		return this.cellRenderer;
+	}
+
+	public int getVisibleIndex() {
+		return isVisible() ? this.visibleIndex : -1;
+	}
+
+	public boolean isEditable() {
+		return this.editable && isVisible();
+	}
+
+	public boolean isNumeric() {
+		final Class c = getColumnClass();
+		return c.equals(Integer.class) || c.equals(Float.class) || c.equals(Long.class) || c.equals(BigDecimal.class);
+	}
+
+	public boolean isRequired() {
+		return this.required;
 	}
 
 	public boolean isVisible() {
-		return visible;
+		return this.visible;
 	}
 
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
-
-	public Class getColumnClass() {
-		return columnClass == null ? Object.class : columnClass;
-	}
-
-	public void setColumnClass(Class columnClass) {
+	public void setColumnClass(final Class columnClass) {
 		this.columnClass = columnClass;
 	}
 
-	public void setColumnClassName(String columnClassName) throws ClassNotFoundException {
+	public void setColumnClassName(final String columnClassName) throws ClassNotFoundException {
 		if (columnClassName.equals("byte[]")) {
 			setColumnClass(Object.class);
 		} else {
@@ -117,62 +129,65 @@ public class FSTableColumn {
 		this.columnClassName = columnClassName;
 	}
 
-	public String getColumnClassName() {
-		return columnClassName;
-	}
-
-	public int getColumnType() {
-		// Handle this on appropriate way
-		return columnType;
-	}
-
-	public void setColumnType(int columnType) {
+	public void setColumnType(final int columnType) {
 		this.columnType = columnType;
 	}
 
-	public String getColumnTypeName() {
-		return columnTypeName;
-	}
-
-	public void setColumnTypeName(String columnTypeName) {
+	public void setColumnTypeName(final String columnTypeName) {
 		this.columnTypeName = columnTypeName;
 	}
 
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
-	}
-
-	public int getVisibleIndex() {
-		return isVisible() ? visibleIndex : -1;
-	}
-
-	public void setVisibleIndex(int visibleIndex) {
-		this.visibleIndex = visibleIndex;
-	}
-
-	public boolean isNumeric() {
-		Class c = getColumnClass();
-		return c.equals(Integer.class) || c.equals(Float.class) || c.equals(Long.class) || c.equals(BigDecimal.class);
-	}
-
-	public int getMaxLength() {
-		return maxLength;
-	}
-
-	public void setMaxLength(int maxLength) {
-		this.maxLength = maxLength;
-	}
-
-	public void setDefaultValue(Object defaultValue) {
+	public void setDefaultValue(final Object defaultValue) {
 		this.defaultValue = defaultValue;
 	}
 
-	public int getPreferredWidth() {
-		return preferredWidth;
+	public void setEditable(final boolean editable) {
+		this.editable = editable;
+	}
+
+	public void setEditor(final TableCellEditor cellEditor) {
+		this.cellEditor = cellEditor;
+	}
+
+	public void setFormatter(final Format formatter) {
+		this.formatter = formatter;
+	}
+
+	public void setHumanName(final String humanName) {
+		this.humanName = humanName;
+	}
+
+	public void setIndex(final int index) {
+		this.index = index;
+	}
+
+	public void setMaxLength(final int maxLength) {
+		this.maxLength = maxLength;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
+		setHumanName(Lables.get(name, true));
+	}
+
+	public void setPreferredWidth(final int preferredWidth) {
+		this.preferredWidth = preferredWidth;
+	}
+
+	public void setRenderer(final TableCellRenderer cellRenderer) {
+		this.cellRenderer = cellRenderer;
+	}
+
+	public void setRequired(final boolean required) {
+		this.required = required;
+	}
+
+	public void setVisible(final boolean visible) {
+		this.visible = visible;
+	}
+
+	public void setVisibleIndex(final int visibleIndex) {
+		this.visibleIndex = visibleIndex;
 	}
 
 }

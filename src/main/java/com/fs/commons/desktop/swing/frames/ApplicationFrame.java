@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.frames;
 
 import java.awt.BorderLayout;
@@ -63,124 +78,125 @@ import com.fs.license.client.LicenseClientFactory;
 
 public class ApplicationFrame extends JKFrame {
 
+	/**
+	 * @author jk
+	 */
+	class MenuItemTitledPanel extends TitledPanel {
+
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+		private final MenuItem item;
+
+		public MenuItemTitledPanel(final MenuItem item) throws UIOPanelCreationException {
+			super(item.getName(), item.createPanel(), item.getIconName());
+			this.item = item;
+		}
+
+		@Override
+		protected void handleAddToFavorites() {
+			captureCurrentPanelImage(this, this.item.getName());
+			ApplicationFrame.this.favoritePanels.put(this.item.getName(), Integer.MAX_VALUE);
+			UserPreferences.putHashTable(getFavortiesPanelKeyName(), ApplicationFrame.this.favoritePanels);
+			loadFavoritesPanel();
+			addFavoritePanelToHome();
+		}
+
+		@Override
+		protected void handleNext() {
+			if (ApplicationFrame.this.currentHistoryIndex < ApplicationFrame.this.history.size() - 1) {
+				ApplicationFrame.this.currentHistoryIndex++;
+				showMenuItemPanel(ApplicationFrame.this.history.get(ApplicationFrame.this.currentHistoryIndex), false, true);
+			}
+		}
+
+		@Override
+		protected void handlePreviouse() {
+			if (ApplicationFrame.this.currentHistoryIndex > 0) {
+				ApplicationFrame.this.currentHistoryIndex--;
+				showMenuItemPanel(ApplicationFrame.this.history.get(ApplicationFrame.this.currentHistoryIndex), false, true);
+			}
+		}
+
+		@Override
+		protected void handleReload() {
+			try {
+				remove((Container) this.panel);
+				AbstractDao.resetCache();
+				SwingUtility.resetComponents();
+				this.panel = this.item.createPanel(true);
+				showPanel();
+			} catch (final UIOPanelCreationException e) {
+				ExceptionUtil.handleException(e);
+			}
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	public static final int DEFAULT_FRAME_WIDTH = 1024;
 
 	private static final int MAX_FAVORITES_SIZE = 10;
 
-	private Application application;
-
-	private Runnable closeExecutor = new CloseExecutor();
-
-	private Hashtable<String, Integer> favoritePanels = new Hashtable<String, Integer>();;
-
-	private ArrayList<MenuItem> history = new ArrayList<MenuItem>();
-	private int currentHistoryIndex = -1;
-
-	// UI Components
-	JKPanel<?> pnlModules;
-	JKPanel<?> pnlMenu;
-	JKPanel<?> pnlMenuItems;
-
-	JKButton btnExit = new JKButton("EXIT");
-
-	JKStatusBar txtGeneralStatus = new JKStatusBar();
-	JKStatusBar txtUserStatus = new JKStatusBar();
-	JKStatusBar txtSystemStatus = new JKStatusBar();
-
-	private JKPanel<?> pnlFavorit;
-
-//	private InactivityListener inactivityListener;
-
 	static {
 		try {
 			LicenseClientFactory.getClient().validateLicense();
 			// } catch (LicenseException e) {
 			// ExceptionUtil.handleException(e);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			ExceptionUtil.handleException(e);
 		}
 	}
 
+	private Application application;;
+
+	private Runnable closeExecutor = new CloseExecutor();
+	private final Hashtable<String, Integer> favoritePanels = new Hashtable<String, Integer>();
+
+	private final ArrayList<MenuItem> history = new ArrayList<MenuItem>();
+	private int currentHistoryIndex = -1;
+	// UI Components
+	JKPanel<?> pnlModules;
+
+	JKPanel<?> pnlMenu;
+
+	JKPanel<?> pnlMenuItems;
+	JKButton btnExit = new JKButton("EXIT");
+	JKStatusBar txtGeneralStatus = new JKStatusBar();
+
+	JKStatusBar txtUserStatus = new JKStatusBar();
+
+	// private InactivityListener inactivityListener;
+
+	JKStatusBar txtSystemStatus = new JKStatusBar();
+
+	private JKPanel<?> pnlFavorit;
+
 	/**
-	 * 
+	 *
 	 */
 	public ApplicationFrame() {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param application
 	 */
-	public ApplicationFrame(Application application) {
+	public ApplicationFrame(final Application application) {
 		setApplication(application);
 
 	}
 
 	/**
-	 * @return the application
-	 */
-	public Application getApplication() {
-		return application;
-	}
-
-	/**
-	 * @param application
-	 *            the application to set
-	 */
-	public void setApplication(Application application) {
-		this.application = application;
-		init();
-//		addAutoLogoutListener();
-		buildHomePanel();
-		showDefaultModule(application);
-	}
-
-//	private void addAutoLogoutListener() {
-//		Action logout = new ActionAdapter() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				try {
-//					ApplicationManager.getInstance().logout();
-//				} catch (ApplicationException e1) {
-//					ExceptionUtil.handleException(e1);
-//				}
-//			}
-//		};
-////		inactivityListener = new InactivityListener(logout, application.getAutoLogoutInterval());
-////		inactivityListener.start();
-//	}
-
-	/**
-	 * 
-	 */
-	private void buildHomePanel() {
-		JKPanel mainPanel = SwingUtility.buildImagePanel(GeneralUtility.getURL(application.getHomeImage()), ImagePanel.SCALED);
-		//TODO : Fix the following to be non-hard coded value
-		if(GeneralUtility.getURL("/resources/images/home.png")!=null){
-			ImagePanel pnlImage = SwingUtility.buildImagePanel(GeneralUtility.getURL("/resources/images/home.png"),ImagePanel.ACTUAL);
-			pnlImage.setBorder(BorderFactory.createLineBorder(Colors.MENU_PANEL_BG,5));
-			pnlImage.setSizeToFitImage();
-			mainPanel.add(pnlImage);
-		}
-//		mainPanel.setOpaque(true);
-//		mainPanel.setGradientType(GradientType.DIAGNOLE);
-//		mainPanel.setBackground(SwingUtility.getDefaultBackgroundColor());
-		setHomePanel(mainPanel);
-
-//		addFavoritePanelToHome();
-	}
-
-	/**
-	 * 
+	 *
 	 */
 	private void addFavoritePanelToHome() {
-		if (pnlFavorit != null) {
-			getHomePanel().remove(pnlFavorit);
+		if (this.pnlFavorit != null) {
+			getHomePanel().remove(this.pnlFavorit);
 		}
-		pnlFavorit = buildFavoritPanelsToHomePage();
-		if (pnlFavorit != null) {
+		this.pnlFavorit = buildFavoritPanelsToHomePage();
+		if (this.pnlFavorit != null) {
 			// pnlFavorit.setPreferredSize(180,
 			// (int)pnlFavorit.getHeight()-200);
 			// getHomePanel().add(pnlFavorit, BorderLayout.SOUTH);
@@ -190,27 +206,312 @@ public class ApplicationFrame extends JKFrame {
 		getHomePanel().repaint();
 	}
 
+	// private void addAutoLogoutListener() {
+	// Action logout = new ActionAdapter() {
+	// @Override
+	// public void actionPerformed(ActionEvent e) {
+	// try {
+	// ApplicationManager.getInstance().logout();
+	// } catch (ApplicationException e1) {
+	// ExceptionUtil.handleException(e1);
+	// }
+	// }
+	// };
+	//// inactivityListener = new InactivityListener(logout,
+	// application.getAutoLogoutInterval());
+	//// inactivityListener.start();
+	// }
+
 	/**
-	 * 
-	 * @param application
+	 *
+	 * @param item
 	 */
-	private void showDefaultModule(Application application) {
-		Module defaultModule = application.getDefaultModule();
-		if (defaultModule != null) {
-			showModuleMenu(defaultModule);
+	protected void addOpenPanelLog(final MenuItem item) {
+		final Integer value = this.favoritePanels.get(item.getName());
+		int visitCount = 0;
+		if (value != null) {
+			visitCount = value;
+		}
+		if (visitCount < Integer.MAX_VALUE) {
+			visitCount++;
+			this.favoritePanels.put(item.getName(), visitCount);
+			UserPreferences.putHashTable(getFavortiesPanelKeyName(), this.favoritePanels);
 		}
 	}
 
 	/**
-	 * @param closeExecutor
-	 *            the closeExecutor to set
+	 * @return
+	 *
 	 */
-	public void setCloseExecutor(Runnable closeExecutor) {
-		this.closeExecutor = closeExecutor;
+	private JKPanel<?> buildFavoritPanelsToHomePage() {
+		loadFavoritesPanel();
+		final ArrayList<Entry> list = GeneralUtility.sortHashTable(this.favoritePanels, false);
+		final int minSize = Math.min(list.size(), MAX_FAVORITES_SIZE);
+		if (minSize > 0) {
+			final JKPanel<?> pnl = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
+			// pnl.setBorder(SwingUtility.createTitledBorder("Favorties_pages"));
+			// pnl.setPreferredSize(new Dimension(600, 180));
+			int count = 0;
+			for (int i = 0; i < minSize; i++) {
+				final String menuItemName = (String) list.get(i).getKey();
+				try {
+					final MenuItem menuItem = this.application.findMenuItem(menuItemName);
+					if (menuItem != null) {
+
+						final JKPanel<?> pnlThumb = new JKPanel<Object>(new BorderLayout());
+						pnlThumb.setPreferredSize(new Dimension(150, 130));
+						final byte[] file = GeneralUtility.readFile(new File(getPanelFileName(menuItem.getName())));
+						final JPanel pnlItem = SwingUtility.buildImagePanel(file, ImagePanel.SCALED);
+						final JKMenuItem btnItem = createJKMenuItem(menuItem, true);
+
+						if (btnItem != null && pnlItem != null) {
+							btnItem.setShortcut(++count + "", count + "");
+							// final Border normalBorder =
+							// BorderFactory.createLineBorder(Colors.FAVORITE_ITEM_BORDER);
+							final Border normalBorder = BorderFactory.createRaisedBevelBorder();
+							pnlThumb.setBorder(normalBorder);
+							btnItem.setBorder(null);
+
+							pnlThumb.add(btnItem, BorderLayout.NORTH);
+							pnlThumb.add(pnlItem, BorderLayout.CENTER);
+
+							pnl.add(pnlThumb);
+							final MouseAdapter adapter = new MouseAdapter() {
+								@Override
+								public void mouseClicked(final MouseEvent e) {
+									btnItem.doClick();
+								}
+
+								@Override
+								public void mouseEntered(final MouseEvent e) {
+									pnlThumb.setBorder(BorderFactory.createLoweredBevelBorder());
+								}
+
+								@Override
+								public void mouseExited(final MouseEvent e) {
+									pnlThumb.setBorder(normalBorder);
+								}
+							};
+							btnItem.addMouseListener(adapter);
+							pnlThumb.addMouseListener(adapter);
+						}
+					}
+				} catch (final IOException e) {
+					System.err.println(e.getMessage());
+				} catch (final SecurityException e) {
+					// Its safe to eat this exception
+				}
+			}
+			return pnl;
+		}
+		return null;
 	}
 
 	/**
-	 * 
+	 *
+	 */
+	private void buildHomePanel() {
+		final JKPanel mainPanel = SwingUtility.buildImagePanel(GeneralUtility.getURL(this.application.getHomeImage()), ImagePanel.SCALED);
+		// TODO : Fix the following to be non-hard coded value
+		if (GeneralUtility.getURL("/resources/images/home.png") != null) {
+			final ImagePanel pnlImage = SwingUtility.buildImagePanel(GeneralUtility.getURL("/resources/images/home.png"), ImagePanel.ACTUAL);
+			pnlImage.setBorder(BorderFactory.createLineBorder(Colors.MENU_PANEL_BG, 5));
+			pnlImage.setSizeToFitImage();
+			mainPanel.add(pnlImage);
+		}
+		// mainPanel.setOpaque(true);
+		// mainPanel.setGradientType(GradientType.DIAGNOLE);
+		// mainPanel.setBackground(SwingUtility.getDefaultBackgroundColor());
+		setHomePanel(mainPanel);
+
+		// addFavoritePanelToHome();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private JKPanel<?> buildLeadingPanel() {
+		if (this.pnlMenuItems == null) {
+			this.pnlMenuItems = new JKMainPanel();
+			this.pnlMenuItems.setGradientType(GradientType.VERTICAL_LINEAR);
+			this.pnlMenuItems.setBackground(Colors.MI_PANEL_BG);
+			this.pnlMenuItems.setBorder(BorderFactory.createRaisedBevelBorder());
+			this.pnlMenuItems.setBackground(Colors.MI_PANEL_BG);
+		}
+		return this.pnlMenuItems;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private JKPanel<?> buildNorthPanel() {
+		final JKPanel<?> pnlNorth = new JKPanel<Object>();
+		pnlNorth.setBorder(BorderFactory.createRaisedBevelBorder());
+		pnlNorth.setLayout(new BoxLayout(pnlNorth, BoxLayout.Y_AXIS));
+		// setJMenuBar(getModulesPanel());
+		pnlNorth.add(getModulesPanel());
+		pnlNorth.add(getMenuPanel());
+		return pnlNorth;
+	}
+
+	/**
+	 *
+	 * @param panel
+	 * @param name
+	 */
+	private void captureCurrentPanelImage(final JKPanel<?> panel, final String name) {
+		final Runnable runnable = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					final File file = new File(getPanelFileName(name));
+					if (!file.exists()) {
+						final BufferedImage image = SwingUtility.convertPanelToImage(panel, 100, 100);// robot.createScreenCapture(panel.getBounds());
+						ImageIO.write(image, "gif", file);
+					}
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		SwingUtilities.invokeLater(runnable);
+	}
+
+	/**
+	 *
+	 * @param item
+	 * @return
+	 */
+	private JKMenuItem createJKMenuItem(final MenuItem item, final boolean refreshModuleAndMenu) {
+		if (isAllowedCommand(item.getPrivilige())) {
+			item.init();
+			final JKMenuItem btnItem = new JKMenuItem(item.getName());
+
+			btnItem.setIcon(item.getIconName());
+			btnItem.setHorizontalTextPosition(SwingConstants.TRAILING);
+			btnItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					showMenuItemPanel(item, true, refreshModuleAndMenu);
+				}
+			});
+			btnItem.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(final MouseEvent e) {
+					if (e.getButton() == MouseEvent.BUTTON3) {
+						showMenuItemPanelInFrame(item);
+					}
+				}
+			});
+			return btnItem;
+		}
+		return null;
+	}
+
+	/**
+	 * @return the application
+	 */
+	public Application getApplication() {
+		return this.application;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private String getFavortiesPanelKeyName() {
+		return SecurityManager.getCurrentUser().getUserId() + "-panels";
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private JKPanel<?> getMenuPanel() {
+		if (this.pnlMenu == null) {
+			this.pnlMenu = new JKMainPanel(new BorderLayout());
+			this.pnlMenu.setBackground(Colors.MENU_PANEL_BG);
+			this.pnlMenu.setGradientType(GradientType.HORIZENTAL);
+			this.pnlMenu.setBorder(BorderFactory.createLineBorder(Color.white));
+		}
+		return this.pnlMenu;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private JKPanel<?> getModulesPanel() {
+		if (this.pnlModules == null) {
+			this.pnlModules = new JKPanel<Object>();
+			this.pnlModules.setGradientType(GradientType.HORIZENTAL);
+			// pnlModules.setOpaque(false);
+			this.pnlModules.setBackground(Colors.MODULE_PANEL_BG);
+			final ArrayList<Module> modules = this.application.getModules();
+			for (int i = 0; i < modules.size(); i++) {
+				final Module module = modules.get(i);
+				if (isAllowedCommand(module.getPrivilige())) {
+					final JKModule btnModule = new JKModule(module.getModuleName());
+					final int order = i + 1;
+					btnModule.setShortcut("control F" + order, "Ctrl F" + order);
+					btnModule.setIcon(module.getIconName());
+					// btnModule.setPrivlige(new
+					// Privilige(module.getPriviligeId() ,
+					// module.getModuleName()));
+					this.pnlModules.add(btnModule);
+					btnModule.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							showModuleMenu(module);
+						}
+					});
+					module.getMenu();// to cache the panels
+				}
+			}
+		}
+		return this.pnlModules;
+	}
+
+	/**
+	 *
+	 * @param name
+	 * @return
+	 */
+	protected String getPanelFileName(final String name) {
+		final String pathName = GeneralUtility.getUserFolderPath(true) + "images";
+		final File path = new File(pathName);
+		if (!path.exists()) {
+			path.mkdir();
+		}
+
+		return pathName + "/" + name + ".gif";
+	}
+
+	private JKPanel getSouthPanel() {
+		final JKPanel pnlSouth = new JKPanel(new GridLayout(1, 3, 5, 5));
+		pnlSouth.add(this.txtGeneralStatus);
+		pnlSouth.add(this.txtUserStatus);
+		pnlSouth.add(this.txtSystemStatus);
+		return pnlSouth;
+	}
+
+	/**
+	 *
+	 */
+	protected void handleClose() {
+		this.closeExecutor.run();
+	}
+
+	public void handleShowPanel(final String menuItemName) throws NotAllowedOperationException, SecurityException {
+		final MenuItem item = getApplication().findMenuItem(menuItemName);
+		showMenuItemPanel(item, false, false);
+	}
+
+	/**
+	 *
 	 */
 	protected void init() {
 		// setSize(DEFAULT_FRAME_WIDTH, DEFAULT_FRAME_HEIGHT);
@@ -222,7 +523,7 @@ public class ApplicationFrame extends JKFrame {
 		// Build UI
 		add(buildNorthPanel(), BorderLayout.NORTH);
 
-		JKPanel<?> leadingPanel = buildLeadingPanel();
+		final JKPanel<?> leadingPanel = buildLeadingPanel();
 		leadingPanel.setGredientColor(Color.white);
 		add(new JKScrollPane(leadingPanel, JKScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JKScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
 				BorderLayout.LINE_START);
@@ -231,108 +532,235 @@ public class ApplicationFrame extends JKFrame {
 		// Register Events
 		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosing(final WindowEvent e) {
 				handleClose();
 			}
 		});
 
-//		// For the inactivity
-//		long eventMask = AWTEvent.MOUSE_MOTION_EVENT_MASK + AWTEvent.MOUSE_EVENT_MASK + AWTEvent.KEY_EVENT_MASK;
-//		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-//
-//			@Override
-//			public void eventDispatched(AWTEvent event) {
-//				if (inactivityListener != null) {
-//					inactivityListener.resetTimer();
-//				}
-//			}
-//		}, eventMask);
-	}
-
-	private JKPanel getSouthPanel() {
-		JKPanel pnlSouth = new JKPanel(new GridLayout(1, 3, 5, 5));
-		pnlSouth.add(txtGeneralStatus);		
-		pnlSouth.add(txtUserStatus);
-		pnlSouth.add(txtSystemStatus);
-		return pnlSouth;
+		// // For the inactivity
+		// long eventMask = AWTEvent.MOUSE_MOTION_EVENT_MASK +
+		// AWTEvent.MOUSE_EVENT_MASK + AWTEvent.KEY_EVENT_MASK;
+		// Toolkit.getDefaultToolkit().addAWTEventListener(new
+		// AWTEventListener() {
+		//
+		// @Override
+		// public void eventDispatched(AWTEvent event) {
+		// if (inactivityListener != null) {
+		// inactivityListener.resetTimer();
+		// }
+		// }
+		// }, eventMask);
 	}
 
 	/**
-	 * 
+	 *
+	 * @param priviligeId
 	 * @return
 	 */
-	private JKPanel<?> buildLeadingPanel() {
-		if (pnlMenuItems == null) {
-			pnlMenuItems = new JKMainPanel();
-			pnlMenuItems.setGradientType(GradientType.VERTICAL_LINEAR);
-			pnlMenuItems.setBackground(Colors.MI_PANEL_BG);
-			pnlMenuItems.setBorder(BorderFactory.createRaisedBevelBorder());
-			pnlMenuItems.setBackground(Colors.MI_PANEL_BG);
+	private boolean isAllowedCommand(final Privilige priv) {
+		try {
+			SecurityManager.getAuthorizer().checkAllowed(priv);
+			return true;
+		} catch (final NotAllowedOperationException e) {
+			System.err.println("Privlige Id : " + priv.getPriviligeId() + " , with name : " + priv.getPriviligeName() + " is not allowed");
+			return false;
+		} catch (final SecurityException e) {
+			ExceptionUtil.handleException(e);
+			return false;
 		}
-		return pnlMenuItems;
+	}
+
+	private void loadFavoritesPanel() {
+		final Hashtable<String, String> hashtable = UserPreferences.getHashtable(getFavortiesPanelKeyName());
+		final Enumeration<String> keys = hashtable.keys();
+		while (keys.hasMoreElements()) {
+			final String key = keys.nextElement();
+			this.favoritePanels.put(key, Integer.parseInt(hashtable.get(key)));
+		}
+
 	}
 
 	/**
-	 * 
-	 * @return
+	 * @param application
+	 *            the application to set
 	 */
-	private JKPanel<?> buildNorthPanel() {
-		JKPanel<?> pnlNorth = new JKPanel<Object>();
-		pnlNorth.setBorder(BorderFactory.createRaisedBevelBorder());
-		pnlNorth.setLayout(new BoxLayout(pnlNorth, BoxLayout.Y_AXIS));
-		// setJMenuBar(getModulesPanel());
-		pnlNorth.add(getModulesPanel());
-		pnlNorth.add(getMenuPanel());
-		return pnlNorth;
+	public void setApplication(final Application application) {
+		this.application = application;
+		init();
+		// addAutoLogoutListener();
+		buildHomePanel();
+		showDefaultModule(application);
 	}
 
 	/**
-	 * 
-	 * @return
+	 * @param closeExecutor
+	 *            the closeExecutor to set
 	 */
-	private JKPanel<?> getModulesPanel() {
-		if (pnlModules == null) {
-			pnlModules = new JKPanel<Object>();
-			pnlModules.setGradientType(GradientType.HORIZENTAL);
-			// pnlModules.setOpaque(false);
-			pnlModules.setBackground(Colors.MODULE_PANEL_BG);
-			ArrayList<Module> modules = application.getModules();
-			for (int i = 0; i < modules.size(); i++) {
-				final Module module = modules.get(i);
-				if (isAllowedCommand(module.getPrivilige())) {
-					JKModule btnModule = new JKModule(module.getModuleName());
-					int order = i + 1;
-					btnModule.setShortcut("control F" + order, "Ctrl F" + order);
-					btnModule.setIcon(module.getIconName());
-					// btnModule.setPrivlige(new
-					// Privilige(module.getPriviligeId() ,
-					// module.getModuleName()));
-					pnlModules.add(btnModule);
-					btnModule.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							showModuleMenu(module);
+	public void setCloseExecutor(final Runnable closeExecutor) {
+		this.closeExecutor = closeExecutor;
+	}
+
+	public void setGeneralStatus(final String status) {
+		this.txtGeneralStatus.setText(status);
+	}
+
+	public void setSystemStatus(final String status) {
+		this.txtSystemStatus.setText(status);
+	}
+
+	public void setUserStatus(final String status) {
+		this.txtUserStatus.setText(status);
+	}
+
+	/**
+	 *
+	 * @param application
+	 */
+	private void showDefaultModule(final Application application) {
+		final Module defaultModule = application.getDefaultModule();
+		if (defaultModule != null) {
+			showModuleMenu(defaultModule);
+		}
+	}
+
+	/**
+	 * @param item
+	 * @param refreshModuleAndMenu
+	 */
+	public void showMenuItemPanel(final MenuItem item, final boolean addToHistory, final boolean refreshModuleAndMenu) {
+		// AnimationUtil.disable(this, Lables.get("Loading.."));
+		final Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					if (item.isExecutor()) {
+						item.createPanel();
+					} else {
+						final MenuItemTitledPanel panel = new MenuItemTitledPanel(item);
+						if (addToHistory) {
+							ApplicationFrame.this.history.add(item);
+							ApplicationFrame.this.currentHistoryIndex = ApplicationFrame.this.history.size() - 1;
 						}
-					});
-					module.getMenu();// to cache the panels
+						if (refreshModuleAndMenu) {
+							// this block will be called from history navigation
+							showModuleMenu(item.getParentMenu().getParentModule());
+							showMenuItems(item.getParentMenu());
+						}
+						handleShowPanel(panel);
+						// captureCurrentPanelImage(panel, item.getName());
+						// addOpenPanelLog(item);
+						setUserStatus(item.getFullQualifiedPath());
+					}
+				} catch (final UIOPanelCreationException e) {
+					ExceptionUtil.handleException(e);
+				} finally {
+					// AnimationUtil.enable(ApplicationFrame.this);
+				}
+			}
+		};
+		SwingUtilities.invokeLater(runnable);
+	}
+
+	/**
+	 *
+	 * @param menuItemName
+	 * @param addToHistory
+	 * @param refreshModuleAndMenu
+	 * @throws NotAllowedOperationException
+	 * @throws SecurityException
+	 */
+	public void showMenuItemPanel(final String menuItemName, final boolean addToHistory, final boolean refreshModuleAndMenu)
+			throws NotAllowedOperationException, SecurityException {
+		final MenuItem item = getApplication().findMenuItem(menuItemName);
+		showMenuItemPanel(item, addToHistory, refreshModuleAndMenu);
+	}
+
+	/**
+	 *
+	 * @param item
+	 * @param b
+	 */
+	protected void showMenuItemPanelInDialog(final MenuItem item) {
+		try {
+			final JKDialog dialog = new JKDialog(new JKFrame(), item.getName());
+			dialog.setSize(new Dimension(850, 600));
+			dialog.setResizable(false);
+			dialog.setModal(false);
+			final JKPanel<?> panel = new MenuItemTitledPanel(item);
+			dialog.add(panel);
+
+			dialog.setLocationRelativeTo(this);
+			dialog.setVisible(true);
+			panel.requestFocus();
+		} catch (final UIOPanelCreationException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	protected void showMenuItemPanelInFrame(final MenuItem item) {
+		try {
+			final JKPanel<?> panel = new MenuItemTitledPanel(item);
+			final JKFrame frame = SwingUtility.showPanelFrame(panel, item.getName());
+			frame.setExtendedState(JKFrame.NORMAL);
+		} catch (final UIOPanelCreationException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	/**
+	 *
+	 * @param menu
+	 */
+	protected void showMenuItems(final Menu menu) {
+		final ArrayList<MenuItem> items = menu.getItems();
+		final GridLayout layout = new GridLayout(1, 1, 2, 5);
+		final JKPanel<?> pnlItems = new JKPanel<Object>(layout);
+		final JKTitle comp = new JKTitle(menu.getName());
+		// comp.setBackground(Colors.MI_PANEL_TITLE_BG);
+		// comp.setForeground(Colors.MI_PANEL_TITLE_FG);
+		pnlItems.add(comp);
+
+		// pnlItems.setOpaque(false);
+		int rows = 1;
+		for (int i = 0; i < items.size(); i++) {
+			final MenuItem item = items.get(i);
+			final JKMenuItem btnItem = createJKMenuItem(item, false);
+			if (btnItem != null) {
+				// btnItem.setShowProgress(true);
+				if (btnItem != null) {
+					final int order = i;
+					SwingUtility.setHotKeyFoButton(btnItem, "alt " + order, "alt " + order);
+					btnItem.setShortcutText("Alt " + order + "", false);
+					// btnItem.setPrivlige(new Privilige(item.getPriviligeId(),
+					// item.getName()));
+					pnlItems.add(btnItem);
+					rows++;
 				}
 			}
 		}
-		return pnlModules;
+		layout.setRows(rows);
+		layout.setColumns(1);
+		this.pnlMenuItems.removeAll();
+		final JKScrollPane comp2 = new JKScrollPane(pnlItems);
+		this.pnlMenuItems.add(comp2);
+		showHomePanel();
+		validate();
+		repaint();
 	}
 
 	/**
-	 * 
+	 *
 	 * @param module
 	 */
-	protected void showModuleMenu(Module module) {
-		ArrayList<Menu> menus = module.getMenu();
-		JKPanel<?> pnlMenu = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
+	protected void showModuleMenu(final Module module) {
+		final ArrayList<Menu> menus = module.getMenu();
+		final JKPanel<?> pnlMenu = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
 		// pnlMenu.setOpaque(false);
 		for (int i = 0; i < menus.size(); i++) {
 			final Menu menu = menus.get(i);
 			if (isAllowedCommand(menu.getPrivilige())) {
-				JKMenu btnMenu = new JKMenu(menu.getName());
-				int order = i + 1;
+				final JKMenu btnMenu = new JKMenu(menu.getName());
+				final int order = i + 1;
 				SwingUtility.setHotKeyFoButton(btnMenu, "control " + order, "control " + order);
 				btnMenu.setShortcutText("Ctrl " + order + "", false);
 				btnMenu.setIcon(menu.getIconName());
@@ -340,7 +768,8 @@ public class ApplicationFrame extends JKFrame {
 				// menu.getName()));
 				pnlMenu.add(btnMenu);
 				btnMenu.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
 						showMenuItems(menu);
 					}
 				});
@@ -358,413 +787,6 @@ public class ApplicationFrame extends JKFrame {
 			// showHomePanel();
 			showMenuItems(module.getMenu().get(0));
 		}
-	}
-
-	/**
-	 * 
-	 * @param priviligeId
-	 * @return
-	 */
-	private boolean isAllowedCommand(Privilige priv) {
-		try {
-			SecurityManager.getAuthorizer().checkAllowed(priv);
-			return true;
-		} catch (NotAllowedOperationException e) {
-			System.err.println("Privlige Id : " + priv.getPriviligeId() + " , with name : " + priv.getPriviligeName() + " is not allowed");
-			return false;
-		} catch (SecurityException e) {
-			ExceptionUtil.handleException(e);
-			return false;
-		}
-	}
-
-	/**
-	 * 
-	 * @param menu
-	 */
-	protected void showMenuItems(Menu menu) {
-		ArrayList<MenuItem> items = menu.getItems();
-		GridLayout layout = new GridLayout(1, 1, 2, 5);
-		JKPanel<?> pnlItems = new JKPanel<Object>(layout);
-		JKTitle comp = new JKTitle(menu.getName());
-		// comp.setBackground(Colors.MI_PANEL_TITLE_BG);
-		// comp.setForeground(Colors.MI_PANEL_TITLE_FG);
-		pnlItems.add(comp);
-
-		// pnlItems.setOpaque(false);
-		int rows = 1;
-		for (int i = 0; i < items.size(); i++) {
-			final MenuItem item = items.get(i);
-			JKMenuItem btnItem = createJKMenuItem(item, false);
-			if (btnItem != null) {
-				// btnItem.setShowProgress(true);
-				if (btnItem != null) {
-					int order = i;
-					SwingUtility.setHotKeyFoButton(btnItem, "alt " + order, "alt " + order);
-					btnItem.setShortcutText("Alt " + order + "", false);
-					// btnItem.setPrivlige(new Privilige(item.getPriviligeId(),
-					// item.getName()));
-					pnlItems.add(btnItem);
-					rows++;
-				}
-			}
-		}
-		layout.setRows(rows);
-		layout.setColumns(1);
-		this.pnlMenuItems.removeAll();
-		JKScrollPane comp2 = new JKScrollPane(pnlItems);
-		this.pnlMenuItems.add(comp2);
-		showHomePanel();
-		validate();
-		repaint();
-	}
-
-	/**
-	 * 
-	 * @param item
-	 * @return
-	 */
-	private JKMenuItem createJKMenuItem(final MenuItem item, final boolean refreshModuleAndMenu) {
-		if (isAllowedCommand(item.getPrivilige())) {
-			item.init();
-			JKMenuItem btnItem = new JKMenuItem(item.getName());
-
-			btnItem.setIcon(item.getIconName());
-			btnItem.setHorizontalTextPosition(SwingConstants.TRAILING);
-			btnItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					showMenuItemPanel(item, true, refreshModuleAndMenu);
-				}
-			});
-			btnItem.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if (e.getButton() == MouseEvent.BUTTON3) {
-						showMenuItemPanelInFrame(item);
-					}
-				}
-			});
-			return btnItem;
-		}
-		return null;
-	}
-
-	protected void showMenuItemPanelInFrame(MenuItem item) {
-		try {
-			JKPanel<?> panel = new MenuItemTitledPanel(item);
-			JKFrame frame = SwingUtility.showPanelFrame(panel, item.getName());
-			frame.setExtendedState(JKFrame.NORMAL);
-		} catch (UIOPanelCreationException e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
-	/**
-	 * 
-	 * @param item
-	 * @param b
-	 */
-	protected void showMenuItemPanelInDialog(MenuItem item) {
-		try {
-			JKDialog dialog = new JKDialog(new JKFrame(), item.getName());
-			dialog.setSize(new Dimension(850, 600));
-			dialog.setResizable(false);
-			dialog.setModal(false);
-			JKPanel<?> panel = new MenuItemTitledPanel(item);
-			dialog.add(panel);
-
-			dialog.setLocationRelativeTo(this);
-			dialog.setVisible(true);
-			panel.requestFocus();
-		} catch (UIOPanelCreationException e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
-	/**
-	 * @param item
-	 * @param refreshModuleAndMenu
-	 */
-	public void showMenuItemPanel(final MenuItem item, final boolean addToHistory, final boolean refreshModuleAndMenu) {
-//		AnimationUtil.disable(this, Lables.get("Loading.."));
-		Runnable runnable = new Runnable() {
-			public void run() {
-				try {
-					if (item.isExecutor()) {
-						item.createPanel();
-					} else {
-						MenuItemTitledPanel panel = new MenuItemTitledPanel(item);
-						if (addToHistory) {
-							history.add(item);
-							currentHistoryIndex = history.size() - 1;
-						}
-						if (refreshModuleAndMenu) {
-							// this block will be called from history navigation
-							showModuleMenu(item.getParentMenu().getParentModule());
-							showMenuItems(item.getParentMenu());
-						}
-						handleShowPanel(panel);
-//						captureCurrentPanelImage(panel, item.getName());
-//						addOpenPanelLog(item);
-						setUserStatus(item.getFullQualifiedPath());
-					}
-				} catch (UIOPanelCreationException e) {
-					ExceptionUtil.handleException(e);
-				} finally {
-//					AnimationUtil.enable(ApplicationFrame.this);
-				}
-			}
-		};
-		SwingUtilities.invokeLater(runnable);
-	}
-
-	/**
-	 * 
-	 * @param panel
-	 * @param name
-	 */
-	private void captureCurrentPanelImage(final JKPanel<?> panel, final String name) {
-		Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					File file = new File(getPanelFileName(name));
-					if (!file.exists()) {
-						BufferedImage image = SwingUtility.convertPanelToImage(panel, 100, 100);// robot.createScreenCapture(panel.getBounds());
-						ImageIO.write(image, "gif", file);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		SwingUtilities.invokeLater(runnable);
-	}
-
-	/**
-	 * 
-	 * @param item
-	 */
-	protected void addOpenPanelLog(MenuItem item) {
-		Integer value = favoritePanels.get(item.getName());
-		int visitCount = 0;
-		if (value != null) {
-			visitCount = value;
-		}
-		if (visitCount < Integer.MAX_VALUE) {
-			visitCount++;
-			favoritePanels.put(item.getName(), visitCount);
-			UserPreferences.putHashTable(getFavortiesPanelKeyName(), favoritePanels);
-		}
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private String getFavortiesPanelKeyName() {
-		return SecurityManager.getCurrentUser().getUserId() + "-panels";
-	}
-
-	/**
-	 * @return
-	 * 
-	 */
-	private JKPanel<?> buildFavoritPanelsToHomePage() {
-		loadFavoritesPanel();
-		ArrayList<Entry> list = GeneralUtility.sortHashTable(favoritePanels, false);
-		int minSize = Math.min(list.size(), MAX_FAVORITES_SIZE);
-		if (minSize > 0) {
-			JKPanel<?> pnl = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
-			// pnl.setBorder(SwingUtility.createTitledBorder("Favorties_pages"));
-			// pnl.setPreferredSize(new Dimension(600, 180));
-			int count = 0;
-			for (int i = 0; i < minSize; i++) {
-				String menuItemName = (String) list.get(i).getKey();
-				try {
-					MenuItem menuItem = application.findMenuItem(menuItemName);
-					if (menuItem != null) {
-
-						final JKPanel<?> pnlThumb = new JKPanel<Object>(new BorderLayout());
-						pnlThumb.setPreferredSize(new Dimension(150, 130));
-						byte[] file = GeneralUtility.readFile(new File(getPanelFileName(menuItem.getName())));
-						final JPanel pnlItem = SwingUtility.buildImagePanel(file, ImagePanel.SCALED);
-						final JKMenuItem btnItem = createJKMenuItem(menuItem, true);
-
-						if (btnItem != null && pnlItem != null) {
-							btnItem.setShortcut(++count + "", count + "");
-							// final Border normalBorder =
-							// BorderFactory.createLineBorder(Colors.FAVORITE_ITEM_BORDER);
-							final Border normalBorder = BorderFactory.createRaisedBevelBorder();
-							pnlThumb.setBorder(normalBorder);
-							btnItem.setBorder(null);
-
-							pnlThumb.add(btnItem, BorderLayout.NORTH);
-							pnlThumb.add(pnlItem, BorderLayout.CENTER);
-
-							pnl.add(pnlThumb);
-							MouseAdapter adapter = new MouseAdapter() {
-								@Override
-								public void mouseExited(MouseEvent e) {
-									pnlThumb.setBorder(normalBorder);
-								}
-
-								@Override
-								public void mouseEntered(MouseEvent e) {
-									pnlThumb.setBorder(BorderFactory.createLoweredBevelBorder());
-								}
-
-								@Override
-								public void mouseClicked(MouseEvent e) {
-									btnItem.doClick();
-								}
-							};
-							btnItem.addMouseListener(adapter);
-							pnlThumb.addMouseListener(adapter);
-						}
-					}
-				} catch (IOException e) {
-					System.err.println(e.getMessage());
-				} catch (SecurityException e) {
-					// Its safe to eat this exception
-				}
-			}
-			return pnl;
-		}
-		return null;
-	}
-
-	private void loadFavoritesPanel() {
-		Hashtable<String, String> hashtable = UserPreferences.getHashtable(getFavortiesPanelKeyName());
-		Enumeration<String> keys = hashtable.keys();
-		while (keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			favoritePanels.put(key, Integer.parseInt(hashtable.get(key)));
-		}
-
-	}
-
-	/**
-	 * 
-	 * @param name
-	 * @return
-	 */
-	protected String getPanelFileName(String name) {
-		String pathName = GeneralUtility.getUserFolderPath(true) + "images";
-		File path = new File(pathName);
-		if (!path.exists()) {
-			path.mkdir();
-		}
-
-		return pathName + "/" + name + ".gif";
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private JKPanel<?> getMenuPanel() {
-		if (pnlMenu == null) {
-			pnlMenu = new JKMainPanel(new BorderLayout());
-			pnlMenu.setBackground(Colors.MENU_PANEL_BG);
-			pnlMenu.setGradientType(GradientType.HORIZENTAL);
-			pnlMenu.setBorder(BorderFactory.createLineBorder(Color.white));
-		}
-		return pnlMenu;
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleClose() {
-		closeExecutor.run();
-	}
-
-	public void setUserStatus(String status) {
-		txtUserStatus.setText(status);
-	}
-
-	public void setSystemStatus(String status) {
-		txtSystemStatus.setText(status);
-	}
-
-	public void setGeneralStatus(String status) {
-		txtGeneralStatus.setText(status);
-	}
-
-	/**
-	 * @author jk
-	 */
-	class MenuItemTitledPanel extends TitledPanel {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		private MenuItem item;
-
-		public MenuItemTitledPanel(MenuItem item) throws UIOPanelCreationException {
-			super(item.getName(), item.createPanel(), item.getIconName());
-			this.item = item;
-		}
-
-		@Override
-		protected void handleReload() {
-			try {
-				remove((Container) this.panel);
-				AbstractDao.resetCache();
-				SwingUtility.resetComponents();
-				this.panel = item.createPanel(true);
-				showPanel();
-			} catch (UIOPanelCreationException e) {
-				ExceptionUtil.handleException(e);
-			}
-		}
-
-		@Override
-		protected void handleAddToFavorites() {
-			captureCurrentPanelImage(this, item.getName());
-			favoritePanels.put(item.getName(), Integer.MAX_VALUE);
-			UserPreferences.putHashTable(getFavortiesPanelKeyName(), favoritePanels);
-			loadFavoritesPanel();
-			addFavoritePanelToHome();
-		}
-
-		@Override
-		protected void handleNext() {
-			if (currentHistoryIndex < history.size() - 1) {
-				currentHistoryIndex++;
-				showMenuItemPanel(history.get(currentHistoryIndex), false, true);
-			}
-		}
-
-		@Override
-		protected void handlePreviouse() {
-			if (currentHistoryIndex > 0) {
-				currentHistoryIndex--;
-				showMenuItemPanel(history.get(currentHistoryIndex), false, true);
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param menuItemName
-	 * @param addToHistory
-	 * @param refreshModuleAndMenu
-	 * @throws NotAllowedOperationException
-	 * @throws SecurityException
-	 */
-	public void showMenuItemPanel(String menuItemName, boolean addToHistory, boolean refreshModuleAndMenu) throws NotAllowedOperationException,
-			SecurityException {
-		MenuItem item = getApplication().findMenuItem(menuItemName);
-		showMenuItemPanel(item, addToHistory, refreshModuleAndMenu);
-	}
-
-	public void handleShowPanel(String menuItemName) throws NotAllowedOperationException, SecurityException {
-		MenuItem item = getApplication().findMenuItem(menuItemName);
-		showMenuItemPanel(item, false, false);
 	}
 
 }

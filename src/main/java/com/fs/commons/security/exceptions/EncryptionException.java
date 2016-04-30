@@ -1,41 +1,50 @@
-/* Modification History
- * Version		Author		Date		Purpose
- *=============================================================================
- *1.0                 Bashar Nadir    Oct 2005          First version
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.fs.commons.security.exceptions;
 
 public class EncryptionException extends SecurityException {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	public EncryptionException() {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param msg
 	 *            String
 	 */
-	public EncryptionException(String msg) {
+	public EncryptionException(final String msg) {
 		super(msg);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param msg
 	 *            String
 	 * @param cause
 	 *            Throwable
 	 */
-	public EncryptionException(String msg, Throwable cause) {
+	public EncryptionException(final String msg, final Throwable cause) {
 		super(msg, cause);
 	}
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao;
 
 import java.io.ByteArrayInputStream;
@@ -28,35 +43,151 @@ import com.fs.commons.util.GeneralUtility;
 
 /**
  * TODO : refactor all the methods to use AbstractDao
- * 
+ *
  * @author Administrator
- * 
+ *
  */
 public class DaoUtil {
+
+	public static void clearCache(final TableMeta tableMeta) {
+		AbstractDao.removeListCache(tableMeta.getListSql());
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////
+	public static String compileSql(final String sql, final Object param) {
+		final Object[] params = { param };
+		return compileSql(sql, params);
+	}
+
+	public static String compileSql(String sql, final Object... param) {
+		for (final Object element : param) {
+			sql = sql.replaceFirst("\\?", element.toString());
+		}
+		return sql;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////
+	public static List<IdValueRecord> createRecordsFromSQL(final String sql) throws DaoException {
+		final DefaultDao dao = new DefaultDao();
+		return dao.createRecordsFromSQL(sql);
+	}
+
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+	public static CachedRowSet executeQuery(final String query) throws DaoException {
+		final DefaultDao dao = new DefaultDao();
+		return dao.executeQuery(query);
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////
+	public static Object[] executeQueryAsArray(final String query) throws DaoException {
+		final DefaultDao dao = new DefaultDao();
+		return dao.exeuteQueryAsArray(query);
+		// String out= dao.executeOutputQuery(templateParamtersQuery,"|","\n");
+		// String[] records = out.split("\n");
+		// Object[][] result=new Object[records.length][];
+		// for (int i = 0; i < records.length; i++) {
+		// result[i]=records[i].split("\\|");
+		// }
+		// return result;
+	}
+
+	// ///////////////////////////////////////////////////////////////////////////////////
+	public static String exeuteOutputQuery(final String query) throws DaoException {
+		final DefaultDao dao = new DefaultDao();
+		return dao.executeOutputQuery(query, " ", "\n");
+	}
 
 	// static ConnectionManager manager =
 	// ConnectionManagerFactory.getDefaultConnectionManager();
 	// static DefaultDao dao=new DefaultDao();
 	// /////////////////////////////////////////////////////////////////////////////////////////////
-	public static Object exeuteSingleOutputQuery(DataSource con, String query) throws DaoException {
-		DefaultDao dao = new DefaultDao(con);
+	public static Object exeuteSingleOutputQuery(final DataSource con, final String query) throws DaoException {
+		final DefaultDao dao = new DefaultDao(con);
 		return dao.exeuteSingleOutputQuery(query);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////////////////
-	public static Object exeuteSingleOutputQuery(String query) throws DaoException {
-		DefaultDao dao = new DefaultDao();
+	public static Object exeuteSingleOutputQuery(final String query) throws DaoException {
+		final DefaultDao dao = new DefaultDao();
 		return dao.exeuteSingleOutputQuery(query);
-	}
-
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-	public static CachedRowSet executeQuery(String query) throws DaoException {
-		DefaultDao dao = new DefaultDao();
-		return dao.executeQuery(query);
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
-	private static Object readResult(ResultSet rs, Field field) throws SQLException {
+	public static String fixStringValue(final String value) {
+		return value.replaceAll("'", "\\\\'");
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////
+	public static byte[] getBinaryStream(final ResultSet rs, final String name) throws SQLException {
+		final InputStream in = rs.getBinaryStream(name);
+		if (in == null) {
+			return null;
+		}
+		byte[] arr = null;
+		try {
+			arr = GeneralUtility.readStream(in);
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		return arr;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////
+	public static byte[] getBlobColumn(final ResultSet rs, final String columnName) throws SQLException {
+		try {
+			final Blob blob = rs.getBlob(columnName);
+			if (blob == null) {
+				return null;
+			}
+
+			final InputStream is = blob.getBinaryStream();
+			final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+			if (is == null) {
+				return null;
+			} else {
+				final byte buffer[] = new byte[64];
+				int c = is.read(buffer);
+				while (c > 0) {
+					bos.write(buffer, 0, c);
+					c = is.read(buffer);
+				}
+				return bos.toByteArray();
+			}
+		} catch (final IOException e) {
+			throw new SQLException("Failed to read BLOB column due to IOException: " + e.getMessage());
+		}
+	}
+
+	public static Date getSystemDate() throws RecordNotFoundException, DaoException {
+		return DaoFactory.createDao().getSystemDate();
+	}
+
+	public static java.sql.Date getSystemDateAsSqlDate() throws RecordNotFoundException, DaoException {
+		return new java.sql.Date(getSystemDate().getTime());
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////
+	public static Record readRecord(final ResultSet rs, final TableMeta tableMeta) throws RecordNotFoundException, DaoException, SQLException {
+		final Record record = tableMeta.createEmptyRecord();
+		record.setIdValue(rs.getObject(tableMeta.getIdField().getName()));
+		// Field idField = record.getIdField();
+		// idField.setValue(rs.getString(idField.getMeta().getName()));
+		final ArrayList<Field> fields = record.getFields();
+		for (int i = 0; i < fields.size(); i++) {
+			final Field field = fields.get(i);
+			final Object value = readResult(rs, field);
+			// Object value = rs.getObject(field.getMeta().getName());
+			if (value != null) {
+				field.setValue(value);
+			}
+		}
+		record.setNewRecord(false);
+		return record;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////
+	private static Object readResult(final ResultSet rs, final Field field) throws SQLException {
 		switch (field.getMeta().getType()) {
 		case Types.BOOLEAN:
 		case Types.TINYINT:
@@ -79,68 +210,11 @@ public class DaoUtil {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
-	public static byte[] getBinaryStream(ResultSet rs, String name) throws SQLException {
-		InputStream in = rs.getBinaryStream(name);
-		if (in == null) {
-			return null;
-		}
-		byte[] arr = null;
-		try {
-			arr = GeneralUtility.readStream(in);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return arr;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////
-	public static Record readRecord(ResultSet rs, TableMeta tableMeta) throws RecordNotFoundException, DaoException, SQLException {
-		Record record = tableMeta.createEmptyRecord();
-		record.setIdValue(rs.getObject(tableMeta.getIdField().getName()));
-		// Field idField = record.getIdField();
-		// idField.setValue(rs.getString(idField.getMeta().getName()));
-		ArrayList<Field> fields = record.getFields();
-		for (int i = 0; i < fields.size(); i++) {
-			Field field = fields.get(i);
-			Object value = readResult(rs, field);
-			// Object value = rs.getObject(field.getMeta().getName());
-			if (value != null) {
-				field.setValue(value);
-			}
-		}
-		record.setNewRecord(false);
-		return record;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////
-	public static List<IdValueRecord> createRecordsFromSQL(String sql) throws DaoException {
-		DefaultDao dao = new DefaultDao();
-		return dao.createRecordsFromSQL(sql);
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////
-	public static void setParamters(Record record, PreparedStatement ps, boolean includeId) throws SQLException {
-		int counter = 1;
-		if (includeId && record.getIdValue() != null) {
-			setParamter(ps, counter++, record.getIdField());
-		}
-		ArrayList<Field> fields = record.getFields();
-		for (int i = 0; i < fields.size(); i++) {
-			try {
-				setParamter(ps, counter++, fields.get(i));
-			} catch (Exception e) {
-				FieldMeta meta = fields.get(i).getMeta();
-				throw new SQLException("Field " + meta.getName() + " Failed to set paramter with value :" + fields.get(i).getValueObject() + "  with type  :" + meta.getType(), e);
-			}
-		}
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////
-	public static void setParamter(PreparedStatement ps, int index, Field field) throws SQLException {
+	public static void setParamter(final PreparedStatement ps, final int index, final Field field) throws SQLException {
 		// System.out.println(field.getMeta().getName()+" - "+field.getValue());
 		// System.out.println(index + "=" +
-		// field.getValueObject()+"  type:"+field.getMeta().getType());
-		Object value = field.getValueObject();
+		// field.getValueObject()+" type:"+field.getMeta().getType());
+		final Object value = field.getValueObject();
 		if (value == null || value.toString().equals("")) {
 			ps.setObject(index, null);
 			return;
@@ -148,7 +222,7 @@ public class DaoUtil {
 		switch (field.getMeta().getType()) {
 		case Types.LONGVARBINARY:
 		case Types.BINARY:
-			byte[] data = (byte[]) field.getValueObject();
+			final byte[] data = (byte[]) field.getValueObject();
 			ps.setBinaryStream(index, new ByteArrayInputStream(data), data.length);
 			break;
 
@@ -156,7 +230,7 @@ public class DaoUtil {
 		case Types.TINYINT:
 		case Types.BIT:
 			// add support for tiny integers represented as numbers
-			ps.setInt(index, ((Boolean) field.getValueAsBoolean()) ? 1 : 0);
+			ps.setInt(index, field.getValueAsBoolean() ? 1 : 0);
 			break;
 		case Types.DECIMAL:
 			ps.setDouble(index, field.getValueAsDouble());
@@ -177,79 +251,21 @@ public class DaoUtil {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
-	public static String fixStringValue(String value) {
-		return value.replaceAll("'", "\\\\'");
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////
-	public static byte[] getBlobColumn(ResultSet rs, String columnName) throws SQLException {
-		try {
-			Blob blob = rs.getBlob(columnName);
-			if (blob == null) {
-				return null;
-			}
-
-			InputStream is = blob.getBinaryStream();
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-			if (is == null) {
-				return null;
-			} else {
-				byte buffer[] = new byte[64];
-				int c = is.read(buffer);
-				while (c > 0) {
-					bos.write(buffer, 0, c);
-					c = is.read(buffer);
-				}
-				return bos.toByteArray();
-			}
-		} catch (IOException e) {
-			throw new SQLException("Failed to read BLOB column due to IOException: " + e.getMessage());
+	public static void setParamters(final Record record, final PreparedStatement ps, final boolean includeId) throws SQLException {
+		int counter = 1;
+		if (includeId && record.getIdValue() != null) {
+			setParamter(ps, counter++, record.getIdField());
 		}
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////
-	public static String compileSql(String sql, Object param) {
-		Object[] params = { param };
-		return compileSql(sql, params);
-	}
-
-	public static String compileSql(String sql, Object... param) {
-		for (int i = 0; i < param.length; i++) {
-			sql = sql.replaceFirst("\\?", param[i].toString());
+		final ArrayList<Field> fields = record.getFields();
+		for (int i = 0; i < fields.size(); i++) {
+			try {
+				setParamter(ps, counter++, fields.get(i));
+			} catch (final Exception e) {
+				final FieldMeta meta = fields.get(i).getMeta();
+				throw new SQLException("Field " + meta.getName() + " Failed to set paramter with value :" + fields.get(i).getValueObject()
+						+ "  with type  :" + meta.getType(), e);
+			}
 		}
-		return sql;
-	}
-
-	public static Date getSystemDate() throws RecordNotFoundException, DaoException {
-		return DaoFactory.createDao().getSystemDate();
-	}
-
-	// ///////////////////////////////////////////////////////////////////////////////////
-	public static String exeuteOutputQuery(String query) throws DaoException {
-		DefaultDao dao = new DefaultDao();
-		return dao.executeOutputQuery(query, " ", "\n");
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////
-	public static Object[] executeQueryAsArray(String query) throws DaoException {
-		DefaultDao dao = new DefaultDao();
-		return dao.exeuteQueryAsArray(query);
-		// String out= dao.executeOutputQuery(templateParamtersQuery,"|","\n");
-		// String[] records = out.split("\n");
-		// Object[][] result=new Object[records.length][];
-		// for (int i = 0; i < records.length; i++) {
-		// result[i]=records[i].split("\\|");
-		// }
-		// return result;
-	}
-
-	public static java.sql.Date getSystemDateAsSqlDate() throws RecordNotFoundException, DaoException {
-		return new java.sql.Date(getSystemDate().getTime());
-	}
-
-	public static void clearCache(TableMeta tableMeta) {
-		AbstractDao.removeListCache(tableMeta.getListSql());
 	}
 
 }

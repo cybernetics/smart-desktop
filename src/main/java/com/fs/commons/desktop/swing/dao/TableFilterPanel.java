@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.dao;
 
 import java.awt.Color;
@@ -13,7 +28,6 @@ import java.sql.Types;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.text.Document;
 
@@ -39,7 +53,7 @@ public class TableFilterPanel extends JKPanel {
 	private static final ImageIcon CLEAR_ICON = new ImageIcon(GeneralUtility.getIconURL("clear_left.png"));
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -76,13 +90,13 @@ public class TableFilterPanel extends JKPanel {
 	private String filterColunmName;
 
 	/**
-	 * 
+	 *
 	 * @param tableModel
 	 *            QueryTableModel
 	 * @param colunmIndex
 	 *            int
 	 */
-	public TableFilterPanel(QueryTableModel tableModel, String columnName, FilterListener listener) {
+	public TableFilterPanel(final QueryTableModel tableModel, final String columnName, final FilterListener listener) {
 		this.filterListener = listener;
 		this.tableModel = tableModel;
 		setFilterColunmName(columnName);
@@ -92,131 +106,40 @@ public class TableFilterPanel extends JKPanel {
 	}
 
 	/**
-	 * 
+	 *
+	 * @return String sql condiotion string
 	 */
-	private void init() {
-		SwingUtility.setHotKeyForFocus(field, "control F", "control F");
-		setLayout(new GridLayout(1, 2));
-		setPreferredSize(size);
-		JKPanel pnl = new JKPanel(new GridLayout(2, 1));
-		lbl.setPreferredSize(new Dimension(75, 20));
-		lbl.setForeground(new Color(22, 125, 219));
-		lbl.setHorizontalAlignment(SwingConstants.LEADING);
-		lbl.setOpaque(false);
-
-		field.setFont(new java.awt.Font("TAHOMA", Font.BOLD, 10));
-		pnl.add(lbl);
-		pnl.add((JComponent) field);
-
-		group.add(rdStartsWith);
-		group.add(rdContains);
-		group.add(rdEndsWith);
-		group.add(rdExclude);
-		group.add(rdMoreThan);
-		group.add(rdLessThan);
-
-		rdContains.setSelected(true);
-		JKPanel pnl2 = new JKPanel(new FlowLayout(FlowLayout.LEADING));
-		pnl2.add(rdStartsWith);
-		pnl2.add(rdContains);
-		pnl2.add(rdEndsWith);
-		pnl2.add(rdExclude);
-		pnl2.add(rdMoreThan);
-		pnl2.add(rdLessThan);
-
-		JKPanel pnlButton = new JKPanel(new FlowLayout(FlowLayout.LEADING));
-		// JKPanel pnlButton1=new JKPanel(new GridLayout(1,3,3,1));//to get
-		// presfered sizes of buttons
-		pnlButton.add(btnShow);
-		pnlButton.add(btnClear);
-		pnlButton.add(btnClose);
-		btnClear.setIcon(CLEAR_ICON);
-		btnShow.setIcon(OK_ICON);
-		btnClose.setIcon(CANCEL_ICON);
-		// pnlButton.add(pnlButton1);
-
-		JKPanel pnl3 = new JKPanel(new GridLayout(2, 1));
-		pnl3.add(pnl2);
-		pnl3.add(pnlButton);
-
-		add(pnl);
-		add(pnl3);
-		// add(pnl2);
-		// add(pnlButton);
-
-		field.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-					btnShow.doClick();
-					e.consume();
-				}
+	public String getConditionString() {
+		try {
+			SwingValidator.checkEmpty(this.field);
+			if (this.rdStartsWith.isSelected()) {
+				return this.filterColunmName + " like '" + this.field.getText() + "%'";
+			} else if (this.rdContains.isSelected()) {
+				return this.filterColunmName + " like '%" + this.field.getText() + "%'";
+			} else if (this.rdEndsWith.isSelected()) {
+				return this.filterColunmName + " like '%" + this.field.getText() + "'";
+			} else if (this.rdExclude.isSelected()) {
+				return this.filterColunmName + " not like '%" + this.field.getText() + "%'";
+			} else if (this.rdMoreThan.isSelected()) {
+				return this.filterColunmName + " > '" + this.field.getText().trim() + "'";
+			} else if (this.rdLessThan.isSelected()) {
+				return this.filterColunmName + " < '" + this.field.getText().trim() + "'";
 			}
-		});
-		btnShow.setShowProgress(true);
-		btnShow.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				filterListener.filterUpdated(TableFilterPanel.this);
-			}
-		});
-		btnClear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				field.setText("");
-				btnShow.doClick();
-			}
-		});
-		btnClose.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				btnClear.doClick();
-				setVisible(false);
-			}
-		});
+			return "";
+		} catch (final ValidationException ex) {
+			return "";
+		}
 	}
 
 	/**
-	 * 
-	 * @return int
-	 */
-	public String getFilterColunmName() {
-		return filterColunmName;
-	}
-
-	/**
-	 * 
-	 * @param filterColunmIndex
-	 *            int
-	 */
-	public void setFilterColunmName(String name) {
-		this.filterColunmName = name;
-		// int maxWidth = tableModel.getColunmWidth(filterColunmIndex);
-		lbl.setText(name);
-
-		// txt.setColumns(maxWidth > 25 ? 25 : maxWidth);
-		// int colunmType = tableModel.getColunmType(filterColunmIndex);
-		// txt.setDocument(getDocument(colunmType, maxWidth));
-		// txt.invalidate();
-	}
-
-	/**
-	 * 
-	 * @param visible
-	 *            boolean
-	 */
-	@Override
-	public void setVisible(boolean visible) {
-		super.setVisible(visible);
-		field.requestFocus();
-	}
-
-	/**
-	 * 
+	 *
 	 * @param sqlType
 	 *            int
 	 * @param maxWidth
 	 *            int
 	 * @return Document
 	 */
-	Document getDocument(int sqlType, int maxWidth) {
+	Document getDocument(final int sqlType, final int maxWidth) {
 		switch (sqlType) {
 		case Types.INTEGER:
 			return new NumberDocument(maxWidth);
@@ -226,44 +149,138 @@ public class TableFilterPanel extends JKPanel {
 	}
 
 	/**
-	 * 
-	 * @return String sql condiotion string
+	 *
+	 * @return int
 	 */
-	public String getConditionString() {
-		try {
-			SwingValidator.checkEmpty(field);
-			if (rdStartsWith.isSelected()) {
-				return filterColunmName + " like '" + field.getText() + "%'";
-			} else if (rdContains.isSelected()) {
-				return filterColunmName + " like '%" + field.getText() + "%'";
-			} else if (rdEndsWith.isSelected()) {
-				return filterColunmName + " like '%" + field.getText() + "'";
-			} else if (rdExclude.isSelected()) {
-				return filterColunmName + " not like '%" + field.getText() + "%'";
-			} else if (rdMoreThan.isSelected()) {
-				return filterColunmName + " > '" + field.getText().trim() + "'";
-			} else if (rdLessThan.isSelected()) {
-				return filterColunmName + " < '" + field.getText().trim() + "'";
+	public String getFilterColunmName() {
+		return this.filterColunmName;
+	}
+
+	/**
+	 *
+	 */
+	private void init() {
+		SwingUtility.setHotKeyForFocus(this.field, "control F", "control F");
+		setLayout(new GridLayout(1, 2));
+		setPreferredSize(size);
+		final JKPanel pnl = new JKPanel(new GridLayout(2, 1));
+		this.lbl.setPreferredSize(new Dimension(75, 20));
+		this.lbl.setForeground(new Color(22, 125, 219));
+		this.lbl.setHorizontalAlignment(SwingConstants.LEADING);
+		this.lbl.setOpaque(false);
+
+		this.field.setFont(new java.awt.Font("TAHOMA", Font.BOLD, 10));
+		pnl.add(this.lbl);
+		pnl.add(this.field);
+
+		this.group.add(this.rdStartsWith);
+		this.group.add(this.rdContains);
+		this.group.add(this.rdEndsWith);
+		this.group.add(this.rdExclude);
+		this.group.add(this.rdMoreThan);
+		this.group.add(this.rdLessThan);
+
+		this.rdContains.setSelected(true);
+		final JKPanel pnl2 = new JKPanel(new FlowLayout(FlowLayout.LEADING));
+		pnl2.add(this.rdStartsWith);
+		pnl2.add(this.rdContains);
+		pnl2.add(this.rdEndsWith);
+		pnl2.add(this.rdExclude);
+		pnl2.add(this.rdMoreThan);
+		pnl2.add(this.rdLessThan);
+
+		final JKPanel pnlButton = new JKPanel(new FlowLayout(FlowLayout.LEADING));
+		// JKPanel pnlButton1=new JKPanel(new GridLayout(1,3,3,1));//to get
+		// presfered sizes of buttons
+		pnlButton.add(this.btnShow);
+		pnlButton.add(this.btnClear);
+		pnlButton.add(this.btnClose);
+		this.btnClear.setIcon(CLEAR_ICON);
+		this.btnShow.setIcon(OK_ICON);
+		this.btnClose.setIcon(CANCEL_ICON);
+		// pnlButton.add(pnlButton1);
+
+		final JKPanel pnl3 = new JKPanel(new GridLayout(2, 1));
+		pnl3.add(pnl2);
+		pnl3.add(pnlButton);
+
+		add(pnl);
+		add(pnl3);
+		// add(pnl2);
+		// add(pnlButton);
+
+		this.field.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(final KeyEvent e) {
+				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+					TableFilterPanel.this.btnShow.doClick();
+					e.consume();
+				}
 			}
-			return "";
-		} catch (ValidationException ex) {
-			return "";
-		}
+		});
+		this.btnShow.setShowProgress(true);
+		this.btnShow.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				TableFilterPanel.this.filterListener.filterUpdated(TableFilterPanel.this);
+			}
+		});
+		this.btnClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				TableFilterPanel.this.field.setText("");
+				TableFilterPanel.this.btnShow.doClick();
+			}
+		});
+		this.btnClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				TableFilterPanel.this.btnClear.doClick();
+				setVisible(false);
+			}
+		});
+	}
+
+	/**
+	 *
+	 * @param filterColunmIndex
+	 *            int
+	 */
+	public void setFilterColunmName(final String name) {
+		this.filterColunmName = name;
+		// int maxWidth = tableModel.getColunmWidth(filterColunmIndex);
+		this.lbl.setText(name);
+
+		// txt.setColumns(maxWidth > 25 ? 25 : maxWidth);
+		// int colunmType = tableModel.getColunmType(filterColunmIndex);
+		// txt.setDocument(getDocument(colunmType, maxWidth));
+		// txt.invalidate();
+	}
+
+	/**
+	 *
+	 * @param visible
+	 *            boolean
+	 */
+	@Override
+	public void setVisible(final boolean visible) {
+		super.setVisible(visible);
+		this.field.requestFocus();
 	}
 
 	/**
 	 * hideButtons
 	 */
-	public void showButtons(boolean show) {
+	public void showButtons(final boolean show) {
 		setPreferredSize(smallsize);
-		btnClear.setVisible(show);
-		btnClose.setVisible(show);
-		btnShow.setVisible(show);
-		rdContains.setVisible(show);
-		rdEndsWith.setVisible(show);
-		rdStartsWith.setVisible(show);
-		rdExclude.setVisible(show);
-		rdMoreThan.setVisible(show);
-		rdLessThan.setVisible(show);
+		this.btnClear.setVisible(show);
+		this.btnClose.setVisible(show);
+		this.btnShow.setVisible(show);
+		this.rdContains.setVisible(show);
+		this.rdEndsWith.setVisible(show);
+		this.rdStartsWith.setVisible(show);
+		this.rdExclude.setVisible(show);
+		this.rdMoreThan.setVisible(show);
+		this.rdLessThan.setVisible(show);
 	}
 }

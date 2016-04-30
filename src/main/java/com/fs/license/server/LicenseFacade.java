@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.license.server;
 
 import java.io.IOException;
@@ -9,17 +24,17 @@ import com.fs.license.LicenseException;
 public final class LicenseFacade {
 
 	/**
-	 * 
+	 *
 	 */
-	protected void validateLicense(int licenseId, String uniqueId) throws LicenseException, Exception {
+	protected void validateLicense(final int licenseId, final String uniqueId) throws LicenseException, Exception {
 		try {
-			LicenseRepository reposiory = LicenseRepository.getInstance(true);
-			License localLicense = reposiory.findLicenseByUniqueId(uniqueId);
+			final LicenseRepository reposiory = LicenseRepository.getInstance(true);
+			final License localLicense = reposiory.findLicenseByUniqueId(uniqueId);
 			if (!uniqueId.equals(localLicense.getUserUniqueId())) {
 				throw new LicenseException("Invalid License", LicenseConstants.ERROR_INVALID_USER_UNIQUE_ID);
 			}
 			if (new Date().after(localLicense.getExpiryDate())) {
-				LicenseException licenseException = new LicenseException("License expired", LicenseConstants.ERROR_LICENSE_EXPIRED);
+				final LicenseException licenseException = new LicenseException("License expired", LicenseConstants.ERROR_LICENSE_EXPIRED);
 				localLicense.setEnabled(false);
 				reposiory.saveLicenses();
 				throw licenseException;
@@ -27,7 +42,7 @@ public final class LicenseFacade {
 			if (!localLicense.isEnabled()) {
 				throw new LicenseException("licenses is disabled ", LicenseConstants.ERROR_LICENSE_DISABLED);
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 	}

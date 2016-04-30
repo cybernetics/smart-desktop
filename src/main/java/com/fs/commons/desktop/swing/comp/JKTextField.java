@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Color;
@@ -33,36 +48,50 @@ import com.lowagie.text.Font;
  * <p>
  * Title:
  * </p>
- * 
+ *
  * <p>
  * Description:
  * </p>
- * 
+ *
  * <p>
  * Copyright: Copyright (c) 2007
  * </p>
- * 
+ *
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
 public class JKTextField extends JTextField implements BindingComponent {
-	public static final java.awt.Font DEFAULT_FONT = new java.awt.Font("TAHOMA", Font.BOLD, 11);
-
-	private static final long serialVersionUID = 1L;
-
 	public static enum FieldType {
 		TEXT, NUMBER, AMOUNT, DATE
 	}
+
+	public static final java.awt.Font DEFAULT_FONT = new java.awt.Font("TAHOMA", Font.BOLD, 11);
+
+	private static final long serialVersionUID = 1L;
 
 	// static Border focusBorder =
 	// BorderFactory.createLineBorder(SystemColor.infoText);
 	// static Border lostFocusBorder =
 	// BorderFactory.createLineBorder(SystemColor.activeCaptionBorder);
 	static Dimension dim = new Dimension(200, 30);
+
+	/**
+	 *
+	 * @param type
+	 *            FieldType
+	 * @return Document
+	 */
+	static Document getDocument(final FieldType type) {
+		if (type == FieldType.NUMBER) {
+			return new NumberDocument();
+		}
+		return new PlainDocument();
+	}
+
 	private String defaultValue;
 	private Class type;
 	protected FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
@@ -73,83 +102,234 @@ public class JKTextField extends JTextField implements BindingComponent {
 	private int maxLength;
 	private long valueFrom;
 	private long valueTo;
+
 	private String oldValue;
 
 	private boolean autoSelectText = true;
 
-	private boolean transfer=true;
-
-	/**
-	 * 
-	 * @param width
-	 *            int
-	 */
-	public JKTextField(int width) {
-		this(width, true);
-	}
-
-	/**
-	 * JKTextField
-	 * 
-	 * @param plainDocument
-	 *            PlainDocument
-	 * @param i
-	 *            int
-	 */
-	public JKTextField(FieldType type, int width) {
-		super(getDocument(type), "", width);
-		init();
-	}
-
-	/**
-	 * JKTextField
-	 * 
-	 * @param plainDocument
-	 *            PlainDocument
-	 * @param i
-	 *            int
-	 */
-	public JKTextField(Document plainDocument, int width) {
-		super(plainDocument, "", width);
-		init();
-	}
+	private boolean transfer = true;
 
 	public JKTextField() {
 		init();
 	}
 
-	public JKTextField(int width, boolean editable) {
-		this(new PlainDocument(), width, editable);
-	}
-
-	public JKTextField(Document doc, int width, boolean editable) {
-		this(new PlainDocument(), width);
+	public JKTextField(final boolean editable) {
+		init();
 		setEditable(editable);
 	}
 
-	public JKTextField(Document document) {
+	public JKTextField(final Document document) {
 		setDocument(document);
 		init();
 	}
 
 	/**
-	 * 
+	 * JKTextField
+	 *
+	 * @param plainDocument
+	 *            PlainDocument
+	 * @param i
+	 *            int
+	 */
+	public JKTextField(final Document plainDocument, final int width) {
+		super(plainDocument, "", width);
+		init();
+	}
+
+	public JKTextField(final Document doc, final int width, final boolean editable) {
+		this(new PlainDocument(), width);
+		setEditable(editable);
+	}
+
+	/**
+	 * JKTextField
+	 *
+	 * @param plainDocument
+	 *            PlainDocument
+	 * @param i
+	 *            int
+	 */
+	public JKTextField(final FieldType type, final int width) {
+		super(getDocument(type), "", width);
+		init();
+	}
+
+	/**
+	 *
+	 * @param width
+	 *            int
+	 */
+	public JKTextField(final int width) {
+		this(width, true);
+	}
+
+	public JKTextField(final int width, final boolean editable) {
+		this(new PlainDocument(), width, editable);
+	}
+
+	public JKTextField(final int i, final int j) {
+		this(i, j, true);
+	}
+
+	/**
+	 *
 	 * @param maxLength
 	 * @param width
 	 * @param editable
 	 */
-	public JKTextField(int maxLength, int width, boolean editable) {
+	public JKTextField(final int maxLength, final int width, final boolean editable) {
 		this(new FSTextDocument(maxLength), width);
 		setEditable(editable);
 	}
 
-	public JKTextField(int i, int j) {
-		this(i, j, true);
+	@Override
+	public void addValidator(final Validator validator) {
+		this.fsWrapper.addValidator(validator);
 	}
 
-	public JKTextField(boolean editable) {
-		init();
-		setEditable(editable);
+	@Override
+	public void addValueChangeListener(final ValueChangeListener listener) {
+		this.fsWrapper.addValueChangeListsner(listener);
+	}
+
+	/**
+	 * @throws ValidationException
+	 *
+	 */
+	public void checkEmpty() throws ValidationException {
+		SwingValidator.checkEmpty(this);
+	}
+
+	/**
+	 *
+	 */
+	protected void checkValidValue() {
+		if (getDocument() instanceof FloatDocument) {
+			try {
+				Float.parseFloat(getText().trim());
+			} catch (final NumberFormatException e) {
+				setText("");
+			}
+		}
+
+	}
+
+	@Override
+	public void clear() {
+		setText("");
+	}
+
+	@Override
+	public void filterValues(final BindingComponent comp1) throws DaoException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public DataSource getDataSource() {
+		return this.fsWrapper.getDataSource();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	@Override
+	public String getDefaultValue() {
+		return this.defaultValue;// ==null?null: calculateDefaultValue();
+	}
+
+	// /////////////////////////////////////////////////////////////////
+	public int getMaxLength() {
+		return this.maxLength;
+	}
+
+	public int getMinLength() {
+		return this.minLength;
+	}
+
+	@Override
+	public String getText() {
+		if (isAutoTrim()) {
+			return super.getText().trim();
+		} else {
+			return super.getText();
+		}
+	}
+
+	public double getTextAsDouble() {
+		return ConversionUtil.toDouble(getValue());
+		// if (getText().equals("")) {
+		// return 0;
+		// }
+		// return Double.parseDouble(getText());
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public float getTextAsFloat() {
+		if (getText().equals("")) {
+			return 0;
+		}
+		return Float.parseFloat(getText());
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public int getTextAsInteger() {
+		return ConversionUtil.toInteger(getValue());
+		// if (getText().equals("")) {
+		// return 0;
+		// }
+		// return Integer.parseInt(getText());
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public long getTextAsLong() {
+		if (getText().equals("")) {
+			return 0;
+		}
+		return Long.parseLong(getText());
+	}
+
+	public Class getType() {
+		return this.type;
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public Object getValue() {
+		return getText().trim().equals("") ? null : getText();
+	}
+
+	public double getValueAsDouble() {
+		return ConversionUtil.toDouble(getValue());
+	}
+
+	// /////////////////////////////////////////////////////////////////
+	public long getValueFrom() {
+		return this.valueFrom;
+	}
+
+	// /////////////////////////////////////////////////////////////////
+	public long getValueTo() {
+		return this.valueTo;
+	}
+
+	/**
+	 *
+	 */
+	protected void handleCopyText() {
+		GeneralUtility.copyToClipboard(getText());
 	}
 
 	/**
@@ -183,8 +363,8 @@ public class JKTextField extends JTextField implements BindingComponent {
 		addFocusListener(new FocusAdapter() {
 
 			@Override
-			public void focusGained(FocusEvent e) {
-				if (autoSelectText) {
+			public void focusGained(final FocusEvent e) {
+				if (JKTextField.this.autoSelectText) {
 					selectAll();
 				}
 			}
@@ -197,7 +377,7 @@ public class JKTextField extends JTextField implements BindingComponent {
 		});
 		addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
 					handleCopyText();
 				}
@@ -205,51 +385,127 @@ public class JKTextField extends JTextField implements BindingComponent {
 		});
 	}
 
+	@Override
+	public boolean isAutoTransferFocus() {
+		return this.transfer;
+	}
+
+	public boolean isAutoTrim() {
+		return this.autoTrim;
+	}
+
+	public boolean isNumbersOnly() {
+		return this.numbersOnly;
+	}
+
+	public boolean isRequired() {
+		return this.required;
+	}
+
 	/**
-	 * 
+	 *
 	 */
-	protected void checkValidValue() {
-		if (getDocument() instanceof FloatDocument) {
-			try {
-				Float.parseFloat(getText().trim());
-			} catch (NumberFormatException e) {
-				setText("");
-			}
+	@Override
+	public void reset() {
+		setText(getDefaultValue() != null ? getDefaultValue() : "");
+	}
+
+	// /////////////////////////////////////////////////////////////////
+	@Override
+	public void selectAll() {
+		setSelectionStart(0);
+		setSelectionEnd(getText().length());
+	}
+
+	public void setAutoSelectText(final boolean autoSelectText) {
+		this.autoSelectText = autoSelectText;
+	}
+
+	@Override
+	public void setAutoTransferFocus(final boolean transfer) {
+		this.transfer = transfer;
+	}
+
+	public void setAutoTrim(final boolean autoTrim) {
+		this.autoTrim = autoTrim;
+	}
+
+	@Override
+	public void setColumns(final int columns) {
+		// Ignore this call , and depend on setPreferedSize
+		System.err.println("Invalid call to setColunms at FSTextField");
+	}
+
+	@Override
+	public void setDataSource(final DataSource manager) {
+		this.fsWrapper.setDataSource(manager);
+	}
+
+	@Override
+	public void setDefaultValue(final Object defaultValue) {
+		if (defaultValue != null && defaultValue.toString().toUpperCase().equals("NULL")) {
+			this.defaultValue = null;
+		} else {
+			this.defaultValue = defaultValue.toString();
+		}
+	}
+
+	// /////////////////////////////////////////////////////////////////
+	public void setMaxLength(final int maxLength) {
+		this.maxLength = maxLength;
+		if (getDocument() instanceof FSTextDocument) {
+			final FSTextDocument doc = (FSTextDocument) getDocument();
+			doc.setMaxLength(maxLength);
+		} else {
+			addValidator(FSValidators.maxLength(maxLength));
+		}
+	}
+
+	public void setMinLength(final int minLength) {
+		this.minLength = minLength;
+		addValidator(FSValidators.minLength(minLength));
+	}
+
+	@Override
+	public void setName(final String name) {
+		super.setName(Lables.get(name));
+	}
+
+	// /////////////////////////////////////////////////////////////////
+	public void setNumbersOnly(final boolean numbersOnly) {
+		this.numbersOnly = numbersOnly;
+		setDocument(new NumberDocument(this.maxLength == 0 ? NumberDocument.DEFAULT_MAX_LENGTH : this.maxLength));
+	}
+
+	public void setRequired(final boolean required) {
+		if (required) {
+			this.fsWrapper.addValidator(FSValidators.REQUIRE_NON_EMPTY_STRING);
+		} else {
+			this.fsWrapper.removeValidator(FSValidators.REQUIRE_NON_EMPTY_STRING);
+		}
+		this.required = required;
+	}
+
+	@Override
+	public void setText(final String text) {
+		// String oldValue2 = getText();
+		super.setText(text);
+		if (this.fsWrapper != null) {
+			// Since this could be called by the super class during construction
+			this.fsWrapper.fireValueChangeListener(this.oldValue, text);
 		}
 
 	}
 
-	/**
-	 * 
-	 */
-	protected void handleCopyText() {
-		GeneralUtility.copyToClipboard(getText());
+	public void setType(final Class type) {
+		this.type = type;
 	}
 
 	/**
-	 * 
-	 * @param type
-	 *            FieldType
-	 * @return Document
+	 *
 	 */
-	static Document getDocument(FieldType type) {
-		if (type == FieldType.NUMBER) {
-			return new NumberDocument();
-		}
-		return new PlainDocument();
-	}
-
-	/**
-	 * 
-	 */
-	public Object getValue() {
-		return getText().trim().equals("") ? null : getText();
-	}
-
-	/**
-	 * 
-	 */
-	public void setValue(Object value) {
+	@Override
+	public void setValue(final Object value) {
 		// Object old=getValue();
 		if (value != null) {
 			setText(ConversionUtil.toString(value));
@@ -259,263 +515,29 @@ public class JKTextField extends JTextField implements BindingComponent {
 		// fsWrapper.fireValueChangeListener(old, value);
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public int getTextAsInteger() {
-		return ConversionUtil.toInteger(getValue());
-		// if (getText().equals("")) {
-		// return 0;
-		// }
-		// return Integer.parseInt(getText());
+	// /////////////////////////////////////////////////////////////////
+	public void setValueFrom(final long valueFrom) {
+		this.valueFrom = valueFrom;
+		addValidator(FSValidators.numberRange(valueFrom, this.valueTo));
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public long getTextAsLong() {
-		if (getText().equals("")) {
-			return 0;
-		}
-		return Long.parseLong(getText());
+	// /////////////////////////////////////////////////////////////////
+	public void setValueTo(final long valueTo) {
+		this.valueTo = valueTo;
+		addValidator(FSValidators.numberRange(this.valueFrom, valueTo));
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public float getTextAsFloat() {
-		if (getText().equals("")) {
-			return 0;
-		}
-		return Float.parseFloat(getText());
-	}
-
-	/**
-	 * @throws ValidationException
-	 * 
-	 */
-	public void checkEmpty() throws ValidationException {
-		SwingValidator.checkEmpty(this);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getDefaultValue() {
-		return defaultValue;// ==null?null: calculateDefaultValue();
-	}
-
-	/**
-	 * 
-	 */
-	public void reset() {
-		setText(getDefaultValue() != null ? getDefaultValue() : "");
-	}
-
-	@Override
-	public void setDefaultValue(Object defaultValue) {
-		if (defaultValue != null && defaultValue.toString().toUpperCase().equals("NULL")) {
-			this.defaultValue = null;
-		} else {
-			this.defaultValue = defaultValue.toString();
-		}
-	}
-
-	@Override
-	public void clear() {
-		setText("");
-	}
-
-	public double getTextAsDouble() {
-		return ConversionUtil.toDouble(getValue());
-		// if (getText().equals("")) {
-		// return 0;
-		// }
-		// return Double.parseDouble(getText());
+	public void setWidth(final int width) {
+		setPreferredSize(new Dimension(width, 25));
 	}
 
 	@Override
 	public void validateValue() throws ValidationException {
 		try {
-			fsWrapper.validateValue();
-		} catch (ValidationException e) {
+			this.fsWrapper.validateValue();
+		} catch (final ValidationException e) {
 			selectAll();
 			throw e;
 		}
-	}
-
-	@Override
-	public void addValidator(Validator validator) {
-		fsWrapper.addValidator(validator);
-	}
-
-	public void setRequired(boolean required) {
-		if (required) {
-			fsWrapper.addValidator(FSValidators.REQUIRE_NON_EMPTY_STRING);
-		} else {
-			fsWrapper.removeValidator(FSValidators.REQUIRE_NON_EMPTY_STRING);
-		}
-		this.required = required;
-	}
-
-	public int getMinLength() {
-		return minLength;
-	}
-
-	public void setMinLength(int minLength) {
-		this.minLength = minLength;
-		addValidator(FSValidators.minLength(minLength));
-	}
-
-	public boolean isNumbersOnly() {
-		return numbersOnly;
-	}
-
-	public boolean isRequired() {
-		return required;
-	}
-
-	// /////////////////////////////////////////////////////////////////
-	public int getMaxLength() {
-		return maxLength;
-	}
-
-	// /////////////////////////////////////////////////////////////////
-	public void setNumbersOnly(boolean numbersOnly) {
-		this.numbersOnly = numbersOnly;
-		setDocument(new NumberDocument(maxLength == 0 ? NumberDocument.DEFAULT_MAX_LENGTH : maxLength));
-	}
-
-	// /////////////////////////////////////////////////////////////////
-	public void setMaxLength(int maxLength) {
-		this.maxLength = maxLength;
-		if (getDocument() instanceof FSTextDocument) {
-			FSTextDocument doc = (FSTextDocument) getDocument();
-			doc.setMaxLength(maxLength);
-		} else {
-			addValidator(FSValidators.maxLength(maxLength));
-		}
-	}
-
-	// /////////////////////////////////////////////////////////////////
-	public void setValueFrom(long valueFrom) {
-		this.valueFrom = valueFrom;
-		addValidator(FSValidators.numberRange(valueFrom, valueTo));
-	}
-
-	// /////////////////////////////////////////////////////////////////
-	public long getValueTo() {
-		return valueTo;
-	}
-
-	// /////////////////////////////////////////////////////////////////
-	public void setValueTo(long valueTo) {
-		this.valueTo = valueTo;
-		addValidator(FSValidators.numberRange(valueFrom, valueTo));
-	}
-
-	// /////////////////////////////////////////////////////////////////
-	public long getValueFrom() {
-		return valueFrom;
-	}
-
-	// /////////////////////////////////////////////////////////////////
-	public void selectAll() {
-		setSelectionStart(0);
-		setSelectionEnd(getText().length());
-	}
-
-	@Override
-	public void setName(String name) {
-		super.setName(Lables.get(name));
-	}
-
-	@Override
-	public void setColumns(int columns) {
-		// Ignore this call , and depend on setPreferedSize
-		System.err.println("Invalid call to setColunms at FSTextField");
-	}
-
-	public boolean isAutoTrim() {
-		return autoTrim;
-	}
-
-	public void setAutoTrim(boolean autoTrim) {
-		this.autoTrim = autoTrim;
-	}
-
-	@Override
-	public String getText() {
-		if (isAutoTrim()) {
-			return super.getText().trim();
-		} else {
-			return super.getText();
-		}
-	}
-
-	public Class getType() {
-		return type;
-	}
-
-	public void setType(Class type) {
-		this.type = type;
-	}
-
-	@Override
-	public void filterValues(BindingComponent comp1) throws DaoException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setDataSource(DataSource manager) {
-		fsWrapper.setDataSource(manager);
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		return fsWrapper.getDataSource();
-	}
-
-	@Override
-	public void addValueChangeListener(ValueChangeListener listener) {
-		fsWrapper.addValueChangeListsner(listener);
-	}
-
-	@Override
-	public void setText(String text) {
-		// String oldValue2 = getText();
-		super.setText(text);
-		if (fsWrapper != null) {
-			// Since this could be called by the super class during construction
-			fsWrapper.fireValueChangeListener(oldValue, text);
-		}
-
-	}
-
-	public double getValueAsDouble() {
-		return ConversionUtil.toDouble(getValue());
-	}
-
-	public void setAutoSelectText(boolean autoSelectText) {
-		this.autoSelectText = autoSelectText;
-	}
-
-	public void setWidth(int width) {
-		setPreferredSize(new Dimension(width, 25));
-	}
-
-	@Override
-	public void setAutoTransferFocus(boolean transfer) {
-		this.transfer = transfer;
-	}
-
-	@Override
-	public boolean isAutoTransferFocus() {
-		return transfer;
 	}
 }

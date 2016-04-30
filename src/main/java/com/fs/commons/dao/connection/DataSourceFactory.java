@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.connection;
 
 import java.sql.Connection;
@@ -11,27 +26,13 @@ public class DataSourceFactory {
 	private static DataSource defaultResourceManager;
 
 	/**
-	 * @return
-	 */
-	public static DataSource getDefaultDataSource() {
-		if (defaultResourceManager == null) {
-			try {
-				checkApplicationInitialized();
-			} catch (Exception e) {
-				throw new IllegalStateException("Unable to Initialize the Application due to the following error:\n" + e.getMessage(), e);
-			}
-		}
-		return defaultResourceManager;
-	}
-
-	/**
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	private static void checkApplicationInitialized() throws Exception {
 		try {
 			ApplicationManager.getInstance().init();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw e;
 			// if this occurs , it would be handled by the getResourceManager
 			// which will throw NullPointerException for non
@@ -40,12 +41,26 @@ public class DataSourceFactory {
 	}
 
 	/**
-	 * 
+	 * @return
+	 */
+	public static DataSource getDefaultDataSource() {
+		if (defaultResourceManager == null) {
+			try {
+				checkApplicationInitialized();
+			} catch (final Exception e) {
+				throw new IllegalStateException("Unable to Initialize the Application due to the following error:\n" + e.getMessage(), e);
+			}
+		}
+		return defaultResourceManager;
+	}
+
+	/**
+	 *
 	 * @param impl
 	 * @throws ServerDownException
 	 * @throws DaoException
 	 */
-	public static void setDefaultDataSource(DataSource impl) throws ServerDownException, DaoException {
+	public static void setDefaultDataSource(final DataSource impl) throws ServerDownException, DaoException {
 		defaultResourceManager = impl;
 		// check weather
 		GeneralUtility.checkDatabaseServer(impl.getDatabaseName(), impl.getDatabaseHost(), impl.getDatabasePort());

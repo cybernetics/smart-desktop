@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.application;
 
 import java.io.FileOutputStream;
@@ -58,153 +73,23 @@ public class Application {
 	// }
 
 	/**
-	 * @return the viewModules
+	 *
+	 * @param listener
 	 */
-	public boolean isViewModules() {
-		return viewModules;
+	public void addListener(final ApplicationListener listener) {
+		this.listeners.add(listener);
 	}
 
 	/**
-	 * @return the splashImage
-	 */
-	public String getSplashImage() {
-		return splashImage;
-	}
-
-	/**
-	 * @param splashImage
-	 *            the splashImage to set
-	 */
-	public void setSplashImage(String splashImage) {
-		this.splashImage = splashImage;
-	}
-
-	/**
-	 * @return the homeImage
-	 */
-	public String getHomeImage() {
-		return homeImage;
-	}
-
-	/**
-	 * @param homeImage
-	 *            the homeImage to set
-	 */
-	public void setHomeImage(String homeImage) {
-		this.homeImage = homeImage;
-	}
-
-	/**
-	 * @return the applicationName
-	 */
-	public String getApplicationName() {
-		return applicationName;
-	}
-
-	/**
-	 * @param applicationName
-	 *            the applicationName to set
-	 */
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
-		UserPreferences.setKeyPrefix(applicationName);
-	}
-
-	/**
-	 * @return the modules
-	 */
-	public ArrayList<Module> getModules() {
-		return modules;
-	}
-
-	/**
-	 * @param modules
-	 *            the modules to set
-	 */
-	public void setModules(ArrayList<Module> modules) {
-		this.modules = modules;
-	}
-
-	@Override
-	public String toString() {
-		StringBuffer buf = new StringBuffer("Name : " + getApplicationName() + "\n");
-		for (int i = 0; i < modules.size(); i++) {
-			buf.append(modules.get(i).toString());
-		}
-		return buf.toString();
-	}
-
-	/**
-	 * @throws ApplicationException
-	 * 
-	 */
-	public void init() throws ApplicationException {
-		try {
-			Lables.getDefaultInstance().addLables(loadCommonsLabel(getLocale()));
-			//boolean debugPriviliges = System.getProperty("fs.debug.priviliges") != null;
-			boolean debugMeta = System.getProperty("fs.debug.meta") != null;
-			for (int i = 0; i < modules.size(); i++) {
-				Module module = modules.get(i);
-				module.init();
-				Hashtable<String, TableMeta> tablesMeta = module.getTablesMeta();
-				TableMetaFactory tableMetaFactory = AbstractTableMetaFactory.addTablesMeta(module.getDataSource(), tablesMeta);
-				Lables.getDefaultInstance().addLables(module.getLables(getLocale()));
-				// MenuSection section=new MenuSection();
-				// section.setName(module.getModuleName());
-				// section.setMenus(module.getMenu());
-				// mainMenu.add(section);
-				ArrayList<Report> reports = module.getReports(getLocale() + "_", getInActiveLocale() + "_");
-				if (reports.size() > 0) {
-					ReportManager.addReports(reports);
-				}
-				// if (debugPriviliges) {
-				// printModuleDebugInfo(module, i != 0);
-				// }
-				if (debugMeta) {
-					tableMetaFactory.writeDynamicMeta(new FileOutputStream(module.getModuleName() + "_meta-out.xml"));
-				}
-			}
-		} catch (ModuleException e) {
-			throw new ApplicationException(e);
-		} catch (IOException e) {
-			throw new ApplicationException(e);
-		} catch (DaoException e) {
-			throw new ApplicationException(e);
-		}
-
-	}
-
-	/**
-	 * @throws SecurityException
-	 * @throws IOException
-	 * @throws ModuleException
-	 */
-	private void setTableMetaPriviliges(Module module) throws SecurityException, IOException, ModuleException {
-		ArrayList<Menu> menus = module.getMenu();
-		for (int i = 0; i < menus.size(); i++) {
-			Menu menu = menus.get(i);
-			ArrayList<MenuItem> items = menu.getItems();
-			for (int j = 0; j < items.size(); j++) {
-				MenuItem item = items.get(j);
-				if (item.isDynamicTableMeta()) {
-//					TableMeta tableMeta = item.getTableMeta();
-//					tableMeta.setpaPrivilige(ne);
-//					if (item.isHasDetailTables()) {
-//					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
+	 *
 	 * @param priviligeId
 	 * @param priviligeName
 	 * @param label
 	 * @throws SecurityException
 	 */
-	private String checkValidPrivilige(int priviligeId, String priviligeName, String label, String parentPriilige) throws SecurityException {
-		StringBuffer buf = new StringBuffer();
+	private String checkValidPrivilige(final int priviligeId, final String priviligeName, final String label, final String parentPriilige)
+			throws SecurityException {
+		final StringBuffer buf = new StringBuffer();
 		buf.append("INSERT INTO sec_privileges values (");
 		buf.append(priviligeId);
 		buf.append(",'");
@@ -218,14 +103,214 @@ public class Application {
 	}
 
 	/**
-	 * 
+	 *
+	 * @param menuItemName
+	 * @return
+	 * @throws SecurityException
+	 * @throws NotAllowedOperationException
+	 */
+	public MenuItem findMenuItem(final String menuItemName) throws NotAllowedOperationException, SecurityException {
+		for (final Module module : getModules()) {
+			for (final Menu menu : module.getMenu()) {
+				for (final MenuItem item : menu.getItems()) {
+					if (item.getName().equals(menuItemName)) {
+						SecurityManager.getAuthorizer().checkAllowed(item.getPrivilige());
+						return item;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return the applicationFrame
+	 */
+	public ApplicationFrame getApplicationFrame() {
+		return this.applicationFrame;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public int getApplicationId() {
+		return this.applicationId;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<ApplicationListener> getApplicationListeners() {
+		return this.listeners;
+	}
+
+	/**
+	 * @return the applicationName
+	 */
+	public String getApplicationName() {
+		return this.applicationName;
+	}
+
+	public int getAutoLogoutInterval() {
+		return this.autoLogoutInterval;
+	}
+
+	/**
+	 * @return the configFileName
+	 */
+	public String getConfigFileName() {
+		return this.configFileName;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public Module getDefaultModule() {
+		for (int i = 0; i < this.modules.size(); i++) {
+			final Module module = this.modules.get(i);
+			if (module.isDefault()) {
+				return module;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return the homeImage
+	 */
+	public String getHomeImage() {
+		return this.homeImage;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public String getInActiveLocale() {
+		return getLocale().equals("en") ? "ar" : "en";
+	}
+
+	/**
+	 * @return the locale
+	 */
+	public String getLocale() {
+		return this.locale == null ? "en" : this.locale;
+	}
+
+	public Module getModule(final String moduleName) {
+		if (GeneralUtility.isEmpty(moduleName)) {
+			return null;
+		}
+		for (final Module module : getModules()) {
+			if (module.getModuleName().trim().equalsIgnoreCase(moduleName.trim())) {
+				return module;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return the modules
+	 */
+	public ArrayList<Module> getModules() {
+		return this.modules;
+	}
+
+	/**
+	 * @return the splashImage
+	 */
+	public String getSplashImage() {
+		return this.splashImage;
+	}
+
+	/**
+	 * @throws ApplicationException
+	 *
+	 */
+	public void init() throws ApplicationException {
+		try {
+			Lables.getDefaultInstance().addLables(loadCommonsLabel(getLocale()));
+			// boolean debugPriviliges =
+			// System.getProperty("fs.debug.priviliges") != null;
+			final boolean debugMeta = System.getProperty("fs.debug.meta") != null;
+			for (int i = 0; i < this.modules.size(); i++) {
+				final Module module = this.modules.get(i);
+				module.init();
+				final Hashtable<String, TableMeta> tablesMeta = module.getTablesMeta();
+				final TableMetaFactory tableMetaFactory = AbstractTableMetaFactory.addTablesMeta(module.getDataSource(), tablesMeta);
+				Lables.getDefaultInstance().addLables(module.getLables(getLocale()));
+				// MenuSection section=new MenuSection();
+				// section.setName(module.getModuleName());
+				// section.setMenus(module.getMenu());
+				// mainMenu.add(section);
+				final ArrayList<Report> reports = module.getReports(getLocale() + "_", getInActiveLocale() + "_");
+				if (reports.size() > 0) {
+					ReportManager.addReports(reports);
+				}
+				// if (debugPriviliges) {
+				// printModuleDebugInfo(module, i != 0);
+				// }
+				if (debugMeta) {
+					tableMetaFactory.writeDynamicMeta(new FileOutputStream(module.getModuleName() + "_meta-out.xml"));
+				}
+			}
+		} catch (final ModuleException e) {
+			throw new ApplicationException(e);
+		} catch (final IOException e) {
+			throw new ApplicationException(e);
+		} catch (final DaoException e) {
+			throw new ApplicationException(e);
+		}
+
+	}
+
+	// ///////////////////////////////////////////////////////
+	public boolean isAllowedCommand(final Privilige privilige, final String name) {
+		try {
+			SecurityManager.getAuthorizer().checkAllowed(privilige);
+			return true;
+		} catch (final NotAllowedOperationException e) {
+			System.err.println("Privlige Id : " + privilige.getPriviligeId() + " , with name : " + name + " is not allowed");
+			return false;
+		} catch (final SecurityException e) {
+			ExceptionUtil.handleException(e);
+			return false;
+		}
+	}
+
+	/**
+	 *
+	 * @param moduleName
+	 * @return
+	 */
+	public boolean isModuleDefined(final String moduleName) {
+		for (final Module module : this.modules) {
+			if (module.getModuleName().equals(moduleName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @return the viewModules
+	 */
+	public boolean isViewModules() {
+		return this.viewModules;
+	}
+
+	/**
+	 *
 	 * @param locale2
 	 * @return
 	 * @throws IOException
 	 */
-	private Properties loadCommonsLabel(String locale) throws IOException {
-		String shortFileName = locale + "_lbl.properties";
-		InputStream in = this.getClass().getResourceAsStream("/resources/meta/" + shortFileName);
+	private Properties loadCommonsLabel(final String locale) throws IOException {
+		final String shortFileName = locale + "_lbl.properties";
+		final InputStream in = this.getClass().getResourceAsStream("/resources/meta/" + shortFileName);
 		if (in != null) {
 			return GeneralUtility.readPropertyStream(in);
 		}
@@ -233,26 +318,66 @@ public class Application {
 	}
 
 	/**
-	 * 
+	 *
+	 * @param applicationFrame
+	 */
+	public void setApplicationFrame(final ApplicationFrame applicationFrame) {
+		this.applicationFrame = applicationFrame;
+	}
+
+	/**
+	 *
+	 * @param applicationId
+	 */
+	public void setApplicationId(final int applicationId) {
+		this.applicationId = applicationId;
+	}
+
+	/**
+	 * @param applicationName
+	 *            the applicationName to set
+	 */
+	public void setApplicationName(final String applicationName) {
+		this.applicationName = applicationName;
+		UserPreferences.setKeyPrefix(applicationName);
+	}
+
+	public void setAutoLogoutInterval(final int autoLogoutInterval) {
+		this.autoLogoutInterval = autoLogoutInterval;
+	}
+
+	public void setAutoLogoutInterval(final String autoLogoutInterval) {
+		if (GeneralUtility.isEmpty(autoLogoutInterval)) {
+			return;
+		}
+		if (!GeneralUtility.isInteger(autoLogoutInterval)) {
+			return;
+		}
+		this.autoLogoutInterval = Integer.parseInt(autoLogoutInterval);
+	}
+
+	/**
+	 *
 	 * @param configFileName
 	 */
-	public void setConfigFileName(String configFileName) {
+	public void setConfigFileName(final String configFileName) {
 		this.configFileName = configFileName;
 	}
 
 	/**
-	 * @return the configFileName
+	 * @param homeImage
+	 *            the homeImage to set
 	 */
-	public String getConfigFileName() {
-		return configFileName;
+	public void setHomeImage(final String homeImage) {
+		this.homeImage = homeImage;
 	}
 
 	/**
-	 * 
+	 *
 	 * @param locale
 	 */
-	public void setLocale(String locale, boolean checkForUserPref) {
-		String localeKey = "locale";
+	public void setLocale(final String locale, final boolean checkForUserPref) {
+		final String localeKey = "locale";
 		// to to find the default locale according to user pref , if not found ,
 		// passed defaut will be used and
 		// and stored as user pref
@@ -265,162 +390,54 @@ public class Application {
 	}
 
 	/**
-	 * @return the locale
+	 * @param modules
+	 *            the modules to set
 	 */
-	public String getLocale() {
-		return locale == null ? "en" : locale;
+	public void setModules(final ArrayList<Module> modules) {
+		this.modules = modules;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * @param splashImage
+	 *            the splashImage to set
 	 */
-	public String getInActiveLocale() {
-		return getLocale().equals("en") ? "ar" : "en";
+	public void setSplashImage(final String splashImage) {
+		this.splashImage = splashImage;
 	}
 
 	/**
-	 * 
-	 * @param listener
-	 */
-	public void addListener(ApplicationListener listener) {
-		listeners.add(listener);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public ArrayList<ApplicationListener> getApplicationListeners() {
-		return listeners;
-	}
-
-	/**
-	 * 
-	 * @param applicationId
-	 */
-	public void setApplicationId(int applicationId) {
-		this.applicationId = applicationId;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getApplicationId() {
-		return applicationId;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Module getDefaultModule() {
-		for (int i = 0; i < modules.size(); i++) {
-			Module module = modules.get(i);
-			if (module.isDefault()) {
-				return module;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param applicationFrame
-	 */
-	public void setApplicationFrame(ApplicationFrame applicationFrame) {
-		this.applicationFrame = applicationFrame;
-	}
-
-	/**
-	 * @return the applicationFrame
-	 */
-	public ApplicationFrame getApplicationFrame() {
-		return applicationFrame;
-	}
-
-	public void setViewModules(boolean viewModules) {
-		this.viewModules = viewModules;
-	}
-
-	/**
-	 * 
-	 * @param menuItemName
-	 * @return
 	 * @throws SecurityException
-	 * @throws NotAllowedOperationException
+	 * @throws IOException
+	 * @throws ModuleException
 	 */
-	public MenuItem findMenuItem(String menuItemName) throws NotAllowedOperationException, SecurityException {
-		for (Module module : getModules()) {
-			for (Menu menu : module.getMenu()) {
-				for (MenuItem item : menu.getItems()) {
-					if (item.getName().equals(menuItemName)) {
-						SecurityManager.getAuthorizer().checkAllowed(item.getPrivilige());
-						return item;
-					}
+	private void setTableMetaPriviliges(final Module module) throws SecurityException, IOException, ModuleException {
+		final ArrayList<Menu> menus = module.getMenu();
+		for (int i = 0; i < menus.size(); i++) {
+			final Menu menu = menus.get(i);
+			final ArrayList<MenuItem> items = menu.getItems();
+			for (int j = 0; j < items.size(); j++) {
+				final MenuItem item = items.get(j);
+				if (item.isDynamicTableMeta()) {
+					// TableMeta tableMeta = item.getTableMeta();
+					// tableMeta.setpaPrivilige(ne);
+					// if (item.isHasDetailTables()) {
+					// }
 				}
 			}
 		}
-		return null;
 	}
 
-	/**
-	 * 
-	 * @param moduleName
-	 * @return
-	 */
-	public boolean isModuleDefined(String moduleName) {
-		for (Module module : modules) {
-			if (module.getModuleName().equals(moduleName)) {
-				return true;
-			}
-		}
-		return false;
+	public void setViewModules(final boolean viewModules) {
+		this.viewModules = viewModules;
 	}
 
-	// ///////////////////////////////////////////////////////
-	public boolean isAllowedCommand(Privilige privilige, String name) {
-		try {
-			SecurityManager.getAuthorizer().checkAllowed(privilige);
-			return true;
-		} catch (NotAllowedOperationException e) {
-			System.err.println("Privlige Id : " + privilige.getPriviligeId() + " , with name : " + name + " is not allowed");
-			return false;
-		} catch (SecurityException e) {
-			ExceptionUtil.handleException(e);
-			return false;
+	@Override
+	public String toString() {
+		final StringBuffer buf = new StringBuffer("Name : " + getApplicationName() + "\n");
+		for (int i = 0; i < this.modules.size(); i++) {
+			buf.append(this.modules.get(i).toString());
 		}
-	}
-
-	public int getAutoLogoutInterval() {
-		return autoLogoutInterval;
-	}
-
-	public void setAutoLogoutInterval(int autoLogoutInterval) {
-		this.autoLogoutInterval = autoLogoutInterval;
-	}
-
-	public void setAutoLogoutInterval(String autoLogoutInterval) {
-		if (GeneralUtility.isEmpty(autoLogoutInterval)) {
-			return;
-		}
-		if (!GeneralUtility.isInteger(autoLogoutInterval)) {
-			return;
-		}
-		this.autoLogoutInterval = Integer.parseInt(autoLogoutInterval);
-	}
-
-	public Module getModule(String moduleName) {
-		if (GeneralUtility.isEmpty(moduleName)) {
-			return null;
-		}
-		for (Module module : getModules()) {
-			if (module.getModuleName().trim().equalsIgnoreCase(moduleName.trim())) {
-				return module;
-			}
-		}
-		return null;
+		return buf.toString();
 	}
 
 }

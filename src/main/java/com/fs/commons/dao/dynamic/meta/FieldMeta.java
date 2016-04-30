@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.meta;
 
 import java.io.Serializable;
@@ -20,6 +35,11 @@ import com.fs.commons.util.GeneralUtility;
 import com.fs.commons.util.ReflicationUtil;
 
 public class FieldMeta implements Serializable, QueryComponent {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -5145553846250082701L;
+
 	public static final boolean ENABLED = true;
 
 	public static final boolean ALLOW_UPDATE = true;
@@ -70,177 +90,61 @@ public class FieldMeta implements Serializable, QueryComponent {
 
 	private boolean keepLastValue;
 
-	private int visibleHeight=300;
+	private int visibleHeight = 300;
 
-	private int visibleWidth=300;
+	private int visibleWidth = 300;
 
-	public String getDefaultValue() {
-		return defaultValue;
+	public void addTrigger(final String triggerClassName) throws Exception {
+		final ReflicationUtil<FieldTrigger> reflicationUtil = new ReflicationUtil<FieldTrigger>();
+		this.triggers.add(reflicationUtil.getInstance(triggerClassName, FieldTrigger.class));
 	}
 
-	public String getCalculatedDefaultValue() throws DaoException {
-		if (defaultValue != null && defaultValue.toUpperCase().startsWith("SELECT")) {
+	/**
+	 * @return
+	 * @throws DaoException
+	 * @throws DaoException
+	 */
+	public String calculateDefaultValue() throws DaoException {
+		if (this.defaultValue.toUpperCase().startsWith("SELECT")) {
 			try {
-				return DaoUtil.exeuteSingleOutputQuery(defaultValue).toString();
-			} catch (RecordNotFoundException e) {
+				final Object obj = DaoUtil.exeuteSingleOutputQuery(this.defaultValue);
+				if (obj == null) {
+					return null;
+				}
+				return obj.toString();
+			} catch (final RecordNotFoundException e) {
 				return null;
 			}
 		}
-		return defaultValue;
-
-	}
-
-	public int getDefaultValueAsInteger() {
-		return defaultValue == null || defaultValue.equals("") || defaultValue.equals("null") ? -1 : Integer.parseInt(defaultValue);
-	}
-
-	/**
-	 * @param defaultValue
-	 */
-	public void setDefaultValue(Object defaultValue) {
-		this.defaultValue = defaultValue.toString();
-	}
-
-	/**
-	 * @return the summaryField
-	 */
-	public boolean isSummaryField() {
-		return this.summaryField;
-	}
-
-	/**
-	 * @param summaryField
-	 *            the summaryField to set
-	 */
-	public void setSummaryField(boolean summaryField) {
-		this.summaryField = summaryField;
-	}
-
-	/**
-	 * @param caption
-	 *            the caption to set
-	 */
-	public void setCaption(String caption) {
-		this.caption = caption;
-	}
-
-	/**
-	 * @return the enabled
-	 */
-	public boolean isEnabled() {
-		return this.enabled;
-	}
-
-	/**
-	 * @param enabled
-	 *            the enabled to set
-	 */
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	public TableMeta getParentTable() {
-		return parentTable;
-	}
-
-	public void setParentTable(TableMeta parentTable) {
-		this.parentTable = parentTable;
-	}
-
-	public boolean isConfirmInput() {
-		return confirmInput;
-	}
-
-	public void setConfirmInput(boolean confirmInput) {
-		this.confirmInput = confirmInput;
-	}
-
-	public boolean isVisible() {
-		return visible;
-	}
-
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	/**
-	 * @return
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * This is to set the name of the field
-	 * 
-	 * @param name
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return
-	 */
-	public boolean isRequired() {
-		return required;
-	}
-
-	/**
-	 * @param optional
-	 */
-	public void setRequired(boolean required) {
-		this.required = required;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return "Field Name = " + getName() + " , " + "Type = " + type + " , " + "Required = " + required + " Max-length =" + maxLength;
+		return this.defaultValue;
 	}
 
 	public FieldMeta copy() throws Exception {
 		return (FieldMeta) GeneralUtility.copy(this);
 	}
 
-	public int getWidth() {
-		return width;
+	@Override
+	public boolean equals(final Object obj) {
+		return ((FieldMeta) obj).getFullQualifiedName().equals(this.getFullQualifiedName());
 	}
 
-	public boolean isAllowUpdate() {
-		return allowUpdate;
-	}
-
-	public void setAllowUpdate(boolean allowUpdate) {
-		this.allowUpdate = allowUpdate;
-	}
-
-	public int getMaxLength() {
-		return maxLength;
-	}
-
-	public void setMaxLength(int maxLength) {
-		if (maxLength > 0) {
-			this.maxLength = maxLength;
+	public String getCalculatedDefaultValue() throws DaoException {
+		if (this.defaultValue != null && this.defaultValue.toUpperCase().startsWith("SELECT")) {
+			try {
+				return DaoUtil.exeuteSingleOutputQuery(this.defaultValue).toString();
+			} catch (final RecordNotFoundException e) {
+				return null;
+			}
 		}
+		return this.defaultValue;
+
 	}
 
 	/**
 	 * @return
 	 */
 	public String getCaption() {
-		String str = caption == null || caption.equals("") ? getName() : caption;
+		final String str = this.caption == null || this.caption.equals("") ? getName() : this.caption;
 		return str;
 		// return Lables.get(str);
 	}
@@ -249,12 +153,16 @@ public class FieldMeta implements Serializable, QueryComponent {
 	 * @return
 	 */
 	public String getCaptionValue() {
-		return caption;
+		return this.caption;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		return ((FieldMeta) obj).getFullQualifiedName().equals(this.getFullQualifiedName());
+	public String getDefaultValue() {
+		return this.defaultValue;
+	}
+
+	public int getDefaultValueAsInteger() {
+		return this.defaultValue == null || this.defaultValue.equals("") || this.defaultValue.equals("null") ? -1
+				: Integer.parseInt(this.defaultValue);
 	}
 
 	/**
@@ -290,119 +198,246 @@ public class FieldMeta implements Serializable, QueryComponent {
 		}
 	}
 
-	/**
-	 * @return
-	 * @throws DaoException
-	 * @throws DaoException
-	 */
-	public String calculateDefaultValue() throws DaoException {
-		if (defaultValue.toUpperCase().startsWith("SELECT")) {
-			try {
-				Object obj = DaoUtil.exeuteSingleOutputQuery(defaultValue);
-				if (obj == null) {
-					return null;
-				}
-				return obj.toString();
-			} catch (RecordNotFoundException e) {
-				return null;
-			}
-		}
-		return defaultValue;
+	public String getFilteredBy() {
+		return this.filteredBy;
 	}
 
 	public String getFullQualifiedName() {
 		return getFullQualifiedName("");
 	}
 
-	public String getFullQualifiedName(String aliasNamePostFix) {
-		if(getParentTable()==null){
-			System.out.println("Failed with parent id null : "+getName());
+	public String getFullQualifiedName(final String aliasNamePostFix) {
+		if (getParentTable() == null) {
+			System.out.println("Failed with parent id null : " + getName());
 		}
 
 		return getParentTable().getTableName() + aliasNamePostFix + "." + getName();
-	}
-
-	public void setIndex(int indx) {
-		this.indx = indx;
 	}
 
 	/**
 	 * @return the indx
 	 */
 	public int getIndx() {
-		return indx;
+		return this.indx;
+	}
+
+	public int getMaxLength() {
+		return this.maxLength;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	public String getOptionsQuery() {
+		return this.optionsQuery;
+	}
+
+	public TableMeta getParentTable() {
+		return this.parentTable;
 	}
 
 	/**
 	 * @return
 	 */
 	public String getPropertyName() {
-		if (propertyName == null) {
+		if (this.propertyName == null) {
 			return GeneralUtility.fixPropertyName(getName());
 		}
-		return propertyName;
-	}
-
-	public void setPropertyName(String propertyName) {
-		this.propertyName = propertyName;
-	}
-
-	/**
-	 * @param query
-	 */
-	public void setOptionsQuery(String optionsQuery) {
-		this.optionsQuery = optionsQuery;
-	}
-
-	public String getOptionsQuery() {
-		return optionsQuery;
-	}
-
-	@Override
-	public Object toQueryElement() {
-		return getFullQualifiedName();
+		return this.propertyName;
 	}
 
 	public ArrayList<FieldTrigger> getTriggers() {
-		return triggers;
+		return this.triggers;
 	}
 
-	public void setTriggers(ArrayList<FieldTrigger> triggers) {
-		this.triggers = triggers;
+	public int getType() {
+		return this.type;
 	}
 
-	public void addTrigger(String triggerClassName) throws Exception {
-		ReflicationUtil<FieldTrigger> reflicationUtil = new ReflicationUtil<FieldTrigger>();
-		triggers.add(reflicationUtil.getInstance(triggerClassName, FieldTrigger.class));
+	public int getVisibleHeight() {
+		return this.visibleHeight;
 	}
 
-	public String getFilteredBy() {
-		return filteredBy;
+	public int getVisibleWidth() {
+		return this.visibleWidth;
 	}
 
-	public void setFilteredBy(String filteredBy) {
-		this.filteredBy = filteredBy;//getParentTable().getField(filteredBy);
+	public int getWidth() {
+		return this.width;
 	}
 
-//	public void setFilteredBy(FieldMeta filteredBy) {
-//		this.filteredBy = filteredBy;
-//	}
+	public boolean isAllowUpdate() {
+		return this.allowUpdate;
+	}
+
+	public boolean isConfirmInput() {
+		return this.confirmInput;
+	}
+
+	/**
+	 * @return the enabled
+	 */
+	public boolean isEnabled() {
+		return this.enabled;
+	}
 
 	@Override
 	public boolean isInline() {
 		return true;
 	}
 
-	public void setLookupNumber(boolean lookupNumber) {
-		this.lookupNumber = lookupNumber;
+	public boolean isKeepLastValue() {
+		return this.keepLastValue;
 	}
 
 	public boolean isLookupNumber() {
-		return lookupNumber;
+		return this.lookupNumber;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isRequired() {
+		return this.required;
+	}
+
+	/**
+	 * @return the summaryField
+	 */
+	public boolean isSummaryField() {
+		return this.summaryField;
+	}
+
+	public boolean isVisible() {
+		return this.visible;
+	}
+
+	public void setAllowUpdate(final boolean allowUpdate) {
+		this.allowUpdate = allowUpdate;
+	}
+
+	/**
+	 * @param caption
+	 *            the caption to set
+	 */
+	public void setCaption(final String caption) {
+		this.caption = caption;
+	}
+
+	public void setConfirmInput(final boolean confirmInput) {
+		this.confirmInput = confirmInput;
+	}
+
+	/**
+	 * @param defaultValue
+	 */
+	public void setDefaultValue(final Object defaultValue) {
+		this.defaultValue = defaultValue.toString();
+	}
+
+	/**
+	 * @param enabled
+	 *            the enabled to set
+	 */
+	public void setEnabled(final boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public void setFilteredBy(final String filteredBy) {
+		this.filteredBy = filteredBy;// getParentTable().getField(filteredBy);
+	}
+
+	public void setIndex(final int indx) {
+		this.indx = indx;
+	}
+
+	public void setKeepLastValue(final boolean keepLastValue) {
+		this.keepLastValue = keepLastValue;
+	}
+
+	public void setLookupNumber(final boolean lookupNumber) {
+		this.lookupNumber = lookupNumber;
+	}
+
+	public void setMaxLength(final int maxLength) {
+		if (maxLength > 0) {
+			this.maxLength = maxLength;
+		}
+	}
+
+	/**
+	 * This is to set the name of the field
+	 *
+	 * @param name
+	 */
+	public void setName(final String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @param query
+	 */
+	public void setOptionsQuery(final String optionsQuery) {
+		this.optionsQuery = optionsQuery;
+	}
+
+	public void setParentTable(final TableMeta parentTable) {
+		this.parentTable = parentTable;
+	}
+
+	public void setPropertyName(final String propertyName) {
+		this.propertyName = propertyName;
+	}
+
+	/**
+	 * @param optional
+	 */
+	public void setRequired(final boolean required) {
+		this.required = required;
+	}
+
+	// public void setFilteredBy(FieldMeta filteredBy) {
+	// this.filteredBy = filteredBy;
+	// }
+
+	/**
+	 * @param summaryField
+	 *            the summaryField to set
+	 */
+	public void setSummaryField(final boolean summaryField) {
+		this.summaryField = summaryField;
+	}
+
+	public void setTriggers(final ArrayList<FieldTrigger> triggers) {
+		this.triggers = triggers;
+	}
+
+	public void setType(final int type) {
+		this.type = type;
+	}
+
+	public void setVisible(final boolean visible) {
+		this.visible = visible;
+	}
+
+	public void setVisibleHeight(final int visibleHeight) {
+		this.visibleHeight = visibleHeight;
+	}
+
+	public void setVisibleWidth(final int visibleWidth) {
+		this.visibleWidth = visibleWidth;
+	}
+
+	public void setWidth(final int width) {
+		this.width = width;
 	}
 
 	public FSTableColumn toFSTableColumn() throws TableMetaNotFoundException, DaoException {
-		FSTableColumn col = new FSTableColumn();
+		final FSTableColumn col = new FSTableColumn();
 		col.setName(getName());
 		col.setHumanName(Lables.get(col.getName(), true));
 		col.setVisible(isVisible());
@@ -416,28 +451,14 @@ public class FieldMeta implements Serializable, QueryComponent {
 		return col;
 	}
 
-	public boolean isKeepLastValue() {
-		return keepLastValue;
+	@Override
+	public Object toQueryElement() {
+		return getFullQualifiedName();
 	}
 
-	public void setKeepLastValue(boolean keepLastValue) {
-		this.keepLastValue = keepLastValue;
-	}
-
-	public int getVisibleHeight() {
-		return visibleHeight;
-	}
-
-	public int getVisibleWidth() {
-		return visibleWidth;
-	}
-	
-	public void setVisibleHeight(int visibleHeight) {
-		this.visibleHeight = visibleHeight;
-	}
-	
-	public void setVisibleWidth(int visibleWidth) {
-		this.visibleWidth = visibleWidth;
+	@Override
+	public String toString() {
+		return "Field Name = " + getName() + " , " + "Type = " + this.type + " , " + "Required = " + this.required + " Max-length =" + this.maxLength;
 	}
 
 }

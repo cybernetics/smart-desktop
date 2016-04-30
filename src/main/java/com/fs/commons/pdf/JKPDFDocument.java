@@ -1,9 +1,17 @@
-/**
- * Modification history
- * ====================================================
- * Version    Date         Developer        Purpose 
- * ====================================================
- * 1.1      18/05/2008     Jamil Shreet    -Modify the following filed : 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.fs.commons.pdf;
@@ -21,7 +29,7 @@ public class JKPDFDocument extends Document {
 
 	private String headerText;
 	private String footerText;
-	private OutputStream out;
+	private final OutputStream out;
 
 	/**
 	 * @1.1
@@ -29,44 +37,46 @@ public class JKPDFDocument extends Document {
 	private PdfWriter writer;
 
 	/**
-	 * 
+	 *
 	 * @param fileOutputStream
 	 */
-	public JKPDFDocument(OutputStream out) {
+	public JKPDFDocument(final OutputStream out) {
 		this(out, null, null);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param out
 	 * @throws DocumentException
 	 * @throws IOException
 	 */
-	public JKPDFDocument(OutputStream out, String headerText, String footerText) {
+	public JKPDFDocument(final OutputStream out, final String headerText, final String footerText) {
 		this.headerText = headerText;
 		this.footerText = footerText;
 		this.out = out;
 	}
 
 	/**
-	 * 
-	 * @throws DocumentException
-	 * @throws IOException
+	 * @return the footerText
 	 */
-	public void openDocument() throws DocumentException, IOException {
-		writer = PdfWriter.getInstance(this, out);
+	public String getFooterText() {
+		return this.footerText;
+	}
 
-		if (headerText != null) {
-			HeaderFooter header = new HeaderFooter(new Phrase(headerText),
-					false);
-			setHeader(header);
-		}
-		if (footerText != null) {
-			HeaderFooter footer = new HeaderFooter(new Phrase(footerText),
-					false);
-			setFooter(footer);
-		}
-		super.open();
+	/**
+	 * @return the headerText
+	 */
+	public String getHeaderText() {
+		return this.headerText;
+	}
+
+	/**
+	 * @1.1
+	 * 
+	 * @return
+	 */
+	public PdfWriter getWriter() {
+		return this.writer;
 	}
 
 	@Override
@@ -75,48 +85,46 @@ public class JKPDFDocument extends Document {
 	}
 
 	/**
-	 * @return the headerText
+	 *
+	 * @throws DocumentException
+	 * @throws IOException
 	 */
-	public String getHeaderText() {
-		return headerText;
-	}
+	public void openDocument() throws DocumentException, IOException {
+		this.writer = PdfWriter.getInstance(this, this.out);
 
-	/**
-	 * @param headerText
-	 *            the headerText to set
-	 */
-	public void setHeaderText(String headerText) {
-		this.headerText = headerText;
-	}
-
-	/**
-	 * @return the footerText
-	 */
-	public String getFooterText() {
-		return footerText;
+		if (this.headerText != null) {
+			final HeaderFooter header = new HeaderFooter(new Phrase(this.headerText), false);
+			setHeader(header);
+		}
+		if (this.footerText != null) {
+			final HeaderFooter footer = new HeaderFooter(new Phrase(this.footerText), false);
+			setFooter(footer);
+		}
+		super.open();
 	}
 
 	/**
 	 * @param footerText
 	 *            the footerText to set
 	 */
-	public void setFooterText(String footerText) {
+	public void setFooterText(final String footerText) {
 		this.footerText = footerText;
 	}
 
 	/**
-	 * @1.1
-	 * @return
+	 * @param headerText
+	 *            the headerText to set
 	 */
-	public PdfWriter getWriter() {
-		return writer;
+	public void setHeaderText(final String headerText) {
+		this.headerText = headerText;
 	}
 
 	/**
 	 * @1.1
+	 * 
 	 * @param writer
 	 */
-	public void setWriter(PdfWriter writer) {
+	public void setWriter(final PdfWriter writer) {
 		this.writer = writer;
 	}
 

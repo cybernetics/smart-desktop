@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui;
 
 import java.awt.BorderLayout;
@@ -30,13 +45,11 @@ import com.fs.commons.util.ExceptionUtil;
 
 /**
  * contains DynPanel with Add,Edit,update,Delete buttons
- * 
+ *
  * @author u087
- * 
+ *
  */
 public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, BindingComponent {
-
-	private static final long serialVersionUID = 1L;
 
 	public enum DynDaoMode {
 		ADD, // Add Record
@@ -46,7 +59,9 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 		DELETE, // View the record and allow delete
 		FIND, DUPLICATE
 		// allow find
-	};
+	}
+
+	private static final long serialVersionUID = 1L;;
 
 	DynDaoMode mode;
 
@@ -115,431 +130,152 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 
 	private boolean showRecordAfterAdd = false;
 
-	public JKPanel getPnlButtonsContainer() {
-		return pnlButtonsContainer;
-	}
-
-	/**
-	 * 
-	 * @param tableMeta
-	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
-	 */
-	public DynDaoPanel(TableMeta tableMeta) throws TableMetaNotFoundException, DaoException {
-		this(new DynPanel(tableMeta));
-	}
-
 	/**
 	 * @throws DaoException
 	 * @throws TableMetaNotFoundException
 	 */
-	public DynDaoPanel(DynPanel dynPanel) throws TableMetaNotFoundException, DaoException {
+	public DynDaoPanel(final DynPanel dynPanel) throws TableMetaNotFoundException, DaoException {
 		this.tableMeta = dynPanel.getTableMeta();
-		pnlDao = dynPanel;
-		pnlDao.addDynDaoActionListener(this);
+		this.pnlDao = dynPanel;
+		this.pnlDao.addDynDaoActionListener(this);
 		init();
 		setMode(DynDaoMode.ADD);
 		setTraversePolicy(null);
 	}
 
-	public DynDaoPanel(String tableName) throws TableMetaNotFoundException, DaoException {
+	public DynDaoPanel(final String tableName) throws TableMetaNotFoundException, DaoException {
 		this(AbstractTableMetaFactory.getTableMeta(tableName));
 	}
 
 	/**
+	 *
+	 * @param tableMeta
+	 * @throws TableMetaNotFoundException
+	 * @throws DaoException
 	 */
-	private void init() {
-		JKPanel container = new JKPanel(new BorderLayout());
-		container.add(pnlDao, BorderLayout.CENTER);
-		container.add(getButtonsPanel(), BorderLayout.SOUTH);
-		container.setBorder(SwingUtility.createTitledBorder(""));
-		add(container, BorderLayout.CENTER);
-		btnImport.addActionListener(new ActionListener() {
+	public DynDaoPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException {
+		this(new DynPanel(tableMeta));
+	}
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleImport();
-			}
-		});
-		btnAdd.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleAdd();
-			}
-		});
-		btnFind.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleFind();
-			}
-		});
-		btnClose.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleClose();
-			}
-		});
-		btnClear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleClear();
-
-			}
-		});
-		btnEdit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleEdit();
-			}
-		});
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleSave();
-			}
-		});
-		btnDuplicate.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleDuplicate();
-			}
-		});
-		btnDelete.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				handleDelete(true);
-			}
-		});
-		btnCancelEdit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleCancelEdit();
-			}
-		});
-		btnNextRecord.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleMoveNextRecord();
-			}
-		});
-		btnPreviouseRecord.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleMovePreviouseRecord();
-			}
-		});
-		btnLastRecord.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleMoveLastRecord();
-			}
-		});
-		btnFirstRecord.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleMoveFirstRecord();
-			}
-		});
-		btnPrint.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handlePrint();
-			}
-		});
-		btnHistory.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleShowHistory();
-			}
-		});
+	public void addButton(final JButton btn) {
+		this.pnlActionButtons.add(btn);
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected void handleShowHistory() {
-		PnlAuditHistory.showHistory(getIdValueAsInteger(), tableMeta.getTableName());
-	}
-
-	protected void handlePrint() {
-		PrintUtilities.printComponent(pnlDao);
+	public void addDynDaoActionListener(final DynDaoActionListener listener) {
+		this.pnlDao.addDynDaoActionListener(listener);
 	}
 
 	/**
-	 * 
+	 * Override the DaoActionListner
 	 */
-	protected void handleMoveNextRecord() {
-		int id = getIdValueAsInteger();
-		int nextRecord = traversePolicy.getNextRecord(id);
-		moveToRecord(nextRecord);
+	@Override
+	public void afterAddRecord(final Record record) throws DaoException {
+		// SwingUtility.showSuccessDialog("SUCC_RECORD_ADDED");
+		if (this.showRecordAfterAdd) {
+			handleFindRecord(record.getIdValue());
+		} else {
+			setMode(DynDaoMode.ADD);
+		}
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected void handleMovePreviouseRecord() {
-		int id = getIdValueAsInteger();
-		int nextRecord = traversePolicy.getPreviouseRecord(id);
-		moveToRecord(nextRecord);
+	@Override
+	public void afterClosePanel() {
+		setVisible(false);
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected void handleMoveLastRecord() {
-		int nextRecord = traversePolicy.getLastRecord();
-		moveToRecord(nextRecord);
+	@Override
+	public void afterDeleteRecord(final Record record) throws DaoException {
+		setMode(DynDaoMode.ADD);
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected void handleMoveFirstRecord() {
-		int nextRecord = traversePolicy.getFirstRecord();
-		moveToRecord(nextRecord);
+	@Override
+	public void afterResetComponents() {
+	}
+
+	// /////////////////////////////////////////////////////////
+	// ///////////////////////////////////////////////////////
+	// ///////////////////////////////////////////////////////
+	/**
+	 *
+	 */
+	@Override
+	public void afterSetMode(final DynDaoMode mode) {
+		if (mode == DynDaoMode.EDIT) {
+			this.pnlDao.requestFocus();
+		}
+	}
+
+	@Override
+	public void afterUpdateRecord(final Record record) throws DaoException {
+		this.pnlDao.handleFindEvent(record.getIdValue());
+	}
+
+	@Override
+	public void beforeAddRecord(final Record record) {
+	}
+
+	@Override
+	public void beforeClosePanel() {
+	}
+
+	@Override
+	public void beforeDeleteRecord(final Record record) throws DaoException {
+	}
+
+	@Override
+	public void beforeResetComponents(final Record record) {
 	}
 
 	/**
-	 * @param recordId
+	 *
 	 */
-	private void moveToRecord(int recordId) {
-		if (recordId != -1) {
+	@Override
+	public void beforeSetMode(final DynDaoMode mode) {
+		if (mode == DynDaoMode.ADD || mode == DynDaoMode.DUPLICATE) {
 			try {
-				handleFindRecord(recordId);
-				traversePolicy.setCurrentRecord(getIdValueAsInteger());
-				checkPnlTraverseEnability();
-			} catch (DaoException e) {
+				resetComponents();
+				this.pnlDao.requestFocus();
+			} catch (final DaoException e) {
 				ExceptionUtil.handleException(e);
 			}
 		}
 	}
 
+	@Override
+	public void beforeUpdateRecord(final Record record) throws DaoException {
+	}
+
 	/**
-	 * 
+	 *
 	 */
 	private void checkPnlTraverseEnability() {
-		if (pnlTraverse.isVisible()) {
-			int currentId = getIdValueAsInteger();
-			btnFirstRecord.setEnabled(traversePolicy.getFirstRecord() != currentId);
-			btnLastRecord.setEnabled(traversePolicy.getLastRecord() != currentId);
-			btnNextRecord.setEnabled(btnLastRecord.isEnabled());
-			btnPreviouseRecord.setEnabled(btnFirstRecord.isEnabled());
+		if (this.pnlTraverse.isVisible()) {
+			final int currentId = getIdValueAsInteger();
+			this.btnFirstRecord.setEnabled(this.traversePolicy.getFirstRecord() != currentId);
+			this.btnLastRecord.setEnabled(this.traversePolicy.getLastRecord() != currentId);
+			this.btnNextRecord.setEnabled(this.btnLastRecord.isEnabled());
+			this.btnPreviouseRecord.setEnabled(this.btnFirstRecord.isEnabled());
 		}
 	}
 
 	/**
-	 * 
-	 */
-	protected void handleDuplicate() {
-		duplicatedRecord = getRecord();
-		setMode(DynDaoMode.DUPLICATE);
-		ArrayList<Field> fields = duplicatedRecord.getFields();
-		for (Field field : fields) {
-			if (field.getValue() != null) {
-				setComponentValue(field.getFieldName(), field.getValueObject());
-			}
-		}
-	}
-
-	/**
-	 * @return
-	 */
-	private JKPanel getButtonsPanel() {
-		pnlButtonsContainer = new JKPanel();
-		pnlButtonsContainer.setLayout(new BoxLayout(pnlButtonsContainer, BoxLayout.Y_AXIS));
-
-		pnlEmpty = new JKPanel();
-		pnlButtonsContainer.add(pnlEmpty);
-		pnlActionButtons = new JKPanel();
-		btnAdd.setShortcut("F1", "F1");
-		btnPrint.setShortcut("alt P", "Alt P");
-		btnEdit.setShortcut("F2", "F2");
-		btnSave.setShortcut("F3", "F3");
-		btnDuplicate.setShortcut("F4", "F4");
-		btnDelete.setShortcut("F9", "F9");
-		btnCancelEdit.setShortcut("F8", "F8");
-		btnClose.setShortcut("F6", "F6");
-		btnClear.setShortcut("F7", "F7");
-		btnFind.setShortcut("alt F", "Alt F");
-		btnHistory.setShortcut("alt H", "Alt H");
-
-		btnEdit.setIcon("edit_smart_org_icon.gif");
-		btnDuplicate.setIcon("dublicate_commons_model_icon.gif");
-		btnDelete.setIcon("delete_commons_system_icons.gif");
-		btnClear.setIcon("clean_commons_model_icon.gif");
-		btnAdd.setIcon("add_commons_system_icon.gif");
-		btnPrint.setIcon("fileprint.png");
-		btnHistory.setIcon("fileprint.png");
-		btnCancelEdit.setIcon("back_commons_system_icon.gif");
-		btnSave.setIcon("save_commons_model_icon.gif");
-		btnClose.setIcon("close.png");
-		btnFind.setIcon("find_commons_system_icon.gif");
-
-		btnFirstRecord.setIcon(SwingUtility.isLeftOrientation() ? "first_button_commons_icon.gif" : "last_button_commons_icon.gif");
-		btnLastRecord.setIcon(SwingUtility.isLeftOrientation() ? "last_button_commons_icon.gif" : "first_button_commons_icon.gif");
-		btnNextRecord.setIcon(SwingUtility.isLeftOrientation() ? "next_button_commons_icon.gif" : "previous_button_commons_icon.gif");
-		btnPreviouseRecord.setIcon(SwingUtility.isLeftOrientation() ? "previous_button_commons_icon.gif" : "next_button_commons_icon.gif");
-
-		pnlActionButtons.add(btnAdd);
-		pnlActionButtons.add(btnFind);
-		pnlActionButtons.add(btnImport);
-		pnlActionButtons.add(btnEdit);
-		pnlActionButtons.add(btnSave);
-		pnlActionButtons.add(btnDuplicate);
-		pnlActionButtons.add(btnDelete);
-		pnlActionButtons.add(btnClear);
-		pnlActionButtons.add(btnCancelEdit);
-		pnlActionButtons.add(btnPrint);
-		pnlActionButtons.add(btnHistory);
-		pnlActionButtons.add(btnClose);
-
-		JKPanel pnlTravrse = getTraversePanel();
-
-		pnlButtonsContainer.add(pnlActionButtons);
-		pnlButtonsContainer.add(pnlTravrse);
-		return pnlButtonsContainer;
-	}
-
-	/**
-	 * @return
-	 */
-	private JKPanel getTraversePanel() {
-		pnlTraverse = new JKPanel();
-		pnlTraverse.setBorder(SwingUtility.createTitledBorder("RECORDS"));
-		pnlTraverse.add(btnFirstRecord);
-		pnlTraverse.add(btnPreviouseRecord);
-		pnlTraverse.add(btnNextRecord);
-		pnlTraverse.add(btnLastRecord);
-		return pnlTraverse;
-	}
-
-	/**
-	 * 
-	 * @param mode
-	 * @throws DaoException
-	 */
-	public void setMode(DynDaoMode mode) {
-		fireBeforeSetMode(mode);
-
-		// SwingUtility.enableContainer(pnlDao, mode == DynDaoMode.VIEW);
-		// used for filtering in the report , to avoid hiding
-		// the find button when record already found
-		if (mode == DynDaoMode.VIEW && !allowEdit && allowFind) {
-			mode = DynDaoMode.FIND;
-		}
-		if (mode == DynDaoMode.ADD) {
-			duplicatedRecord = null;
-		}
-		if (mode == DynDaoMode.ADD || mode == DynDaoMode.DUPLICATE) {
-			pnlDao.enableAllComponents(isAllowAdd());
-		} else if (mode == DynDaoMode.VIEW) {
-			pnlDao.enableAllComponents(false);
-			btnEdit.requestFocus();
-		} else if (mode == DynDaoMode.FIND) {
-			pnlDao.enableAllComponents(false);
-		} else if (mode == DynDaoMode.EDIT) {
-			pnlDao.enableDataFields(tableMeta.isAllowUpdate());
-		} else {
-			System.err.print("Unhandled mode : " + mode.toString());
-		}
-
-		btnCancelEdit.setVisible(mode == DynDaoMode.EDIT);
-		btnAdd.setVisible(tableMeta.isAllowAdd() && (mode == DynDaoMode.ADD || mode == DynDaoMode.DUPLICATE));
-		btnFind.setVisible(allowFind && (mode == DynDaoMode.ADD || mode == DynDaoMode.FIND));
-		btnEdit.setVisible(allowEdit && mode == DynDaoMode.VIEW && (tableMeta.isAllowUpdate() || tableMeta.isAllowDelete()));
-
-		btnDelete.setVisible(isAllowDelete() && (mode == DynDaoMode.DELETE || mode == DynDaoMode.EDIT));
-		btnSave.setVisible(isAllowUpdate() && (mode == DynDaoMode.UPDATE || mode == DynDaoMode.EDIT));
-		btnClear.setVisible(isAllowAdd() && (allowClear && (mode == DynDaoMode.VIEW || mode == DynDaoMode.EDIT)));
-		btnClose.setVisible(allowClose);
-		btnDuplicate.setVisible(isAllowAdd() && isAllowDuplicate() && btnEdit.isVisible());
-		pnlTraverse.setVisible(traversePolicy != null && btnEdit.isVisible());
-		btnImport.setVisible(allowImport && btnAdd.isVisible());
-		btnPrint.setVisible(!btnAdd.isVisible() && isAllowPrint());
-		btnHistory.setVisible(!btnAdd.isVisible() && isAllowHistory());
-		checkPnlTraverseEnability();
-		this.mode = mode;
-
-		pack();
-		fireAfterSetMode(mode);
-	}
-
-	private boolean isAllowDuplicate() {
-		return allowDuplicate && !tableMeta.isSingleRecord();
-	}
-
-	private boolean isAllowUpdate() {
-		return tableMeta.isAllowUpdate();
-	}
-
-	private boolean isAllowDelete() {
-		return tableMeta.isAllowDelete();
-	}
-
-	private boolean isAllowAdd() {
-		return allowAdd && tableMeta.isAllowAdd();
-	}
-
-	/**
-	 * @param allowCopy
-	 *            the allowCopy to set
-	 */
-	public void setAllowDuplicate(boolean allowCopy) {
-		this.allowDuplicate = allowCopy;
-	}
-
-	/**
-	 * 
-	 * 
-	 */
-	public void handleDelete(boolean confirm) {
-		if (!confirm || (confirm && SwingUtility.showConfirmationDialog("CONFIRM_DELETE_RECORD"))) {
-			try {
-				pnlDao.handleDeleteEvent();
-			} catch (DaoException ex) {
-				SwingUtility.showDatabaseErrorDialog(ex.getMessage(), ex);
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * 
-	 */
-	protected void handleSave() {
-		try {
-			pnlDao.validateUpdateData();
-			pnlDao.handleSaveEvent();
-		} catch (ValidationException e) {
-			ExceptionUtil.handleException(e);
-		} catch (RecordNotFoundException ex) {
-			ExceptionUtil.handleException(ex);
-		} catch (DaoException ex) {
-			ExceptionUtil.handleException(ex);
-		}
-	}
-
-	/**
-	 * 
-	 * @throws DaoException
-	 */
-	protected void handleEdit() {
-		setMode(DynDaoMode.EDIT);
-	}
-
-	/**
-	 * 
-	 * 
-	 */
-	protected void handleClear() {
-		setMode(DynDaoMode.ADD);
-	}
-
-	/**
-	 * 
+	 *
 	 * @param mode
 	 */
-	private void fireAfterSetMode(DynDaoMode mode) {
-		ArrayList<DynDaoActionListener> list = pnlDao.getListeners();
+	private void fireAfterSetMode(final DynDaoMode mode) {
+		final ArrayList<DynDaoActionListener> list = this.pnlDao.getListeners();
 		for (int i = 0; i < list.size(); i++) {
 			list.get(i).afterSetMode(mode);
 		}
@@ -547,183 +283,136 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 
 	/**
 	 */
-	private void fireBeforeSetMode(DynDaoMode mode) {
-		ArrayList<DynDaoActionListener> list = pnlDao.getListeners();
+	private void fireBeforeSetMode(final DynDaoMode mode) {
+		final ArrayList<DynDaoActionListener> list = this.pnlDao.getListeners();
 		for (int i = 0; i < list.size(); i++) {
 			list.get(i).beforeSetMode(mode);
 		}
 	}
 
 	/**
-	 * 
-	 * 
+	 * @return
 	 */
-	private void pack() {
-		if (getRootPane() != null && getRootPane().getParent() instanceof JKDialog) {
-			((JKDialog) getRootPane().getParent()).pack();
+	private JKPanel getButtonsPanel() {
+		this.pnlButtonsContainer = new JKPanel();
+		this.pnlButtonsContainer.setLayout(new BoxLayout(this.pnlButtonsContainer, BoxLayout.Y_AXIS));
+
+		this.pnlEmpty = new JKPanel();
+		this.pnlButtonsContainer.add(this.pnlEmpty);
+		this.pnlActionButtons = new JKPanel();
+		this.btnAdd.setShortcut("F1", "F1");
+		this.btnPrint.setShortcut("alt P", "Alt P");
+		this.btnEdit.setShortcut("F2", "F2");
+		this.btnSave.setShortcut("F3", "F3");
+		this.btnDuplicate.setShortcut("F4", "F4");
+		this.btnDelete.setShortcut("F9", "F9");
+		this.btnCancelEdit.setShortcut("F8", "F8");
+		this.btnClose.setShortcut("F6", "F6");
+		this.btnClear.setShortcut("F7", "F7");
+		this.btnFind.setShortcut("alt F", "Alt F");
+		this.btnHistory.setShortcut("alt H", "Alt H");
+
+		this.btnEdit.setIcon("edit_smart_org_icon.gif");
+		this.btnDuplicate.setIcon("dublicate_commons_model_icon.gif");
+		this.btnDelete.setIcon("delete_commons_system_icons.gif");
+		this.btnClear.setIcon("clean_commons_model_icon.gif");
+		this.btnAdd.setIcon("add_commons_system_icon.gif");
+		this.btnPrint.setIcon("fileprint.png");
+		this.btnHistory.setIcon("fileprint.png");
+		this.btnCancelEdit.setIcon("back_commons_system_icon.gif");
+		this.btnSave.setIcon("save_commons_model_icon.gif");
+		this.btnClose.setIcon("close.png");
+		this.btnFind.setIcon("find_commons_system_icon.gif");
+
+		this.btnFirstRecord.setIcon(SwingUtility.isLeftOrientation() ? "first_button_commons_icon.gif" : "last_button_commons_icon.gif");
+		this.btnLastRecord.setIcon(SwingUtility.isLeftOrientation() ? "last_button_commons_icon.gif" : "first_button_commons_icon.gif");
+		this.btnNextRecord.setIcon(SwingUtility.isLeftOrientation() ? "next_button_commons_icon.gif" : "previous_button_commons_icon.gif");
+		this.btnPreviouseRecord.setIcon(SwingUtility.isLeftOrientation() ? "previous_button_commons_icon.gif" : "next_button_commons_icon.gif");
+
+		this.pnlActionButtons.add(this.btnAdd);
+		this.pnlActionButtons.add(this.btnFind);
+		this.pnlActionButtons.add(this.btnImport);
+		this.pnlActionButtons.add(this.btnEdit);
+		this.pnlActionButtons.add(this.btnSave);
+		this.pnlActionButtons.add(this.btnDuplicate);
+		this.pnlActionButtons.add(this.btnDelete);
+		this.pnlActionButtons.add(this.btnClear);
+		this.pnlActionButtons.add(this.btnCancelEdit);
+		this.pnlActionButtons.add(this.btnPrint);
+		this.pnlActionButtons.add(this.btnHistory);
+		this.pnlActionButtons.add(this.btnClose);
+
+		final JKPanel pnlTravrse = getTraversePanel();
+
+		this.pnlButtonsContainer.add(this.pnlActionButtons);
+		this.pnlButtonsContainer.add(pnlTravrse);
+		return this.pnlButtonsContainer;
+	}
+
+	public Object getComponentValue(final String compName) {
+		return getFieldComponent(compName).getValue();
+	}
+
+	public int getComponentValueAsInteger(final String compName) {
+		final Object obj = getComponentValue(compName);
+		if (obj == null || obj.toString().trim().equals("")) {
+			return -1;
 		}
+		return Integer.parseInt(obj.toString());
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
 	 */
-	private void handleAdd() {
-		try {
-			pnlDao.validateAddData(!tableMeta.getIdField().isAutoIncrement());
-			String newId = pnlDao.handleAddEvent();
-			if (newId != null) {
-				setNewRecordId(newId);
-			}
-		} catch (ValidationException ex) {
-			ExceptionUtil.handleException(ex);
-		} catch (DaoException ex) {
-			ExceptionUtil.handleException(ex);
-		}
+	public DynamicDao getDao() {
+		return this.pnlDao.getDao();
 	}
 
+	public Record getDuplicatedRecord() {
+		return this.duplicatedRecord;
+	}
+
+	public JKPanel getEmptyPanel() {
+		return this.pnlEmpty;
+	}
+
+	// ////////////////////////////
+	// Delegate methods
 	/**
-	 * 
-	 * @param newId
+	 *
+	 * @param compName
+	 * @return
 	 */
-	public void setNewRecordId(String newId) {
-		this.newId = newId;
-
+	public BindingComponent getFieldComponent(final String compName) {
+		return this.pnlDao.getFieldComponent(compName);
 	}
 
 	/**
-	 * Called by the find button event
-	 * 
-	 */
-	private void handleFind() {
-		try {
-			Object id = QueryDialog.showQueryDialog(tableMeta);
-			if (id != null) {
-				handleFindRecord(id);
-			}
-		} catch (RecordNotFoundException ex) {
-			SwingUtility.showMessageDialog(ex.getMessage(), ex);
-			pnlDao.requestFocus();
-		} catch (DaoException ex) {
-			SwingUtility.showDatabaseErrorDialog(ex.getMessage(), ex);
-		}
-
-	}
-
-	/**
-	 * 
-	 */
-	public void handleFindRecord(Object id) throws DaoException {
-		handleFind(id.toString(), true);
-	}
-
-	/**
-	 * Created to fix the recursion issue at refined method
-	 * 
-	 * @param recordId
-	 * @throws DaoException
-	 */
-	public void handleFind(String recordId, boolean setViewMode) throws DaoException {
-		pnlDao.handleFindEvent(recordId);
-		if (setViewMode) {
-			setMode(DynDaoMode.VIEW);
-		}
-	}
-
-	/**
-	 * 
-	 */
-	public void handleClose() {
-		pnlDao.close();// wait for call back to execute the real close on
-	}
-
-	/**
-	 * 
-	 * @param allowFind
-	 */
-	public void setAllowFind(boolean allowFind) {
-		this.allowFind = allowFind;
-		setMode(mode);// just to refresh the components
-	}
-
-	@Override
-	public void resetComponents() throws DaoException {
-		pnlDao.resetComponents();
-
-	}
-
-	@Override
-	public void requestFocus() {
-		if (mode == DynDaoMode.VIEW) {// DynPanel will be disabled
-			btnEdit.requestFocus();
-		} else {
-			pnlDao.requestFocus();
-		}
-	}
-
-	/**
-	 * 
-	 * @param showClose
-	 */
-	public void setAllowClose(boolean showClose) {
-		this.allowClose = showClose;
-		if (btnClose.isVisible()) {
-			btnClose.setVisible(showClose);
-		}
-	}
-
-	/**
-	 * 
-	 * @param showClear
-	 */
-	public void setAllowClear(boolean showClear) {
-		this.allowClear = showClear;
-	}
-
-	/**
-	 * 
-	 * @param showAdd
-	 */
-	public void setAllowAdd(boolean showAdd) {
-		this.allowAdd = showAdd;
-
-	}
-
-	/**
-	 * 
-	 * @param showEdit
-	 */
-	public void setAllowEdit(boolean showEdit) {
-		this.allowEdit = showEdit;
-
-	}
-
-	/**
-	 * 
-	 */
-	public void addDynDaoActionListener(DynDaoActionListener listener) {
-		pnlDao.addDynDaoActionListener(listener);
-	}
-
-	/**
-	 * 
-	 */
-	public DynDaoMode getMode() {
-		return mode;
-	}
-
-	/**
-	 * 
-	 */
-	public Record getRecord() {
-		return pnlDao.viewToRecord();
-	}
-
-	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getIdValue() {
-		return pnlDao.getIdValue();
+		return this.pnlDao.getIdValue();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public int getIdValueAsInteger() {
+		return getPnlDao().getIdFieldValueAsInteger();
+	}
+
+	/**
+	 *
+	 */
+	public DynDaoMode getMode() {
+		return this.mode;
+	}
+
+	public JKPanel getPnlButtonsContainer() {
+		return this.pnlButtonsContainer;
 	}
 
 	/**
@@ -734,242 +423,249 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	}
 
 	/**
-	 * @param pnlDao
-	 *            the pnlDao to set
+	 *
 	 */
-	public void setPnlDao(DynPanel pnlDao) {
-		this.pnlDao = pnlDao;
+	public Record getRecord() {
+		return this.pnlDao.viewToRecord();
 	}
 
 	/**
-	 * 
-	 */
-	public Object getValue() {
-		return getIdValue();
-	}
-
-	/**
-	 * 
-	 */
-	public void setValue(Object value) {
-		try {
-			handleFindRecord(value.toString());
-		} catch (DaoException e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
-	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public TableMeta getTableMeta() {
-		return tableMeta;
+		return this.tableMeta;
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
-	public int getIdValueAsInteger() {
-		return getPnlDao().getIdFieldValueAsInteger();
-	}
-
-	/**
-	 * USED TO CALL THE FIND AGAIN , THE IDEA FROM THIS METHOD IS TO RE-POPULATE
-	 * THE DATA ESPECIALY IF THE USER UPDTED THE CONTENTS OF THE COMPONENTS
-	 * (COMBO BOX FOR EXAM) FROM CUSTOMIZED PANEL , like PnlClassCourses in
-	 * smart-school
-	 * 
-	 * @throws DaoException
-	 */
-	public void reFind() throws DaoException {
-		if (getMode() == DynDaoMode.VIEW) {
-			pnlDao.handleFindEvent(getIdValue(), false);
-			// pnlDao.findRecord(getIdValue());
-		} else {
-			throw new IllegalStateException("Refind in non view mode is not allowed , Current mode is :" + getMode());
-		}
-	}
-
-	/**
-	 * 
-	 * @param componentName
-	 * @param masterIdValue
-	 */
-	public void setComponentValue(String componentName, Object value) {
-		pnlDao.setComponentValue(componentName, value);
-	}
-
-	// /////////////////////////////////////////////////////////
-	// ///////////////////////////////////////////////////////
-	// ///////////////////////////////////////////////////////
-	/**
-	 * 
-	 */
-	@Override
-	public void afterSetMode(DynDaoMode mode) {
-		if (mode == DynDaoMode.EDIT) {
-			pnlDao.requestFocus();
-		}
-	}
-
-	/**
-	 * Override the DaoActionListner
-	 */
-	@Override
-	public void afterAddRecord(Record record) throws DaoException {
-		// SwingUtility.showSuccessDialog("SUCC_RECORD_ADDED");
-		if (showRecordAfterAdd) {
-			handleFindRecord(record.getIdValue());
-		} else {
-			setMode(DynDaoMode.ADD);
-		}
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void afterDeleteRecord(Record record) throws DaoException {
-		setMode(DynDaoMode.ADD);
-	}
-
-	@Override
-	public void afterUpdateRecord(Record record) throws DaoException {
-		pnlDao.handleFindEvent(record.getIdValue());
-	}
-
-	@Override
-	public void onRecordFound(Record record) {
-		setMode(DynDaoMode.VIEW);
-	}
-
-	@Override
-	public void beforeAddRecord(Record record) {
-	}
-
-	@Override
-	public void beforeClosePanel() {
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void afterClosePanel() {
-		setVisible(false);
-	}
-
-	@Override
-	public void beforeDeleteRecord(Record record) throws DaoException {
-	}
-
-	@Override
-	public void beforeUpdateRecord(Record record) throws DaoException {
-	}
-
-	@Override
-	public void onDaoException(Record recod, DaoException ex) {
-		ExceptionUtil.handleException(ex);
-	}
-
-	@Override
-	public void onRecordNotFound(Object recordId, DaoException e) {
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void afterResetComponents() {
-	}
-
-	@Override
-	public void beforeResetComponents(Record record) {
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void beforeSetMode(DynDaoMode mode) {
-		if (mode == DynDaoMode.ADD || mode == DynDaoMode.DUPLICATE) {
-			try {
-				resetComponents();
-				pnlDao.requestFocus();
-			} catch (DaoException e) {
-				ExceptionUtil.handleException(e);
-			}
-		}
-	}
-
-	// ////////////////////////////
-	// Delegate methods
-	/**
-	 * 
-	 * @param compName
-	 * @return
-	 */
-	public BindingComponent getFieldComponent(String compName) {
-		return pnlDao.getFieldComponent(compName);
-	}
-
-	public Object getComponentValue(String compName) {
-		return ((BindingComponent) getFieldComponent(compName)).getValue();
-	}
-
-	public int getComponentValueAsInteger(String compName) {
-		Object obj = getComponentValue(compName);
-		if (obj == null || obj.toString().trim().equals("")) {
-			return -1;
-		}
-		return Integer.parseInt(obj.toString());
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public DynamicDao getDao() {
-		return pnlDao.getDao();
-	}
-
-	@Override
-	public void setEnabled(boolean enabled) {
-		super.setEnabled(enabled);
-		if (enabled) {
-			// this call to fix the conflict may caused by the the setEnabled
-			// call which will
-			// enable every without any respect the to the current mode
-			pnlDao.enableDataFields(true);
-		}
+	private JKPanel getTraversePanel() {
+		this.pnlTraverse = new JKPanel();
+		this.pnlTraverse.setBorder(SwingUtility.createTitledBorder("RECORDS"));
+		this.pnlTraverse.add(this.btnFirstRecord);
+		this.pnlTraverse.add(this.btnPreviouseRecord);
+		this.pnlTraverse.add(this.btnNextRecord);
+		this.pnlTraverse.add(this.btnLastRecord);
+		return this.pnlTraverse;
 	}
 
 	/**
 	 * @return the traversePolicy
 	 */
 	public RecordTraversePolicy getTraversePolicy() {
-		return traversePolicy;
+		return this.traversePolicy;
 	}
 
 	/**
-	 * @param traversePolicy
-	 *            the traversePolicy to set
+	 *
 	 */
-	public void setTraversePolicy(RecordTraversePolicy traversePolicy) {
-		this.traversePolicy = traversePolicy;
+	@Override
+	public Object getValue() {
+		return getIdValue();
+	}
+
+	/**
+	 *
+	 */
+	private void handleAdd() {
+		try {
+			this.pnlDao.validateAddData(!this.tableMeta.getIdField().isAutoIncrement());
+			final String newId = this.pnlDao.handleAddEvent();
+			if (newId != null) {
+				setNewRecordId(newId);
+			}
+		} catch (final ValidationException ex) {
+			ExceptionUtil.handleException(ex);
+		} catch (final DaoException ex) {
+			ExceptionUtil.handleException(ex);
+		}
+	}
+
+	/**
+	 *
+	 */
+	private void handleCancelEdit() {
+		// setMode(DynDaoMode.VIEW);
+		try {
+			handleFindRecord(getRecord().getIdValue());
+		} catch (final DaoException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	/**
+	 *
+	 *
+	 */
+	protected void handleClear() {
+		setMode(DynDaoMode.ADD);
+	}
+
+	/**
+	 *
+	 */
+	public void handleClose() {
+		this.pnlDao.close();// wait for call back to execute the real close on
+	}
+
+	/**
+	 *
+	 *
+	 */
+	public void handleDelete(final boolean confirm) {
+		if (!confirm || confirm && SwingUtility.showConfirmationDialog("CONFIRM_DELETE_RECORD")) {
+			try {
+				this.pnlDao.handleDeleteEvent();
+			} catch (final DaoException ex) {
+				SwingUtility.showDatabaseErrorDialog(ex.getMessage(), ex);
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleDuplicate() {
+		this.duplicatedRecord = getRecord();
+		setMode(DynDaoMode.DUPLICATE);
+		final ArrayList<Field> fields = this.duplicatedRecord.getFields();
+		for (final Field field : fields) {
+			if (field.getValue() != null) {
+				setComponentValue(field.getFieldName(), field.getValueObject());
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @throws DaoException
+	 */
+	protected void handleEdit() {
+		setMode(DynDaoMode.EDIT);
+	}
+
+	/**
+	 * Called by the find button event
+	 *
+	 */
+	private void handleFind() {
+		try {
+			final Object id = QueryDialog.showQueryDialog(this.tableMeta);
+			if (id != null) {
+				handleFindRecord(id);
+			}
+		} catch (final RecordNotFoundException ex) {
+			SwingUtility.showMessageDialog(ex.getMessage(), ex);
+			this.pnlDao.requestFocus();
+		} catch (final DaoException ex) {
+			SwingUtility.showDatabaseErrorDialog(ex.getMessage(), ex);
+		}
+
+	}
+
+	/**
+	 * Created to fix the recursion issue at refined method
+	 *
+	 * @param recordId
+	 * @throws DaoException
+	 */
+	public void handleFind(final String recordId, final boolean setViewMode) throws DaoException {
+		this.pnlDao.handleFindEvent(recordId);
+		if (setViewMode) {
+			setMode(DynDaoMode.VIEW);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public void handleFindRecord(final Object id) throws DaoException {
+		handleFind(id.toString(), true);
+	}
+
+	private void handleImport() {
+		final String record = SwingUtility.showInputDialog("ENTER_RECORD");
+		if (record != null) {
+			try {
+				importRecord(record.split(";"));
+			} catch (final DaoException e) {
+				ExceptionUtil.handleException(e);
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleMoveFirstRecord() {
+		final int nextRecord = this.traversePolicy.getFirstRecord();
+		moveToRecord(nextRecord);
+	}
+
+	/**
+	 *
+	 */
+	protected void handleMoveLastRecord() {
+		final int nextRecord = this.traversePolicy.getLastRecord();
+		moveToRecord(nextRecord);
+	}
+
+	/**
+	 *
+	 */
+	protected void handleMoveNextRecord() {
+		final int id = getIdValueAsInteger();
+		final int nextRecord = this.traversePolicy.getNextRecord(id);
+		moveToRecord(nextRecord);
+	}
+
+	/**
+	 *
+	 */
+	protected void handleMovePreviouseRecord() {
+		final int id = getIdValueAsInteger();
+		final int nextRecord = this.traversePolicy.getPreviouseRecord(id);
+		moveToRecord(nextRecord);
+	}
+
+	protected void handlePrint() {
+		PrintUtilities.printComponent(this.pnlDao);
+	}
+
+	/**
+	 *
+	 *
+	 */
+	protected void handleSave() {
+		try {
+			this.pnlDao.validateUpdateData();
+			this.pnlDao.handleSaveEvent();
+		} catch (final ValidationException e) {
+			ExceptionUtil.handleException(e);
+		} catch (final RecordNotFoundException ex) {
+			ExceptionUtil.handleException(ex);
+		} catch (final DaoException ex) {
+			ExceptionUtil.handleException(ex);
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleShowHistory() {
+		PnlAuditHistory.showHistory(getIdValueAsInteger(), this.tableMeta.getTableName());
 	}
 
 	/**
 	 * @param data
 	 * @throws DaoException
 	 */
-	public void importRecord(String[] data) throws DaoException {
-		Record emptyRecord = getDao().createEmptyRecord(true);
-		ArrayList<Field> fields = emptyRecord.getFields();
+	public void importRecord(final String[] data) throws DaoException {
+		final Record emptyRecord = getDao().createEmptyRecord(true);
+		final ArrayList<Field> fields = emptyRecord.getFields();
 		int index = 0;
-		for (Field field : fields) {
+		for (final Field field : fields) {
 			if (index >= data.length) {
 				break;
 			}
@@ -977,86 +673,415 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 				field.setValue(data[index++]);
 			}
 		}
-		String recordId = getDao().insertRecord(emptyRecord);
+		final String recordId = getDao().insertRecord(emptyRecord);
 		handleFindRecord(recordId);
+	}
+
+	/**
+	 */
+	private void init() {
+		final JKPanel container = new JKPanel(new BorderLayout());
+		container.add(this.pnlDao, BorderLayout.CENTER);
+		container.add(getButtonsPanel(), BorderLayout.SOUTH);
+		container.setBorder(SwingUtility.createTitledBorder(""));
+		add(container, BorderLayout.CENTER);
+		this.btnImport.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleImport();
+			}
+		});
+		this.btnAdd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleAdd();
+			}
+		});
+		this.btnFind.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleFind();
+			}
+		});
+		this.btnClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleClose();
+			}
+		});
+		this.btnClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleClear();
+
+			}
+		});
+		this.btnEdit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleEdit();
+			}
+		});
+		this.btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleSave();
+			}
+		});
+		this.btnDuplicate.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleDuplicate();
+			}
+		});
+		this.btnDelete.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleDelete(true);
+			}
+		});
+		this.btnCancelEdit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleCancelEdit();
+			}
+		});
+		this.btnNextRecord.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleMoveNextRecord();
+			}
+		});
+		this.btnPreviouseRecord.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleMovePreviouseRecord();
+			}
+		});
+		this.btnLastRecord.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleMoveLastRecord();
+			}
+		});
+		this.btnFirstRecord.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleMoveFirstRecord();
+			}
+		});
+		this.btnPrint.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handlePrint();
+			}
+		});
+		this.btnHistory.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleShowHistory();
+			}
+		});
+	}
+
+	private boolean isAllowAdd() {
+		return this.allowAdd && this.tableMeta.isAllowAdd();
+	}
+
+	private boolean isAllowDelete() {
+		return this.tableMeta.isAllowDelete();
+	}
+
+	private boolean isAllowDuplicate() {
+		return this.allowDuplicate && !this.tableMeta.isSingleRecord();
+	}
+
+	public boolean isAllowHistory() {
+		return this.allowHistory;
 	}
 
 	/**
 	 * @return the allowImport
 	 */
 	public boolean isAllowImport() {
-		return allowImport;
+		return this.allowImport;
+	}
+
+	public boolean isAllowPrint() {
+		return this.allowPrint;
+	}
+
+	private boolean isAllowUpdate() {
+		return this.tableMeta.isAllowUpdate();
+	}
+
+	public boolean isShowRecordAfterAdd() {
+		return this.showRecordAfterAdd;
+	}
+
+	/**
+	 * @param recordId
+	 */
+	private void moveToRecord(final int recordId) {
+		if (recordId != -1) {
+			try {
+				handleFindRecord(recordId);
+				this.traversePolicy.setCurrentRecord(getIdValueAsInteger());
+				checkPnlTraverseEnability();
+			} catch (final DaoException e) {
+				ExceptionUtil.handleException(e);
+			}
+		}
+	}
+
+	@Override
+	public void onDaoException(final Record recod, final DaoException ex) {
+		ExceptionUtil.handleException(ex);
+	}
+
+	@Override
+	public void onRecordFound(final Record record) {
+		setMode(DynDaoMode.VIEW);
+	}
+
+	@Override
+	public void onRecordNotFound(final Object recordId, final DaoException e) {
+	}
+
+	/**
+	 *
+	 *
+	 */
+	private void pack() {
+		if (getRootPane() != null && getRootPane().getParent() instanceof JKDialog) {
+			((JKDialog) getRootPane().getParent()).pack();
+		}
+	}
+
+	/**
+	 * USED TO CALL THE FIND AGAIN , THE IDEA FROM THIS METHOD IS TO RE-POPULATE
+	 * THE DATA ESPECIALY IF THE USER UPDTED THE CONTENTS OF THE COMPONENTS
+	 * (COMBO BOX FOR EXAM) FROM CUSTOMIZED PANEL , like PnlClassCourses in
+	 * smart-school
+	 *
+	 * @throws DaoException
+	 */
+	public void reFind() throws DaoException {
+		if (getMode() == DynDaoMode.VIEW) {
+			this.pnlDao.handleFindEvent(getIdValue(), false);
+			// pnlDao.findRecord(getIdValue());
+		} else {
+			throw new IllegalStateException("Refind in non view mode is not allowed , Current mode is :" + getMode());
+		}
+	}
+
+	@Override
+	public void requestFocus() {
+		if (this.mode == DynDaoMode.VIEW) {// DynPanel will be disabled
+			this.btnEdit.requestFocus();
+		} else {
+			this.pnlDao.requestFocus();
+		}
+	}
+
+	@Override
+	public void resetComponents() throws DaoException {
+		this.pnlDao.resetComponents();
+
+	}
+
+	/**
+	 *
+	 * @param showAdd
+	 */
+	public void setAllowAdd(final boolean showAdd) {
+		this.allowAdd = showAdd;
+
+	}
+
+	/**
+	 *
+	 * @param showClear
+	 */
+	public void setAllowClear(final boolean showClear) {
+		this.allowClear = showClear;
+	}
+
+	/**
+	 *
+	 * @param showClose
+	 */
+	public void setAllowClose(final boolean showClose) {
+		this.allowClose = showClose;
+		if (this.btnClose.isVisible()) {
+			this.btnClose.setVisible(showClose);
+		}
+	}
+
+	/**
+	 * @param allowCopy
+	 *            the allowCopy to set
+	 */
+	public void setAllowDuplicate(final boolean allowCopy) {
+		this.allowDuplicate = allowCopy;
+	}
+
+	/**
+	 *
+	 * @param showEdit
+	 */
+	public void setAllowEdit(final boolean showEdit) {
+		this.allowEdit = showEdit;
+
+	}
+
+	/**
+	 *
+	 * @param allowFind
+	 */
+	public void setAllowFind(final boolean allowFind) {
+		this.allowFind = allowFind;
+		setMode(this.mode);// just to refresh the components
+	}
+
+	public void setAllowHistory(final boolean allowHostory) {
+		this.allowHistory = allowHostory;
 	}
 
 	/**
 	 * @param allowImport
 	 *            the allowImport to set
 	 */
-	public void setAllowImport(boolean allowImport) {
+	public void setAllowImport(final boolean allowImport) {
 		this.allowImport = allowImport;
 	}
 
-	private void handleImport() {
-		String record = SwingUtility.showInputDialog("ENTER_RECORD");
-		if (record != null) {
-			try {
-				importRecord(record.split(";"));
-			} catch (DaoException e) {
-				ExceptionUtil.handleException(e);
-			}
+	public void setAllowPrint(final boolean allowPrint) {
+		this.allowPrint = allowPrint;
+	}
+
+	/**
+	 *
+	 * @param componentName
+	 * @param masterIdValue
+	 */
+	public void setComponentValue(final String componentName, final Object value) {
+		this.pnlDao.setComponentValue(componentName, value);
+	}
+
+	@Override
+	public void setEnabled(final boolean enabled) {
+		super.setEnabled(enabled);
+		if (enabled) {
+			// this call to fix the conflict may caused by the the setEnabled
+			// call which will
+			// enable every without any respect the to the current mode
+			this.pnlDao.enableDataFields(true);
 		}
 	}
 
 	/**
-	 * 
+	 *
+	 * @param mode
+	 * @throws DaoException
 	 */
-	private void handleCancelEdit() {
-		// setMode(DynDaoMode.VIEW);
+	public void setMode(DynDaoMode mode) {
+		fireBeforeSetMode(mode);
+
+		// SwingUtility.enableContainer(pnlDao, mode == DynDaoMode.VIEW);
+		// used for filtering in the report , to avoid hiding
+		// the find button when record already found
+		if (mode == DynDaoMode.VIEW && !this.allowEdit && this.allowFind) {
+			mode = DynDaoMode.FIND;
+		}
+		if (mode == DynDaoMode.ADD) {
+			this.duplicatedRecord = null;
+		}
+		if (mode == DynDaoMode.ADD || mode == DynDaoMode.DUPLICATE) {
+			this.pnlDao.enableAllComponents(isAllowAdd());
+		} else if (mode == DynDaoMode.VIEW) {
+			this.pnlDao.enableAllComponents(false);
+			this.btnEdit.requestFocus();
+		} else if (mode == DynDaoMode.FIND) {
+			this.pnlDao.enableAllComponents(false);
+		} else if (mode == DynDaoMode.EDIT) {
+			this.pnlDao.enableDataFields(this.tableMeta.isAllowUpdate());
+		} else {
+			System.err.print("Unhandled mode : " + mode.toString());
+		}
+
+		this.btnCancelEdit.setVisible(mode == DynDaoMode.EDIT);
+		this.btnAdd.setVisible(this.tableMeta.isAllowAdd() && (mode == DynDaoMode.ADD || mode == DynDaoMode.DUPLICATE));
+		this.btnFind.setVisible(this.allowFind && (mode == DynDaoMode.ADD || mode == DynDaoMode.FIND));
+		this.btnEdit.setVisible(this.allowEdit && mode == DynDaoMode.VIEW && (this.tableMeta.isAllowUpdate() || this.tableMeta.isAllowDelete()));
+
+		this.btnDelete.setVisible(isAllowDelete() && (mode == DynDaoMode.DELETE || mode == DynDaoMode.EDIT));
+		this.btnSave.setVisible(isAllowUpdate() && (mode == DynDaoMode.UPDATE || mode == DynDaoMode.EDIT));
+		this.btnClear.setVisible(isAllowAdd() && this.allowClear && (mode == DynDaoMode.VIEW || mode == DynDaoMode.EDIT));
+		this.btnClose.setVisible(this.allowClose);
+		this.btnDuplicate.setVisible(isAllowAdd() && isAllowDuplicate() && this.btnEdit.isVisible());
+		this.pnlTraverse.setVisible(this.traversePolicy != null && this.btnEdit.isVisible());
+		this.btnImport.setVisible(this.allowImport && this.btnAdd.isVisible());
+		this.btnPrint.setVisible(!this.btnAdd.isVisible() && isAllowPrint());
+		this.btnHistory.setVisible(!this.btnAdd.isVisible() && isAllowHistory());
+		checkPnlTraverseEnability();
+		this.mode = mode;
+
+		pack();
+		fireAfterSetMode(mode);
+	}
+
+	/**
+	 *
+	 * @param newId
+	 */
+	public void setNewRecordId(final String newId) {
+		this.newId = newId;
+
+	}
+
+	/**
+	 * @param pnlDao
+	 *            the pnlDao to set
+	 */
+	public void setPnlDao(final DynPanel pnlDao) {
+		this.pnlDao = pnlDao;
+	}
+
+	public void setShowButtons(final boolean show) {
+		this.pnlButtonsContainer.setVisible(show);
+	}
+
+	public void setShowRecordAfterAdd(final boolean showRecordAfterAdd) {
+		this.showRecordAfterAdd = showRecordAfterAdd;
+	}
+
+	/**
+	 * @param traversePolicy
+	 *            the traversePolicy to set
+	 */
+	public void setTraversePolicy(final RecordTraversePolicy traversePolicy) {
+		this.traversePolicy = traversePolicy;
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void setValue(final Object value) {
 		try {
-			handleFindRecord(getRecord().getIdValue());
-		} catch (DaoException e) {
+			handleFindRecord(value.toString());
+		} catch (final DaoException e) {
 			ExceptionUtil.handleException(e);
 		}
-	}
-
-	public JKPanel getEmptyPanel() {
-		return pnlEmpty;
-	}
-
-	public void setShowButtons(boolean show) {
-		pnlButtonsContainer.setVisible(show);
-	}
-
-	public void addButton(JButton btn) {
-		pnlActionButtons.add(btn);
-	}
-
-	public Record getDuplicatedRecord() {
-		return duplicatedRecord;
-	}
-
-	public void setAllowPrint(boolean allowPrint) {
-		this.allowPrint = allowPrint;
-	}
-
-	public void setAllowHistory(boolean allowHostory) {
-		this.allowHistory = allowHostory;
-	}
-
-	public boolean isAllowHistory() {
-		return allowHistory;
-	}
-
-	public boolean isAllowPrint() {
-		return allowPrint;
-	}
-
-	public boolean isShowRecordAfterAdd() {
-		return showRecordAfterAdd;
-	}
-
-	public void setShowRecordAfterAdd(boolean showRecordAfterAdd) {
-		this.showRecordAfterAdd = showRecordAfterAdd;
 	}
 
 }

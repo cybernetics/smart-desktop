@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.application.ui.menu;
 
@@ -12,7 +24,7 @@ import com.fs.commons.security.Privilige;
 
 /**
  * @author u087
- * 
+ *
  */
 public class Menu {
 	String name;
@@ -23,45 +35,14 @@ public class Menu {
 	ArrayList<Menu> groups = new ArrayList<Menu>();
 	Module parentModule;
 
-	/**
-	 * @return the parentModule
-	 */
-	public Module getParentModule() {
-		return parentModule;
-	}
-
-	/**
-	 * @param parentModule
-	 *            the parentModule to set
-	 */
-	public void setParentModule(Module parentModule) {
-		this.parentModule = parentModule;
-	}
-
 	int priviligeId;
-
-	/**
-	 * @return the priviligeId
-	 */
-	public Privilige getPrivilige() {
-		int privId=(getParentModule().getModuleName()+getName()).hashCode();
-		return new Privilige(privId,getName(),getParentModule().getPrivilige());
-	}
-
-//	/**
-//	 * @param priviligeId
-//	 *            the priviligeId to set
-//	 */
-//	public void setPriviligeId(int priviligeId) {
-//		this.priviligeId = priviligeId;
-//	}
 
 	/**
 	 * @param o
 	 * @return
 	 * @see java.util.ArrayList#add(java.lang.Object)
 	 */
-	public boolean add(MenuItem o) {
+	public boolean add(final MenuItem o) {
 		return this.items.add(o);
 	}
 
@@ -70,12 +51,25 @@ public class Menu {
 	 * @return
 	 * @see java.util.ArrayList#addAll(java.util.Collection)
 	 */
-	public boolean addAll(Collection<? extends MenuItem> c) {
+	public boolean addAll(final Collection<? extends MenuItem> c) {
 		return this.items.addAll(c);
 	}
 
+	public void addGroup(final Menu menu) {
+		this.groups.add(menu);
+
+	}
+
+	// /**
+	// * @param priviligeId
+	// * the priviligeId to set
+	// */
+	// public void setPriviligeId(int priviligeId) {
+	// this.priviligeId = priviligeId;
+	// }
+
 	/**
-	 * 
+	 *
 	 * @see java.util.ArrayList#clear()
 	 */
 	public void clear() {
@@ -87,16 +81,34 @@ public class Menu {
 	 * @return
 	 * @see java.util.ArrayList#get(int)
 	 */
-	public MenuItem get(int index) {
+	public MenuItem get(final int index) {
 		return this.items.get(index);
+	}
+
+	public String getFullQualifiedPath() {
+		final StringBuffer buf = new StringBuffer();
+		buf.append(Lables.get(getParentModule().getModuleName(), true));
+		buf.append("-->");
+		buf.append(Lables.get(getName(), true));
+		return buf.toString();
+	}
+
+	public ArrayList<Menu> getGroups() {
+		return this.groups;
+	}
+
+	/**
+	 * @return the iconName
+	 */
+	public String getIconName() {
+		return this.iconName;
 	}
 
 	/**
 	 * @return
-	 * @see java.util.ArrayList#size()
 	 */
-	public int size() {
-		return this.items.size();
+	public ArrayList<MenuItem> getItems() {
+		return this.items;
 	}
 
 	/**
@@ -107,36 +119,37 @@ public class Menu {
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @return the parentModule
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public Module getParentModule() {
+		return this.parentModule;
 	}
 
 	/**
-	 * @return
+	 * @return the priviligeId
 	 */
-	public ArrayList<MenuItem> getItems() {
-		return items;
+	public Privilige getPrivilige() {
+		final int privId = (getParentModule().getModuleName() + getName()).hashCode();
+		return new Privilige(privId, getName(), getParentModule().getPrivilige());
 	}
 
-	/**
-	 * @return the iconName
-	 */
-	public String getIconName() {
-		return this.iconName;
-	}
+	public void init() {
+		new Runnable() {
 
-	public ArrayList<Menu> getGroups() {
-		return groups;
+			@Override
+			public void run() {
+				for (int i = 0; i < Menu.this.items.size(); i++) {
+					Menu.this.items.get(i).init();
+				}
+			}
+		};
 	}
 
 	/**
 	 * @param iconName
 	 *            the iconName to set
 	 */
-	public void setIconName(String iconName) {
+	public void setIconName(final String iconName) {
 		this.iconName = iconName;
 	}
 
@@ -144,32 +157,31 @@ public class Menu {
 	 * @param items
 	 *            the items to set
 	 */
-	public void setItems(ArrayList<MenuItem> items) {
+	public void setItems(final ArrayList<MenuItem> items) {
 		this.items = items;
 	}
 
-	public void addGroup(Menu menu) {
-		groups.add(menu);
-
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(final String name) {
+		this.name = name;
 	}
 
-	public void init() {
-		new Runnable() {
-			
-			@Override
-			public void run() {
-				for (int i = 0; i < items.size(); i++) {
-					items.get(i).init();
-				}	
-			}
-		};
+	/**
+	 * @param parentModule
+	 *            the parentModule to set
+	 */
+	public void setParentModule(final Module parentModule) {
+		this.parentModule = parentModule;
 	}
 
-	public String getFullQualifiedPath() {
-		StringBuffer buf=new StringBuffer();
-		buf.append(Lables.get(getParentModule().getModuleName(),true));
-		buf.append("-->");
-		buf.append(Lables.get(getName(),true));
-		return buf.toString();
+	/**
+	 * @return
+	 * @see java.util.ArrayList#size()
+	 */
+	public int size() {
+		return this.items.size();
 	}
 }

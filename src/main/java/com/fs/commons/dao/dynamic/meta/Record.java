@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.meta;
 
 import java.sql.Time;
@@ -28,192 +43,161 @@ public class Record {
 	// TODO : fix my name
 	String gui;
 
-	public Record(TableMeta meta) {
+	public Record(final TableMeta meta) {
 		this.tableMeta = meta;
 	}
 
-	/**
-	 * @return the tableMeta
-	 */
-	public TableMeta getTableMeta() {
-		return tableMeta;
+	public void addField(final Field field) {
+		this.fields.add(field);
 	}
 
-	/**
-	 * @return the deleted
-	 */
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	/**
-	 * @param deleted
-	 *            the deleted to set
-	 */
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-		if (deleted) {
-			setModified(false);
+	public String concatFieldsValue(final String separator, final String... fieldNames) {
+		final StringBuffer buf = new StringBuffer();
+		for (final String fieldName : fieldNames) {
+			buf.append(getFieldValue(fieldName).toString());
+			buf.append(separator);
 		}
+		return buf.toString();
 	}
 
-	/**
-	 * @return the newRecord
-	 */
-	public boolean isNewRecord() {
-		IdFieldMeta field = (IdFieldMeta) getIdField().getMeta();
-		// ignore user value if id is already set
-		if (field.isAutoIncrement() && (getIdValue() != null && !getIdValue().equals(""))) {
-			return false;
+	public Field getField(final int index) {
+		return this.fields.get(index);
+	}
+
+	public Field getField(final String name) {
+		for (int i = 0; i < this.fields.size(); i++) {
+			if (this.fields.get(i).getMeta().getName().equals(name)) {
+				return this.fields.get(i);
+			}
 		}
-		return newRecord;
-	}
-
-	/**
-	 * @param newRecord
-	 *            the newRecord to set
-	 */
-	public void setNewRecord(boolean newRecord) {
-		this.newRecord = newRecord;
+		return null;
 	}
 
 	public ArrayList<Field> getFields() {
-		return fields;
+		return this.fields;
+	}
+
+	public int getFieldsCount() {
+		return this.fields.size();
 	}
 
 	// public void setFields(ArrayList<Field> fields) {
 	// this.fields = fields;
 	// }
 
-	public Field getField(int index) {
-		return fields.get(index);
-	}
-
-	public int getFieldsCount() {
-		return fields.size();
-	}
-
-	public void addField(Field field) {
-		fields.add(field);
-	}
-
-	public void setFieldValue(String fieldName, Object value) {
-		for (int i = 0; i < fields.size(); i++) {
-			if (fields.get(i).getMeta().getName().equals(fieldName)) {
-				fields.get(i).setValue(value);
-				return;
-			}
+	public ArrayList<Object> getFieldsValues() {
+		final ArrayList<Object> objs = new ArrayList<Object>();
+		for (int i = 0; i < this.fields.size(); i++) {
+			final Field field = this.fields.get(i);
+			objs.add(field.getValueObject());
 		}
-		throw new RuntimeException("Field " + fieldName + " didnt set in  this record");
-	}
-
-	public Field getIdField() {
-		return idField;
-	}
-
-	public void setIdField(Field idField) {
-		this.idField = idField;
-	}
-
-	public void setIdValue(Object value) {
-		idField.setValue(value);
-	}
-
-	public Object getIdValue() {
-		return idField.getValue();
-	}
-
-	public int getIdValueAsInteger() {
-		return idField.getValueAsInteger();
-	}
-
-	@Override
-	public String toString() {
-		return toString(false);
+		return objs;
 	}
 
 	/**
-	 * 
-	 * @param valuesOnly
+	 *
+	 * @param string
 	 * @return
 	 */
-	public String toString(boolean valuesOnly) {
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < fields.size(); i++) {
-			Field field = fields.get(i);
-			if (valuesOnly) {
-				buffer.append(Lables.get(field.getFieldName()));
-				buffer.append(" : ");
-				buffer.append(field.getValue() == null ? "-" : field.getValue());
-			} else {
-				buffer.append(field.toString());
-			}
-			buffer.append("\n");
-		}
-		return buffer.toString();
+	public Object getFieldValue(final String fieldName) {
+		return getField(fieldName).getValueObject();
 	}
 
-	public Field getField(String name) {
-		for (int i = 0; i < fields.size(); i++) {
-			if (fields.get(i).getMeta().getName().equals(name)) {
-				return fields.get(i);
-			}
+	public Boolean getFieldValueAsBoolean(final String fieldName) {
+		return getField(fieldName).getValueAsBoolean();
+	}
+
+	public Date getFieldValueAsDate(final String fieldName) {
+		return ConversionUtil.toDate(getFieldValue(fieldName));
+	}
+
+	public double getFieldValueAsDouble(final String fieldName) {
+		return getField(fieldName).getValueAsDouble();
+	}
+
+	public float getFieldValueAsFloat(final String fieldName) {
+		return getField(fieldName).getValueAsFloat();
+	}
+
+	public int getFieldValueAsInteger(final String fieldName) {
+		return getField(fieldName).getValueAsInteger();
+	}
+
+	public java.sql.Date getFieldValueAsSqlDate(final String fieldName) {
+		final Date value = getFieldValueAsDate(fieldName);
+		if (value != null) {
+			return new java.sql.Date(value.getTime());
 		}
 		return null;
 	}
 
+	public String getFieldValueAsString(final String fieldName) {
+		return getField(fieldName).getValue();
+	}
+
+	public Time getFieldValueAsTime(final String fieldName) {
+		return ConversionUtil.toTime(getFieldValue(fieldName));
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	public ArrayList<Object> getFieldValues() {
+		final ArrayList<Field> fields = getFields();
+		final ArrayList<Object> values = new ArrayList<Object>();
+		for (final Field field : fields) {
+			values.add(field.getValueObject());
+		}
+		return values;
+	}
+
 	/**
-	 * 
+	 *
 	 * @param masterFieldName
 	 * @return
 	 */
-	public Field getForiegnKeyFieldByMasterFieldName(String masterFieldName) {
-		for (int i = 0; i < fields.size(); i++) {
-			if (fields.get(i).getMeta() instanceof ForiegnKeyFieldMeta) {
-				ForiegnKeyFieldMeta field = (ForiegnKeyFieldMeta) fields.get(i).getMeta();
+	public Field getForiegnKeyFieldByMasterFieldName(final String masterFieldName) {
+		for (int i = 0; i < this.fields.size(); i++) {
+			if (this.fields.get(i).getMeta() instanceof ForiegnKeyFieldMeta) {
+				final ForiegnKeyFieldMeta field = (ForiegnKeyFieldMeta) this.fields.get(i).getMeta();
 				if (field.getReferenceField().equals(masterFieldName)) {
-					return fields.get(i);
+					return this.fields.get(i);
 				}
 			}
 		}
 		return null;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public ArrayList<Field> lstSummaryFields() {
-		// TODO : use the lstSummaryFields in tableMeta
-		ArrayList<Field> summaryFields = new ArrayList<Field>();
-		for (int i = 0; i < fields.size(); i++) {
-			Field field = fields.get(i);
-			if (field.getMeta().isSummaryField()) {
-				summaryFields.add(field);
-			}
-		}
-		if (summaryFields.size() == 0 && fields.size() > 1) {
-			summaryFields.add(fields.get(1));
-		}
-		return summaryFields;
+	public String getGui() {
+		return this.gui;
+	}
+
+	public Field getIdField() {
+		return this.idField;
+	}
+
+	public Object getIdValue() {
+		return this.idField.getValue();
+	}
+
+	public int getIdValueAsInteger() {
+		return this.idField.getValueAsInteger();
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 * @throws DaoException
 	 * @throws RecordNotFoundException
 	 */
 	public String getSummaryValue() throws RecordNotFoundException, DaoException {
-		ArrayList<Field> fields = lstSummaryFields();
-		StringBuffer buffer = new StringBuffer();
+		final ArrayList<Field> fields = lstSummaryFields();
+		final StringBuffer buffer = new StringBuffer();
 		for (int i = 0; i < fields.size(); i++) {
-			Field field = fields.get(i);
+			final Field field = fields.get(i);
 			if (field.getValue() != null) {
 				String summaryValue;
 				if (field.getMeta() instanceof ForiegnKeyFieldMeta) {
-					ForiegnKeyFieldMeta meta = (ForiegnKeyFieldMeta) field.getMeta();
-					DynamicDao dao = new DynamicDao(meta.getReferenceTable());
+					final ForiegnKeyFieldMeta meta = (ForiegnKeyFieldMeta) field.getMeta();
+					final DynamicDao dao = new DynamicDao(meta.getReferenceTable());
 					summaryValue = dao.findRecord(field.getValue()).getSummaryValue();
 				} else {
 					summaryValue = field.getValue() + " ";
@@ -225,38 +209,20 @@ public class Record {
 	}
 
 	/**
-	 * 
-	 * @param string
-	 * @return
+	 * @return the tableMeta
 	 */
-	public Object getFieldValue(String fieldName) {
-		return getField(fieldName).getValueObject();
-	}
-
-	public int getFieldValueAsInteger(String fieldName) {
-		return getField(fieldName).getValueAsInteger();
-	}
-
-	public float getFieldValueAsFloat(String fieldName) {
-		return getField(fieldName).getValueAsFloat();
-	}
-
-	public String getFieldValueAsString(String fieldName) {
-		return getField(fieldName).getValue();
-	}
-
-	public Boolean getFieldValueAsBoolean(String fieldName) {
-		return getField(fieldName).getValueAsBoolean();
+	public TableMeta getTableMeta() {
+		return this.tableMeta;
 	}
 
 	/**
-	 * 
+	 *
 	 * @param columnIndex
 	 * @return
 	 */
-	public Field getVisibleField(int visibleIndex) {
+	public Field getVisibleField(final int visibleIndex) {
 		int counter = 0;
-		for (Field field : fields) {
+		for (final Field field : this.fields) {
 			if (field.getMeta().isVisible()) {
 				if (counter++ == visibleIndex) {
 					return field;
@@ -267,25 +233,29 @@ public class Record {
 	}
 
 	/**
-	 * 
-	 * @param b
+	 * @return the deleted
 	 */
-	public void setModified(boolean modified) {
-		this.modified = modified;
+	public boolean isDeleted() {
+		return this.deleted;
+	}
+
+	public boolean isIdAutoIncrement() {
+		final IdFieldMeta meta = (IdFieldMeta) getIdField().getMeta();
+		return meta.isAutoIncrement();
 	}
 
 	/**
 	 * @return the modified
 	 */
 	public boolean isModified() {
-		if (modified) {
+		if (this.modified) {
 			if (isNewRecord()) {
 				// id new record visible fields as null or having default
 				// values, this will be considered as unmodified record ,
 				// mainly used in tabular component
-				for (Field field : fields) {
-					FieldMeta fieldMeta = field.getMeta();
-					String value = field.getValue();
+				for (final Field field : this.fields) {
+					final FieldMeta fieldMeta = field.getMeta();
+					final String value = field.getValue();
 					if (fieldMeta.isVisible() && value != null && !value.equals("") && !value.equals(fieldMeta.getDefaultValue())) {
 						return true;
 					}
@@ -298,12 +268,116 @@ public class Record {
 	}
 
 	/**
-	 * 
+	 * @return the newRecord
+	 */
+	public boolean isNewRecord() {
+		final IdFieldMeta field = (IdFieldMeta) getIdField().getMeta();
+		// ignore user value if id is already set
+		if (field.isAutoIncrement() && getIdValue() != null && !getIdValue().equals("")) {
+			return false;
+		}
+		return this.newRecord;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ArrayList<Field> lstSummaryFields() {
+		// TODO : use the lstSummaryFields in tableMeta
+		final ArrayList<Field> summaryFields = new ArrayList<Field>();
+		for (int i = 0; i < this.fields.size(); i++) {
+			final Field field = this.fields.get(i);
+			if (field.getMeta().isSummaryField()) {
+				summaryFields.add(field);
+			}
+		}
+		if (summaryFields.size() == 0 && this.fields.size() > 1) {
+			summaryFields.add(this.fields.get(1));
+		}
+		return summaryFields;
+	}
+
+	public void populateFrom(final FSTableRecord fsTableRecord) {
+		final ArrayList<Field> fields = getFields();
+		setNewRecord(fsTableRecord.getStatus() == RecordStatus.NEW);
+		for (final Field field : fields) {
+			field.setValue(fsTableRecord.getFieldValue(field.getFieldName()));
+		}
+
+	}
+
+	public void populateTo(final FSTableRecord fsTableRecord) throws TableMetaNotFoundException, DaoException {
+		final ArrayList<Field> fields = getFields();
+		for (final Field field : fields) {
+			fsTableRecord.addEmptyValue(field.getMeta().toFSTableColumn());
+			fsTableRecord.setFieldValue(field.getFieldName(), field.getValue());
+			fsTableRecord.setStatus(RecordStatus.LATEST);
+		}
+	}
+
+	public void prepareForAdd() {
+		setIdValue(null);
+		setModified(true);
+		setNewRecord(true);
+	}
+
+	/**
+	 * @param deleted
+	 *            the deleted to set
+	 */
+	public void setDeleted(final boolean deleted) {
+		this.deleted = deleted;
+		if (deleted) {
+			setModified(false);
+		}
+	}
+
+	public void setFieldValue(final String fieldName, final Object value) {
+		for (int i = 0; i < this.fields.size(); i++) {
+			if (this.fields.get(i).getMeta().getName().equals(fieldName)) {
+				this.fields.get(i).setValue(value);
+				return;
+			}
+		}
+		throw new RuntimeException("Field " + fieldName + " didnt set in  this record");
+	}
+
+	public void setGui(final String gui) {
+		this.gui = gui;
+	}
+
+	public void setIdField(final Field idField) {
+		this.idField = idField;
+	}
+
+	public void setIdValue(final Object value) {
+		this.idField.setValue(value);
+	}
+
+	/**
+	 *
+	 * @param b
+	 */
+	public void setModified(final boolean modified) {
+		this.modified = modified;
+	}
+
+	/**
+	 * @param newRecord
+	 *            the newRecord to set
+	 */
+	public void setNewRecord(final boolean newRecord) {
+		this.newRecord = newRecord;
+	}
+
+	/**
+	 *
 	 * @param record
 	 */
-	public void setValues(boolean overwriteIfNull, Record... records) {
-		for (Record record : records) {
-			for (Field field : fields) {
+	public void setValues(final boolean overwriteIfNull, final Record... records) {
+		for (final Record record : records) {
+			for (final Field field : this.fields) {
 				if (record.getField(field.getFieldName()) != null) {
 					if (record.getFieldValue(field.getFieldName()) != null || overwriteIfNull) {
 						field.setValue(record.getFieldValue(field.getFieldName()));
@@ -313,50 +387,46 @@ public class Record {
 		}
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	public void setValues(final Hashtable<String, Object> hash) {
+		final Enumeration<String> keys = hash.keys();
+		while (keys.hasMoreElements()) {
+			final String key = keys.nextElement();
+			if (getField(key) != null) {
+				setFieldValue(key, hash.get(key));
+			}
+		}
+	}
+
 	/**
-	 * 
+	 *
 	 * @param record
 	 * @param account
 	 * @param supplier
 	 */
-	public void setValues(Record... record) {
+	public void setValues(final Record... record) {
 		setValues(false, record);
-	}
-
-	public void prepareForAdd() {
-		setIdValue(null);
-		setModified(true);
-		setNewRecord(true);
-	}
-
-	public String concatFieldsValue(String separator, String... fieldNames) {
-		StringBuffer buf = new StringBuffer();
-		for (String fieldName : fieldNames) {
-			buf.append(getFieldValue(fieldName).toString());
-			buf.append(separator);
-		}
-		return buf.toString();
 	}
 
 	public Object toObject() {
 		if (getTableMeta().getBeanName() == null) {
 			throw new IllegalStateException("Please set 'class' property for meta " + getTableMeta().getTableName());
 		}
-		Object bean = GeneralUtility.createClass(getTableMeta().getBeanName());
+		final Object bean = GeneralUtility.createClass(getTableMeta().getBeanName());
 		try {
-			BeanUtil util = new BeanUtil(bean.getClass());
-			Hashtable<Object, Object> map = new Hashtable<Object, Object>();
+			final BeanUtil util = new BeanUtil(bean.getClass());
+			final Hashtable<Object, Object> map = new Hashtable<Object, Object>();
 			if (getIdField().getValueObject() != null) {
 				map.put(getIdField().getMeta().getPropertyName(), getIdField().getValueObject());
 			}
-			ArrayList<Field> fields = getFields();
-			for (Field field : fields) {
+			final ArrayList<Field> fields = getFields();
+			for (final Field field : fields) {
 				if (field.getValueObject() != null) {
 					if (field.getMeta() instanceof ForiegnKeyFieldMeta) {
-						ForiegnKeyFieldMeta meta = (ForiegnKeyFieldMeta) field.getMeta();
-						TableMeta referenceTableMeta = meta.getReferenceTableMeta();
+						final ForiegnKeyFieldMeta meta = (ForiegnKeyFieldMeta) field.getMeta();
+						final TableMeta referenceTableMeta = meta.getReferenceTableMeta();
 						if (referenceTableMeta.getBeanName() != null) {
-							Record record = referenceTableMeta.createEmptyRecord();
+							final Record record = referenceTableMeta.createEmptyRecord();
 							record.setIdValue(field.getValueObject());
 							map.put(field.getMeta().getPropertyName(), record.toObject());
 						} else {
@@ -369,91 +439,36 @@ public class Record {
 				}
 			}
 			util.populate(map, bean);
-		} catch (BeanUtilException e) {
+		} catch (final BeanUtilException e) {
 			ExceptionUtil.handleException(e);
 		}
 		return bean;
 	}
 
-	// /////////////////////////////////////////////////////////////////////////
-	public void setValues(Hashtable<String, Object> hash) {
-		Enumeration<String> keys = hash.keys();
-		while (keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			if (getField(key) != null) {
-				setFieldValue(key, hash.get(key));
+	@Override
+	public String toString() {
+		return toString(false);
+	}
+
+	/**
+	 *
+	 * @param valuesOnly
+	 * @return
+	 */
+	public String toString(final boolean valuesOnly) {
+		final StringBuffer buffer = new StringBuffer();
+		for (int i = 0; i < this.fields.size(); i++) {
+			final Field field = this.fields.get(i);
+			if (valuesOnly) {
+				buffer.append(Lables.get(field.getFieldName()));
+				buffer.append(" : ");
+				buffer.append(field.getValue() == null ? "-" : field.getValue());
+			} else {
+				buffer.append(field.toString());
 			}
+			buffer.append("\n");
 		}
+		return buffer.toString();
 	}
 
-	// /////////////////////////////////////////////////////////////////////////
-	public ArrayList<Object> getFieldValues() {
-		ArrayList<Field> fields = getFields();
-		ArrayList<Object> values = new ArrayList<Object>();
-		for (Field field : fields) {
-			values.add(field.getValueObject());
-		}
-		return values;
-	}
-
-	public boolean isIdAutoIncrement() {
-		IdFieldMeta meta = (IdFieldMeta) getIdField().getMeta();
-		return meta.isAutoIncrement();
-	}
-
-	public String getGui() {
-		return gui;
-	}
-
-	public void setGui(String gui) {
-		this.gui = gui;
-	}
-
-	public double getFieldValueAsDouble(String fieldName) {
-		return getField(fieldName).getValueAsDouble();
-	}
-
-	public ArrayList<Object> getFieldsValues() {
-		ArrayList<Object> objs = new ArrayList<Object>();
-		for (int i = 0; i < fields.size(); i++) {
-			Field field = fields.get(i);
-			objs.add(field.getValueObject());
-		}
-		return objs;
-	}
-
-	public Date getFieldValueAsDate(String fieldName) {
-		return ConversionUtil.toDate(getFieldValue(fieldName));
-	}
-
-	public java.sql.Date getFieldValueAsSqlDate(String fieldName) {
-		Date value = getFieldValueAsDate(fieldName);
-		if (value != null) {
-			return new java.sql.Date(value.getTime());
-		}
-		return null;
-	}
-
-	public Time getFieldValueAsTime(String fieldName) {
-		return ConversionUtil.toTime(getFieldValue(fieldName));
-	}
-
-	public void populateTo(FSTableRecord fsTableRecord) throws TableMetaNotFoundException, DaoException {
-		ArrayList<Field> fields = getFields();
-		for (Field field : fields) {
-			fsTableRecord.addEmptyValue(field.getMeta().toFSTableColumn());
-			fsTableRecord.setFieldValue(field.getFieldName(), field.getValue());
-			fsTableRecord.setStatus(RecordStatus.LATEST);
-		}
-	}
-	
-	public void populateFrom(FSTableRecord fsTableRecord){
-		ArrayList<Field> fields = getFields();
-		setNewRecord(fsTableRecord.getStatus()==RecordStatus.NEW);
-		for (Field field : fields) {
-			field.setValue(fsTableRecord.getFieldValue(field.getFieldName()));
-		}
-
-	}
-	
 }

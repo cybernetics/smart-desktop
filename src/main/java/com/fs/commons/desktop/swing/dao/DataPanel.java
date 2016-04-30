@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.dao;
 
 import java.awt.Component;
@@ -20,7 +35,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 
 public abstract class DataPanel extends JKPanel implements DaoActionsListener, ViewContainer {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -35,48 +50,114 @@ public abstract class DataPanel extends JKPanel implements DaoActionsListener, V
 	ModelViewBiding binding;
 
 	/**
-	 * 
+	 *
 	 */
 	public DataPanel() {
 		setBorder(BorderFactory.createEtchedBorder());
 	}
 
 	/**
-	 * 
+	 *
 	 * @param bindingBeanClass
 	 * @throws BeanUtilException
 	 */
-	public DataPanel(Class bindingBeanClass) throws BeanUtilException {
+	public DataPanel(final Class bindingBeanClass) throws BeanUtilException {
 		setBorder(BorderFactory.createEtchedBorder());
-		binding = new ModelViewBiding(bindingBeanClass, this);
+		this.binding = new ModelViewBiding(bindingBeanClass, this);
 	}
 
 	/**
-	 * 
-	 * @throws ValidationException
-	 * @param validateId
+	 *
+	 * @param comp
+	 * @param propertyName
+	 */
+	protected void addBindingComponent(final BindingComponent comp, final String propertyName) {
+		this.bindingComponents.put(propertyName, comp);
+	}
+
+	/**
+	 *
+	 * @param comp
+	 */
+	protected void addComponent(final BindingComponent comp) {
+		addComponent(comp, "");
+	}
+
+	/**
+	 * First component will be considered as the id
+	 *
+	 * @param bindingComponent
+	 *            JComponent
+	 */
+	public void addComponent(final BindingComponent bindingComponent, final String propertyName) {
+		this.components.add(bindingComponent);
+		if (bindingComponent instanceof BindingComponent) {
+			addBindingComponent(bindingComponent, propertyName);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public abstract void addComponents();
+
+	/**
+	 *
+	 * @param enable
 	 *            boolean
-	 * @throws DaoException
 	 */
-	public abstract void validateAddData(boolean validateId) throws ValidationException, DaoException;
+	public void enableAllComponents(final boolean enable) {
+		enableIdField(enable);
+		enableDataFields(enable);
+	}
 
 	/**
-	 * 
-	 * @throws ValidationException
-	 * @throws DaoException
+	 *
+	 * @param enable
+	 *            boolean
 	 */
-	public abstract void validateUpdateData() throws ValidationException, DaoException;
+	public boolean enableDataFields(final boolean enable) {
+		if (this.components.size() > 1) {// some times the table only contains
+											// one
+			// value which is the id , like the re_year
+			// table in UM
+			for (int i = 1; i < this.components.size(); i++) {
+				if (this.components.get(i) instanceof Container) {
+					SwingUtility.enableContainer((Container) this.components.get(i), enable);
+				}
+				this.components.get(i).setEnabled(enable);
+			}
+			if (enable) {
+				this.components.get(1).requestFocus();
+			} else {
+				this.components.get(this.components.size() - 1).transferFocus();
+			}
+		}
+		return true;
+	}
 
 	/**
-	 * 
+	 *
+	 * @param enable
+	 *            boolean
+	 */
+	public void enableIdField(final boolean enable) {
+		getIdField().setEnabled(enable);
+		if (enable) {
+			getIdField().requestFocus();
+		}
+	}
+
+	/**
+	 *
 	 * @return JComponent
 	 */
 	public BindingComponent getIdField() {
-		return components.get(0);
+		return this.components.get(0);
 	}
 
 	/**
-	 * 
+	 *
 	 * @return JComponent
 	 */
 	public int getIdFieldValueAsInteger() {
@@ -84,7 +165,7 @@ public abstract class DataPanel extends JKPanel implements DaoActionsListener, V
 	}
 
 	/**
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getIdValue() {
@@ -93,94 +174,32 @@ public abstract class DataPanel extends JKPanel implements DaoActionsListener, V
 	}
 
 	/**
-	 * 
-	 * @param value
+	 *
 	 */
-	public void setIdValue(Object value) {
-		/** @todo add approp support for other comoponents types */
-		((BindingComponent) getIdField()).setValue(value);
+	@Override
+	public BindingComponent getViewComponent(final String viewName) {
+		return this.bindingComponents.get(viewName);
 	}
 
 	/**
-	 * 
-	 * @param enable
-	 *            boolean
+	 *
 	 */
-	public void enableIdField(boolean enable) {
-		getIdField().setEnabled(enable);
-		if (enable) {
-			getIdField().requestFocus();
-		}		
+	@Override
+	public Map getViewComponents() {
+		return this.bindingComponents;
 	}
 
 	/**
-	 * 
-	 * @param enable
-	 *            boolean
+	 * @throws BeanUtilException
+	 *
+	 *
 	 */
-	public boolean enableDataFields(boolean enable) {
-		if (components.size() > 1) {// some times the table only contains one
-			// value which is the id , like the re_year
-			// table in UM
-			for (int i = 1; i < components.size(); i++) {
-				if (components.get(i) instanceof Container) {
-					SwingUtility.enableContainer((Container) components.get(i), enable);
-				}
-				components.get(i).setEnabled(enable);
-			}
-			if (enable) {
-				components.get(1).requestFocus();
-			} else {
-				components.get(components.size() - 1).transferFocus();
-			}			
+	public void modelToView(final Object bean) {
+		try {
+			this.binding.modelToView(bean);
+		} catch (final BeanUtilException e) {
+			throw new RuntimeException(e);
 		}
-		return true;		
-	}
-
-	/**
-	 * 
-	 * @param enable
-	 *            boolean
-	 */
-	public void enableAllComponents(boolean enable) {
-		enableIdField(enable);
-		enableDataFields(enable);
-	}
-
-	/**
-	 * 
-	 */
-	public abstract void addComponents();
-
-	/**
-	 * 
-	 * @param comp
-	 */
-	protected void addComponent(BindingComponent comp) {
-		addComponent(comp,"");		
-	}
-	
-
-	/**
-	 * First component will be considered as the id
-	 * 
-	 * @param bindingComponent
-	 *            JComponent
-	 */
-	public void addComponent(BindingComponent bindingComponent, String propertyName) {
-		components.add(bindingComponent);
-		if (bindingComponent instanceof BindingComponent) {
-			addBindingComponent((BindingComponent) bindingComponent, propertyName);
-		}
-	}
-
-	/**
-	 * 
-	 * @param comp
-	 * @param propertyName
-	 */
-	protected void addBindingComponent(BindingComponent comp, String propertyName) {
-		bindingComponents.put(propertyName, comp);
 	}
 
 	// /**
@@ -195,107 +214,106 @@ public abstract class DataPanel extends JKPanel implements DaoActionsListener, V
 
 	/**
 	 * @throws DaoException
-	 * 
+	 *
 	 */
 	@Override
 	public void resetComponents() throws DaoException {
-		for (int i = 0; i < components.size(); i++) {
-			if (components.get(i) instanceof Container) {
-				resetComponents((Container) components.get(i));
+		for (int i = 0; i < this.components.size(); i++) {
+			if (this.components.get(i) instanceof Container) {
+				resetComponents((Container) this.components.get(i));
 			}
-			SwingUtility.resetComponent(components.get(i));
+			SwingUtility.resetComponent(this.components.get(i));
 		}
 		if (getIdField().isVisible() && getIdField().isEnabled()) {
 			getIdField().requestFocus();
 		} else {
-			components.get(1).requestFocus();
+			this.components.get(1).requestFocus();
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @param container
 	 *            Container
 	 * @throws DaoException
 	 */
-	protected void resetComponents(Container container) throws DaoException {
-		Component[] components = container.getComponents();
-		for (int i = 0; i < components.length; i++) {
-			if (components[i] instanceof Container) {
-				resetComponents((Container) components[i]);
+	protected void resetComponents(final Container container) throws DaoException {
+		final Component[] components = container.getComponents();
+		for (final Component component2 : components) {
+			if (component2 instanceof Container) {
+				resetComponents((Container) component2);
 			}
-			SwingUtility.resetComponent(components[i]);
+			SwingUtility.resetComponent(component2);
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @param component
 	 *            Component
 	 * @throws DaoException
 	 */
-//	private static void resetComponent(Component component) throws DaoException {
-//		if (component instanceof JTextComponent) {
-//			((JTextComponent) component).setText("");
-//		} else if (component instanceof DaoComboBox) {
-//			((DaoComboBox) component).reloadData();
-//			//((DaoComboBox) component).reset();
-//		} else if (component instanceof DaoComboWithManagePanel) {
-//			//((DaoComboWithManagePanel) component).reloadData();
-//			((DaoComboWithManagePanel) component).getCombo().setSelectedIndex(-1);
-//		} else if (component instanceof JComboBox) {
-//			((JComboBox) component).setSelectedIndex(-1);
-//		} else if (component instanceof JKDate) {
-//			((JKDate) component).setDate(new Date());
-//		} else if (component instanceof JList) {
-//			((JList) component).setSelectedIndex(-1);
-//		} else if (component instanceof JRadioButton) {
-//			((JRadioButton) component).setSelected(false);
-//		} else if (component instanceof JKCheckBox) {
-//			((JKCheckBox) component).reset();
-//		} else if (component instanceof JKPanel) {
-//			((JKPanel) component).resetComponents();
-//		}
-//	}
+	// private static void resetComponent(Component component) throws
+	// DaoException {
+	// if (component instanceof JTextComponent) {
+	// ((JTextComponent) component).setText("");
+	// } else if (component instanceof DaoComboBox) {
+	// ((DaoComboBox) component).reloadData();
+	// //((DaoComboBox) component).reset();
+	// } else if (component instanceof DaoComboWithManagePanel) {
+	// //((DaoComboWithManagePanel) component).reloadData();
+	// ((DaoComboWithManagePanel) component).getCombo().setSelectedIndex(-1);
+	// } else if (component instanceof JComboBox) {
+	// ((JComboBox) component).setSelectedIndex(-1);
+	// } else if (component instanceof JKDate) {
+	// ((JKDate) component).setDate(new Date());
+	// } else if (component instanceof JList) {
+	// ((JList) component).setSelectedIndex(-1);
+	// } else if (component instanceof JRadioButton) {
+	// ((JRadioButton) component).setSelected(false);
+	// } else if (component instanceof JKCheckBox) {
+	// ((JKCheckBox) component).reset();
+	// } else if (component instanceof JKPanel) {
+	// ((JKPanel) component).resetComponents();
+	// }
+	// }
 
 	/**
-	 * 
+	 *
+	 * @param value
 	 */
-	public BindingComponent getViewComponent(String viewName) {
-		return bindingComponents.get(viewName);
+	public void setIdValue(final Object value) {
+		/** @todo add approp support for other comoponents types */
+		getIdField().setValue(value);
 	}
 
 	/**
-	 * @throws BeanUtilException
-	 * 
-	 * 
+	 *
+	 * @throws ValidationException
+	 * @param validateId
+	 *            boolean
+	 * @throws DaoException
 	 */
-	public void modelToView(Object bean) {
-		try {
-			binding.modelToView(bean);
-		} catch (BeanUtilException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	public abstract void validateAddData(boolean validateId) throws ValidationException, DaoException;
 
 	/**
-	 * 
+	 *
+	 * @throws ValidationException
+	 * @throws DaoException
+	 */
+	public abstract void validateUpdateData() throws ValidationException, DaoException;
+
+	/**
+	 *
 	 * @return
 	 * @throws BeanUtilException
 	 */
-	public Object viewToModel(){
+	public Object viewToModel() {
 		try {
-			return binding.viewToModel();
-		} catch (BeanUtilException e) {
+			return this.binding.viewToModel();
+		} catch (final BeanUtilException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	/**
-	 * 
-	 */
-	public Map getViewComponents() {
-		return bindingComponents;
 	}
 
 	// @Override
@@ -305,7 +323,7 @@ public abstract class DataPanel extends JKPanel implements DaoActionsListener, V
 	// components.get(i).requestFocus();
 	// return;
 	// }
-	//			
+	//
 	// }
 	// }
 }

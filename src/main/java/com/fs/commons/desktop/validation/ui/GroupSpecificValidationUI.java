@@ -1,70 +1,48 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * Copyright 2002-2016 Jalal Kiswani.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The contents of this file are subject to the terms of either the GNU
- * General Public License Version 2 only ("GPL") or the Common
- * Development and Distribution License("CDDL") (collectively, the
- * "License"). You may not use this file except in compliance with the
- * License. You can obtain a copy of the License at
- * http://www.netbeans.org/cddl-gplv2.html
- * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
- * specific language governing permissions and limitations under the
- * License.  When distributing the software, include this License Header
- * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
- * accompanied this code. If applicable, add the following below the
- * License Header, with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Contributor(s):
- *
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
- * If you wish your version of this file to be governed by only the CDDL
- * or only the GPL Version 2, indicate your decision by adding
- * "[Contributor] elects to include this software in this distribution
- * under the [CDDL or GPL Version 2] license." If you do not indicate a
- * single choice of license, a recipient has the option to distribute
- * your version of this file under either the CDDL, the GPL Version 2 or
- * to extend the choice of license to its licensees as provided above.
- * However, if you add GPL Version 2 code and therefore, elected the GPL
- * Version 2 license, then the option applies only if the new code is
- * made subject to such option by the copyright holder.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.validation.ui;
 
 import com.fs.commons.desktop.validation.Problem;
 
 /**
- * Validation UI which knows what validation group it belongs to, so
- * in the case of a ValidationGroup parented to another one, the child's UI
- * can be removed from the parent's list of uis to proxy if it is removed
- * from the parent group.
+ * Validation UI which knows what validation group it belongs to, so in the case
+ * of a ValidationGroup parented to another one, the child's UI can be removed
+ * from the parent's list of uis to proxy if it is removed from the parent
+ * group.
  *
  *
  * @author Tim Boudreau
  */
 final class GroupSpecificValidationUI implements ValidationUI {
-    final ValidationUI ui;
-    final ValidationGroupImpl owner;
-    public GroupSpecificValidationUI(ValidationGroupImpl owner, ValidationUI ui) {
-        this.owner = owner;
-        this.ui = ui;
-    }
+	final ValidationUI ui;
+	final ValidationGroupImpl owner;
 
-    public void clearProblem() {
-        ui.clearProblem();
-    }
+	public GroupSpecificValidationUI(final ValidationGroupImpl owner, final ValidationUI ui) {
+		this.owner = owner;
+		this.ui = ui;
+	}
 
-    public void setProblem(Problem problem) {
-        ui.setProblem(problem);
-    }
+	@Override
+	public void clearProblem() {
+		this.ui.clearProblem();
+	}
+
+	@Override
+	public void setProblem(final Problem problem) {
+		this.ui.setProblem(problem);
+	}
 
 }

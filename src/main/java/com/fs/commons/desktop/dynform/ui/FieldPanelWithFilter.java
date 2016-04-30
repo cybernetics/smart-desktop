@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.dynform.ui;
 
@@ -40,72 +52,121 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 	JKTextField txtView = new JKTextField(20);
 	JKButton btnSelect = new JKButton("SELECT", "F12");
 	JKButton btnAdd = new JKButton("ADD");
-	private  TableMeta tableMeta;
+	private TableMeta tableMeta;
 	private Object defaultValue;
 	private DataSource manager;
 	private boolean allowManage;
-	
+
 	public FieldPanelWithFilter() {
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public FieldPanelWithFilter(String tableMeta) {
+	public FieldPanelWithFilter(final String tableMeta) {
 		this(AbstractTableMetaFactory.getTableMeta(tableMeta));
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public FieldPanelWithFilter(TableMeta tableMeta) {
+	public FieldPanelWithFilter(final TableMeta tableMeta) {
 		this.tableMeta = tableMeta;
 		init();
 		setAllowManage(false);
 	}
 
-	// ///////////////////////////////////////////////////////////////
-	public void setAllowManage(boolean allowManage) {
-		this.allowManage = allowManage;
-		btnAdd.setVisible(allowManage);
+	/**
+	 *
+	 * @throws ValidationException
+	 */
+	public void checkEmpty() throws ValidationException {
+		SwingValidator.checkEmpty(this);
 	}
 
-	public boolean isAllowManage() {
-		btnAdd.setVisible(allowManage);
-		return allowManage;
+	@Override
+	public void clear() {
+		this.record = null;
+		this.txtView.clear();
+	}
+
+	@Override
+	public DataSource getDataSource() {
+		return this.manager;
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	@Override
+	public Object getValue() {
+		if (this.record != null) {
+			return this.record.getIdValue();
+		}
+		return null;
+	}
+
+	public int getValueAsInteger() {
+		if (this.record == null) {
+			return -1;
+		}
+		return this.record.getIdValueAsInteger();
+	}
+
+	// //////////////////////////////////////////////////////////////////////
+	protected void handleEdit() {
+		try {
+			final DynMasterDetailCRUDLPanel pnl = new DynMasterDetailCRUDLPanel(this.tableMeta);
+			pnl.addMasterDaoActionListener(new DynDaoActionAdapter() {
+				@Override
+				public void afterAddRecord(final Record record) throws DaoException {
+					setValue(record.getIdValue());
+				}
+			});
+			SwingUtility.showPanelInDialog(pnl, this.tableMeta.getTableName());
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	// //////////////////////////////////////////////////////////////////////
+	private void handleSelect() {
+		final Object id = QueryDialog.showQueryDialog(this.tableMeta);
+		if (id != null) {
+			setValue(id);
+		}
+		SwingUtility.pressKey(KeyEvent.VK_TAB);
 	}
 
 	// ///////////////////////////////////////////////////////////////
 	private void init() {
 		setLayout(new BorderLayout());
-		add(txtView, BorderLayout.CENTER);
+		add(this.txtView, BorderLayout.CENTER);
 
-		JKPanel pnlButtons = new JKPanel();
-		pnlButtons.add(btnAdd);
-		pnlButtons.add(btnSelect);
+		final JKPanel pnlButtons = new JKPanel();
+		pnlButtons.add(this.btnAdd);
+		pnlButtons.add(this.btnSelect);
 		add(pnlButtons, BorderLayout.LINE_END);
 
-		txtView.setEditable(false);
-		btnSelect.setIcon("find_commons_mod_icon.gif");
+		this.txtView.setEditable(false);
+		this.btnSelect.setIcon("find_commons_mod_icon.gif");
 		// btnSelect.setShortcut("F12", "f12");
-		btnAdd.setIcon("edit.png");
-		btnSelect.addMouseListener(new MouseAdapter() {
+		this.btnAdd.setIcon("edit.png");
+		this.btnSelect.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(final MouseEvent e) {
 				handleSelect();
 			}
 		});
-		btnSelect.addKeyListener(new KeyAdapter() {
+		this.btnSelect.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == e.VK_ENTER) {
-					btnSelect.transferFocus();
+			public void keyPressed(final KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					FieldPanelWithFilter.this.btnSelect.transferFocus();
 				}
-				if (e.getKeyCode() == e.VK_SPACE) {
+				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 					handleSelect();
 				}
 			}
 
 		});
-		txtView.addKeyListener(new KeyAdapter() {
+		this.txtView.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 				// if(e.getKeyCode()==e.VK_ENTER){
 				// btnSelect.doClick();
 				// }
@@ -114,66 +175,25 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 				}
 			}
 		});
-		btnAdd.addActionListener(new ActionListener() {
+		this.btnAdd.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleEdit();
 			}
 		});
 
 	}
 
-	// //////////////////////////////////////////////////////////////////////
-	protected void handleEdit() {
-		try {
-			DynMasterDetailCRUDLPanel pnl = new DynMasterDetailCRUDLPanel(tableMeta);
-			pnl.addMasterDaoActionListener(new DynDaoActionAdapter() {
-				@Override
-				public void afterAddRecord(Record record) throws DaoException {
-					setValue(record.getIdValue());
-				}
-			});
-			SwingUtility.showPanelInDialog(pnl, tableMeta.getTableName());
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
-	// //////////////////////////////////////////////////////////////////////
-	private void handleSelect() {
-		Object id = QueryDialog.showQueryDialog(tableMeta);
-		if (id != null) {
-			setValue(id);
-		}
-		SwingUtility.pressKey(KeyEvent.VK_TAB);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.JComponent#setEnabled(boolean)
-	 */
 	@Override
-	public void setEnabled(boolean enabled) {
-		btnSelect.setVisible(enabled);
-		btnSelect.setEnabled(enabled);
-		btnAdd.setVisible(enabled && isAllowManage());
-		txtView.setEnabled(enabled);
-
-	}
-
-	/**
-	 * 
-	 * @throws ValidationException
-	 */
-	public void checkEmpty() throws ValidationException {
-		SwingValidator.checkEmpty(this);
+	public boolean isAllowManage() {
+		this.btnAdd.setVisible(this.allowManage);
+		return this.allowManage;
 	}
 
 	@Override
 	public void requestFocus() {
-		if (btnSelect.isVisible() && btnSelect.isEnabled()) {
-			btnSelect.requestFocus();
+		if (this.btnSelect.isVisible() && this.btnSelect.isEnabled()) {
+			this.btnSelect.requestFocus();
 			// btnSelect.doClick();
 		} else {
 			super.requestFocus();
@@ -182,63 +202,59 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 
 	@Override
 	public void reset() {
-		setValue(defaultValue);
-	}
-
-	@Override
-	public void clear() {
-		record = null;
-		txtView.clear();
+		setValue(this.defaultValue);
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public void setDefaultValue(Object defaultValue) {
+	@Override
+	public void setAllowManage(final boolean allowManage) {
+		this.allowManage = allowManage;
+		this.btnAdd.setVisible(allowManage);
+	}
+
+	@Override
+	public void setDataSource(final DataSource manager) {
+		this.manager = manager;
+	}
+
+	// ///////////////////////////////////////////////////////////////
+	@Override
+	public void setDefaultValue(final Object defaultValue) {
 		this.defaultValue = defaultValue;
 	}
 
-	// ///////////////////////////////////////////////////////////////
-	public Object getValue() {
-		if (record != null) {
-			return record.getIdValue();
-		}
-		return null;
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javax.swing.JComponent#setEnabled(boolean)
+	 */
+	@Override
+	public void setEnabled(final boolean enabled) {
+		this.btnSelect.setVisible(enabled);
+		this.btnSelect.setEnabled(enabled);
+		this.btnAdd.setVisible(enabled && isAllowManage());
+		this.txtView.setEnabled(enabled);
+
 	}
 
 	@Override
-	public void setValue(Object value) {
-		Object oldValue = getValue();
+	public void setValue(final Object value) {
+		final Object oldValue = getValue();
 		if (value != null && !value.toString().trim().equals("") && !value.toString().toLowerCase().equals("null")) {
 			try {
-				DynamicDao dao = new DynamicDao(tableMeta);
-				record = dao.findRecord(value);
-				txtView.setValue(record.getSummaryValue());
-			} catch (RecordNotFoundException e) {
-				Logger.fatal("Record not found for field :" + tableMeta.getTableName() + " for id : " + value);
+				final DynamicDao dao = new DynamicDao(this.tableMeta);
+				this.record = dao.findRecord(value);
+				this.txtView.setValue(this.record.getSummaryValue());
+			} catch (final RecordNotFoundException e) {
+				Logger.fatal("Record not found for field :" + this.tableMeta.getTableName() + " for id : " + value);
 				setValue(null);// recursion
-			} catch (DaoException e) {
+			} catch (final DaoException e) {
 				ExceptionUtil.handleException(e);
 			}
 		} else {
 			clear();
 		}
-		Object newValue = getValue();
-		fsWrapper.fireValueChangeListener(oldValue, newValue);
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		return manager;
-	}
-
-	@Override
-	public void setDataSource(DataSource manager) {
-		this.manager = manager;
-	}
-
-	public int getValueAsInteger() {
-		if (record == null) {
-			return -1;
-		}
-		return record.getIdValueAsInteger();
+		final Object newValue = getValue();
+		this.fsWrapper.fireValueChangeListener(oldValue, newValue);
 	}
 }

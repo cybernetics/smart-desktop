@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.ComponentOrientation;
@@ -27,9 +42,25 @@ public class JKInternalFrame extends JInternalFrame implements UIPanel, DaoCompo
 		init();
 	}
 
-	public JKInternalFrame(String title) throws HeadlessException {
+	public JKInternalFrame(final String title) throws HeadlessException {
 		super(title);
 		init();
+	}
+
+	public void addWindowListener(final WindowAdapter windowAdapter) {
+		// TODO : handle me
+	}
+
+	public void applyDataSource() {
+		SwingUtility.applyDataSource(this, this.connectionManager);
+	}
+
+	@Override
+	public DataSource getDataSource() {
+		if (this.connectionManager == null) {
+			return DataSourceFactory.getDefaultDataSource();
+		}
+		return this.connectionManager;
 	}
 
 	private void init() {
@@ -43,29 +74,6 @@ public class JKInternalFrame extends JInternalFrame implements UIPanel, DaoCompo
 		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
 	}
 
-	@Override
-	public void setTitle(String text) {
-		super.setTitle(Lables.get(text));
-	}
-
-	public void setRightToLeft() {
-		applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-	}
-
-	public void addWindowListener(WindowAdapter windowAdapter) {
-		// TODO : handle me
-	}
-
-	public void setLocationRelativeTo(Object object) {
-		// TODO :handle me
-
-	}
-
-	public void setIconImage(Image image) {
-		// TODO : handle me
-
-	}
-
 	public void initDefaults() throws PropertyVetoException {
 		setVisible(true);
 		setMaximum(true);
@@ -76,20 +84,27 @@ public class JKInternalFrame extends JInternalFrame implements UIPanel, DaoCompo
 	}
 
 	@Override
-	public void setDataSource(DataSource manager) {
+	public void setDataSource(final DataSource manager) {
 		this.connectionManager = manager;
 		applyDataSource();
 	}
 
-	@Override
-	public DataSource getDataSource() {
-		if (connectionManager == null) {
-			return DataSourceFactory.getDefaultDataSource();
-		}
-		return connectionManager;
+	public void setIconImage(final Image image) {
+		// TODO : handle me
+
 	}
 
-	public void applyDataSource() {
-		SwingUtility.applyDataSource(this, connectionManager);
+	public void setLocationRelativeTo(final Object object) {
+		// TODO :handle me
+
+	}
+
+	public void setRightToLeft() {
+		applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+	}
+
+	@Override
+	public void setTitle(final String text) {
+		super.setTitle(Lables.get(text));
 	}
 }

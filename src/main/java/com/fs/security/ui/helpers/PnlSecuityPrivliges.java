@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.security.ui.helpers;
 
 import java.awt.BorderLayout;
@@ -26,84 +41,106 @@ import com.fs.commons.security.Privilige;
 import com.fs.commons.util.ExceptionUtil;
 
 public class PnlSecuityPrivliges extends JKPanel {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -4577778132829126243L;
 	private final SecurityTreeNode ROOT = new SecurityTreeNode();
-	JKTree tree = new JKTree(ROOT);
+	JKTree tree = new JKTree(this.ROOT);
 	DaoComboBox cmbRoles = new DaoComboBox(AbstractTableMetaFactory.getTableMeta("sec_roles"));
 	JKButton btnSave = new JKButton("SAVE");
 	// JKButton btnReload=new JKButton("RELOAD");
 	JKButton btnClose = new JKButton("CLOSE");
 
 	/**
-	 * 
+	 *
 	 * @throws DaoException
 	 */
 	public PnlSecuityPrivliges() throws DaoException {
 		init();
 	}
 
-	/**
-	 * 
-	 */
-	private void init() {
-		TreeCheckBoxNodeRenderer renderer = new TreeCheckBoxNodeRenderer();
-		tree.setCellRenderer(renderer);
-
-		tree.setCellEditor(new TreeCheckBoxNodeEditor(tree));
-		tree.setEditable(true);
-//		tree.setRootVisible(false);
-		setLayout(new BorderLayout());
-		add(getNothPanel(), BorderLayout.NORTH);
-		add(new JScrollPane(tree), BorderLayout.CENTER);
-		add(getSouthPanel(), BorderLayout.SOUTH);
-		handleRoleChanged();
-		cmbRoles.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleRoleChanged();
-			}
-		});
-		btnSave.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleSave();
-			}
-		});
-		btnClose.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent actionevent) {
-				handleClose();
-			}
-		});
+	private DynamicDao getDao() {
+		final DynamicDao dao = new DynamicDao(AbstractTableMetaFactory.getTableMeta("sec_role_privileges"));
+		return dao;
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
+	 */
+	private JKPanel getNothPanel() {
+		final JKPanel pnl = new JKPanel();
+		pnl.add(new JKLabledComponent("ROLES", this.cmbRoles));
+		return pnl;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private JKPanel getSouthPanel() {
+		final JKPanel pnl = new JKPanel();
+		pnl.add(this.btnSave);
+		pnl.add(this.btnClose);
+		this.btnSave.setShortcut("F3", "F3");
+		this.btnSave.setIcon("save_commons_model_icon.gif");
+
+		this.btnClose.setShortcut("F6", "F6");
+		this.btnClose.setIcon("close.png");
+
+		this.btnSave.setShowProgress(true);
+		return pnl;
+	}
+
+	/**
+	 *
 	 */
 	protected void handleClose() {
 		SwingUtility.closePanel(this);
 	}
 
 	/**
-	 * 
+	 *
+	 */
+	protected void handleRoleChanged() {
+		try {
+			final int roldId = this.cmbRoles.getSelectedIdValueAsInteger();
+			if (roldId != -1) {
+				TreeUtil.setSelected(this.tree, this.tree.getRoot(), false, true);
+				final DynamicDao dao = getDao();
+				final ArrayList<Record> rolePrivliges = dao.findByFieldValue("role_id", roldId);
+				for (final Record record : rolePrivliges) {
+					final Privilige privilige = (Privilige) this.tree.searchNode(new Privilige(record.getFieldValueAsInteger("privilege_id")), null);
+					privilige.setSelected(true);
+				}
+			}
+			this.tree.refresh();
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+		}
+		this.tree.setEnabled(this.cmbRoles.getSelectedIdValueAsInteger() != -1);
+		this.btnSave.setEnabled(this.cmbRoles.getSelectedIdValueAsInteger() != -1);
+	}
+
+	/**
+	 *
 	 */
 	protected void handleSave() {
 		try {
-			ArrayList<TreeNode> array = tree.getNodesAsArray();
-			DynamicDao dao = getDao();
-			int roleId = cmbRoles.getSelectedIdValueAsInteger();
+			final ArrayList<TreeNode> array = this.tree.getNodesAsArray();
+			final DynamicDao dao = getDao();
+			final int roleId = this.cmbRoles.getSelectedIdValueAsInteger();
 			try {
 				dao.deleteByFieldValue("role_id", roleId);
-			} catch (RecordNotFoundException e) {
-				//its safe to eat this exception
+			} catch (final RecordNotFoundException e) {
+				// its safe to eat this exception
 			}
-			for (TreeNode treeNode : array) {
+			for (final TreeNode treeNode : array) {
 				if (treeNode instanceof Privilige) {
-					Privilige p = (Privilige) treeNode;
+					final Privilige p = (Privilige) treeNode;
 					if (p.isSelected()) {
-						Record record = dao.createEmptyRecord(true);
+						final Record record = dao.createEmptyRecord(true);
 						record.setFieldValue("role_id", roleId);
 						record.setFieldValue("privilege_id", p.getPriviligeId());
 						dao.insertRecord(record);
@@ -112,72 +149,54 @@ public class PnlSecuityPrivliges extends JKPanel {
 			}
 			SwingUtility.showSuccessDialog("ROLE_UPDATED_SUCC");
 			handleRoleChanged();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			ExceptionUtil.handleException(e);
 		}
 	}
 
 	/**
-	 * 
-	 * @return
+	 *
 	 */
-	private JKPanel getSouthPanel() {
-		JKPanel pnl = new JKPanel();
-		pnl.add(btnSave);
-		pnl.add(btnClose);
-		btnSave.setShortcut("F3", "F3");
-		btnSave.setIcon("save_commons_model_icon.gif");
+	private void init() {
+		final TreeCheckBoxNodeRenderer renderer = new TreeCheckBoxNodeRenderer();
+		this.tree.setCellRenderer(renderer);
 
-		btnClose.setShortcut("F6", "F6");
-		btnClose.setIcon("close.png");
-		
-		btnSave.setShowProgress(true);
-		return pnl;
-	}
+		this.tree.setCellEditor(new TreeCheckBoxNodeEditor(this.tree));
+		this.tree.setEditable(true);
+		// tree.setRootVisible(false);
+		setLayout(new BorderLayout());
+		add(getNothPanel(), BorderLayout.NORTH);
+		add(new JScrollPane(this.tree), BorderLayout.CENTER);
+		add(getSouthPanel(), BorderLayout.SOUTH);
+		handleRoleChanged();
+		this.cmbRoles.addActionListener(new ActionListener() {
 
-	/**
-	 * 
-	 */
-	protected void handleRoleChanged() {
-		try {
-			int roldId = cmbRoles.getSelectedIdValueAsInteger();
-			if (roldId != -1) {
-				TreeUtil.setSelected(tree, tree.getRoot(), false, true);
-				DynamicDao dao = getDao();
-				ArrayList<Record> rolePrivliges = dao.findByFieldValue("role_id", roldId);
-				for (Record record : rolePrivliges) {
-					Privilige privilige = (Privilige) tree.searchNode(new Privilige(record.getFieldValueAsInteger("privilege_id")), null);
-					privilige.setSelected(true);
-				}
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleRoleChanged();
 			}
-			tree.refresh();
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-		}
-		tree.setEnabled(cmbRoles.getSelectedIdValueAsInteger() != -1);
-		btnSave.setEnabled(cmbRoles.getSelectedIdValueAsInteger() != -1);
-	}
+		});
+		this.btnSave.addActionListener(new ActionListener() {
 
-	private DynamicDao getDao() {
-		DynamicDao dao = new DynamicDao(AbstractTableMetaFactory.getTableMeta("sec_role_privileges"));
-		return dao;
-	}
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleSave();
+			}
+		});
+		this.btnClose.addActionListener(new ActionListener() {
 
-	/**
-	 * 
-	 * @return
-	 */
-	private JKPanel getNothPanel() {
-		JKPanel pnl = new JKPanel();
-		pnl.add(new JKLabledComponent("ROLES", cmbRoles));
-		return pnl;
+			@Override
+			public void actionPerformed(final ActionEvent actionevent) {
+				handleClose();
+			}
+		});
 	}
 
 	/**
 	 * @param privlige
 	 * @param selected
 	 */
-	private void setSelected(Privilige privlige, boolean selected) {
+	private void setSelected(final Privilige privlige, final boolean selected) {
 
 	}
 }

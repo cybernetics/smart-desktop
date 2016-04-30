@@ -1,5 +1,19 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.security.ui.helpers;
-
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,31 +28,16 @@ import com.fs.security.facade.SecurityFacade;
 
 public class SecurityTreeNode implements TreeNode {
 
-	private ArrayList<Privilige> privilige;
+	private final ArrayList<Privilige> privilige;
 
 	public SecurityTreeNode() throws DaoException {
-		SecurityFacade facade = new SecurityFacade();
-		privilige = facade.lstPrivilige();
+		final SecurityFacade facade = new SecurityFacade();
+		this.privilige = facade.lstPrivilige();
 	}
 
 	@Override
-	public TreeNode getChildAt(int childIndex) {
-		return privilige.get(childIndex);
-	}
-
-	@Override
-	public int getChildCount() {
-		return privilige.size();
-	}
-
-	@Override
-	public TreeNode getParent() {
-		return null;
-	}
-
-	@Override
-	public int getIndex(TreeNode node) {
-		return privilige.indexOf(node);
+	public Enumeration children() {
+		return Collections.enumeration(this.privilige);
 	}
 
 	@Override
@@ -47,13 +46,28 @@ public class SecurityTreeNode implements TreeNode {
 	}
 
 	@Override
-	public boolean isLeaf() {
-		return false;
+	public TreeNode getChildAt(final int childIndex) {
+		return this.privilige.get(childIndex);
 	}
 
 	@Override
-	public Enumeration children() {
-		return Collections.enumeration(privilige);
+	public int getChildCount() {
+		return this.privilige.size();
+	}
+
+	@Override
+	public int getIndex(final TreeNode node) {
+		return this.privilige.indexOf(node);
+	}
+
+	@Override
+	public TreeNode getParent() {
+		return null;
+	}
+
+	@Override
+	public boolean isLeaf() {
+		return false;
 	}
 
 	@Override

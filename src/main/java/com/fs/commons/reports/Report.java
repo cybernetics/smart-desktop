@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.reports;
 
@@ -11,7 +23,7 @@ import com.fs.commons.util.GeneralUtility;
 
 /**
  * @author u087
- * 
+ *
  */
 public class Report {
 	String name;
@@ -37,33 +49,40 @@ public class Report {
 	boolean compiled;
 
 	/**
+	 * @param o
+	 * @return
+	 * @see java.util.ArrayList#add(java.lang.Object)
+	 */
+	public boolean addParamter(final Paramter o) {
+		return this.paramters.add(o);
+	}
+
+	public String getAbsolutOutPath1() {
+		return GeneralUtility.getReportsOutPath() + System.getProperty("file.separator") + getOutFileName();
+	}
+
+	public InputStream getInputStream() throws FileNotFoundException {
+		return GeneralUtility.getReportFileAsStream(getOutFileName());
+	}
+
+	/**
 	 * @return the name
 	 */
 	public String getName() {
 		return this.name;
 	}
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
+	public String getOutFileName() {
+		return this.outFileName;
 	}
 
 	/**
-	 * @return the title
+	 * @param index
+	 * @return
+	 * @see java.util.ArrayList#get(int)
 	 */
-	public String getTitle() {
-		return this.title;
-	}
-
-	/**
-	 * @param title
-	 *            the title to set
-	 */
-	public void setTitle(String title) {
-		this.title = title;
+	public Paramter getParamter(final int index) {
+		return this.paramters.get(index);
 	}
 
 	/**
@@ -74,41 +93,6 @@ public class Report {
 	}
 
 	/**
-	 * @param paramters
-	 *            the paramters to set
-	 */
-	public void setParamters(ArrayList<Paramter> paramters) {
-		this.paramters = paramters;
-	}
-
-	/**
-	 * @param o
-	 * @return
-	 * @see java.util.ArrayList#add(java.lang.Object)
-	 */
-	public boolean addParamter(Paramter o) {
-		return this.paramters.add(o);
-	}
-
-	/**
-	 * @param index
-	 * @return
-	 * @see java.util.ArrayList#get(int)
-	 */
-	public Paramter getParamter(int index) {
-		return this.paramters.get(index);
-	}
-
-	/**
-	 * @param elem
-	 * @return
-	 * @see java.util.ArrayList#indexOf(java.lang.Object)
-	 */
-	public int indexOfParamter(Object elem) {
-		return this.paramters.indexOf(elem);
-	}
-
-	/**
 	 * @return
 	 * @see java.util.ArrayList#size()
 	 */
@@ -116,14 +100,24 @@ public class Report {
 		return this.paramters.size();
 	}
 
-	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("{Report name:" + getName());
-		buffer.append(", Title : " + getTitle());
-		buffer.append(", Paramters " + paramters.toString());
-		buffer.append("}");
-		return buffer.toString();
+	public String getSourceFileName() {
+		return this.sourceFileName;
+	}
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return this.title;
+	}
+
+	/**
+	 * @param elem
+	 * @return
+	 * @see java.util.ArrayList#indexOf(java.lang.Object)
+	 */
+	public int indexOfParamter(final Object elem) {
+		return this.paramters.indexOf(elem);
 	}
 
 	// /**
@@ -156,11 +150,8 @@ public class Report {
 	// this.absolutOutPath = absolutOutPath;
 	// }
 
-	/**
-	 * @param parseBoolean
-	 */
-	public void setVisible(boolean visible) {
-		this.visible = visible;
+	public boolean isCompiled() {
+		return this.compiled;
 	}
 
 	/**
@@ -192,41 +183,62 @@ public class Report {
 	// return sourcePath;
 	// }
 
-	/**
-	 * the generated and compiled file full name
-	 * 
-	 * @param string
-	 */
-	public void setOutFileName(String outFileName) {
-		this.outFileName = outFileName;
-	}
-
-	public String getOutFileName() {
-		return outFileName;
-	}
-
-	public String getAbsolutOutPath1() {
-		return GeneralUtility.getReportsOutPath() + System.getProperty("file.separator") + getOutFileName();
-	}
-
-	public String getSourceFileName() {
-		return sourceFileName;
-	}
-
-	public void setSourceFileName(String sourceFileName) {
-		this.sourceFileName = sourceFileName;
-	}
-
-	public boolean isCompiled() {
-		return compiled;
-	}
-
-	public void setCompiled(boolean compiled) {
+	public void setCompiled(final boolean compiled) {
 		this.compiled = compiled;
 	}
 
-	public InputStream getInputStream() throws FileNotFoundException {
-		return GeneralUtility.getReportFileAsStream(getOutFileName());
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(final String name) {
+		this.name = name;
+	}
+
+	/**
+	 * the generated and compiled file full name
+	 *
+	 * @param string
+	 */
+	public void setOutFileName(final String outFileName) {
+		this.outFileName = outFileName;
+	}
+
+	/**
+	 * @param paramters
+	 *            the paramters to set
+	 */
+	public void setParamters(final ArrayList<Paramter> paramters) {
+		this.paramters = paramters;
+	}
+
+	public void setSourceFileName(final String sourceFileName) {
+		this.sourceFileName = sourceFileName;
+	}
+
+	/**
+	 * @param title
+	 *            the title to set
+	 */
+	public void setTitle(final String title) {
+		this.title = title;
+	}
+
+	/**
+	 * @param parseBoolean
+	 */
+	public void setVisible(final boolean visible) {
+		this.visible = visible;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append("{Report name:" + getName());
+		buffer.append(", Title : " + getTitle());
+		buffer.append(", Paramters " + this.paramters.toString());
+		buffer.append("}");
+		return buffer.toString();
 	}
 
 }

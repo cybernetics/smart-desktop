@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui.masterdetail;
 
 import java.awt.BorderLayout;
@@ -23,13 +38,18 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 
 public class DynMasterDetailPanel extends AbstractMasterDetail {
 
-	private JKTabbedPane pnlTabbedPane = new JKTabbedPane();
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 5865900742114738634L;
 
-	private JKButton btnNext = new JKButton("Next");
+	private final JKTabbedPane pnlTabbedPane = new JKTabbedPane();
 
-	private JKButton btnPre = new JKButton("Previouse");
+	private final JKButton btnNext = new JKButton("Next");
 
-	private JKButton btnClose = new JKButton("Close");
+	private final JKButton btnPre = new JKButton("Previouse");
+
+	private final JKButton btnClose = new JKButton("Close");
 
 	private JKPanel pnlButtons;
 
@@ -41,98 +61,112 @@ public class DynMasterDetailPanel extends AbstractMasterDetail {
 		super();
 	}
 
-	// /////////////////////////////////////////////////////////////////
-	public DynMasterDetailPanel(TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
-		super(tableMeta);
-	}
-
-	public DynMasterDetailPanel(String tableMetaName) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public DynMasterDetailPanel(final String tableMetaName) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
 		this(AbstractTableMetaFactory.getTableMeta(tableMetaName));
 	}
 
-	/**
-	 * I made public , to give the caller the ability to add extra components
-	 * for this panel
-	 * 
-	 * @return
-	 */
-	protected JKPanel getButtonsPanel() {
-		if (pnlButtons == null) {
-			pnlButtons = new JKPanel();
-			// if (pnlTabbedPane.getTabCount() > 1) {
-//			SwingUtility.setHotKeyFoButton(SwingUtility.isLeftOrientation() ? btnNext : btnPre, "ctrl  RIGHT", "NEXT");
-			btnNext.setShortcut(SwingUtility.isLeftOrientation()?"ctrl RIGHT":"ctrl LEFT", SwingUtility.isLeftOrientation()?"ctrl ->":"ctr <-");
-			btnPre.setShortcut(SwingUtility.isLeftOrientation()?"ctrl LEFT":"ctrl RIGHT", SwingUtility.isLeftOrientation()?"ctrl <-":"ctr ->");
-//			SwingUtility.setHotKeyFoButton(SwingUtility.isLeftOrientation() ? btnPre : btnNext, "ctrl  LEFT", "PRE");
-			btnNext.setIcon(SwingUtility.isLeftOrientation() ? "next2.gif" : "previos2.gif");
-			btnPre.setIcon(SwingUtility.isLeftOrientation() ? "previos2.gif" : "next2.gif");
-			btnClose.setIcon("fileclose.png");
-			pnlButtons.add(btnPre);
-			pnlButtons.add(btnNext);
-//			pnlButtons.add(btnClose);
-			// }
-		}
-		return pnlButtons;
+	// /////////////////////////////////////////////////////////////////
+	public DynMasterDetailPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+		super(tableMeta);
+	}
+
+	@Override
+	public void addComponent(final JComponent comp) {
+		getButtonsPanel().add(comp);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param title
 	 * @param icon
 	 * @param pnl
 	 */
 	@Override
-	protected void addPanelToView(String title, String icon, JKPanel pnl) {
-		pnlTabbedPane.addTab(title, icon, pnl);
+	protected void addPanelToView(final String title, final String icon, final JKPanel pnl) {
+		this.pnlTabbedPane.addTab(title, icon, pnl);
 	}
 
 	/**
-	 * 
+	 * I made public , to give the caller the ability to add extra components
+	 * for this panel
+	 *
 	 * @return
 	 */
+	protected JKPanel getButtonsPanel() {
+		if (this.pnlButtons == null) {
+			this.pnlButtons = new JKPanel();
+			// if (pnlTabbedPane.getTabCount() > 1) {
+			// SwingUtility.setHotKeyFoButton(SwingUtility.isLeftOrientation() ?
+			// btnNext : btnPre, "ctrl RIGHT", "NEXT");
+			this.btnNext.setShortcut(SwingUtility.isLeftOrientation() ? "ctrl RIGHT" : "ctrl LEFT",
+					SwingUtility.isLeftOrientation() ? "ctrl ->" : "ctr <-");
+			this.btnPre.setShortcut(SwingUtility.isLeftOrientation() ? "ctrl LEFT" : "ctrl RIGHT",
+					SwingUtility.isLeftOrientation() ? "ctrl <-" : "ctr ->");
+			// SwingUtility.setHotKeyFoButton(SwingUtility.isLeftOrientation() ?
+			// btnPre : btnNext, "ctrl LEFT", "PRE");
+			this.btnNext.setIcon(SwingUtility.isLeftOrientation() ? "next2.gif" : "previos2.gif");
+			this.btnPre.setIcon(SwingUtility.isLeftOrientation() ? "previos2.gif" : "next2.gif");
+			this.btnClose.setIcon("fileclose.png");
+			this.pnlButtons.add(this.btnPre);
+			this.pnlButtons.add(this.btnNext);
+			// pnlButtons.add(btnClose);
+			// }
+		}
+		return this.pnlButtons;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	@Override
 	protected int getCurrentPanelIndex() {
-		return pnlTabbedPane.getSelectedIndex();
+		return this.pnlTabbedPane.getSelectedIndex();
 	}
 
 	@Override
 	protected void initUI() {
 		setLayout(new BorderLayout());
-		JKPanel container = new JKPanel();
+		final JKPanel container = new JKPanel();
 		container.setLayout(new BorderLayout());
 		// addPanelsToContainer();
 
-		container.add(pnlTabbedPane, BorderLayout.CENTER);
+		container.add(this.pnlTabbedPane, BorderLayout.CENTER);
 		container.add(getButtonsPanel(), BorderLayout.SOUTH);
 
 		add(container);
 
 		addComponentListener(new ComponentAdapter() {
 			@Override
-			public void componentShown(ComponentEvent e) {
+			public void componentShown(final ComponentEvent e) {
 			}
 		});
 
-		pnlTabbedPane.addChangeListener(new ChangeListener() {
+		this.pnlTabbedPane.addChangeListener(new ChangeListener() {
 			// // This method is called whenever the selected tab changes
-			public void stateChanged(ChangeEvent evt) {
-				JTabbedPane pane = (JTabbedPane) evt.getSource();
-				int sel = pane.getSelectedIndex();
+			@Override
+			public void stateChanged(final ChangeEvent evt) {
+				final JTabbedPane pane = (JTabbedPane) evt.getSource();
+				final int sel = pane.getSelectedIndex();
 				navigateToPanelAtIndex(sel);
 			}
 		});
 
-		btnNext.addActionListener(new ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
+		this.btnNext.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final java.awt.event.ActionEvent e) {
 				navigateToPanelAtIndex(getCurrentPanelIndex() + 1);
 			};
 		});
-		btnPre.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnPre.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				navigateToPanelAtIndex(getCurrentPanelIndex() - 1);
 			}
 		});
-		btnClose.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleClosePanel();
 			}
 		});
@@ -140,18 +174,13 @@ public class DynMasterDetailPanel extends AbstractMasterDetail {
 
 	@Override
 	protected void navigateToPanelAtIndex(int panelIndex) {
-		if (panelIndex < 0 || panelIndex == 0 || panelIndex >= pnlTabbedPane.getTabCount()) {
+		if (panelIndex < 0 || panelIndex == 0 || panelIndex >= this.pnlTabbedPane.getTabCount()) {
 			panelIndex = 0;
 		}
-		pnlTabbedPane.setSelectedIndex(panelIndex);
-		btnClose.setVisible(getCurrentPanelIndex() > 0);// since the
+		this.pnlTabbedPane.setSelectedIndex(panelIndex);
+		this.btnClose.setVisible(getCurrentPanelIndex() > 0);// since the
 		// master
-		btnPre.setEnabled(getCurrentPanelIndex() > 0);
-		btnNext.setEnabled(getCurrentPanelIndex() + 1 != pnlTabbedPane.getTabCount());
-	}
-
-	@Override
-	public void addComponent(JComponent comp) {
-		getButtonsPanel().add(comp);
+		this.btnPre.setEnabled(getCurrentPanelIndex() > 0);
+		this.btnNext.setEnabled(getCurrentPanelIndex() + 1 != this.pnlTabbedPane.getTabCount());
 	}
 }

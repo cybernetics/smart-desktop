@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.jalalkiswani</groupId>
 		<artifactId>jk-os-parent</artifactId>
-		<version>0.0.5</version>
+		<version>0.0.6</version>
 	</parent>
 	<artifactId>smart-desktop</artifactId>
 

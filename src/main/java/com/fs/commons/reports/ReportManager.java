@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.reports;
 
 import java.io.FileNotFoundException;
@@ -6,11 +21,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.dao.dynamic.DynamicDao;
@@ -21,30 +31,51 @@ import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+
 /**
  * TODO : refactor this class regarding compilation , since we dont compile
  * reports any more , its compiled in the anr script during the building process
- * 
+ *
  * @author user
- * 
+ *
  */
 public class ReportManager {
 	private static ArrayList<Report> allReports = new ArrayList<Report>();
 
-	private ArrayList<Report> instanceReports = new ArrayList<Report>();
 	private static Map<String, String> databaseReports = new HashMap<>();
-	// this variable will be useful in localized systems , where it could be
-	// set according
-	// to the system current locale , thus it would load all reports that
-	// Begins with the prefix of that locale
-	private String prefix;
-	private String altPrefix;
 	static {
 		try {
 			loadDatabaseReports();
-		} catch (DaoException e) {
+		} catch (final DaoException e) {
 			ExceptionUtil.handleException(e);
 		}
+	}
+
+	// //////////////////////////////////////////////////////////////
+	public static void addReports(final ArrayList<Report> reports) {
+		allReports.addAll(reports);
+	}
+
+	// //////////////////////////////////////////////////////////////
+	public static void clearReports() {
+		allReports.clear();
+	}
+
+	/**
+	 *
+	 * @param report
+	 * @throws JRException
+	 * @throws IOException
+	 */
+	public static void compileReport(final Report report, final String outputFolder) throws JRException, IOException {
+		final InputStream fileInputStream = GeneralUtility.getReportFileAsStream(report.getSourceFileName());
+		final JasperDesign jasperDesign = JRXmlLoader.load(fileInputStream);
+		JasperCompileManager.compileReportToFile(jasperDesign, outputFolder + report.getOutFileName());
+		fileInputStream.close();
 	}
 
 	// // //////////////////////////////////////////////////////////////
@@ -53,21 +84,24 @@ public class ReportManager {
 	// }
 
 	// //////////////////////////////////////////////////////////////
-	public ReportManager(InputStream in, String prefix, String altPrefix) throws JKXmlException {
-		this(new ReportXmlParser().parse(in), prefix, altPrefix);
-	}
-
-	// ///////////////////////////////////////////////////////////////
-	private ReportManager(ArrayList<Report> reports, String prefix, String altPrefix) {
-		instanceReports = reports;
-		this.prefix = prefix;
-		this.altPrefix = altPrefix;
-		compileReports();
+	public static Report getReport(final int index) {
+		final Report report = allReports.get(index);
+		return report;
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public ArrayList<Report> getInstanceReports() {
-		return instanceReports;
+	public static Report getReport(final String name) {
+		for (int i = 0; i < allReports.size(); i++) {
+			if (allReports.get(i).getName().equals(name)) {
+				return allReports.get(i);
+			}
+		}
+		return null;
+	}
+
+	// //////////////////////////////////////////////////////////////
+	public static ArrayList<Report> getReports() {
+		return allReports;
 	}
 
 	// /**
@@ -82,76 +116,54 @@ public class ReportManager {
 	// }
 
 	// //////////////////////////////////////////////////////////////
-	private void compileReports() {
-		Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				// System.out.println("Compiling Reports...");
-				for (int i = 0; i < instanceReports.size(); i++) {
-					Report report = instanceReports.get(i);
-					// if (i == 0) {
-					// checkSourcePath(report.getSourcePath());
-					// checkOutpath(report.getOutPath());
-					// }
-					initReport(report);
-				}
-				// System.out.println("Compiling Reports Done...");
-			}
-		};
-		runnable.run();
-		// Thread t = new Thread(runnable);
-		// t.start();
+	public static int getReportsCount() {
+		return allReports.size();
 	}
 
 	// //////////////////////////////////////////////////////////////
-	private void initReport(Report report) {
-		try {
-			String sourceFileName = checkReportFileName(report);
-			report.setSourceFileName(sourceFileName);
-			report.setOutFileName(getOutFileName(report));
-			// report.setAbsolutOutPath(GeneralUtility.geto + "/" +
-			// report.getOutFileName());
-			// convert the condition to not
-			if (allowCompile(report)) {
-				// only compile reports if not exists
-				// System.out.println("Compiling Report : "+prefix+report.getName());
-				compileReport(report, "");
-				// JasperReport jr
-				// =JasperCompileManager.compileReport(report.getAbsolutSourcePath());
-			}
-		} catch (JRException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Unable to compile report: " + report.getSourceFileName(), e);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+	public static void init(final InputStream in) throws JKXmlException {
+		init(in, "");
+	}
+
+	// //////////////////////////////////////////////////////////////
+	public static void init(final InputStream in, final String prefix) throws JKXmlException {
+		final ReportManager manager = new ReportManager(in, prefix, "");
+		addReports(manager.getInstanceReports());
+	}
+
+	private static void loadDatabaseReports() throws RecordNotFoundException, DaoException {
+		final DynamicDao dao = DaoFactory.createDynamicDao("conf_reports");
+		final ArrayList<Record> records = dao.lstRecords();
+		for (final Record record : records) {
+			databaseReports.put(record.getFieldValueAsString("report_name"), record.getFieldValueAsString("report_file"));
 		}
 	}
 
-	private String getOutFileName(Report report) throws RecordNotFoundException, DaoException {
-		// TODO : refactor me and tune it to read all the reports only once
-		String name = report.getName();
-		if (databaseReports.get(report.getName()) != null) {
-			name = databaseReports.get(report.getName());
-		}
-		return prefix + name + ".jasper";
+	private ArrayList<Report> instanceReports = new ArrayList<Report>();
+
+	// this variable will be useful in localized systems , where it could be
+	// set according
+	// to the system current locale , thus it would load all reports that
+	// Begins with the prefix of that locale
+	private final String prefix;
+
+	private final String altPrefix;
+
+	// ///////////////////////////////////////////////////////////////
+	private ReportManager(final ArrayList<Report> reports, final String prefix, final String altPrefix) {
+		this.instanceReports = reports;
+		this.prefix = prefix;
+		this.altPrefix = altPrefix;
+		compileReports();
 	}
 
-	/**
-	 * 
-	 * @param report
-	 * @throws JRException
-	 * @throws IOException
-	 */
-	public static void compileReport(Report report, String outputFolder) throws JRException, IOException {
-		InputStream fileInputStream = GeneralUtility.getReportFileAsStream(report.getSourceFileName());
-		JasperDesign jasperDesign = JRXmlLoader.load(fileInputStream);
-		JasperCompileManager.compileReportToFile(jasperDesign, outputFolder + report.getOutFileName());
-		fileInputStream.close();
+	// //////////////////////////////////////////////////////////////
+	public ReportManager(final InputStream in, final String prefix, final String altPrefix) throws JKXmlException {
+		this(new ReportXmlParser().parse(in), prefix, altPrefix);
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////////
-	private boolean allowCompile(Report report) throws Exception {
+	private boolean allowCompile(final Report report) throws Exception {
 		return false;
 		// URL resource = GeneralUtility.getURL(report.getAbsolutSourcePath());
 		// File sourceFile = new File(sourceFileName);
@@ -180,15 +192,15 @@ public class ReportManager {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	private String checkReportFileName(Report report) throws FileNotFoundException {
+	private String checkReportFileName(final Report report) throws FileNotFoundException {
 		InputStream inputStream = null;
 		try {
-			String name = prefix + report.getName() + ".jrxml";
+			String name = this.prefix + report.getName() + ".jrxml";
 			inputStream = GeneralUtility.getReportFileAsStream(name);
 			if (inputStream != null) {
 				return name;
 			}
-			name = altPrefix + report.getName() + ".jrxml";
+			name = this.altPrefix + report.getName() + ".jrxml";
 			inputStream = GeneralUtility.getReportFileAsStream(name);
 			if (inputStream != null) {
 				return name;
@@ -203,64 +215,71 @@ public class ReportManager {
 			if (inputStream != null) {
 				try {
 					inputStream.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 				}
 			}
 		}
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public static Report getReport(int index) {
-		Report report = allReports.get(index);
-		return report;
-	}
+	private void compileReports() {
+		final Runnable runnable = new Runnable() {
 
-	// //////////////////////////////////////////////////////////////
-	public static int getReportsCount() {
-		return allReports.size();
-	}
-
-	// //////////////////////////////////////////////////////////////
-	public static Report getReport(String name) {
-		for (int i = 0; i < allReports.size(); i++) {
-			if (allReports.get(i).getName().equals(name)) {
-				return allReports.get(i);
+			@Override
+			public void run() {
+				// System.out.println("Compiling Reports...");
+				for (int i = 0; i < ReportManager.this.instanceReports.size(); i++) {
+					final Report report = ReportManager.this.instanceReports.get(i);
+					// if (i == 0) {
+					// checkSourcePath(report.getSourcePath());
+					// checkOutpath(report.getOutPath());
+					// }
+					initReport(report);
+				}
+				// System.out.println("Compiling Reports Done...");
 			}
+		};
+		runnable.run();
+		// Thread t = new Thread(runnable);
+		// t.start();
+	}
+
+	// //////////////////////////////////////////////////////////////
+	public ArrayList<Report> getInstanceReports() {
+		return this.instanceReports;
+	}
+
+	private String getOutFileName(final Report report) throws RecordNotFoundException, DaoException {
+		// TODO : refactor me and tune it to read all the reports only once
+		String name = report.getName();
+		if (databaseReports.get(report.getName()) != null) {
+			name = databaseReports.get(report.getName());
 		}
-		return null;
+		return this.prefix + name + ".jasper";
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public static void addReports(ArrayList<Report> reports) {
-		allReports.addAll(reports);
-	}
-
-	// //////////////////////////////////////////////////////////////
-	public static ArrayList<Report> getReports() {
-		return allReports;
-	}
-
-	// //////////////////////////////////////////////////////////////
-	public static void init(InputStream in) throws JKXmlException {
-		init(in, "");
-	}
-
-	// //////////////////////////////////////////////////////////////
-	public static void init(InputStream in, String prefix) throws JKXmlException {
-		ReportManager manager = new ReportManager(in, prefix, "");
-		addReports(manager.getInstanceReports());
-	}
-
-	// //////////////////////////////////////////////////////////////
-	public static void clearReports() {
-		allReports.clear();
-	}
-
-	private static void loadDatabaseReports() throws RecordNotFoundException, DaoException {
-		DynamicDao dao = DaoFactory.createDynamicDao("conf_reports");
-		ArrayList<Record> records = dao.lstRecords();
-		for (Record record : records) {
-			databaseReports.put(record.getFieldValueAsString("report_name"), record.getFieldValueAsString("report_file"));
+	private void initReport(final Report report) {
+		try {
+			final String sourceFileName = checkReportFileName(report);
+			report.setSourceFileName(sourceFileName);
+			report.setOutFileName(getOutFileName(report));
+			// report.setAbsolutOutPath(GeneralUtility.geto + "/" +
+			// report.getOutFileName());
+			// convert the condition to not
+			if (allowCompile(report)) {
+				// only compile reports if not exists
+				// System.out.println("Compiling Report :
+				// "+prefix+report.getName());
+				compileReport(report, "");
+				// JasperReport jr
+				// =JasperCompileManager.compileReport(report.getAbsolutSourcePath());
+			}
+		} catch (final JRException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Unable to compile report: " + report.getSourceFileName(), e);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 

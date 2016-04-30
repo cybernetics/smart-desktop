@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.pdf;
 
 import java.io.ByteArrayInputStream;
@@ -17,49 +32,50 @@ import com.lowagie.text.pdf.PdfWriter;
 
 public class PDFMergeUtil {
 	// ////////////////////////////////////////////////////////////////
-	public static void concatPDFs(List<byte[]> allPdfBytes,  OutputStream outputStream) throws PdfException {
-		ArrayList<InputStream> streams = new ArrayList<InputStream>();
-		for (byte[] pdfFile : allPdfBytes) {
-			ByteArrayInputStream pdfBytes = new ByteArrayInputStream(pdfFile);
+	public static void concatPDFs(final List<byte[]> allPdfBytes, final OutputStream outputStream) throws PdfException {
+		final ArrayList<InputStream> streams = new ArrayList<InputStream>();
+		for (final byte[] pdfFile : allPdfBytes) {
+			final ByteArrayInputStream pdfBytes = new ByteArrayInputStream(pdfFile);
 			streams.add(pdfBytes);
 		}
-		concatPDFs(streams, outputStream,false);
+		concatPDFs(streams, outputStream, false);
 	}
 
 	// ////////////////////////////////////////////////////////////////
-	public static void concatPDFs(List<InputStream> pdfs, OutputStream outputStream, boolean paginate) throws PdfException {
-		Document document = new Document();
+	public static void concatPDFs(final List<InputStream> pdfs, final OutputStream outputStream, final boolean paginate) throws PdfException {
+		final Document document = new Document();
 		try {
-			List<PdfReader> readers = new ArrayList<PdfReader>();
+			final List<PdfReader> readers = new ArrayList<PdfReader>();
 			int totalPages = 0;
-			Iterator<InputStream> iteratorPDFs = pdfs.iterator();
+			final Iterator<InputStream> iteratorPDFs = pdfs.iterator();
 
 			// Create Readers for the pdfs.
 			while (iteratorPDFs.hasNext()) {
-				InputStream pdf = iteratorPDFs.next();
-				PdfReader pdfReader = new PdfReader(pdf);
+				final InputStream pdf = iteratorPDFs.next();
+				final PdfReader pdfReader = new PdfReader(pdf);
 				readers.add(pdfReader);
 				totalPages += pdfReader.getNumberOfPages();
 			}
 
 			// Create a writer for the outputstream
-			PdfWriter writer = PdfWriter.getInstance(document, outputStream);
-			
+			final PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+
 			document.open();
 
 			// BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA,
 			// BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-			PdfContentByte cb = writer.getDirectContent(); // Holds the PDF
+			final PdfContentByte cb = writer.getDirectContent(); // Holds the
+																	// PDF
 			// data
 
 			PdfImportedPage page;
 			int currentPageNumber = 0;
 			int pageOfCurrentReaderPDF = 0;
-			Iterator<PdfReader> iteratorPDFReader = readers.iterator();
+			final Iterator<PdfReader> iteratorPDFReader = readers.iterator();
 
 			// Loop through the PDF files and add to the output.
 			while (iteratorPDFReader.hasNext()) {
-				PdfReader pdfReader = iteratorPDFReader.next();
+				final PdfReader pdfReader = iteratorPDFReader.next();
 
 				// Create a new page in the target for each source page.
 				while (pageOfCurrentReaderPDF < pdfReader.getNumberOfPages()) {
@@ -79,19 +95,21 @@ public class PDFMergeUtil {
 				}
 				pageOfCurrentReaderPDF = 0;
 			}
-			
+
 			outputStream.flush();
 			document.close();
 			outputStream.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new PdfException(e);
 		} finally {
-			if (document.isOpen())
+			if (document.isOpen()) {
 				document.close();
+			}
 			try {
-				if (outputStream != null)
+				if (outputStream != null) {
 					outputStream.close();
-			} catch (IOException ioe) {
+				}
+			} catch (final IOException ioe) {
 				ioe.printStackTrace();
 			}
 		}

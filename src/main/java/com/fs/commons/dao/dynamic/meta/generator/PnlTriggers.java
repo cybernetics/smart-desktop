@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.meta.generator;
 
 import java.awt.BorderLayout;
@@ -16,131 +31,133 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 public class PnlTriggers extends JKPanel<Object> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private final Collection<String> triggersNames;
-	ArrayList<JKTextField> cmbTriggers = new ArrayList<JKTextField>();
-	private JKPanel<?> pnlTriggers;
-	
-	JKButton btnAdd=new JKButton("add");
-	JKButton btnSave=new JKButton("save");
-	JKButton btnClose=new JKButton("close");
 
 	/**
-	 * 
+	 *
+	 * @param args
+	 */
+	public static void main(final String[] args) {
+		final ArrayList<String> triggers = new ArrayList<String>();
+		final PnlTriggers pnl = new PnlTriggers(triggers);
+		SwingUtility.showPanelInDialog(pnl, "");
+		System.out.println(triggers);
+	}
+
+	private final Collection<String> triggersNames;
+	ArrayList<JKTextField> cmbTriggers = new ArrayList<JKTextField>();
+
+	private JKPanel<?> pnlTriggers;
+	JKButton btnAdd = new JKButton("add");
+	JKButton btnSave = new JKButton("save");
+
+	JKButton btnClose = new JKButton("close");
+
+	/**
+	 *
 	 * @param triggers
 	 */
-	public PnlTriggers(Collection<String> triggers) {
+	public PnlTriggers(final Collection<String> triggers) {
 		this.triggersNames = triggers;
 		init();
 	}
 
 	/**
-	 * 
+	 *
+	 * @param name
 	 */
-	private void init() {
-		setLayout(new BorderLayout());
-		add(getTriggersPanel(), BorderLayout.CENTER);
-		add(getButtonsPanel(),BorderLayout.SOUTH);
-		btnAdd.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			  handleAdd();	
-			}
-		});
-		btnSave.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			  handleSave();	
-			}
-		});
-		btnClose.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			  handleClose();	
-			}
-		});
+	private void addTrigger(final String name) {
+		final JKTextField txt = new JKTextField();
+		txt.setText(name);
+		this.cmbTriggers.add(txt);
+		this.pnlTriggers.add(txt);
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
+	 */
+	private JKPanel<?> getButtonsPanel() {
+		final JKPanel<?> pnlButtons = new JKPanel<Object>();
+		pnlButtons.add(this.btnAdd);
+		pnlButtons.add(this.btnSave);
+		pnlButtons.add(this.btnClose);
+		return pnlButtons;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private JKPanel<?> getTriggersPanel() {
+		if (this.pnlTriggers == null) {
+			this.pnlTriggers = new JKPanel<Object>();
+			this.pnlTriggers.setLayout(new BoxLayout(this.pnlTriggers, BoxLayout.Y_AXIS));
+			for (final String triggersName : this.triggersNames) {
+				addTrigger(triggersName);
+			}
+		}
+		return this.pnlTriggers;
+	}
+
+	/**
+	 *
 	 */
 	protected void handleAdd() {
-		String triggerName= SwingUtility.showInputDialog("Enter trigger Name");
+		final String triggerName = SwingUtility.showInputDialog("Enter trigger Name");
 		addTrigger(triggerName);
-		pnlTriggers.validate();
-		pnlTriggers.repaint();
+		this.pnlTriggers.validate();
+		this.pnlTriggers.repaint();
 		SwingUtility.packWindow(this);
 	}
 
 	/**
-	 * 
-	 */
-	protected void handleSave() {
-		triggersNames.clear();
-		for (int i = 0; i < cmbTriggers.size(); i++) {
-			String triggerName=cmbTriggers.get(i).getText().trim();
-			if(!triggerName.equals("")){
-				triggersNames.add(triggerName);
-			}
-		}
-		handleClose();
-	}
-
-	/**
-	 * 
+	 *
 	 */
 	protected void handleClose() {
 		SwingUtility.closePanelDialog(this);
 	}
 
 	/**
-	 * 
-	 * @return
+	 *
 	 */
-	private JKPanel<?> getButtonsPanel() {
-		JKPanel<?> pnlButtons=new JKPanel<Object>();
-		pnlButtons.add(btnAdd);
-		pnlButtons.add(btnSave);
-		pnlButtons.add(btnClose);
-		return pnlButtons;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private JKPanel<?> getTriggersPanel() {
-		if (pnlTriggers == null) {
-			pnlTriggers = new JKPanel<Object>();
-			pnlTriggers.setLayout(new BoxLayout(pnlTriggers, BoxLayout.Y_AXIS));
-			for (String triggersName : triggersNames) {
-				addTrigger(triggersName);
+	protected void handleSave() {
+		this.triggersNames.clear();
+		for (int i = 0; i < this.cmbTriggers.size(); i++) {
+			final String triggerName = this.cmbTriggers.get(i).getText().trim();
+			if (!triggerName.equals("")) {
+				this.triggersNames.add(triggerName);
 			}
 		}
-		return pnlTriggers;
+		handleClose();
 	}
 
 	/**
-	 * 
-	 * @param name
+	 *
 	 */
-	private void addTrigger(String name) {
-		JKTextField txt=new JKTextField();
-		txt.setText(name);
-		cmbTriggers.add(txt);
-		pnlTriggers.add(txt);
-	}
-	
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		ArrayList<String> triggers = new ArrayList<String>();
-		PnlTriggers pnl=new PnlTriggers(triggers);
-		SwingUtility.showPanelInDialog(pnl, "");
-		System.out.println(triggers);
+	private void init() {
+		setLayout(new BorderLayout());
+		add(getTriggersPanel(), BorderLayout.CENTER);
+		add(getButtonsPanel(), BorderLayout.SOUTH);
+		this.btnAdd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleAdd();
+			}
+		});
+		this.btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleSave();
+			}
+		});
+		this.btnClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleClose();
+			}
+		});
 	}
 }

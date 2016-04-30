@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Dimension;
@@ -17,28 +32,75 @@ import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.validation.Validator;
 
 public class JKPasswordField extends JPasswordField implements BindingComponent<String> {
-	private FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
-
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
+
 	// static Border focusBorder =
 	// BorderFactory.createLineBorder(SystemColor.infoText);
 	// static Border lostFocusBorder =
 	// BorderFactory.createLineBorder(SystemColor.activeCaptionBorder);
 	static Dimension dim = new Dimension(200, 30);
+	private final FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
 	private String defaultValue;
 
 	private boolean transfer;
 
 	public JKPasswordField() {
-		this(10,10);
+		this(10, 10);
 	}
-	
-	public JKPasswordField(int maxlength, int col) {
+
+	public JKPasswordField(final int maxlength, final int col) {
 		super(new TextDocument(maxlength), "", col);
 		init();
+	}
+
+	@Override
+	public void addValidator(final Validator validator) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addValueChangeListener(final ValueChangeListener listener) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 *
+	 * @throws ValidationException
+	 */
+	public void checkEmpty() throws ValidationException {
+		SwingValidator.checkEmpty(this);
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void filterValues(final BindingComponent component) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public DataSource getDataSource() {
+		return this.fsWrapper.getDataSource();
+	}
+
+	@Override
+	public String getDefaultValue() {
+		return this.defaultValue;
+	}
+
+	@Override
+	public String getValue() {
+		return getText();
 	}
 
 	/**
@@ -51,7 +113,7 @@ public class JKPasswordField extends JPasswordField implements BindingComponent<
 		// setBorder(lostFocusBorder);
 		addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyTyped(KeyEvent e) {
+			public void keyTyped(final KeyEvent e) {
 				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
 					transferFocus();
 				}
@@ -60,73 +122,62 @@ public class JKPasswordField extends JPasswordField implements BindingComponent<
 
 		addFocusListener(new FocusAdapter() {
 			@Override
-			public void focusGained(FocusEvent e) {
+			public void focusGained(final FocusEvent e) {
 				// setBorder(focusBorder);
 				setSelectionStart(0);
 				setSelectionEnd(getText().length());
 			}
 
 			@Override
-			public void focusLost(FocusEvent e) {
+			public void focusLost(final FocusEvent e) {
 				// setBorder(lostFocusBorder);
 			}
 		});
 	}
 
-	public String getValue() {
-		return getText();
+	@Override
+	public boolean isAutoTransferFocus() {
+		return this.transfer;
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	public void setValue(String value) {
-		setText(value);
-	}
-
-	/**
-	 * 
-	 * @throws ValidationException
-	 */
-	public void checkEmpty() throws ValidationException {
-		SwingValidator.checkEmpty(this);
-	}
-
-	/**
-	 * 
-	 */
+	@Override
 	public void reset() {
 		setText(getDefaultValue() != null ? getDefaultValue() : "");
 	}
 
+	@Override
+	public void setAutoTransferFocus(final boolean transfer) {
+		this.transfer = transfer;
+	}
+
+	@Override
+	public void setColumns(final int columns) {
+		// Just ignore to take the preffered size
+	}
+
+	@Override
+	public void setDataSource(final DataSource manager) {
+		this.fsWrapper.setDataSource(manager);
+	}
+
 	/**
-	 * 
+	 *
 	 * @param defaultValue
 	 */
-	public void setDefaultValue(String defaultValue) {
+	@Override
+	public void setDefaultValue(final String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
 
-	public String getDefaultValue() {
-		return defaultValue;
-	}
-
+	/**
+	 *
+	 */
 	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void filterValues(BindingComponent component) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void addValidator(Validator validator) {
-		// TODO Auto-generated method stub
-
+	public void setValue(final String value) {
+		setText(value);
 	}
 
 	@Override
@@ -134,34 +185,4 @@ public class JKPasswordField extends JPasswordField implements BindingComponent<
 		// TODO Auto-generated method stub
 
 	}
-
-	@Override
-	public void setColumns(int columns) {
-		// Just ignore to take the preffered size
-	}
-
-	@Override
-	public void setDataSource(DataSource manager) {
-		fsWrapper.setDataSource(manager);
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		return fsWrapper.getDataSource();
-	}
-
-	@Override
-	public void addValueChangeListener(ValueChangeListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setAutoTransferFocus(boolean transfer) {
-		this.transfer = transfer;
-	}
-
-	@Override
-	public boolean isAutoTransferFocus() {
-		return transfer;
-	}}
+}

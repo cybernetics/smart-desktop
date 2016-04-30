@@ -1,9 +1,17 @@
-/**
- * Modification history
- * ====================================================
- * Version    Date         Developer        Purpose 
- * ====================================================
- * 1.1      30/06/2008     Jamil Shreet    -Add the following class : 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.apps.backup;
 
@@ -11,8 +19,9 @@ import com.fs.commons.dao.connection.DataSource;
 
 /**
  * @1.1
- * @author ASUS
  * 
+ * @author ASUS
+ *
  */
 public class DatabaseInfo {
 
@@ -26,7 +35,7 @@ public class DatabaseInfo {
 	public DatabaseInfo() {
 	}
 
-	public DatabaseInfo(DataSource con) {
+	public DatabaseInfo(final DataSource con) {
 		setDatabaseHost(con.getDatabaseHost());
 		setDatabaseName(con.getDatabaseName());
 		setDatabasePort(con.getDatabasePort());
@@ -35,93 +44,93 @@ public class DatabaseInfo {
 	}
 
 	/**
-	 * @return the fileName
-	 */
-	public String getFileName() {
-		return fileName;
-	}
-
-	/**
-	 * @param fileName
-	 *            the fileName to set
-	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	/**
 	 * @return the databaseHost
 	 */
 	public String getDatabaseHost() {
-		return databaseHost;
-	}
-
-	/**
-	 * @param databaseHost
-	 *            the databaseHost to set
-	 */
-	public void setDatabaseHost(String databaseHost) {
-		this.databaseHost = databaseHost;
-	}
-
-	/**
-	 * @return the databasePort
-	 */
-	public int getDatabasePort() {
-		return databasePort;
-
-	}
-
-	/**
-	 * @param databasePort
-	 *            the databasePort to set
-	 */
-	public void setDatabasePort(int databasePort) {
-		this.databasePort = databasePort;
+		return this.databaseHost;
 	}
 
 	/**
 	 * @return the databaseName
 	 */
 	public String getDatabaseName() {
-		return databaseName;
-	}
-
-	/**
-	 * @param databaseName
-	 *            the databaseName to set
-	 */
-	public void setDatabaseName(String databaseName) {
-		this.databaseName = databaseName;
-	}
-
-	/**
-	 * @return the databaseUser
-	 */
-	public String getDatabaseUser() {
-		return databaseUser;
-	}
-
-	/**
-	 * @param databaseUser
-	 *            the databaseUser to set
-	 */
-	public void setDatabaseUser(String databaseUser) {
-		this.databaseUser = databaseUser;
+		return this.databaseName;
 	}
 
 	/**
 	 * @return the databasePassword
 	 */
 	public String getDatabasePassword() {
-		return databasePassword;
+		return this.databasePassword;
+	}
+
+	/**
+	 * @return the databasePort
+	 */
+	public int getDatabasePort() {
+		return this.databasePort;
+
+	}
+
+	/**
+	 * @return the databaseUser
+	 */
+	public String getDatabaseUser() {
+		return this.databaseUser;
+	}
+
+	/**
+	 * @return the fileName
+	 */
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	/**
+	 * @param databaseHost
+	 *            the databaseHost to set
+	 */
+	public void setDatabaseHost(final String databaseHost) {
+		this.databaseHost = databaseHost;
+	}
+
+	/**
+	 * @param databaseName
+	 *            the databaseName to set
+	 */
+	public void setDatabaseName(final String databaseName) {
+		this.databaseName = databaseName;
 	}
 
 	/**
 	 * @param databasePassword
 	 *            the databasePassword to set
 	 */
-	public void setDatabasePassword(String databasePassword) {
+	public void setDatabasePassword(final String databasePassword) {
 		this.databasePassword = databasePassword;
+	}
+
+	/**
+	 * @param databasePort
+	 *            the databasePort to set
+	 */
+	public void setDatabasePort(final int databasePort) {
+		this.databasePort = databasePort;
+	}
+
+	/**
+	 * @param databaseUser
+	 *            the databaseUser to set
+	 */
+	public void setDatabaseUser(final String databaseUser) {
+		this.databaseUser = databaseUser;
+	}
+
+	/**
+	 * @param fileName
+	 *            the fileName to set
+	 */
+	public void setFileName(final String fileName) {
+		this.fileName = fileName;
 	}
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp.panels;
 
 import java.awt.BorderLayout;
@@ -21,46 +36,86 @@ import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.ReflicationUtil;
 
 /**
- * 
+ *
  * @author mkiswani
- * 
+ *
  */
 public class PnlImport extends JKPanel {
-	protected JKFilePanel filePanel = new JKFilePanel();
-	protected JKButton btnImport = new JKButton("IMPORT","",true);
-	protected Collection<ImportListener> listeners = new ArrayList<ImportListener>();
-	private String pnlTitle;
-	private Class importerClass;
+	// ///////////////////////////////////////////////////////////////////////////////////////////////////
+	protected class ImportListenerImp extends ImportListenerAdapter {
+		@Override
+		public void onException(final Exception e, final Importer importer) {
+			final boolean countine = SwingUtility
+					.showConfirmationDialog("ERROR_HAPPENED_WHILE_IMPORTING:POSSIBLE " + "REASON" + e.getMessage() + " DO_YOU_WANT_TO_CONTINUE");
+			if (!countine) {
+				importer.setStopIfErrorOccuers(true);
+			}
+		}
+	}
 
-	public PnlImport(String pnlTitle,Class importerClass, String... extensions) {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 8981633765691991651L;
+	protected JKFilePanel filePanel = new JKFilePanel();
+	protected JKButton btnImport = new JKButton("IMPORT", "", true);
+	protected Collection<ImportListener> listeners = new ArrayList<ImportListener>();
+	private final String pnlTitle;
+
+	private final Class importerClass;
+
+	public PnlImport(final String pnlTitle, final Class importerClass, final String... extensions) {
 		this.pnlTitle = pnlTitle;
 		this.importerClass = importerClass;
-		filePanel.setExtensions(extensions);
+		this.filePanel.setExtensions(extensions);
 		init();
 	}
 
-	public PnlImport(String pnlTitle, Class importerClass, String allowedExtensions) {
-		this(pnlTitle, importerClass , allowedExtensions.split(","));
+	public PnlImport(final String pnlTitle, final Class importerClass, final String allowedExtensions) {
+		this(pnlTitle, importerClass, allowedExtensions.split(","));
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	public void addListener(final ImportListener listener) {
+		this.listeners.add(listener);
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
-	private void init() {
-		JKPanel jkPanel = getMainPnl();
-		btnImport.setIcon("import.png");
-		add(jkPanel);
+	protected JKPanel getBtnsPnl() {
+		final JKPanel pnl = new JKPanel();
+		pnl.add(this.btnImport);
+		return pnl;
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////
+	protected JKPanel getCenterPnl() {
+		final JKPanel pnl = new JKPanel();
+		pnl.setLayout(new BoxLayout(pnl, BoxLayout.LINE_AXIS));
+		pnl.add(new JKLabledComponent("FILE", this.filePanel));
+		pnl.add(this.btnImport);
+		return pnl;
+	}
+
+	public JKFilePanel getFilePanel() {
+		return this.filePanel;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	public Collection<ImportListener> getListeners() {
+		return this.listeners;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
 	protected JKPanel getMainPnl() {
-		JKPanel jkPanel = new JKPanel();
+		final JKPanel jkPanel = new JKPanel();
 		setContainerPnlPreferedSize(jkPanel);
-		Border createTitledBorder = SwingUtility.createTitledBorder(pnlTitle);
+		final Border createTitledBorder = SwingUtility.createTitledBorder(this.pnlTitle);
 		jkPanel.setBorder(createTitledBorder);
 		jkPanel.setLayout(new BorderLayout());
 		jkPanel.add(getCenterPnl(), BorderLayout.NORTH);
-		btnImport.addActionListener(new ActionListener() {
+		this.btnImport.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(final ActionEvent arg0) {
 				handleImport();
 
 			}
@@ -68,33 +123,37 @@ public class PnlImport extends JKPanel {
 		return jkPanel;
 	}
 
-	protected void setContainerPnlPreferedSize(JKPanel jkPanel) {
-		jkPanel.setPreferredSize(650, 70);
-	}
-
 	// ////////////////////////////////////////////////////////////////////////////////////
 	protected void handleImport() {
 		try {
 			validateFields();
-			final File selectedFile = filePanel.getSelectedFile();
-			boolean result = SwingUtility.showConfirmationDialog(Lables.get("YOU_ARE_TRYING_TO_IMPORT")+ "\n" + selectedFile.getAbsolutePath() + "\n" + Lables.get("ARE_YOU_SURE"));
+			final File selectedFile = this.filePanel.getSelectedFile();
+			final boolean result = SwingUtility.showConfirmationDialog(
+					Lables.get("YOU_ARE_TRYING_TO_IMPORT") + "\n" + selectedFile.getAbsolutePath() + "\n" + Lables.get("ARE_YOU_SURE"));
 			if (result) {
 				handleImport(selectedFile);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			ExceptionUtil.handleException(e);
 		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////
 	protected void handleImport(final File selectedFile) throws Exception {
-		File file = new File(selectedFile.getAbsolutePath());// Weird case filechooser obj returns a subclass of File which is
-					 //Win32Shell obj and i need and io.File object to call the importer class
-					 //By using the reflection  
-		ReflicationUtil<Importer> util = new ReflicationUtil<Importer>();
-		Importer importer2 = util.newInstance(importerClass, file);
+		final File file = new File(selectedFile.getAbsolutePath());// Weird case
+																	// filechooser
+																	// obj
+																	// returns a
+																	// subclass
+																	// of File
+																	// which is
+		// Win32Shell obj and i need and io.File object to call the importer
+		// class
+		// By using the reflection
+		final ReflicationUtil<Importer> util = new ReflicationUtil<Importer>();
+		final Importer importer2 = util.newInstance(this.importerClass, file);
 		importer2.addListener(new ImportListenerImp());
-		for (ImportListener importListener : listeners) {
+		for (final ImportListener importListener : this.listeners) {
 			importer2.addListener(importListener);
 		}
 		if (importer2.imporT()) {
@@ -104,64 +163,30 @@ public class PnlImport extends JKPanel {
 		}
 	}
 
-	// ///////////////////////////////////////////////////////////////////////////////////////////////////
-	protected class ImportListenerImp extends ImportListenerAdapter {
-		@Override
-		public void onException(Exception e, Importer importer) {
-			boolean countine = SwingUtility.showConfirmationDialog("ERROR_HAPPENED_WHILE_IMPORTING:POSSIBLE " 
-																	+ "REASON" 
-																	+ e.getMessage()
-																	+ " DO_YOU_WANT_TO_CONTINUE");
-			if (!countine) {
-				importer.setStopIfErrorOccuers(true);
-			}
-		}
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////////////
-	protected JKPanel getCenterPnl() {
-		JKPanel pnl = new JKPanel();
-		pnl.setLayout(new BoxLayout(pnl, BoxLayout.LINE_AXIS));
-		pnl.add(new JKLabledComponent("FILE", filePanel));
-		pnl.add(btnImport);
-		return pnl;
-	}
-
 	// //////////////////////////////////////////////////////////////////////////////////////
-	protected JKPanel getBtnsPnl() {
-		JKPanel pnl = new JKPanel();
-		pnl.add(btnImport);
-		return pnl;
+	private void init() {
+		final JKPanel jkPanel = getMainPnl();
+		this.btnImport.setIcon("import.png");
+		add(jkPanel);
 	}
 
-	public JKFilePanel getFilePanel() {
-		return filePanel;
+	protected void setContainerPnlPreferedSize(final JKPanel jkPanel) {
+		jkPanel.setPreferredSize(650, 70);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void setFilePanel(JKFilePanel filePanel) {
+	public void setFilePanel(final JKFilePanel filePanel) {
 		this.filePanel = filePanel;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	public Collection<ImportListener> getListeners() {
-		return listeners;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void setListeners(Collection<ImportListener> listeners) {
+	public void setListeners(final Collection<ImportListener> listeners) {
 		this.listeners = listeners;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void addListener(ImportListener listener) {
-		this.listeners.add(listener);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	protected void validateFields() throws ValidationException {
 		getFilePanel().checkFields();
 	}
-	
-	
+
 }

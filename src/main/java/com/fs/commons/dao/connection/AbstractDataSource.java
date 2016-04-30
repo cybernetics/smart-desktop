@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.connection;
 
 import java.sql.Connection;
@@ -24,75 +39,57 @@ public abstract class AbstractDataSource implements DataSource {
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
-	public void close(Connection con) {
+	@Override
+	public void close(final Connection con) {
 		try {
-			if (con != null && !con.isClosed() && con != queryConnection) {
+			if (con != null && !con.isClosed() && con != this.queryConnection) {
 				// GeneralUtility.printStackTrace();
 				if (isDebug()) {
-					System.out.println("closing connection : Current connection " + (--connectionsCount));
+					System.out.println("closing connection : Current connection " + --connectionsCount);
 				}
 				// System.err.println("closing connection");
 				con.close();
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
-	public void close(Statement stmt) {
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (Exception e) {
-
+	@Override
+	public void close(final Connection connection, final boolean commit) throws DaoException {
+		try {
+			if (commit) {
+				connection.commit();
+			} else {
+				connection.rollback();
 			}
+			close(connection);
+		} catch (final SQLException e) {
+			throw new DaoException(e);
 		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
-	public void close(ResultSet rs) {
+	@Override
+	public void close(final ResultSet rs) {
 		if (rs != null) {
 			try {
 				rs.close();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
-	public Connection getConnection() throws DaoException {
-		if (!driverClassLoaded) {
-			loadDriverClass();
-			driverClassLoaded = true;
-		}
-		try {
-			// System.err.println("Createing new connection");
-			// GeneralUtility.printStackTrace();
-			if (isDebug()) {
-				System.out.println("Creating connection , current opened connections : " + (++connectionsCount));
-			}
-			return connect();
-		} catch (Exception e) {
+	@Override
+	public void close(final Statement stmt) {
+		if (stmt != null) {
 			try {
-				GeneralUtility.checkServer(getDatabaseHost(), getDatabasePort());
-				throw new DaoException(
-						Lables.getDefaultInstance().getLabel("UNABLE_TO_CONNECT_TO_DATABASE_AT_HOST", true) + ": " + getDatabaseHost(), e);
-			} catch (ServerDownException ex) {
-				throw new DaoException(ex);
+				stmt.close();
+			} catch (final Exception e) {
+
 			}
-		}
-	}
-
-	private boolean isDebug() {
-		return new Boolean(System.getProperty("fs.connection.debug", "false"));
-	}
-
-	private void loadDriverClass() {
-		try {
-			Class.forName(getDriverName());
-		} catch (ClassNotFoundException e) {
-			ExceptionUtil.handleException(e);
 		}
 	}
 
@@ -102,31 +99,49 @@ public abstract class AbstractDataSource implements DataSource {
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
-	public void close(Connection connection, boolean commit) throws DaoException {
-		try {
-			if (commit) {
-				connection.commit();
-			} else {
-				connection.rollback();
-			}
-			close(connection);
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		}
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////
+	@Override
 	public Session createSession() throws DaoException {
-		if (parentSession == null || parentSession.isClosed()) {
-			parentSession = new Session(this);
-			return parentSession;
+		if (this.parentSession == null || this.parentSession.isClosed()) {
+			this.parentSession = new Session(this);
+			return this.parentSession;
 		}
-		return new Session(parentSession);
+		return new Session(this.parentSession);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
 	@Override
-	public void setDatabaseName(String databseName) {
+	public Connection getConnection() throws DaoException {
+		if (!this.driverClassLoaded) {
+			loadDriverClass();
+			this.driverClassLoaded = true;
+		}
+		try {
+			// System.err.println("Createing new connection");
+			// GeneralUtility.printStackTrace();
+			if (isDebug()) {
+				System.out.println("Creating connection , current opened connections : " + (++connectionsCount));
+			}
+			return connect();
+		} catch (final Exception e) {
+			try {
+				GeneralUtility.checkServer(getDatabaseHost(), getDatabasePort());
+				throw new DaoException(Lables.getDefaultInstance().getLabel("UNABLE_TO_CONNECT_TO_DATABASE_AT_HOST", true) + ": " + getDatabaseHost(),
+						e);
+			} catch (final ServerDownException ex) {
+				throw new DaoException(ex);
+			}
+		}
+	}
+
+	@Override
+	public Connection getQueryConnection() throws DaoException {
+		if (this.queryConnection == null) {
+			this.queryConnection = getConnection();
+		}
+		return this.queryConnection;
+		// System.out.println("\n\n///////////////////////////////////////////////////////////////\n");
+		// GeneralUtility.printStackTrace();
+		// return getConnection();
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
@@ -135,16 +150,21 @@ public abstract class AbstractDataSource implements DataSource {
 		return Integer.parseInt(getProperty(PROPERTY_QUERY_LIMIT, DEFAULT_LIMIT + ""));
 	}
 
-	@Override
-	public Connection getQueryConnection() throws DaoException {
-		if (queryConnection == null) {
-			queryConnection = getConnection();
-		}
-		return queryConnection;
-		// System.out.println("\n\n///////////////////////////////////////////////////////////////\n");
-		// GeneralUtility.printStackTrace();
-		// return getConnection();
+	private boolean isDebug() {
+		return new Boolean(System.getProperty("fs.connection.debug", "false"));
 	}
 
+	private void loadDriverClass() {
+		try {
+			Class.forName(getDriverName());
+		} catch (final ClassNotFoundException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////
+	@Override
+	public void setDatabaseName(final String databseName) {
+	}
 
 }

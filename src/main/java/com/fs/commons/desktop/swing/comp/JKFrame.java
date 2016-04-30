@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.swing.comp;
 
@@ -28,11 +40,11 @@ import com.fs.commons.util.ExceptionUtil;
 
 /**
  * @author u087
- * 
+ *
  */
 public class JKFrame extends JFrame implements DaoComponent {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -52,46 +64,36 @@ public class JKFrame extends JFrame implements DaoComponent {
 		initFrame();
 	}
 
-	public JKFrame(DaoComponent parent) {
+	public JKFrame(final DaoComponent parent) {
 		setDataSource(parent.getDataSource());
 	}
 
 	/**
-	 * 
+	 *
 	 * @param gc
 	 */
-	public JKFrame(GraphicsConfiguration gc) {
+	public JKFrame(final GraphicsConfiguration gc) {
 		super(gc);
 		initFrame();
 	}
 
-	/**
-	 * 
-	 * @param title
-	 * @param gc
-	 */
-	public JKFrame(String title, GraphicsConfiguration gc) {
-		super(title, gc);
-		initFrame();
-	}
-
-	public JKFrame(String title) throws HeadlessException {
+	public JKFrame(final String title) throws HeadlessException {
 		super(Lables.get(title));
 		initFrame();
 	}
 
-	@Override
-	public void setVisible(boolean show) {
-		if (show) {
-//			AnimationUtil.open(this);
-			super.setVisible(true);
-		} else {
-			// if(getSize().getWidth()<=1){
-			super.setVisible(false);
-			// }else{
-			// AnimationUtil.close(this,false);
-			// }
-		}
+	/**
+	 *
+	 * @param title
+	 * @param gc
+	 */
+	public JKFrame(final String title, final GraphicsConfiguration gc) {
+		super(title, gc);
+		initFrame();
+	}
+
+	public void applyDataSource() {
+		SwingUtility.applyDataSource(this, this.manager);
 	}
 
 	@Override
@@ -103,63 +105,15 @@ public class JKFrame extends JFrame implements DaoComponent {
 		// }
 	}
 
-	/**
-	 * 
-	 */
-	private void initFrame() {
-		setSize(1024, 700);
-		setBackground(Colors.MAIN_PANEL_BG);
-		setLocationRelativeTo(null);
-		getInputContext().selectInputMethod(SwingUtility.getDefaultLocale());
-		getContentPane().addContainerListener(new ContainerAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * java.awt.event.ContainerAdapter#componentRemoved(java.awt.event
-			 * .ContainerEvent)
-			 */
-			@Override
-			public void componentRemoved(ContainerEvent e) {
-				if (e.getChild() != getHomePanel() && getHomePanel() != null && !showAnotherPanel) {
-					showHomePanel();
-				}
-			}
-
-		});
-	}
-
-	public void showHomePanel() {
-		handleShowPanel(getHomePanel());
-	}
-
-	/**
-	 * 
-	 * @param item
-	 */
-	public void handleShowPanel(JPanel panel) {
-		if (panel == null) {
-			// do nothing
-			return;
+	@Override
+	public DataSource getDataSource() {
+		if (this.manager != null) {
+			return this.manager;
 		}
-		showAnotherPanel = true;
-		if (centerPanel != null) {
-			remove(centerPanel);
+		if (getParent() instanceof DaoComponent) {
+			return ((DaoComponent) getParent()).getDataSource();
 		}
-
-		panel.applyComponentOrientation(SwingUtility.getDefaultComponentOrientation());
-
-//		panel.setMinimumSize(new Dimension(900,600));
-//		JScrollPane pane=new JScrollPane(panel);		
-		add(panel, BorderLayout.CENTER);
-
-		centerPanel = panel;
-		centerPanel.setBorder(BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED, Color.DARK_GRAY, Color.black));
-		
-		validate();
-		repaint();
-		centerPanel.requestFocus();
-		showAnotherPanel = false;
+		return DataSourceFactory.getDefaultDataSource();
 	}
 
 	/**
@@ -170,16 +124,58 @@ public class JKFrame extends JFrame implements DaoComponent {
 	}
 
 	/**
-	 * @param homePanel
+	 *
+	 * @param item
 	 */
-	public void setHomePanel(JPanel homePanel) {
-		this.homePanel = homePanel;
-		handleShowPanel(homePanel);
+	public void handleShowPanel(final JPanel panel) {
+		if (panel == null) {
+			// do nothing
+			return;
+		}
+		this.showAnotherPanel = true;
+		if (this.centerPanel != null) {
+			remove(this.centerPanel);
+		}
+
+		panel.applyComponentOrientation(SwingUtility.getDefaultComponentOrientation());
+
+		// panel.setMinimumSize(new Dimension(900,600));
+		// JScrollPane pane=new JScrollPane(panel);
+		add(panel, BorderLayout.CENTER);
+
+		this.centerPanel = panel;
+		this.centerPanel.setBorder(BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED, Color.DARK_GRAY, Color.black));
+
+		validate();
+		repaint();
+		this.centerPanel.requestFocus();
+		this.showAnotherPanel = false;
 	}
 
-	@Override
-	public void setTitle(String title) {
-		super.setTitle(Lables.get(title));
+	/**
+	 *
+	 */
+	private void initFrame() {
+		setSize(1024, 700);
+		setBackground(Colors.MAIN_PANEL_BG);
+		setLocationRelativeTo(null);
+		getInputContext().selectInputMethod(SwingUtility.getDefaultLocale());
+		getContentPane().addContainerListener(new ContainerAdapter() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see
+			 * java.awt.event.ContainerAdapter#componentRemoved(java.awt.event
+			 * .ContainerEvent)
+			 */
+			@Override
+			public void componentRemoved(final ContainerEvent e) {
+				if (e.getChild() != getHomePanel() && getHomePanel() != null && !JKFrame.this.showAnotherPanel) {
+					showHomePanel();
+				}
+			}
+
+		});
 	}
 
 	public void refreshComponents() {
@@ -187,37 +183,53 @@ public class JKFrame extends JFrame implements DaoComponent {
 		repaint();
 	}
 
-	public void setRightToLeft() {
-		applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-	}
-
-	public void setBackgroundImage(String image, int type) {
+	public void setBackgroundImage(final String image, final int type) {
 		try {
 			setHomePanel(new ImagePanel(SwingUtility.getImage(image), type));
 			showHomePanel();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			ExceptionUtil.handleException(e);
 		}
 	}
 
 	@Override
-	public void setDataSource(DataSource manager) {
+	public void setDataSource(final DataSource manager) {
 		this.manager = manager;
 		applyDataSource();
 	}
 
-	@Override
-	public DataSource getDataSource() {
-		if (manager != null) {
-			return manager;
-		}
-		if (getParent() instanceof DaoComponent) {
-			return ((DaoComponent) getParent()).getDataSource();
-		}
-		return DataSourceFactory.getDefaultDataSource();
+	/**
+	 * @param homePanel
+	 */
+	public void setHomePanel(final JPanel homePanel) {
+		this.homePanel = homePanel;
+		handleShowPanel(homePanel);
 	}
 
-	public void applyDataSource() {
-		SwingUtility.applyDataSource(this, manager);
+	public void setRightToLeft() {
+		applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+	}
+
+	@Override
+	public void setTitle(final String title) {
+		super.setTitle(Lables.get(title));
+	}
+
+	@Override
+	public void setVisible(final boolean show) {
+		if (show) {
+			// AnimationUtil.open(this);
+			super.setVisible(true);
+		} else {
+			// if(getSize().getWidth()<=1){
+			super.setVisible(false);
+			// }else{
+			// AnimationUtil.close(this,false);
+			// }
+		}
+	}
+
+	public void showHomePanel() {
+		handleShowPanel(getHomePanel());
 	}
 }

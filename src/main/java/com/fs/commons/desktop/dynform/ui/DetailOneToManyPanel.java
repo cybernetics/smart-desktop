@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.dynform.ui;
 
@@ -35,11 +47,11 @@ import com.fs.commons.util.GeneralUtility;
 
 /**
  * @author u087
- * 
+ *
  */
 public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -60,189 +72,71 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 	JKButton btnDelete = new JKButton("DELETE", "alt D");
 
 	/**
-	 * @return the extraWhereCondition
-	 */
-	public String getExtraWhereCondition() {
-		return extraWhereCondition;
-	}
-
-	/**
-	 * @param extraWhereCondition
-	 *            the extraWhereCondition to set
-	 */
-	public void setExtraWhereCondition(String extraWhereCondition) {
-		this.extraWhereCondition = extraWhereCondition;
-	}
-
-	/**
 	 * @throws TableMetaNotFoundException
 	 * @throws DaoException
-	 * 
+	 *
 	 */
-	public DetailOneToManyPanel(ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws TableMetaNotFoundException, DaoException {
+	public DetailOneToManyPanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws TableMetaNotFoundException, DaoException {
 		// fix me
 		this.masterTableMeta = foriegnKeyFieldMeta.getReferenceTableMeta();
 		this.foriegnKeyFieldMeta = foriegnKeyFieldMeta;
 		this.foriegnKeyFieldMeta.setAllowUpdate(false);
 		this.foriegnKeyFieldMeta.setEnabled(false);
-		queryTable.getModel().setDataSource(foriegnKeyFieldMeta.getParentTable().getDataSource());
+		this.queryTable.getModel().setDataSource(foriegnKeyFieldMeta.getParentTable().getDataSource());
 		// queryTable.setShowRecordsCount(true);
-		pnlDetail = createDetailPanel();
+		this.pnlDetail = createDetailPanel();
 		init();
 		resetComponents();
 	}
 
-	public DetailOneToManyPanel(String detailTableName, String foriegKeyFieldName) throws TableMetaNotFoundException, DaoException {
+	public DetailOneToManyPanel(final String detailTableName, final String foriegKeyFieldName) throws TableMetaNotFoundException, DaoException {
 		this((ForiegnKeyFieldMeta) AbstractTableMetaFactory.getTableMeta(detailTableName).getField(foriegKeyFieldName));
+	}
+
+	public void addDaoListener(final DynDaoActionListener listener) {
+		this.pnlDetail.addDynDaoActionListener(listener);
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void addDynDaoActionListener(final DynDaoActionListener listener) {
+		this.pnlDetail.addDynDaoActionListener(listener);
 	}
 
 	/**
 	 * p
-	 * 
+	 *
 	 * @return
 	 * @throws DaoException
 	 * @throws TableMetaNotFoundException
 	 */
 	protected DynDaoPanel createDetailPanel() throws TableMetaNotFoundException, DaoException {
-		DynDaoPanel pnlDetail = new DynDaoPanel(getDetailTableMeta());
+		final DynDaoPanel pnlDetail = new DynDaoPanel(getDetailTableMeta());
 		pnlDetail.setAllowClose(false);
 		pnlDetail.setAllowDuplicate(true);
 		return pnlDetail;
 	}
 
-	public void addDaoListener(DynDaoActionListener listener) {
-		pnlDetail.addDynDaoActionListener(listener);
-	}
-
 	/**
-	 * Init UI
-	 */
-	private void init() {
-		initTable();
-		setLayout(new BorderLayout());
-		setBorder(SwingUtility.createTitledBorder(foriegnKeyFieldMeta.getParentTable().getCaption()));
-		// add(getButtonsPanel(),getButtonsPanelLocation());
-		if (!isShowDaoPanelInDialog()) {
-			add(pnlDetail, getDaoPanelLocation());
-		}
-
-		add(getCenterPanel(), BorderLayout.CENTER);
-		queryTable.addDaoRecordListener(new RecordActionAdapter() {
-			@Override
-			public void recordSelected(String recordId) {
-				handleFind(recordId);
-			}
-		});
-		pnlDetail.addDynDaoActionListener(new DynDaoActionAdapter() {
-			@Override
-			public void afterResetComponents() {
-				// we re-set the value here again because the DynPanel are
-				// clearing all
-				// the fields from its old values , so we need a way to reset it
-				// again
-				pnlDetail.setComponentValue(foriegnKeyFieldMeta.getName(), masterIdValue);
-			}
-
-			@Override
-			public void afterAddRecord(Record record) {
-				reloadTableData();
-				pnlDetail.requestFocus();
-			}
-
-			@Override
-			public void afterUpdateRecord(Record record) {
-				reloadTableData();
-			}
-
-			@Override
-			public void afterDeleteRecord(Record record) {
-				reloadTableData();
-			}
-		});
-		btnDelete.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleDelete();
-			}
-		});
-		btnAdd.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleShowAddDialog();
-			}
-		});
-
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleImport() {
-		JFileChooser fs = new JFileChooser();
-		fs.showOpenDialog(null);
-		File file = fs.getSelectedFile();
-		if (file != null && !file.isFile()) {
-			try {
-				GeneralUtility.readFile(file);
-			} catch (IOException e) {
-				ExceptionUtil.handleException(e);
-			}
-		}
-	}
-
-	private Component getCenterPanel() {
-		JKPanel pnl = new JKPanel(new BorderLayout());
-		queryTable.setShowRecordsCount(true);
-		queryTable.setPreferredSize(new Dimension(700, 300));
-		pnl.add(getButtonsPanel(), getButtonsPanelLocation());
-		pnl.add(queryTable, BorderLayout.CENTER);
-		return pnl;
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleDelete() {
-		int[] ids = queryTable.getSelectedIdsAsInteger();
-		if (ids.length == 0) {
-			SwingUtility.showUserErrorDialog("PLEASE_SELECT_RECORDS_FROM_TABLE");
-		}
-		if (SwingUtility.showConfirmationDialog("YOU_ARE_ABOUT_TO_DELETE_ALL_SELECTED_RECORDS,ARE_YOU_SURE?")) {
-			for (Integer id : ids) {
-				try {
-					pnlDetail.handleFindRecord(id);
-					pnlDetail.handleDelete(false);
-				} catch (DaoException e) {
-					ExceptionUtil.handleException(e);
-				}
-			}
-		}
-		reloadTableData();
-	}
-
-	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private JKPanel getButtonsPanel() {
-		JKPanel pnl = new JKPanel(new FlowLayout(FlowLayout.LEADING));
+		final JKPanel pnl = new JKPanel(new FlowLayout(FlowLayout.LEADING));
 		if (isShowDaoPanelInDialog()) {
-			pnl.add(btnAdd);
+			pnl.add(this.btnAdd);
 		}
-		pnl.add(btnDelete);
-		btnDelete.setShowProgress(true);
-		btnDelete.setIcon("db_remove.png");
-		btnAdd.setIcon("add_commons_system_icon.gif");
+		pnl.add(this.btnDelete);
+		this.btnDelete.setShowProgress(true);
+		this.btnDelete.setIcon("db_remove.png");
+		this.btnAdd.setIcon("add_commons_system_icon.gif");
 		return pnl;
 	}
 
-	protected boolean isShowDaoPanelInDialog() {
-		return getDaoPanelLocation() == null;
-	}
-
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private String getButtonsPanelLocation() {
@@ -252,8 +146,17 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 		return getDaoPanelLocation().equals(BorderLayout.NORTH) ? BorderLayout.SOUTH : BorderLayout.NORTH;
 	}
 
+	private Component getCenterPanel() {
+		final JKPanel pnl = new JKPanel(new BorderLayout());
+		this.queryTable.setShowRecordsCount(true);
+		this.queryTable.setPreferredSize(new Dimension(700, 300));
+		pnl.add(getButtonsPanel(), getButtonsPanelLocation());
+		pnl.add(this.queryTable, BorderLayout.CENTER);
+		return pnl;
+	}
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	protected String getDaoPanelLocation() {
@@ -261,71 +164,217 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
 	 */
-	private void initTable() {
-		queryTable.setAllowFiltering(true);
-		queryTable.setShowFilterButtons(false);
-		queryTable.setShowSortingPanel(false);
+	public TableMeta getDetailTableMeta() {
+		return this.foriegnKeyFieldMeta.getParentTable();
 	}
 
-	/*
-	 * This method should be called only from two places : 1- From master panel
-	 * when master to command this panel show the detail info of that record 2-
-	 * from resetComponent by passing null parameter , any other call should be
-	 * very careful
+	/**
+	 * @return the extraWhereCondition
 	 */
-	public void setMasterIdValue(Object masterIdValue) {
-		if (masterIdValue == null || masterIdValue.toString().trim().equals("")) {
-			this.masterIdValue = null;
-			this.queryTable.setQuery("");
-			pnlDetail.setMode(DynDaoMode.ADD);
-			// is very important to call the following statement since setMode
-			// will enable the fields
-			// automatically
-			setEnabled(false);
-		} else {
-			this.masterIdValue = masterIdValue;
-			reloadTableData();
-			pnlDetail.setComponentValue(foriegnKeyFieldMeta.getName(), masterIdValue);
-			// this call wil insure that the buttons will be anabled
-			setEnabled(true);
-			// pnlDetail.setEnabled(true);
-			// btnDelete.setEnabled(true);
-			// btnAdd.setEnabled(true);
-			// this will enable the mode if the table meta is allowed to add
-			pnlDetail.setMode(DynDaoMode.ADD);
+	public String getExtraWhereCondition() {
+		return this.extraWhereCondition;
+	}
 
+	/**
+	 *
+	 * @return
+	 */
+	public ForiegnKeyFieldMeta getForiegnKeyFieldMeta() {
+		return this.foriegnKeyFieldMeta;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public Object getMasterIdValue() {
+		return this.masterIdValue;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	protected int getMasterIdValueAsInteger() {
+		if (getMasterIdValue() == null) {
+			return 0;
 		}
+		return Integer.parseInt(getMasterIdValue().toString());
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public TableMeta getMasterTableMeta() {
+		return this.masterTableMeta;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public DynDaoPanel getPnlDetail() {
+		return this.pnlDetail;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public QueryJTable getQueryTable() {
+		return this.queryTable;
+	}
+
+	/**
+	 *
+	 */
+	protected void handleDelete() {
+		final int[] ids = this.queryTable.getSelectedIdsAsInteger();
+		if (ids.length == 0) {
+			SwingUtility.showUserErrorDialog("PLEASE_SELECT_RECORDS_FROM_TABLE");
+		}
+		if (SwingUtility.showConfirmationDialog("YOU_ARE_ABOUT_TO_DELETE_ALL_SELECTED_RECORDS,ARE_YOU_SURE?")) {
+			for (final Integer id : ids) {
+				try {
+					this.pnlDetail.handleFindRecord(id);
+					this.pnlDetail.handleDelete(false);
+				} catch (final DaoException e) {
+					ExceptionUtil.handleException(e);
+				}
+			}
+		}
+		reloadTableData();
+	}
+
+	/**
+	 * @param recordId
+	 */
+	@Override
+	public void handleFind(final Object recordId) {
+		try {
+			this.pnlDetail.handleFindRecord(recordId);
+			if (isShowDaoPanelInDialog()) {
+				SwingUtility.showPanelInDialog(this.pnlDetail, "EDIT_RECORD");
+			}
+		} catch (final DaoException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleImport() {
+		final JFileChooser fs = new JFileChooser();
+		fs.showOpenDialog(null);
+		final File file = fs.getSelectedFile();
+		if (file != null && !file.isFile()) {
+			try {
+				GeneralUtility.readFile(file);
+			} catch (final IOException e) {
+				ExceptionUtil.handleException(e);
+			}
+		}
+	}
+
+	private void handleShowAddDialog() {
+		this.pnlDetail.setMode(DynDaoMode.ADD);
+		SwingUtility.showPanelInDialog(this.pnlDetail, "ADD_RECORD");
+		this.queryTable.reloadData();
+	}
+
+	/**
+	 * Init UI
+	 */
+	private void init() {
+		initTable();
+		setLayout(new BorderLayout());
+		setBorder(SwingUtility.createTitledBorder(this.foriegnKeyFieldMeta.getParentTable().getCaption()));
+		// add(getButtonsPanel(),getButtonsPanelLocation());
+		if (!isShowDaoPanelInDialog()) {
+			add(this.pnlDetail, getDaoPanelLocation());
+		}
+
+		add(getCenterPanel(), BorderLayout.CENTER);
+		this.queryTable.addDaoRecordListener(new RecordActionAdapter() {
+			@Override
+			public void recordSelected(final String recordId) {
+				handleFind(recordId);
+			}
+		});
+		this.pnlDetail.addDynDaoActionListener(new DynDaoActionAdapter() {
+			@Override
+			public void afterAddRecord(final Record record) {
+				reloadTableData();
+				DetailOneToManyPanel.this.pnlDetail.requestFocus();
+			}
+
+			@Override
+			public void afterDeleteRecord(final Record record) {
+				reloadTableData();
+			}
+
+			@Override
+			public void afterResetComponents() {
+				// we re-set the value here again because the DynPanel are
+				// clearing all
+				// the fields from its old values , so we need a way to reset it
+				// again
+				DetailOneToManyPanel.this.pnlDetail.setComponentValue(DetailOneToManyPanel.this.foriegnKeyFieldMeta.getName(),
+						DetailOneToManyPanel.this.masterIdValue);
+			}
+
+			@Override
+			public void afterUpdateRecord(final Record record) {
+				reloadTableData();
+			}
+		});
+		this.btnDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleDelete();
+			}
+		});
+		this.btnAdd.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleShowAddDialog();
+			}
+		});
+
+	}
+
+	/**
+	 *
+	 */
+	private void initTable() {
+		this.queryTable.setAllowFiltering(true);
+		this.queryTable.setShowFilterButtons(false);
+		this.queryTable.setShowSortingPanel(false);
+	}
+
+	protected boolean isShowDaoPanelInDialog() {
+		return getDaoPanelLocation() == null;
 	}
 
 	/**
 	 * Reload the table data only
 	 */
 	public void reloadTableData() {
-		int selectedRecord = queryTable.getSelectedRow();
-		String staticWhere = getDetailTableMeta().getTableName() + "." + foriegnKeyFieldMeta.getName() + "=" + masterIdValue;
-		if (extraWhereCondition != null) {
-			staticWhere += " AND " + extraWhereCondition;
+		final int selectedRecord = this.queryTable.getSelectedRow();
+		String staticWhere = getDetailTableMeta().getTableName() + "." + this.foriegnKeyFieldMeta.getName() + "=" + this.masterIdValue;
+		if (this.extraWhereCondition != null) {
+			staticWhere += " AND " + this.extraWhereCondition;
 		}
-		queryTable.getModel().setStaticWhere(staticWhere);
-		queryTable.setQuery(getDetailTableMeta().getReportSql());
-		btnDelete.setVisible(queryTable.getModel().getRowCount() > 0 && getDetailTableMeta().isAllowDelete());
-		queryTable.setSelectedRow(selectedRecord);
-	}
-
-	/**
-	 * @param recordId
-	 */
-	public void handleFind(Object recordId) {
-		try {
-			pnlDetail.handleFindRecord(recordId);
-			if (isShowDaoPanelInDialog()) {
-				SwingUtility.showPanelInDialog(pnlDetail, "EDIT_RECORD");
-			}
-		} catch (DaoException e) {
-			ExceptionUtil.handleException(e);
-		}
+		this.queryTable.getModel().setStaticWhere(staticWhere);
+		this.queryTable.setQuery(getDetailTableMeta().getReportSql());
+		this.btnDelete.setVisible(this.queryTable.getModel().getRowCount() > 0 && getDetailTableMeta().isAllowDelete());
+		this.queryTable.setSelectedRow(selectedRecord);
 	}
 
 	@Override
@@ -336,86 +385,54 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 	}
 
 	/**
-	 * 
+	 * @param extraWhereCondition
+	 *            the extraWhereCondition to set
 	 */
-	public void addDynDaoActionListener(DynDaoActionListener listener) {
-		pnlDetail.addDynDaoActionListener(listener);
+	public void setExtraWhereCondition(final String extraWhereCondition) {
+		this.extraWhereCondition = extraWhereCondition;
+	}
+
+	public void setFieldValue(final String name, final Object value) {
+		getPnlDetail().setComponentValue(name, value);
 	}
 
 	/*
-	 * 
+	 * This method should be called only from two places : 1- From master panel
+	 * when master to command this panel show the detail info of that record 2-
+	 * from resetComponent by passing null parameter , any other call should be
+	 * very careful
 	 */
-	public void setMode(DynDaoMode mode) {
-		pnlDetail.setMode(mode);
-	}
+	@Override
+	public void setMasterIdValue(final Object masterIdValue) {
+		if (masterIdValue == null || masterIdValue.toString().trim().equals("")) {
+			this.masterIdValue = null;
+			this.queryTable.setQuery("");
+			this.pnlDetail.setMode(DynDaoMode.ADD);
+			// is very important to call the following statement since setMode
+			// will enable the fields
+			// automatically
+			setEnabled(false);
+		} else {
+			this.masterIdValue = masterIdValue;
+			reloadTableData();
+			this.pnlDetail.setComponentValue(this.foriegnKeyFieldMeta.getName(), masterIdValue);
+			// this call wil insure that the buttons will be anabled
+			setEnabled(true);
+			// pnlDetail.setEnabled(true);
+			// btnDelete.setEnabled(true);
+			// btnAdd.setEnabled(true);
+			// this will enable the mode if the table meta is allowed to add
+			this.pnlDetail.setMode(DynDaoMode.ADD);
 
-	/**
-	 * 
-	 * @return
-	 */
-	public ForiegnKeyFieldMeta getForiegnKeyFieldMeta() {
-		return foriegnKeyFieldMeta;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public TableMeta getMasterTableMeta() {
-		return masterTableMeta;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public TableMeta getDetailTableMeta() {
-		return foriegnKeyFieldMeta.getParentTable();
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public DynDaoPanel getPnlDetail() {
-		return pnlDetail;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public Object getMasterIdValue() {
-		return masterIdValue;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public QueryJTable getQueryTable() {
-		return queryTable;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	protected int getMasterIdValueAsInteger() {
-		if (getMasterIdValue() == null) {
-			return 0;
 		}
-		return Integer.parseInt(getMasterIdValue().toString());
 	}
 
-	private void handleShowAddDialog() {
-		pnlDetail.setMode(DynDaoMode.ADD);
-		SwingUtility.showPanelInDialog(pnlDetail, "ADD_RECORD");
-		this.queryTable.reloadData();
-	}
-
-	public void setFieldValue(String name, Object value) {
-		getPnlDetail().setComponentValue(name,value);
+	/*
+	 *
+	 */
+	@Override
+	public void setMode(final DynDaoMode mode) {
+		this.pnlDetail.setMode(mode);
 	}
 
 }

@@ -1,9 +1,17 @@
-/**
- * Modification history
- * ====================================================
- * Version    Date         Developer        Purpose 
- * ====================================================
- * 1.1      31/8/2008     Jamil Shreet    -Add method showConfirmationDialog(String messages[]) that takes array as String.
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.swing;
 
@@ -99,13 +107,12 @@ public class SwingUtility {
 			// PlasticXPLookAndFeel.setHighContrastFocusColorsEnabled(true);
 			// PlasticXPLookAndFeel.setPlasticTheme(new SkyBlue());
 
-
-			ColorUIResource disabledBackground = new ColorUIResource(Color.white);
+			final ColorUIResource disabledBackground = new ColorUIResource(Color.white);
 			UIManager.put("ComboBox.disabledBackground", disabledBackground);
-			ColorUIResource disabledForeground = new ColorUIResource(Color.black);
+			final ColorUIResource disabledForeground = new ColorUIResource(Color.black);
 			UIManager.put("ComboBox.disabledForeground", disabledForeground);
-			UIManager.setLookAndFeel(new com.jgoodies.looks.plastic.PlasticXPLookAndFeel());			
-//		    NativeInterface.open();
+			UIManager.setLookAndFeel(new com.jgoodies.looks.plastic.PlasticXPLookAndFeel());
+			// NativeInterface.open();
 
 			// addFocusForwardKey(KeyEvent.VK_DOWN);
 			// addFocusBackKey(KeyEvent.VK_UP);
@@ -124,7 +131,7 @@ public class SwingUtility {
 			// NativeInterface.close();
 			// }
 			// });
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -143,95 +150,56 @@ public class SwingUtility {
 
 	static String defaultLocale = "en";
 
-	/**
-	 * @param defaultLocale
-	 *            the defaultLocale to set
-	 */
-	public static void setDefaultLocale(String defaultLocale) {
-		if (defaultLocale.equals("ar")) {
-			setDefaultComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		} else {
-			setDefaultComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		}
-		SwingUtility.defaultLocale = defaultLocale;
-	}
-
 	private static JFileChooser chooser = new JFileChooser(".");
 
 	/**
-	 * 
-	 * @return
+	 *
+	 * @param btn
+	 * @param obj
+	 * @param methodName
+	 * @author mkiswani
 	 */
-	public static void createLineBorder(JKPanel<?> pnl) {
-		pnl.setBorder(new LineBorder(Color.lightGray));
+	public static void addActionListener(final AbstractButton btn, final Object obj, final String methodName) {
+		btn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					ReflicationUtil.callMethod(obj, methodName);
+				} catch (final InvocationTargetException e1) {
+					ExceptionUtil.handleException(e1.getCause());
+				}
+			}
+		});
 
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-
-	public static ComponentOrientation getDefaultComponentOrientation() {
-		return defaultComponentOrientation;
+	public static void addFocusBackKey(final int button) {
+		final KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		final Set<?> oldBackKeys = manager.getDefaultFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+		final Set<KeyStroke> backwordKeys = new HashSet(oldBackKeys);
+		backwordKeys.add(KeyStroke.getKeyStroke(button, 0));
+		manager.setDefaultFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwordKeys);
 	}
 
 	/**
-	 * 
-	 * @return
+	 * @param vkDown
+	 *
 	 */
-	public static boolean isLeftOrientation() {
-		return defaultComponentOrientation == ComponentOrientation.LEFT_TO_RIGHT;
+	public static void addFocusForwardKey(final int button) {
+		final KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		final Set<?> forwardKeys = manager.getDefaultFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+		final Set<KeyStroke> newForwardKeys = new HashSet(forwardKeys);
+		newForwardKeys.add(KeyStroke.getKeyStroke(button, 0));
+		manager.setDefaultFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 	}
 
 	/**
-	 * 
-	 * @param orientation
-	 */
-	public static void setDefaultComponentOrientation(ComponentOrientation orientation) {
-		SwingUtility.defaultComponentOrientation = orientation;
-		if (!isLeftOrientation()) {
-			defaultLocale = "ar";
-		} else {
-			defaultLocale = "en";
-		}
-	}
-
-	/**
-	 * 
-	 * @param panel
-	 *            JPanel
-	 */
-	public static void testPanel(JPanel panel) {
-		JKFrame frame = new JKFrame();
-		// frame.setExtendedState(frame.MAXIMIZED_BOTH);
-		JKMainPanel mainPanel = new JKMainPanel(new BorderLayout());
-		mainPanel.add(panel);
-		frame.add(mainPanel);
-		frame.applyComponentOrientation(getDefaultComponentOrientation());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-	}
-
-	/**
-	 * 
+	 *
 	 * @param panel
 	 * @param title
 	 * @throws HeadlessException
 	 */
-	public static void addPanelToFrame(JFrame frame, JPanel panel, String title) throws HeadlessException {
-		frame.add(panel);
-		frame.setTitle(title);
-		frame.applyComponentOrientation(getDefaultComponentOrientation());
-	}
-
-	/**
-	 * 
-	 * @param panel
-	 * @param title
-	 * @throws HeadlessException
-	 */
-	private static void addPanelToDialog(JDialog dialog, JPanel panel, String title) throws HeadlessException {
+	private static void addPanelToDialog(final JDialog dialog, final JPanel panel, final String title) throws HeadlessException {
 		// panel.setBorder(createTitledBorder(title));
 		dialog.add(new JKScrollPane(panel));
 		panel.setOpaque(true);
@@ -240,12 +208,165 @@ public class SwingUtility {
 	}
 
 	/**
-	 * 
+	 *
+	 * @param panel
+	 * @param title
+	 * @throws HeadlessException
+	 */
+	public static void addPanelToFrame(final JFrame frame, final JPanel panel, final String title) throws HeadlessException {
+		frame.add(panel);
+		frame.setTitle(title);
+		frame.applyComponentOrientation(getDefaultComponentOrientation());
+	}
+
+	public static void applyDataSource(final Container comp, final DataSource manager) {
+		final Vector<BindingComponent> bindingComponents = SwingUtility.findBindingComponents(comp);
+		for (final BindingComponent bindingComponent : bindingComponents) {
+			bindingComponent.setDataSource(manager);
+		}
+	}
+
+	/**
+	 * @param image
+	 * @param scaled
+	 * @return
+	 */
+	public static JPanel buildImagePanel(final byte[] image, final int scaled) {
+		return buildImagePanel(new ByteArrayInputStream(image), scaled);
+	}
+
+	public static JPanel buildImagePanel(final InputStream in, final int scaled) {
+		BufferedImage image = null;
+		try {
+			image = javax.imageio.ImageIO.read(in);
+			return new ImagePanel(image, scaled);
+		} catch (final IOException ex) {
+			return new JPanel();
+		}
+	}
+
+	/**
+	 * @param url
+	 * @param scaled
+	 * @return
+	 */
+	public static ImagePanel buildImagePanel(final URL url, final int scaled) {
+		BufferedImage image = null;
+		try {
+			if (url != null) {
+				image = getImage(url);
+				return new ImagePanel(image, scaled);
+			}
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+		return new ImagePanel();
+	}
+
+	/**
+	 *
+	 * @param text
+	 * @param fontSize
+	 * @return
+	 */
+	public static int calculateTextSize(final String text, final int fontSize) {
+		final JLabel lbl = new JLabel(text);
+		return (int) lbl.getPreferredSize().getWidth();
+		// java.awt.Font font=new java.awt.Font("Arial",Font.BOLD,fontSize);
+		// FontMetrics metrics =
+		// Toolkit.getDefaultToolkit().getFontMetrics(font);
+		// return metrics.stringWidth(text);
+	}
+
+	/*
+	 *
+	 */
+	public static void closePanel(final JPanel pnl) {
+		// Container cont = pnl.getParent();
+		// cont.remove(pnl);
+		// cont.validate();
+		// cont.repaint();
+		getDefaultMainFrame().showHomePanel();
+	}
+
+	/**
+	 *
+	 */
+	public static void closePanelDialog(final JComponent comp) {
+		if (comp.getRootPane() != null) {
+			final Container cont = comp.getRootPane().getParent();
+			if (cont != null) {
+				if (cont instanceof JDialog) {
+					((JDialog) cont).dispose();
+				}
+			}
+		}
+	}
+
+	public static void closePanelWindow(final JComponent comp) {
+		if (comp.getRootPane() != null) {
+			final Window window = getWindow(comp);
+			if (window != null) {
+				window.dispose();
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param color
+	 * @return
+	 */
+	public static String colorToHex(final Color color) {
+		return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+	}
+
+	/**
+	 *
+	 * @param pnl
+	 * @param fullColored
+	 * @return
+	 */
+	public static BufferedImage convertPanelToImage(final JKPanel<?> pnl, final int width, final int height) {
+		try {
+			BufferedImage img = ImageUtil.getCompatibleImage(pnl.getWidth(), pnl.getHeight());// new
+			// BufferedImage(width,height,
+			// type);
+
+			final Robot robot = new Robot();
+			img = robot.createScreenCapture(getDefaultMainFrame().getBounds());
+			img = ImageUtil.scaleNewerWay(img, false, width, height);
+			return img;
+		} catch (final AWTException e) {
+		}
+		return null;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public static void createLineBorder(final JKPanel<?> pnl) {
+		pnl.setBorder(new LineBorder(Color.lightGray));
+
+	}
+
+	public static Border createTitledBorder(final String title) {
+		final TitledBorder b = BorderFactory.createTitledBorder("");
+		b.setTitle(Lables.get(title, true));
+		b.setTitleJustification(TitledBorder.DEFAULT_JUSTIFICATION);
+		b.setTitlePosition(TitledBorder.CENTER);
+		b.setTitleColor(Colors.TITLE_BORDER_BG);
+		return b;
+	}
+
+	/**
+	 *
 	 * @param cont
 	 * @param enable
 	 */
-	public static void enableContainer(Container cont, boolean enable) {
-		int count = cont.getComponentCount();
+	public static void enableContainer(final Container cont, final boolean enable) {
+		final int count = cont.getComponentCount();
 		Component comp;
 		for (int i = 0; i < count; i++) {
 			comp = cont.getComponent(i);
@@ -261,126 +382,92 @@ public class SwingUtility {
 		}
 	}
 
-	/**
-	 * 
-	 * @param parentComponent
-	 * @param message
-	 * @return
-	 * @throws HeadlessException
-	 */
-	public static String showInputDialog(String message) throws HeadlessException {
-		return showInputDialog(defaultMainFrame, message);
-	}
-
-	/**
-	 * 
-	 * @param parentComponent
-	 * @param message
-	 * @return
-	 * @throws HeadlessException
-	 */
-	public static String showInputDialog(Component parentComponent, String message) throws HeadlessException {
-		return JOptionPane.showInputDialog(parentComponent, Lables.get(message, true));
-	}
-
-	/**
-	 * 
-	 * @param error
-	 * @param parent
-	 */
-	public static void showErrorDialog(String error, Throwable e, Window parent) {
-		JOptionPane.showMessageDialog(parent, getDialogViewComponent(error));
-		throw new RuntimeException(e);
-	}
-	
-	public static void showErrorDialog(String error, Throwable e, Window parent,boolean color) {
-		JOptionPane.showMessageDialog(parent, getDialogViewComponent(error,true));
-		throw new RuntimeException(e);
-	}
-
-	public static void showSuccessDialog(JDialog parent, String string) {
-		JOptionPane.showMessageDialog(parent, Lables.get(string, true));
-	}
-
-	public static void showSuccessDialog(final String string) {
-		JOptionPane.showMessageDialog(getDefaultMainFrame(), getDialogViewComponent(string));
-	}
-
-	public static void showUserErrorDialog(JDialog parent, String message, Exception ex) {
-		JOptionPane.showMessageDialog(parent, getDialogViewComponent(message));
-	}
-
-	public static void showUserErrorDialog(JFrame parent, String message, Exception ex) {
-		JOptionPane.showMessageDialog(parent, getDialogViewComponent(message));
-		ex.printStackTrace();
-	}
-
-	public static void showDatabaseErrorDialog(String message, Exception ex) {
-		showDatabaseErrorDialog(emptyDialog, message, ex);
-	}
-
-	public static void showDatabaseErrorDialog(JDialog dialog, String message, Exception ex) {
-		JOptionPane.showMessageDialog(dialog, getDialogViewComponent(message));
-		throw new RuntimeException(ex);
-	}
-
-	public static boolean showConfirmationDialog(String message) {
-		return showConfirmationDialog(getDefaultMainFrame(), message);
-	}
-
-	/**
-	 * @1.1
-	 * @param message
-	 * @return
-	 */
-	public static boolean showConfirmationDialog(String message[]) {
-		return showConfirmationDialog(getDefaultMainFrame(), message);
-	}
-
-	/**
-	 * @1.1
-	 * @param window
-	 * @param messages
-	 * @return
-	 */
-	public static boolean showConfirmationDialog(Window window, String[] messages) {
-		StringBuffer concateMessage = new StringBuffer();
-		String stringLabel = "";
-		for (int i = 0; i < messages.length; i++) {
-			concateMessage.append(Lables.get(messages[i], true));
-			concateMessage.append("\n");
+	public static BindingComponent findBindingComponent(final Container cont, final String componentNam) {
+		final Vector<BindingComponent> components = findBindingComponents(cont);
+		for (final BindingComponent bindingComponent : components) {
+			if (bindingComponent.getName() != null && bindingComponent.getName().equals(componentNam)) {
+				return bindingComponent;
+			}
 		}
-		concateMessage.append(stringLabel);
-		int choice = JOptionPane.showConfirmDialog(window, (Lables.get(concateMessage.toString(), true)), Lables.get("WARNING"),
-				JOptionPane.YES_NO_OPTION);
-		return choice == JOptionPane.YES_OPTION;
+		return null;
 	}
 
-	public static boolean showConfirmationDialog(JDialog dialog, String message) {
-		int choice = JOptionPane.showConfirmDialog(dialog, (Lables.get(message, true)), Lables.get("WARNING"), JOptionPane.YES_NO_OPTION);
-		return choice == JOptionPane.YES_OPTION;
+	public static Vector<BindingComponent> findBindingComponents(final Container cont) {
+		final Vector<BindingComponent> c = new Vector<BindingComponent>();
+		final Component[] components = cont.getComponents();
+		for (final Component component : components) {
+			if (component instanceof BindingComponent) {
+				c.add((BindingComponent) component);
+			}
+			if (component instanceof Container) {
+				c.addAll(findBindingComponents((Container) component));
+			}
+		}
+		return c;
 	}
 
 	/**
-	 * 
-	 * @param dialog
-	 * @param message
+	 *
+	 * @param str
 	 * @return
 	 */
-	public static boolean showConfirmationDialog(Window window, String message) {
-		// int choice = JOptionPane.showConfirmDialog(window,
-		// (Lables.get(message)), Lables.get("WARNING"),
-		// JOptionPane.YES_NO_OPTION);
+	public static String fixTwoLinesIssue(final String str) {
+		final String arr[] = str.split(" ");
+		String result = "<html><body>" + arr[0];
+		for (int i = 1; i < arr.length; i++) {
+			result += "<br>" + arr[i];
+		}
+		result += "</body></html>";
+		return result;
+	}
 
-		String no = Lables.get("No");
-		String yes = Lables.get("Yes");
-		int selection = JOptionPane.showOptionDialog(window, Lables.get(message, true), Lables.get("WARNING"), JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE, null, new String[] { yes, no }, no);
-		return selection == JOptionPane.YES_OPTION;
+	private static Window getActiveWindow() {
+		final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		final Window window = keyboardFocusManager.getActiveWindow();
+		if (window == null) {
+			return getDefaultMainFrame();
+		}
+		return window;
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
+	 */
+	public static String getDatePattern() {
+		return isLeftOrientation() ? "yyyy/MM/dd" : "dd/MM/yyyy";
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public static Color getDefaultBackgroundColor() {
+		return defaultBackgroundColor;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+
+	public static ComponentOrientation getDefaultComponentOrientation() {
+		return defaultComponentOrientation;
+	}
+
+	public static JFileChooser getDefaultFileChooser() {
+		return chooser;
+	}
+
+	/**
+	 * @return
+	 */
+	public static Locale getDefaultLocale() {
+		return new Locale(defaultLocale, "JO");
+	}
+
+	/**
+	 *
 	 * @return
 	 */
 	public static JKFrame getDefaultMainFrame() {
@@ -390,129 +477,685 @@ public class SwingUtility {
 		return defaultMainFrame;
 	}
 
-	/**
-	 * 
-	 * @param defaultMainFrame
-	 */
-	public static void setDefaultMainFrame(JKFrame defaultMainFrame) {
-		SwingUtility.defaultMainFrame = defaultMainFrame;
-		defaultMainFrame.setLocale(getDefaultLocale());
-	}
-
-	/**
-	 * 
-	 * @param comp
-	 */
-	public static void setFont(Component comp) {
-		// comp.setFont(defaultFont);
-	}
-
-	public static void setBoldFont(Component comp) {
-		comp.setFont(new Font("Tahoma", Font.BOLD, 10));
-	}
-
-	public static Border createTitledBorder(String title) {
-		TitledBorder b = BorderFactory.createTitledBorder("");
-		b.setTitle(Lables.get(title, true));
-		b.setTitleJustification(TitledBorder.DEFAULT_JUSTIFICATION);
-		b.setTitlePosition(TitledBorder.CENTER);
-		b.setTitleColor(Colors.TITLE_BORDER_BG);
-		return b;
+	private static JScrollPane getDialogViewComponent(final String string) {
+		return getDialogViewComponent(string, false);
 	}
 
 	// private static Font getDefaultFont() {
 	// return defaultFont;
 	// }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public static Color getDefaultBackgroundColor() {
-		return defaultBackgroundColor;
+	private static JScrollPane getDialogViewComponent(final String string, final boolean color) {
+		final JKTextArea txt = new JKTextArea();
+		txt.setText(Lables.get(string, true));
+		txt.setEditable(false);
+
+		if (color) {
+			txt.setForeground(Color.red);
+			txt.setFont(new Font("Tahoma", Font.BOLD, 22));
+		}
+		final JScrollPane jScrollPane = new JScrollPane(txt);
+		jScrollPane.getViewport().setPreferredSize(new Dimension(500, 200));
+		return jScrollPane;
 	}
 
 	/**
-	 * 
-	 * @param defaultBackgroundColor
-	 */
-	public static void setDefaultBackgroundColor(Color defaultBackgroundColor) {
-		SwingUtility.defaultBackgroundColor = defaultBackgroundColor;
-	}
-
-	/*
-	 * 
-	 */
-	public static void closePanel(JPanel pnl) {
-		// Container cont = pnl.getParent();
-		// cont.remove(pnl);
-		// cont.validate();
-		// cont.repaint();
-		getDefaultMainFrame().showHomePanel();
-	}
-
-	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public static JDialog getEmptyDialog() {
 		return emptyDialog;
 	}
 
+	public static JFileChooser getFileChooser() {
+		return chooser;
+	}
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public static JPanel getHomePanel() {
 		return getDefaultMainFrame().getHomePanel();
 	}
 
+	public static BufferedImage getImage(final InputStream in) throws IOException {
+		BufferedImage image;
+		image = javax.imageio.ImageIO.read(in);
+		return image;
+	}
+
+	public static BufferedImage getImage(final String imageName) throws IOException {
+		return getImage(GeneralUtility.getFileURI(imageName).toURL());
+	}
+
+	public static BufferedImage getImage(final URL url) throws IOException {
+		BufferedImage image;
+		image = javax.imageio.ImageIO.read(url);
+		return image;
+	}
+
+	public static Dimension getMaxWindowSize() {
+		final Dimension d = getScreenDimesion();
+		return new Dimension((int) d.getWidth() - 100, (int) d.getHeight() - 100);
+	}
+
+	public static Dimension getScreenDimesion() {
+		return Toolkit.getDefaultToolkit().getScreenSize();
+	}
+
+	public static int getTabPaneLeadingPlacement() {
+		return isLeftOrientation() ? JTabbedPane.LEFT : JTabbedPane.RIGHT;
+	}
+
 	/**
-	 * 
+	 *
+	 * @param text
+	 * @param bold
+	 * @return
+	 */
+	public static int getTextWidth(final String text, final boolean bold) {
+		Font font = UIManager.getFont("Label.font");
+		if (bold) {
+			font = font.deriveFont(Font.BOLD);
+		}
+		return getTextWidth(text, font);
+	}
+
+	/**
+	 *
+	 * @param text
+	 * @param font
+	 * @return
+	 */
+	public static int getTextWidth(final String text, final Font font) {
+		final JLabel lbl = new JLabel(text);
+		lbl.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+		lbl.setFont(font);
+		return (int) lbl.getPreferredSize().getWidth();
+		// get metrics from the graphics
+		// FontMetrics metrics = new FontMetrics(font){};
+		// get the height of a line of text in this
+		// font and render context
+		// int hgt = metrics.getHeight();
+		// get the advance of my text in this font
+		// and render context
+		// int adv = metrics.stringWidth(text);
+		// calculate the size of a box to hold the
+		// text with some padding.
+		// Dimension size = new Dimension(adv+2, hgt+2);
+		// return size;
+	}
+
+	private static Window getWindow(final JComponent comp) {
+		if (comp.getRootPane() != null) {
+			final Container cont = comp.getRootPane().getParent();
+			if (cont != null) {
+				if (cont instanceof Window) {
+					return (Window) cont;
+				}
+			}
+		}
+		return null;
+	}
+
+	public static Dimension getWindowActualSize(final Window window) {
+		if (window.isVisible()) {
+			return window.getSize();
+		}
+		if (window instanceof Frame) {
+			final Frame frame = (Frame) window;
+			if (frame.getExtendedState() == Frame.MAXIMIZED_BOTH) {
+				return Toolkit.getDefaultToolkit().getScreenSize();
+			}
+		}
+		return window.getSize();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public static boolean isLeftOrientation() {
+		return defaultComponentOrientation == ComponentOrientation.LEFT_TO_RIGHT;
+	}
+
+	public static boolean isVisibleOnScreen(final JComponent component) {
+		final Window window = getWindow(component);
+		if (window != null) {
+			return window.isVisible();
+		}
+		return false;
+	}
+
+	public static void main(final String[] args) {
+		// System.out.println(colorToHex(Color.red));
+		// System.out.println(showIntegerInput("test"));
+		// System.out.println(showConfirmationDialog(new Frame(),
+		// "line1\nline2"));
+		System.out.println(getTextWidth("Jalal Kiswani", new Font("Arial", Font.BOLD, 12)));
+	}
+
+	public static void maximumizBoth(final Window window) {
+		if (window instanceof Frame) {
+			final Frame frm = (Frame) window;
+			frm.setExtendedState(Frame.MAXIMIZED_BOTH);
+		} else {
+			window.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+		}
+
+	}
+
+	/**
+	 * i seperated it in different method to avoid affecting other components
+	 *
+	 * @param comp
+	 */
+	public static void packJFrameWindow(final JComponent comp) {
+		if (comp.getRootPane() != null) {
+			final Container cont = comp.getRootPane().getParent();
+			if (cont instanceof JFrame) {
+				((JFrame) cont).pack();
+				((JFrame) cont).setLocationRelativeTo(null);
+			}
+		}
+	}
+
+	public static void packWindow(final JComponent comp) {
+
+		if (comp.getRootPane() != null) {
+			final Container cont = comp.getRootPane().getParent();
+			if (cont != null) {
+				if (cont instanceof JDialog) {
+					((JDialog) cont).pack();
+					((JDialog) cont).setLocationRelativeTo(null);
+				}
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param string
+	 */
+	public static void pressKey(final int key) {
+		try {
+			final Robot robot = new Robot();
+			robot.keyPress(key);
+		} catch (final AWTException e) {
+			// ExceptionUtil.handleException(e);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public static void pressTab() {
+		final Runnable r = new Runnable() {
+
+			@Override
+			public void run() {
+				pressKey(KeyEvent.VK_TAB);
+			}
+		};
+		new Thread(r).start();
+	}
+
+	public static void printInstalledLookAndFeel() {
+		final LookAndFeelInfo[] look = UIManager.getInstalledLookAndFeels();
+		for (final LookAndFeelInfo lookAndFeelInfo : look) {
+			System.out.println(lookAndFeelInfo.getClassName());
+		}
+	}
+
+	public static void reloadTable(final int nextRow, final QueryJTable tbl) {
+		tbl.setSelectedRow(nextRow);
+		tbl.reloadData();
+	}
+
+	/**
+	 *
+	 * @param component
+	 * @throws DaoException
+	 */
+	public static void resetComponent(final Component component) throws DaoException {
+		if (component instanceof BindingComponent) {
+			((BindingComponent<?>) component).reset();
+		} else if (component instanceof JComboBox) {
+			((JComboBox<?>) component).setSelectedIndex(-1);
+		} else if (component instanceof JList) {
+			((JList<?>) component).setSelectedIndex(-1);
+		} else if (component instanceof JRadioButton) {
+			((JRadioButton) component).setSelected(false);
+		}
+	}
+
+	/**
+	 *
+	 * @param component
+	 * @throws DaoException
+	 */
+	public static void resetComponent(final Object component) throws DaoException {
+		if (component instanceof BindingComponent) {
+			((BindingComponent) component).reset();
+		} else if (component instanceof JComboBox) {
+			((JComboBox) component).setSelectedIndex(-1);
+		} else if (component instanceof JList) {
+			((JList) component).setSelectedIndex(-1);
+		} else if (component instanceof JRadioButton) {
+			((JRadioButton) component).setSelected(false);
+		}
+	}
+
+	public static void resetComponents() {
+		// NativeInterface.close();
+		// NativeInterface.open();
+	}
+
+	public static void setBoldFont(final Component comp) {
+		comp.setFont(new Font("Tahoma", Font.BOLD, 10));
+	}
+
+	/**
+	 *
+	 * @param defaultBackgroundColor
+	 */
+	public static void setDefaultBackgroundColor(final Color defaultBackgroundColor) {
+		SwingUtility.defaultBackgroundColor = defaultBackgroundColor;
+	}
+
+	/**
+	 *
+	 * @param orientation
+	 */
+	public static void setDefaultComponentOrientation(final ComponentOrientation orientation) {
+		SwingUtility.defaultComponentOrientation = orientation;
+		if (!isLeftOrientation()) {
+			defaultLocale = "ar";
+		} else {
+			defaultLocale = "en";
+		}
+	}
+
+	/**
+	 * @param defaultLocale
+	 *            the defaultLocale to set
+	 */
+	public static void setDefaultLocale(final String defaultLocale) {
+		if (defaultLocale.equals("ar")) {
+			setDefaultComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		} else {
+			setDefaultComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		}
+		SwingUtility.defaultLocale = defaultLocale;
+	}
+
+	/**
+	 *
+	 * @param defaultMainFrame
+	 */
+	public static void setDefaultMainFrame(final JKFrame defaultMainFrame) {
+		SwingUtility.defaultMainFrame = defaultMainFrame;
+		defaultMainFrame.setLocale(getDefaultLocale());
+	}
+
+	/**
+	 *
+	 * @param comp
+	 */
+	public static void setFont(final Component comp) {
+		// comp.setFont(defaultFont);
+	}
+
+	public static void setGeneralStatus(final String status) {
+		final ApplicationFrame applicationFrame = ApplicationManager.getInstance().getApplication().getApplicationFrame();
+		if (applicationFrame != null) {
+			applicationFrame.setGeneralStatus(status);
+		}
+	}
+
+	/**
+	 *
 	 * @param homePanel
 	 */
-	public static void setHomePanel(JPanel homePanel) {
+	public static void setHomePanel(final JPanel homePanel) {
 		getDefaultMainFrame().setHomePanel(homePanel);
 	}
 
 	/**
-	 * 
-	 * @return
+	 *
+	 * @param btn
+	 * @param keyStroke
+	 * @param actionName
 	 */
-	public static String getDatePattern() {
-		return isLeftOrientation() ? "yyyy/MM/dd" : "dd/MM/yyyy";
+	public static void setHotKeyFoButton(final JButton btn, final String keyStroke, final String actionName) {
+		// get the button's Action map
+		final ActionMap amap = btn.getActionMap();
+		// add an action to the button's action map
+		// and give it a name(it can be any object not just String)
+		amap.put(actionName, new AbstractAction() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				// call your a method that contains your action code
+				if (btn.isVisible() && btn.isEnabled()) {
+					btn.doClick();
+				}
+			}
+		});
+		// get the input map for the button
+		final InputMap imap = btn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		// add a key stroke associated with an action in the action map(action
+		// name).
+		// imap.put(KeyStroke.getKeyStroke("F1"),"ActionName");
+		// you can do the same for more than one key.
+		imap.put(KeyStroke.getKeyStroke(keyStroke), actionName);
 	}
 
 	/**
+	 *
+	 * @param btnAdd
+	 * @param string
+	 */
+	public static void setHotKeyFoButton(final JKButton btn, final String shortcut) {
+		setHotKeyFoButton(btn, shortcut, shortcut);
+	}
+
+	/**
+	 *
+	 * @param btn
+	 * @param keyStroke
+	 * @param actionName
+	 */
+	public static void setHotKeyForFocus(final JComponent comp, final String keyStroke, final String actionName) {
+		// get the button's Action map
+		final ActionMap amap = comp.getActionMap();
+		// add an action to the button's action map
+		// and give it a name(it can be any object not just String)
+		amap.put(actionName, new AbstractAction() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				// call your a method that contains your action code
+				comp.requestFocus();
+			}
+		});
+		// get the input map for the button
+		final InputMap imap = comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		// add a key stroke associated with an action in the action map(action
+		// name).
+		// imap.put(KeyStroke.getKeyStroke("F1"),"ActionName");
+		// you can do the same for more than one key.
+		imap.put(KeyStroke.getKeyStroke(keyStroke), actionName);
+	}
+
+	public static void setSystemStatus(final String status) {
+		ApplicationManager.getInstance().getApplication().getApplicationFrame().setSystemStatus(status);
+	}
+
+	public static void setUserStatus(final String status) {
+		ApplicationManager.getInstance().getApplication().getApplicationFrame().setUserStatus(status);
+	}
+
+	public static boolean showConfirmationDialog(final JDialog dialog, final String message) {
+		final int choice = JOptionPane.showConfirmDialog(dialog, Lables.get(message, true), Lables.get("WARNING"), JOptionPane.YES_NO_OPTION);
+		return choice == JOptionPane.YES_OPTION;
+	}
+
+	public static boolean showConfirmationDialog(final String message) {
+		return showConfirmationDialog(getDefaultMainFrame(), message);
+	}
+
+	/**
+	 * @1.1
 	 * 
+	 * @param message
+	 * @return
+	 */
+	public static boolean showConfirmationDialog(final String message[]) {
+		return showConfirmationDialog(getDefaultMainFrame(), message);
+	}
+
+	public static boolean showConfirmationDialog(final String key, final String extraInfo) {
+		final String str = Lables.get(key, true);
+		return showConfirmationDialog(str + "\n" + extraInfo);
+	}
+
+	/**
+	 *
+	 * @param dialog
+	 * @param message
+	 * @return
+	 */
+	public static boolean showConfirmationDialog(final Window window, final String message) {
+		// int choice = JOptionPane.showConfirmDialog(window,
+		// (Lables.get(message)), Lables.get("WARNING"),
+		// JOptionPane.YES_NO_OPTION);
+
+		final String no = Lables.get("No");
+		final String yes = Lables.get("Yes");
+		final int selection = JOptionPane.showOptionDialog(window, Lables.get(message, true), Lables.get("WARNING"), JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE, null, new String[] { yes, no }, no);
+		return selection == JOptionPane.YES_OPTION;
+	}
+
+	/**
+	 * @1.1
+	 * 
+	 * @param window
+	 * @param messages
+	 * @return
+	 */
+	public static boolean showConfirmationDialog(final Window window, final String[] messages) {
+		final StringBuffer concateMessage = new StringBuffer();
+		final String stringLabel = "";
+		for (final String message : messages) {
+			concateMessage.append(Lables.get(message, true));
+			concateMessage.append("\n");
+		}
+		concateMessage.append(stringLabel);
+		final int choice = JOptionPane.showConfirmDialog(window, Lables.get(concateMessage.toString(), true), Lables.get("WARNING"),
+				JOptionPane.YES_NO_OPTION);
+		return choice == JOptionPane.YES_OPTION;
+	}
+
+	public static void showDatabaseErrorDialog(final JDialog dialog, final String message, final Exception ex) {
+		JOptionPane.showMessageDialog(dialog, getDialogViewComponent(message));
+		throw new RuntimeException(ex);
+	}
+
+	public static void showDatabaseErrorDialog(final String message, final Exception ex) {
+		showDatabaseErrorDialog(emptyDialog, message, ex);
+	}
+
+	/**
+	 *
+	 * @param xml
+	 * @param string
+	 */
+	public static void showEncodedComponent(final String xml, final String title) {
+		if (xml == null || xml.trim().equals("")) {
+			return;
+		}
+		final Object object = GeneralUtility.toObject(xml);
+		if (object instanceof Window) {
+			final Window window = (Window) object;
+			window.pack();
+			enableContainer(window, false);
+			window.setVisible(true);
+		} else if (object instanceof JPanel) {
+			final JPanel panel = (JPanel) object;
+			enableContainer(panel, false);
+			SwingUtility.showPanelInDialog(panel, title);
+		} else if (object instanceof JComponent) {
+			final FSPanel pnl = new FSPanel((JComponent) object);
+			enableContainer(pnl, false);
+			SwingUtility.showPanelInDialog(pnl, title);
+		} else {
+			System.err.println(object.getClass().getName() + " cannot be viewed");
+		}
+	}
+
+	/**
+	 * @param message
+	 * @param ex
+	 */
+	public static void showErrorDialog(final String message, final Throwable ex) {
+		showErrorDialog(message, ex, getDefaultMainFrame());
+
+	}
+
+	public static void showErrorDialog(final String message, final Throwable ex, final boolean color) {
+		showErrorDialog(message, ex, getDefaultMainFrame(), color);
+
+	}
+
+	/**
+	 *
+	 * @param error
+	 * @param parent
+	 */
+	public static void showErrorDialog(final String error, final Throwable e, final Window parent) {
+		JOptionPane.showMessageDialog(parent, getDialogViewComponent(error));
+		throw new RuntimeException(e);
+	}
+
+	public static void showErrorDialog(final String error, final Throwable e, final Window parent, final boolean color) {
+		JOptionPane.showMessageDialog(parent, getDialogViewComponent(error, true));
+		throw new RuntimeException(e);
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	public static void showFrame(final String frameClassName, final JDesktopPane pane)
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException, PropertyVetoException {
+		if (frameClassName != null && !frameClassName.trim().equals("")) {
+			final Object instance = Class.forName(frameClassName).newInstance();
+			if (instance instanceof JFrame) {
+				final JFrame frame = (JFrame) instance;
+				if (!frame.isVisible()) {
+					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+					frame.setVisible(true);
+				}
+			} else if (instance instanceof JKInternalFrame) {
+				final JKInternalFrame frm = (JKInternalFrame) instance;
+				pane.add(frm);
+				if (!frm.isVisible()) {
+					frm.initDefaults();
+				}
+			} else {
+				System.err.println(frameClassName + " is not instanceof JFrame");
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param parentComponent
+	 * @param message
+	 * @return
+	 * @throws HeadlessException
+	 */
+	public static String showInputDialog(final Component parentComponent, final String message) throws HeadlessException {
+		return JOptionPane.showInputDialog(parentComponent, Lables.get(message, true));
+	}
+
+	/**
+	 *
+	 * @param parentComponent
+	 * @param message
+	 * @return
+	 * @throws HeadlessException
+	 */
+	public static String showInputDialog(final String message) throws HeadlessException {
+		return showInputDialog(defaultMainFrame, message);
+	}
+
+	/**
+	 *
+	 * @param string
+	 * @return
+	 */
+	public static int showIntegerInput(final String msg) {
+		String input;
+		while ((input = showInputDialog(msg)) != null) {
+			try {
+				return Integer.parseInt(input);
+			} catch (final NumberFormatException e) {
+				SwingUtility.showUserErrorDialog("PLEASE_ENTER_NUMBERS_ONLY", false);
+			}
+		}
+		return -1;
+	}
+
+	public static void showMessageDialog(final String message, final Throwable ex) {
+		JOptionPane.showMessageDialog(getDefaultMainFrame(), Lables.get(message, true));
+		throw new RuntimeException(message);
+	}
+
+	/**
+	 * @param browser
+	 * @param string
+	 * @return
+	 */
+	public static JKFrame showPanelFrame(final JKPanel<?> panel, final String title) {
+		final JKFrame frame = new JKFrame(title);
+		frame.add(panel, BorderLayout.CENTER);
+		frame.pack();
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		return frame;
+	}
+
+	/**
+	 *
+	 * @param panel
+	 * @param title
+	 * @return
+	 */
+	public static JDialog showPanelInDialog(final JPanel panel, final String title) {
+		return showPanelInDialog(panel, title, true);
+	}
+
+	/**
+	 *
 	 * @param pnl
 	 * @param title
 	 * @param modal
 	 * @return
 	 */
-	public static JDialog showPanelInDialog(JPanel pnl, String title, boolean modal) {
+	public static JDialog showPanelInDialog(final JPanel pnl, final String title, final boolean modal) {
 		return showPanelInDialog(pnl, title, modal, null);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param pnl
 	 * @param title
 	 * @param modal
 	 * @param parent
 	 * @return
 	 */
-	public static JKDialog showPanelInDialog(JPanel pnl, String title, boolean modal, JKPanel<?> parent) {
+	public static JKDialog showPanelInDialog(final JPanel pnl, final String title, final boolean modal, final JKPanel<?> parent) {
 		return showPanelInDialog(pnl, title, modal, parent, null);
 	}
 
-	public static JKDialog showPanelInDialog(JPanel pnl, String title, boolean modal, JKPanel<?> parent, Dimension dimension) {
+	public static JKDialog showPanelInDialog(final JPanel pnl, final String title, final boolean modal, final JKPanel<?> parent,
+			final Dimension dimension) {
 		JKDialog dialog = null;
 		if (parent != null && parent.getRootPane() != null) {
-			Container cont = parent.getRootPane().getParent();
+			final Container cont = parent.getRootPane().getParent();
 			if (cont != null) {
 				if (cont instanceof JDialog) {
-					dialog = new JKDialog(((JDialog) cont), title);
+					dialog = new JKDialog((JDialog) cont, title);
 				}
 			}
 		}
@@ -535,337 +1178,64 @@ public class SwingUtility {
 		return dialog;
 	}
 
-	private static Window getActiveWindow() {
-		KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		Window window = keyboardFocusManager.getActiveWindow();
-		if (window == null) {
-			return getDefaultMainFrame();
-		}
-		return window;
+	public static void showSuccessDialog(final JDialog parent, final String string) {
+		JOptionPane.showMessageDialog(parent, Lables.get(string, true));
 	}
 
-	/**
-	 * 
-	 * @param panel
-	 * @param title
-	 * @return
-	 */
-	public static JDialog showPanelInDialog(JPanel panel, String title) {
-		return showPanelInDialog(panel, title, true);
+	public static void showSuccessDialog(final String string) {
+		JOptionPane.showMessageDialog(getDefaultMainFrame(), getDialogViewComponent(string));
 	}
 
-	/**
-	 * 
-	 */
-	public static void closePanelDialog(JComponent comp) {
-		if (comp.getRootPane() != null) {
-			Container cont = comp.getRootPane().getParent();
-			if (cont != null) {
-				if (cont instanceof JDialog) {
-					((JDialog) cont).dispose();
-				}
-			}
-		}
+	public static void showUserErrorDialog(final JDialog parent, final String message, final Exception ex) {
+		JOptionPane.showMessageDialog(parent, getDialogViewComponent(message));
 	}
 
-	/**
-	 * 
-	 * @param btn
-	 * @param keyStroke
-	 * @param actionName
-	 */
-	public static void setHotKeyFoButton(final JButton btn, String keyStroke, String actionName) {
-		// get the button's Action map
-		ActionMap amap = btn.getActionMap();
-		// add an action to the button's action map
-		// and give it a name(it can be any object not just String)
-		amap.put(actionName, new AbstractAction() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			public void actionPerformed(ActionEvent e) {
-				// call your a method that contains your action code
-				if (btn.isVisible() && btn.isEnabled()) {
-					btn.doClick();
-				}
-			}
-		});
-		// get the input map for the button
-		InputMap imap = btn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		// add a key stroke associated with an action in the action map(action
-		// name).
-		// imap.put(KeyStroke.getKeyStroke("F1"),"ActionName");
-		// you can do the same for more than one key.
-		imap.put(KeyStroke.getKeyStroke(keyStroke), actionName);
+	public static void showUserErrorDialog(final JFrame parent, final String message, final Exception ex) {
+		JOptionPane.showMessageDialog(parent, getDialogViewComponent(message));
+		ex.printStackTrace();
 	}
 
-	/**
-	 * 
-	 * @param btn
-	 * @param keyStroke
-	 * @param actionName
-	 */
-	public static void setHotKeyForFocus(final JComponent comp, String keyStroke, String actionName) {
-		// get the button's Action map
-		ActionMap amap = comp.getActionMap();
-		// add an action to the button's action map
-		// and give it a name(it can be any object not just String)
-		amap.put(actionName, new AbstractAction() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			public void actionPerformed(ActionEvent e) {
-				// call your a method that contains your action code
-				comp.requestFocus();
-			}
-		});
-		// get the input map for the button
-		InputMap imap = comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		// add a key stroke associated with an action in the action map(action
-		// name).
-		// imap.put(KeyStroke.getKeyStroke("F1"),"ActionName");
-		// you can do the same for more than one key.
-		imap.put(KeyStroke.getKeyStroke(keyStroke), actionName);
-	}
-
-	/**
-	 * 
-	 * @param message
-	 * @param ex
-	 */
-	public static void showUserErrorDialog(String message, Exception ex) {
-		showUserErrorDialog(SwingUtility.getDefaultMainFrame(), message, ex);
-		throw new RuntimeException(message);
-	}
-
-	public static void showMessageDialog(String message, Throwable ex) {
-		JOptionPane.showMessageDialog(getDefaultMainFrame(), Lables.get(message, true));
-		throw new RuntimeException(message);
-	}
-
-	public static void showUserErrorDialog(String string) {
+	public static void showUserErrorDialog(final String string) {
 		showUserErrorDialog(string, true);
 	}
 
-	public static void showUserErrorDialog(String string, boolean throwRuntimeException) {
-		JScrollPane jScrollPane = getDialogViewComponent(string);
+	public static void showUserErrorDialog(final String string, final boolean throwRuntimeException) {
+		final JScrollPane jScrollPane = getDialogViewComponent(string);
 
 		JOptionPane.showMessageDialog(getDefaultMainFrame(), jScrollPane);
 		if (throwRuntimeException) {
 			throw new RuntimeException(string);
 		}
 	}
-	
-	private static JScrollPane getDialogViewComponent(String string) {
-		return getDialogViewComponent(string, false);
-	}
-	private static JScrollPane getDialogViewComponent(String string, boolean color) {
-		JKTextArea txt = new JKTextArea();
-		txt.setText(Lables.get(string, true));
-		txt.setEditable(false);
-		
-		if(color){
-		txt.setForeground(Color.red);
-		txt.setFont(new Font("Tahoma", Font.BOLD, 22));
-		}
-		JScrollPane jScrollPane = new JScrollPane(txt);
-		jScrollPane.getViewport().setPreferredSize(new Dimension(500, 200));
-		return jScrollPane;
-	}
-
-	public static void packWindow(JComponent comp) {
-
-		if (comp.getRootPane() != null) {
-			Container cont = comp.getRootPane().getParent();
-			if (cont != null) {
-				if (cont instanceof JDialog) {
-					((JDialog) cont).pack();
-					((JDialog) cont).setLocationRelativeTo(null);
-				}
-			}
-		}
-	}
 
 	/**
-	 * i seperated it in different method to avoid affecting other components
-	 * 
-	 * @param comp
-	 */
-	public static void packJFrameWindow(JComponent comp) {
-		if (comp.getRootPane() != null) {
-			Container cont = comp.getRootPane().getParent();
-			if (cont instanceof JFrame) {
-				((JFrame) cont).pack();
-				((JFrame) cont).setLocationRelativeTo(null);
-			}
-		}
-	}
-
-	/**
-	 * @param url
-	 * @param scaled
-	 * @return
-	 */
-	public static ImagePanel buildImagePanel(URL url, int scaled) {
-		BufferedImage image = null;
-		try {
-			if (url != null) {
-				image = getImage(url);
-				return new ImagePanel(image, scaled);
-			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-		return new ImagePanel();
-	}
-
-	public static BufferedImage getImage(URL url) throws IOException {
-		BufferedImage image;
-		image = javax.imageio.ImageIO.read(url);
-		return image;
-	}
-
-	public static BufferedImage getImage(InputStream in) throws IOException {
-		BufferedImage image;
-		image = javax.imageio.ImageIO.read(in);
-		return image;
-	}
-
-	public static BufferedImage getImage(String imageName) throws IOException {
-		return getImage(GeneralUtility.getFileURI(imageName).toURL());
-	}
-
-	public static JPanel buildImagePanel(InputStream in, int scaled) {
-		BufferedImage image = null;
-		try {
-			image = javax.imageio.ImageIO.read(in);
-			return new ImagePanel(image, scaled);
-		} catch (IOException ex) {
-			return new JPanel();
-		}
-	}
-
-	/**
-	 * @param image
-	 * @param scaled
-	 * @return
-	 */
-	public static JPanel buildImagePanel(byte[] image, int scaled) {
-		return buildImagePanel(new ByteArrayInputStream(image), scaled);
-	}
-
-	public static BufferedImage toBufferedImage(byte[] imageBytes) throws IOException {
-		return javax.imageio.ImageIO.read(new ByteArrayInputStream(imageBytes));
-	}
-
-	/**
-	 * 
-	 * @param pnl
-	 * @param fullColored
-	 * @return
-	 */
-	public static BufferedImage convertPanelToImage(JKPanel<?> pnl, int width, int height) {
-		try {
-			BufferedImage img = ImageUtil.getCompatibleImage(pnl.getWidth(), pnl.getHeight());// new
-			// BufferedImage(width,height,
-			// type);
-
-			Robot robot = new Robot();
-			img = robot.createScreenCapture(getDefaultMainFrame().getBounds());
-			img = ImageUtil.scaleNewerWay(img, false, width, height);
-			return img;
-		} catch (AWTException e) {
-		}
-		return null;
-	}
-
-	/**
+	 *
 	 * @param message
 	 * @param ex
 	 */
-	public static void showErrorDialog(String message, Throwable ex) {
-		showErrorDialog(message, ex, getDefaultMainFrame());
-
-	}
-	
-	public static void showErrorDialog(String message, Throwable ex,boolean color) {
-		showErrorDialog(message, ex, getDefaultMainFrame(),color);
-
+	public static void showUserErrorDialog(final String message, final Exception ex) {
+		showUserErrorDialog(SwingUtility.getDefaultMainFrame(), message, ex);
+		throw new RuntimeException(message);
 	}
 
-	/**
-	 * @return
-	 */
-	public static Locale getDefaultLocale() {
-		return new Locale(defaultLocale, "JO");
-	}
-
-	public static JFileChooser getDefaultFileChooser() {
-		return chooser;
-	}
-
-	public static boolean showConfirmationDialog(String key, String extraInfo) {
-		String str = Lables.get(key, true);
-		return showConfirmationDialog(str + "\n" + extraInfo);
-	}
-
-	public static void showUserErrorDialog(String messge, String extraInfo) {
-		String str = Lables.get(messge, true);
+	public static void showUserErrorDialog(final String messge, final String extraInfo) {
+		final String str = Lables.get(messge, true);
 		showUserErrorDialog(str + "\n" + extraInfo);
 
 	}
 
 	/**
-	 * 
-	 * @param str
-	 * @return
+	 *
+	 * @param obj
 	 */
-	public static String fixTwoLinesIssue(String str) {
-		String arr[] = str.split(" ");
-		String result = "<html><body>" + arr[0];
-		for (int i = 1; i < arr.length; i++) {
-			result += "<br>" + arr[i];
-		}
-		result += "</body></html>";
-		return result;
+	public static void testComponentSerialization(final Object obj) {
+		final String xml = GeneralUtility.toXml(obj);
+		// Object object = GeneralUtility.toObject(xml);
+		showEncodedComponent(xml, "Test");
 	}
 
-	/**
-	 * @param browser
-	 * @param string
-	 * @return
-	 */
-	public static JKFrame showPanelFrame(JKPanel<?> panel, String title) {
-		JKFrame frame = new JKFrame(title);
-		frame.add(panel, BorderLayout.CENTER);
-		frame.pack();
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-		return frame;
-	}
-
-	/**
-	 * 
-	 * @param text
-	 * @param fontSize
-	 * @return
-	 */
-	public static int calculateTextSize(String text, int fontSize) {
-		JLabel lbl = new JLabel(text);
-		return (int) lbl.getPreferredSize().getWidth();
-		// java.awt.Font font=new java.awt.Font("Arial",Font.BOLD,fontSize);
-		// FontMetrics metrics =
-		// Toolkit.getDefaultToolkit().getFontMetrics(font);
-		// return metrics.stringWidth(text);
-	}
-
-	public static void testInternalFrame(JKInternalFrame frame) {
-		JKFrame frm = new JKFrame();
+	public static void testInternalFrame(final JKInternalFrame frame) {
+		final JKFrame frm = new JKFrame();
 		frm.setExtendedState(6);
 		// JKDesktopPane pane = new JKDesktopPane();
 		// pane.add(frame);
@@ -873,394 +1243,37 @@ public class SwingUtility {
 		try {
 			frame.initDefaults();
 			frm.setVisible(true);
-		} catch (PropertyVetoException e) {
+		} catch (final PropertyVetoException e) {
 			ExceptionUtil.handleException(e);
 		}
 	}
 
-	public static void main(String[] args) {
-		// System.out.println(colorToHex(Color.red));
-		// System.out.println(showIntegerInput("test"));
-		// System.out.println(showConfirmationDialog(new Frame(),
-		// "line1\nline2"));
-		System.out.println(getTextWidth("Jalal Kiswani", new Font("Arial", Font.BOLD, 12)));
-	}
-
-	/**
-	 * 
-	 * @param component
-	 * @throws DaoException
-	 */
-	public static void resetComponent(Component component) throws DaoException {
-		if (component instanceof BindingComponent) {
-			((BindingComponent<?>) component).reset();
-		} else if (component instanceof JComboBox) {
-			((JComboBox<?>) component).setSelectedIndex(-1);
-		} else if (component instanceof JList) {
-			((JList<?>) component).setSelectedIndex(-1);
-		} else if (component instanceof JRadioButton) {
-			((JRadioButton) component).setSelected(false);
-		}
-	}
-
-	/**
-	 * 
-	 * @param color
-	 * @return
-	 */
-	public static String colorToHex(Color color) {
-		return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
-	}
-
-	/**
-	 * 
-	 * @param btnAdd
-	 * @param string
-	 */
-	public static void setHotKeyFoButton(JKButton btn, String shortcut) {
-		setHotKeyFoButton(btn, shortcut, shortcut);
-	}
-
-	/**
-	 * 
-	 * @param string
-	 */
-	public static void pressKey(int key) {
-		try {
-			Robot robot = new Robot();
-			robot.keyPress(key);
-		} catch (AWTException e) {
-			// ExceptionUtil.handleException(e);
-		}
-	}
-
-	/**
-	 * @param vkDown
-	 * 
-	 */
-	public static void addFocusForwardKey(int button) {
-		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		Set<?> forwardKeys = manager.getDefaultFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-		Set<KeyStroke> newForwardKeys = new HashSet(forwardKeys);
-		newForwardKeys.add(KeyStroke.getKeyStroke(button, 0));
-		manager.setDefaultFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
-	}
-
-	public static void addFocusBackKey(int button) {
-		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		Set<?> oldBackKeys = manager.getDefaultFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-		Set<KeyStroke> backwordKeys = new HashSet(oldBackKeys);
-		backwordKeys.add(KeyStroke.getKeyStroke(button, 0));
-		manager.setDefaultFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwordKeys);
-	}
-
-	/**
-	 * 
-	 */
-	public static void pressTab() {
-		Runnable r = new Runnable() {
-
-			@Override
-			public void run() {
-				pressKey(KeyEvent.VK_TAB);
-			}
-		};
-		new Thread(r).start();
-	}
-
-	/**
-	 * 
-	 * @param string
-	 * @return
-	 */
-	public static int showIntegerInput(String msg) {
-		String input;
-		while ((input = showInputDialog(msg)) != null) {
-			try {
-				return Integer.parseInt(input);
-			} catch (NumberFormatException e) {
-				SwingUtility.showUserErrorDialog("PLEASE_ENTER_NUMBERS_ONLY", false);
-			}
-		}
-		return -1;
-	}
-
-	public static Dimension getScreenDimesion() {
-		return Toolkit.getDefaultToolkit().getScreenSize();
-	}
-
-	public static Dimension getMaxWindowSize() {
-		Dimension d = getScreenDimesion();
-		return new Dimension((int) d.getWidth() - 100, (int) d.getHeight() - 100);
-	}
-
-	public static JFileChooser getFileChooser() {
-		return chooser;
-	}
-
-	public static void printInstalledLookAndFeel() {
-		LookAndFeelInfo[] look = UIManager.getInstalledLookAndFeels();
-		for (LookAndFeelInfo lookAndFeelInfo : look) {
-			System.out.println(lookAndFeelInfo.getClassName());
-		}
-	}
-
-	public static int getTabPaneLeadingPlacement() {
-		return isLeftOrientation() ? JTabbedPane.LEFT : JTabbedPane.RIGHT;
-	}
-
-	public static void reloadTable(int nextRow, QueryJTable tbl) {
-		tbl.setSelectedRow(nextRow);
-		tbl.reloadData();
-	}
-
-	/**
-	 * 
-	 * @param btn
-	 * @param obj
-	 * @param methodName
-	 * @author mkiswani
-	 */
-	public static void addActionListener(AbstractButton btn, final Object obj, final String methodName) {
-		btn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					ReflicationUtil.callMethod(obj, methodName);
-				} catch (InvocationTargetException e1) {
-					ExceptionUtil.handleException(e1.getCause());
-				}
-			}
-		});
-
-	}
-
-	public static void closePanelWindow(JComponent comp) {
-		if (comp.getRootPane() != null) {
-			Window window = getWindow(comp);
-			if (window != null) {
-				window.dispose();
-			}
-		}
-	}
-
-	private static Window getWindow(JComponent comp) {
-		if (comp.getRootPane() != null) {
-			Container cont = comp.getRootPane().getParent();
-			if (cont != null) {
-				if (cont instanceof Window) {
-					return ((Window) cont);
-				}
-			}
-		}
-		return null;
-	}
-
-	public static void applyDataSource(Container comp, DataSource manager) {
-		Vector<BindingComponent> bindingComponents = SwingUtility.findBindingComponents(comp);
-		for (BindingComponent bindingComponent : bindingComponents) {
-			bindingComponent.setDataSource(manager);
-		}
-	}
-
-	public static Vector<BindingComponent> findBindingComponents(Container cont) {
-		Vector<BindingComponent> c = new Vector<BindingComponent>();
-		Component[] components = cont.getComponents();
-		for (Component component : components) {
-			if (component instanceof BindingComponent) {
-				c.add((BindingComponent) component);
-			}
-			if (component instanceof Container) {
-				c.addAll(findBindingComponents((Container) component));
-			}
-		}
-		return c;
-	}
-
-	public static BindingComponent findBindingComponent(Container cont, String componentNam) {
-		Vector<BindingComponent> components = findBindingComponents(cont);
-		for (BindingComponent bindingComponent : components) {
-			if (bindingComponent.getName() != null && bindingComponent.getName().equals(componentNam)) {
-				return bindingComponent;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param component
-	 * @throws DaoException
-	 */
-	public static void resetComponent(Object component) throws DaoException {
-		if (component instanceof BindingComponent) {
-			((BindingComponent) component).reset();
-		} else if (component instanceof JComboBox) {
-			((JComboBox) component).setSelectedIndex(-1);
-		} else if (component instanceof JList) {
-			((JList) component).setSelectedIndex(-1);
-		} else if (component instanceof JRadioButton) {
-			((JRadioButton) component).setSelected(false);
-		}
-	}
-
-	/**
-	 * 
-	 * @param xml
-	 * @param string
-	 */
-	public static void showEncodedComponent(String xml, String title) {
-		if (xml == null || xml.trim().equals("")) {
-			return;
-		}
-		Object object = GeneralUtility.toObject(xml);
-		if (object instanceof Window) {
-			Window window = (Window) object;
-			window.pack();
-			enableContainer(window, false);
-			window.setVisible(true);
-		} else if (object instanceof JPanel) {
-			JPanel panel = (JPanel) object;
-			enableContainer(panel, false);
-			SwingUtility.showPanelInDialog(panel, title);
-		} else if (object instanceof JComponent) {
-			FSPanel pnl = new FSPanel((JComponent) object);
-			enableContainer(pnl, false);
-			SwingUtility.showPanelInDialog(pnl, title);
-		} else {
-			System.err.println(object.getClass().getName() + " cannot be viewed");
-		}
-	}
-
-	/**
-	 * 
-	 * @param text
-	 * @param bold
-	 * @return
-	 */
-	public static int getTextWidth(String text, boolean bold) {
-		Font font = UIManager.getFont("Label.font");
-		if (bold) {
-			font = font.deriveFont(Font.BOLD);
-		}
-		return getTextWidth(text, font);
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	public static void showFrame(String frameClassName, JDesktopPane pane) throws InstantiationException, IllegalAccessException,
-			ClassNotFoundException, PropertyVetoException {
-		if (frameClassName != null && !frameClassName.trim().equals("")) {
-			Object instance = Class.forName(frameClassName).newInstance();
-			if (instance instanceof JFrame) {
-				JFrame frame = (JFrame) instance;
-				if (!frame.isVisible()) {
-					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-					frame.setVisible(true);
-				}
-			} else if (instance instanceof JKInternalFrame) {
-				JKInternalFrame frm = (JKInternalFrame) instance;
-				pane.add(frm);
-				if (!frm.isVisible()) {
-					frm.initDefaults();
-				}
-			} else {
-				System.err.println(frameClassName + " is not instanceof JFrame");
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param text
-	 * @param font
-	 * @return
-	 */
-	public static int getTextWidth(String text, Font font) {
-		JLabel lbl = new JLabel(text);
-		lbl.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-		lbl.setFont(font);
-		return (int) lbl.getPreferredSize().getWidth();
-		// get metrics from the graphics
-		// FontMetrics metrics = new FontMetrics(font){};
-		// get the height of a line of text in this
-		// font and render context
-		// int hgt = metrics.getHeight();
-		// get the advance of my text in this font
-		// and render context
-		// int adv = metrics.stringWidth(text);
-		// calculate the size of a box to hold the
-		// text with some padding.
-		// Dimension size = new Dimension(adv+2, hgt+2);
-		// return size;
-	}
-
-	/**
-	 * 
-	 * @param obj
-	 */
-	public static void testComponentSerialization(Object obj) {
-		String xml = GeneralUtility.toXml(obj);
-		// Object object = GeneralUtility.toObject(xml);
-		showEncodedComponent(xml, "Test");
-	}
-
-	public static void setGeneralStatus(String status) {
-		ApplicationFrame applicationFrame = ApplicationManager.getInstance().getApplication().getApplicationFrame();
-		if (applicationFrame != null) {
-			applicationFrame.setGeneralStatus(status);
-		}
-	}
-
-	public static void setUserStatus(String status) {
-		ApplicationManager.getInstance().getApplication().getApplicationFrame().setUserStatus(status);
-	}
-
-	public static void setSystemStatus(String status) {
-		ApplicationManager.getInstance().getApplication().getApplicationFrame().setSystemStatus(status);
-	}
-
-	public static Dimension getWindowActualSize(Window window) {
-		if (window.isVisible()) {
-			return window.getSize();
-		}
-		if (window instanceof Frame) {
-			Frame frame = (Frame) window;
-			if (frame.getExtendedState() == Frame.MAXIMIZED_BOTH) {
-				return Toolkit.getDefaultToolkit().getScreenSize();
-			}
-		}
-		return window.getSize();
-	}
-
-	public static void maximumizBoth(Window window) {
-		if (window instanceof Frame) {
-			Frame frm = (Frame) window;
-			frm.setExtendedState(Frame.MAXIMIZED_BOTH);
-		} else {
-			window.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-		}
-
-	}
-
-	public static void testMenuItem(String name) throws NotAllowedOperationException, SecurityException, UIOPanelCreationException {
+	public static void testMenuItem(final String name) throws NotAllowedOperationException, SecurityException, UIOPanelCreationException {
 		com.fs.commons.security.SecurityManager.setCurrentUser(new User(1));
-		MenuItem item = ApplicationManager.getInstance().getApplication().findMenuItem(name);
+		final MenuItem item = ApplicationManager.getInstance().getApplication().findMenuItem(name);
 		// PnlStudentManagement pnl=new PnlStudentManagement();
 		// pnl.setTableMeta(AbstractTableMetaFactory.getTableMeta("reg_active_students"));
 		SwingUtility.testPanel((JPanel) item.createPanel());
 	}
 
-	public static boolean isVisibleOnScreen(JComponent component) {
-		Window window = getWindow(component);
-		if (window != null) {
-			return window.isVisible();
-		}
-		return false;
+	/**
+	 *
+	 * @param panel
+	 *            JPanel
+	 */
+	public static void testPanel(final JPanel panel) {
+		final JKFrame frame = new JKFrame();
+		// frame.setExtendedState(frame.MAXIMIZED_BOTH);
+		final JKMainPanel mainPanel = new JKMainPanel(new BorderLayout());
+		mainPanel.add(panel);
+		frame.add(mainPanel);
+		frame.applyComponentOrientation(getDefaultComponentOrientation());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
 	}
 
-	public static void resetComponents() {
-//		NativeInterface.close();
-//		NativeInterface.open();
+	public static BufferedImage toBufferedImage(final byte[] imageBytes) throws IOException {
+		return javax.imageio.ImageIO.read(new ByteArrayInputStream(imageBytes));
 	}
 
 	// public static void setLookAndFeel() {

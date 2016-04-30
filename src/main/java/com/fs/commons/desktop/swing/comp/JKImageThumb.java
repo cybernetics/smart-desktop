@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.desktop.swing.comp;
 
@@ -23,11 +35,11 @@ import com.fs.commons.util.GeneralUtility;
 
 /**
  * @author u087
- * 
+ *
  */
 public class JKImageThumb extends JKPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -36,43 +48,24 @@ public class JKImageThumb extends JKPanel {
 	byte[] imageData;
 
 	/**
-	 * 
+	 *
 	 */
-	public JKImageThumb(byte[] image) {
+	public JKImageThumb(final byte[] image) {
 		this.imageData = image;
-		pnlImage = SwingUtility.buildImagePanel(image, ImagePanel.SCALED);
+		this.pnlImage = SwingUtility.buildImagePanel(image, ImagePanel.SCALED);
 		init();
 	}
 
 	/**
-	 * 
-	 */
-	private void init() {
-		setLayout(new BorderLayout());
-		pnlImage.setPreferredSize(new Dimension(100, 100));
-		setBorder(BorderFactory.createLineBorder(Color.ORANGE));
-		add(pnlImage, BorderLayout.CENTER);
-
-		pnlImage.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 1) {
-					handleShowImage();
-				}
-			}
-		});
-	}
-
-	/**
-	 * 
+	 *
 	 */
 	protected void handleShowImage() {
 		final JKPanel pnl = new JKPanel(new BorderLayout());
-		final JPanel pnlImage = SwingUtility.buildImagePanel(imageData, ImagePanel.SCALED);
+		final JPanel pnlImage = SwingUtility.buildImagePanel(this.imageData, ImagePanel.SCALED);
 		pnlImage.setPreferredSize(new Dimension(450, 600));
-		JKPanel pnlButtons = new JKPanel();
-		JKButton btnPrint = new JKButton("Print");
-		JKButton btnClose = new JKButton("Close");
+		final JKPanel pnlButtons = new JKPanel();
+		final JKButton btnPrint = new JKButton("Print");
+		final JKButton btnClose = new JKButton("Close");
 		btnPrint.setIcon(new ImageIcon(GeneralUtility.getIconURL("fileprint.png")));
 		btnClose.setIcon(new ImageIcon(GeneralUtility.getIconURL("cancel.png")));
 
@@ -83,15 +76,36 @@ public class JKImageThumb extends JKPanel {
 		pnl.add(pnlButtons, BorderLayout.SOUTH);
 
 		btnClose.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				SwingUtility.closePanelWindow(pnl);
 			}
 		});
 		btnPrint.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				SwingPrintUtility.printComponent(pnlImage);
 			}
 		});
 		SwingUtility.showPanelInDialog(pnl, "Preview");
+	}
+
+	/**
+	 *
+	 */
+	private void init() {
+		setLayout(new BorderLayout());
+		this.pnlImage.setPreferredSize(new Dimension(100, 100));
+		setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+		add(this.pnlImage, BorderLayout.CENTER);
+
+		this.pnlImage.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				if (e.getClickCount() == 1) {
+					handleShowImage();
+				}
+			}
+		});
 	}
 }

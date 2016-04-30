@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing;
 
 import java.awt.Color;
@@ -13,7 +28,7 @@ public class Colors {
 		try {
 			prop = GeneralUtility.readPropertyStream(GeneralUtility.getFileInputStream("/color.properties"));
 			// System.out.println(prop);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			System.err.println("Unable to read the colors file");
 			e.printStackTrace();
 			// just eat the exception and read default values
@@ -64,22 +79,22 @@ public class Colors {
 	// public static final Color MENU_ITEMS_PANEL= NICE_BLUE;
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
-	protected static Color getColor(String colorStr) {
+	protected static Color getColor(final String colorStr) {
 		return getColor(colorStr, Color.black);
 	}
 
-	private static Color getColor(String colorStr, Color defaultColor) {
+	private static Color getColor(String colorStr, final Color defaultColor) {
 		colorStr = CollectionUtil.fixPropertyKey(colorStr);
 		if (prop.getProperty(colorStr) == null) {
 			System.out.println("Color  " + colorStr + " Is not avaiable ");
 			return defaultColor;
 		}
-		String[] color = prop.getProperty(colorStr).split(",");
+		final String[] color = prop.getProperty(colorStr).split(",");
 		if (color.length != 3) {
-			String replace = color[0].replace("#", "0x");
+			final String replace = color[0].replace("#", "0x");
 			// System.out.println(replace);
 			return Color.decode(replace);
 		}
@@ -87,7 +102,7 @@ public class Colors {
 
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		System.out.println();
 	}
 

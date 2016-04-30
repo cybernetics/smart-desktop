@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp.panels;
 
 import java.awt.Component;
@@ -17,7 +32,7 @@ import com.fs.commons.util.ExceptionUtil;
 
 public class ImagePanel extends JKPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -36,73 +51,29 @@ public class ImagePanel extends JKPanel {
 	public ImagePanel() {
 	}
 
-	public ImagePanel(BufferedImage image) {
+	public ImagePanel(final BufferedImage image) {
 		this(image, TILED);
 	}
 
-	/**
-	 * @return the image
-	 */
-	public BufferedImage getImage() {
-		return image;
-	}
-
-	public void setImage(ImageIcon image) {
-		setImage( new BufferedImage(image.getIconWidth(), image.getIconHeight(), BufferedImage.TYPE_INT_RGB));
-	}
-
-	/**
-	 * @param image
-	 *            the image to set
-	 */
-	public void setImage(BufferedImage image) {
-		this.image = image;
-		invalidate();
-		repaint();
-	}
-
-	/**
-	 * @return the style
-	 */
-	public int getStyle() {
-		return style;
-	}
-
-	/**
-	 * @param style
-	 *            the style to set
-	 */
-	public void setStyle(int style) {
-		this.style = style;
-	}
-
-	public ImagePanel(BufferedImage image, int style) {
+	public ImagePanel(final BufferedImage image, final int style) {
 		this.image = image;
 		this.style = style;
 		// setLayout(new BorderLayout());
 		setBackground(Colors.MAIN_PANEL_BG);
 	}
 
-	public void setImageAlignmentX(float alignmentX) {
-		this.alignmentX = alignmentX > 1.0f ? 1.0f : alignmentX < 0.0f ? 0.0f : alignmentX;
-	}
-
-	public void setImageAlignmentY(float alignmentY) {
-
-	}
-
-	public void add(JComponent component) {
+	public void add(final JComponent component) {
 		add(component, null);
 	}
 
-	public void add(JComponent component, Object constraints) {
+	public void add(final JComponent component, final Object constraints) {
 		component.setOpaque(false);
 
 		if (component instanceof JScrollPane) {
-			JScrollPane scrollPane = (JScrollPane) component;
-			JViewport viewport = scrollPane.getViewport();
+			final JScrollPane scrollPane = (JScrollPane) component;
+			final JViewport viewport = scrollPane.getViewport();
 			viewport.setOpaque(false);
-			Component c = viewport.getView();
+			final Component c = viewport.getView();
 
 			if (c instanceof JComponent) {
 				((JComponent) c).setOpaque(false);
@@ -112,20 +83,54 @@ public class ImagePanel extends JKPanel {
 		super.add(component, constraints);
 	}
 
-	protected void paintComponent(Graphics g) {
+	private void drawActual(final Graphics g) {
+		final Dimension d = getSize();
+		final float x = (d.width - this.image.getWidth()) * this.alignmentX;
+		final float y = 0;// (d.height - image.getHeight()) * alignmentY;
+		g.drawImage(this.image, (int) x, (int) y, this);
+	}
+
+	private void drawTiled(final Graphics g) {
+		final Dimension d = getSize();
+		final int width = this.image.getWidth(null);
+		final int height = this.image.getHeight(null);
+
+		for (int x = 0; x < d.width; x += width) {
+			for (int y = 0; y < d.height; y += height) {
+				g.drawImage(this.image, x, y, null, null);
+			}
+		}
+	}
+
+	/**
+	 * @return the image
+	 */
+	public BufferedImage getImage() {
+		return this.image;
+	}
+
+	/**
+	 * @return the style
+	 */
+	public int getStyle() {
+		return this.style;
+	}
+
+	@Override
+	protected void paintComponent(final Graphics g) {
 		super.paintComponent(g);
-		if (image == null) {
+		if (this.image == null) {
 			return;
 		}
 
-		switch (style) {
+		switch (this.style) {
 		case TILED:
 			drawTiled(g);
 			break;
 
 		case SCALED:
-			Dimension d = getSize();
-			g.drawImage(image, 0, 0, d.width, d.height, null);
+			final Dimension d = getSize();
+			g.drawImage(this.image, 0, 0, d.width, d.height, null);
 			break;
 
 		case ACTUAL:
@@ -134,42 +139,53 @@ public class ImagePanel extends JKPanel {
 		}
 	}
 
-	private void drawTiled(Graphics g) {
-		Dimension d = getSize();
-		int width = image.getWidth(null);
-		int height = image.getHeight(null);
-
-		for (int x = 0; x < d.width; x += width) {
-			for (int y = 0; y < d.height; y += height) {
-				g.drawImage(image, x, y, null, null);
-			}
-		}
-	}
-
-	private void drawActual(Graphics g) {
-		Dimension d = getSize();
-		float x = (d.width - image.getWidth()) * alignmentX;
-		float y = 0;// (d.height - image.getHeight()) * alignmentY;
-		g.drawImage(image, (int) x, (int) y, this);
-	}
-
-	public void setImage(byte[] image) {
-		try {
-			this.image = javax.imageio.ImageIO.read(new ByteArrayInputStream(image));
-			invalidate();
-			repaint();
-		} catch (IOException e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
 	public void removeImage() {
-		image = null;
+		this.image = null;
 		invalidate();
 		repaint();
 	}
 
+	/**
+	 * @param image
+	 *            the image to set
+	 */
+	public void setImage(final BufferedImage image) {
+		this.image = image;
+		invalidate();
+		repaint();
+	}
+
+	public void setImage(final byte[] image) {
+		try {
+			this.image = javax.imageio.ImageIO.read(new ByteArrayInputStream(image));
+			invalidate();
+			repaint();
+		} catch (final IOException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	public void setImage(final ImageIcon image) {
+		setImage(new BufferedImage(image.getIconWidth(), image.getIconHeight(), BufferedImage.TYPE_INT_RGB));
+	}
+
+	public void setImageAlignmentX(final float alignmentX) {
+		this.alignmentX = alignmentX > 1.0f ? 1.0f : alignmentX < 0.0f ? 0.0f : alignmentX;
+	}
+
+	public void setImageAlignmentY(final float alignmentY) {
+
+	}
+
 	public void setSizeToFitImage() {
-		setPreferredSize(image.getWidth(), image.getHeight());
+		setPreferredSize(this.image.getWidth(), this.image.getHeight());
+	}
+
+	/**
+	 * @param style
+	 *            the style to set
+	 */
+	public void setStyle(final int style) {
+		this.style = style;
 	}
 }

@@ -1,10 +1,23 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.notification.facade;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-
 
 import com.fs.commons.application.ApplicationException;
 import com.fs.commons.application.ApplicationManager;
@@ -23,33 +36,41 @@ import com.fs.notification.bean.Status;
 import com.fs.notification.dao.NotificationDao;
 
 public class NotificationFacade {
+	///////////////////////////////////////////////////////////////////////////////
+	public static void main(final String[] args) throws FileNotFoundException, ApplicationException, RecordNotFoundException, DaoException {
+		ApplicationManager.getInstance().init();
+		final NotificationFacade f = new NotificationFacade();
+		System.out.println(f.syncAccounts(6).size());
+	}
+
 	NotificationDao dao = new NotificationDao();
 
-	public void generateEvent(int specId) throws RecordNotFoundException, DaoException {
+	public void generateEvent(final int specId) throws RecordNotFoundException, DaoException {
 		boolean commit = false;
-		Session session = getSession();
+		final Session session = getSession();
 		try {
-			EventGenerationTask spec = dao.findEventGenerationTask(specId);
-			String[] group = TemplateManager.compileTemplateGroup(spec.getTemplate(), spec.getTemplateValues().getQueryText());
+			final EventGenerationTask spec = this.dao.findEventGenerationTask(specId);
+			final String[] group = TemplateManager.compileTemplateGroup(spec.getTemplate(), spec.getTemplateValues().getQueryText());
 
-			ArrayList<Account> accounts = syncAccounts(spec.getAppliedAccountsQuery());
-			if(group.length!=accounts.size()){
-				throw new IllegalStateException("TEMPLATE_GROUP_COUNT_DOESNOT_MATCH_ACCOUNTS_COUNT"+" -->("+group.length+","+accounts.size()+")");
+			final ArrayList<Account> accounts = syncAccounts(spec.getAppliedAccountsQuery());
+			if (group.length != accounts.size()) {
+				throw new IllegalStateException(
+						"TEMPLATE_GROUP_COUNT_DOESNOT_MATCH_ACCOUNTS_COUNT" + " -->(" + group.length + "," + accounts.size() + ")");
 			}
-			
-			for (int i=0;i<group.length;i++) {
-				String compileTemplateText =group[i];
-				
-				Event event = new Event();
+
+			for (int i = 0; i < group.length; i++) {
+				final String compileTemplateText = group[i];
+
+				final Event event = new Event();
 				event.setStatus(new Status(1));
 				event.setTitle(spec.getTemplate().getTempTitle());
 				event.setText(compileTemplateText);
 				event.setNotificationType(spec.getNotType());
-				
-				Account account=accounts.get(i);
-				dao.addEvent(event);
-				dao.addAccountEvent(new AccountEvent(event,account));
-								
+
+				final Account account = accounts.get(i);
+				this.dao.addEvent(event);
+				this.dao.addAccountEvent(new AccountEvent(event, account));
+
 			}
 			commit = true;
 		} finally {
@@ -57,30 +78,38 @@ public class NotificationFacade {
 		}
 	}
 
+	///////////////////////////////////////////////////////////////////////////////
+	private Session getSession() throws DaoException {
+		final Session session = DataSourceFactory.getDefaultDataSource().createSession();
+		this.dao.setSession(session);
+		return session;
+	}
+
 	/**
 	 * create if accounts doesnot exists
+	 * 
 	 * @param query
 	 * @return
 	 * @throws DaoException
 	 */
-	private ArrayList<Account> loadAccounts(Query query) throws DaoException {
-		Object[] records = DaoUtil.executeQueryAsArray(query.getQueryText());
-		ArrayList<Account> accounts = new ArrayList<Account>();
-		for (int i = 0; i < records.length; i++) {
-			Object[] row = (Object[]) records[i];
+	private ArrayList<Account> loadAccounts(final Query query) throws DaoException {
+		final Object[] records = DaoUtil.executeQueryAsArray(query.getQueryText());
+		final ArrayList<Account> accounts = new ArrayList<Account>();
+		for (final Object record : records) {
+			final Object[] row = (Object[]) record;
 			if (row.length != 4) {
 				System.out.println(Arrays.toString(row));
-				throw new IllegalStateException("GENERATION_ACCOUNTS_QUERY_SHOULW_CONTAINS(NUMBER,NAME,MOBILE,EMAIL) : "+row.length);
+				throw new IllegalStateException("GENERATION_ACCOUNTS_QUERY_SHOULW_CONTAINS(NUMBER,NAME,MOBILE,EMAIL) : " + row.length);
 			}
-			Account account = new Account();
+			final Account account = new Account();
 			account.setNumber(row[0].toString());
 			account.setName(row[1].toString());
 			account.setActive(true);
-			
-			if(row[2]!=null){
+
+			if (row[2] != null) {
 				account.setMobile(row[2].toString());
 			}
-			if(row[3]!=null && validateEmail(row[3])){
+			if (row[3] != null && validateEmail(row[3])) {
 				account.setEmail(row[3].toString());
 			}
 			accounts.add(account);
@@ -88,59 +117,44 @@ public class NotificationFacade {
 		return accounts;
 	}
 
-	/**
-	 * 
-	 * @param object
-	 * @return
-	 */
-	private boolean validateEmail(Object object) {
-		return true;
-	}
-
 	///////////////////////////////////////////////////////////////////////////////
-	private Account syncAccount(Account account) throws DaoException {		
+	private Account syncAccount(Account account) throws DaoException {
 		try {
-			account= dao.findAccount(account.getNumber(), account.getName());
-			//account.setId(account1.getId());
-			//dao.updateAccount(account);
-		} catch (RecordNotFoundException e) {
-			dao.addAccount(account);
+			account = this.dao.findAccount(account.getNumber(), account.getName());
+			// account.setId(account1.getId());
+			// dao.updateAccount(account);
+		} catch (final RecordNotFoundException e) {
+			this.dao.addAccount(account);
 		}
 		return account;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
-	private Session getSession() throws DaoException {
-		Session session = DataSourceFactory.getDefaultDataSource().createSession();
-		dao.setSession(session);
-		return session;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////
-	public ArrayList<Account> syncAccounts(int queryId) throws RecordNotFoundException, DaoException {
-		Query query = dao.findQuery(queryId);
+	public ArrayList<Account> syncAccounts(final int queryId) throws RecordNotFoundException, DaoException {
+		final Query query = this.dao.findQuery(queryId);
 		return syncAccounts(query);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	/**
-	 * Load accounts from query
-	 * Build array list of accounts
-	 * for each accout , check if not exists in the database , add it
+	 * Load accounts from query Build array list of accounts for each accout ,
+	 * check if not exists in the database , add it
 	 */
-	private ArrayList<Account> syncAccounts(Query query) throws DaoException {
-		ArrayList<Account> accounts = loadAccounts(query);
-		for (int i=0;i<accounts.size();i++) {
-			 Account account = accounts.get(i);
-			 accounts.set(i,syncAccount(account));
+	private ArrayList<Account> syncAccounts(final Query query) throws DaoException {
+		final ArrayList<Account> accounts = loadAccounts(query);
+		for (int i = 0; i < accounts.size(); i++) {
+			final Account account = accounts.get(i);
+			accounts.set(i, syncAccount(account));
 		}
 		return accounts;
 	}
 
-	///////////////////////////////////////////////////////////////////////////////
-	public static void main(String[] args) throws FileNotFoundException, ApplicationException, RecordNotFoundException, DaoException {
-		ApplicationManager.getInstance().init();
-		NotificationFacade f=new NotificationFacade();
-		System.out.println(f.syncAccounts(6).size());
+	/**
+	 *
+	 * @param object
+	 * @return
+	 */
+	private boolean validateEmail(final Object object) {
+		return true;
 	}
 }

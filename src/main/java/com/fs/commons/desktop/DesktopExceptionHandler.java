@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop;
 
 import java.io.File;
@@ -36,8 +51,45 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 
 	private static String LOGS_FOLDER = "logs";
 
+	/**
+	 *
+	 * @return
+	 */
+	public static String getLogFileName() {
+		final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+		final String logFileName = LOGS_FOLDER + "/" + format.format(new Date()) + ".log";
+		return logFileName;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] getTodayLogFile() throws IOException {
+		try {
+			final byte[] file = GeneralUtility.readFile(new File(getLogFileName()));
+			return file;
+		} catch (final FileNotFoundException e) {
+			return new byte[] {};
+		}
+	}
+
+	/**
+	 *
+	 * @throws FileNotFoundException
+	 */
+	public static void initExceptionLogging() throws FileNotFoundException {
+		// check if log folder exists
+		final File file = new File(LOGS_FOLDER);
+		if (!file.exists()) {
+			file.mkdir();
+		}
+		System.setErr(new ExceptionLogging(getLogFileName()));
+	}
+
 	@Override
-	public void handleException(Throwable e) {
+	public void handleException(final Throwable e) {
 		if (e instanceof ServerDownException) {
 			showError(e, e.getMessage(), "GeneralDatabaseerror.gif", false);
 		}
@@ -51,25 +103,25 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			return;
 		}
 		if (e instanceof DaoException) {
-			DaoException ex = (DaoException) e;
-			if(e instanceof DaoValidationException){
+			final DaoException ex = (DaoException) e;
+			if (e instanceof DaoValidationException) {
 				showError(e, e.getMessage(), "GeneralDatabaseerror.gif", false);
 				return;
 			}
 			if (ex.getCause() instanceof ValidationException) {
-				handleException((Exception) ex.getCause());
+				handleException(ex.getCause());
 				return;
 			}
 			if (ex.isInvalidUsernamePassword() || ex.isInvalidDatabaseName()) {
 				showError(e, e.getMessage(), "GeneralDatabaseerror.gif", false);
 				System.exit(0);
-			}else if(e.getCause() instanceof java.net.ConnectException || e.getCause() instanceof java.net.SocketException){
+			} else if (e.getCause() instanceof java.net.ConnectException || e.getCause() instanceof java.net.SocketException) {
 				handleException(new ServerDownException(ex.getCause()));
 			} else if (ex.getCause() instanceof ServerDownException) {
-					handleException((Exception) ex.getCause());
-			}else if(ex.isDuplicateKeyErrorCode()){
+				handleException(ex.getCause());
+			} else if (ex.isDuplicateKeyErrorCode()) {
 				showError(e, "DUPLICATE_RECORD", "GeneralDatabaseerror.gif", false);
-			}else {
+			} else {
 				showError(e, "DATABASE_ERROR,PLEASE_CHECK_LOG_FILE", "GeneralDatabaseerror.gif", true);
 				e.printStackTrace(System.err);
 				return;
@@ -83,9 +135,9 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			SwingUtility.showErrorDialog("CLASS_NOTFOUND_EXCEPTION", e, SwingUtility.getDefaultMainFrame());
 			return;
 		}
-		
+
 		if (e instanceof ReportException) {
-			if (e.getCause() instanceof EmptyReportException) {	
+			if (e.getCause() instanceof EmptyReportException) {
 				SwingUtility.showErrorDialog("EMPTY_REPORT", e, SwingUtility.getDefaultMainFrame());
 				return;
 			}
@@ -105,12 +157,12 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			return;
 		}
 		if (e instanceof ReportException) {
-			SwingUtility.showErrorDialog(Lables.get("UNABLE_TO_PRINT_REPORT") + " : " + Lables.get(e.getMessage()), e, SwingUtility
-					.getDefaultMainFrame());
+			SwingUtility.showErrorDialog(Lables.get("UNABLE_TO_PRINT_REPORT") + " : " + Lables.get(e.getMessage()), e,
+					SwingUtility.getDefaultMainFrame());
 			return;
 		}
 		if (e instanceof LicenseException) {
-			LicenseException ex = (LicenseException) e;
+			final LicenseException ex = (LicenseException) e;
 			SwingUtility.showUserErrorDialog("License Error : \n\t" + e.getMessage() + " \n Error Code : " + ex.getErrorCode(), false);
 			System.exit(0);
 		}
@@ -133,9 +185,9 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 					// just eat the exception since it is already handled in the
 					// security framework
 				} else if (e.getCause() instanceof LicenseException) {
-					handleException((LicenseException) e.getCause());
+					handleException(e.getCause());
 				} else if (e.getCause() instanceof InstanceException) {
-					handleException((InstanceException) e.getCause());
+					handleException(e.getCause());
 				} else {
 					SwingUtility.showErrorDialog(e.getMessage(), e, SwingUtility.getDefaultMainFrame());
 				}
@@ -144,7 +196,7 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			}
 		}
 		if (e instanceof ValidationException) {
-			ValidationException ex = (ValidationException) e;
+			final ValidationException ex = (ValidationException) e;
 			if (ex.getComponent() != null) {
 				ex.getComponent().requestFocus();
 			}
@@ -157,60 +209,24 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			}
 			return;
 		}
-		//Default exception handling
+		// Default exception handling
 		SwingUtility.showErrorDialog(Lables.get("EXCEPTION") + " : \n" + Lables.get(e.getMessage()), e, SwingUtility.getDefaultMainFrame());
 	}
 
 	/**
-	 * 
+	 *
 	 * @param e
 	 * @param errorMessage
 	 * @param iconName
 	 */
-	public void showError(Throwable e, String errorMessage, String iconName, boolean throwRunTime) {
-		JOptionPane.showMessageDialog(SwingUtility.getDefaultMainFrame(), Lables.get(errorMessage,true), Lables.get("ERROR"), JOptionPane.ERROR_MESSAGE,
-				new ImageIcon(GeneralUtility.getIconURL(iconName)));
+	@Override
+	public void showError(final Throwable e, final String errorMessage, final String iconName, final boolean throwRunTime) {
+		JOptionPane.showMessageDialog(SwingUtility.getDefaultMainFrame(), Lables.get(errorMessage, true), Lables.get("ERROR"),
+				JOptionPane.ERROR_MESSAGE, new ImageIcon(GeneralUtility.getIconURL(iconName)));
 		if (throwRunTime) {
 			throw new RuntimeException(e);
 		} else {
 			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 
-	 * @throws FileNotFoundException
-	 */
-	public static void initExceptionLogging() throws FileNotFoundException {
-		// check if log folder exists
-		File file = new File(LOGS_FOLDER);
-		if (!file.exists()) {
-			file.mkdir();
-		}
-		System.setErr(new ExceptionLogging(getLogFileName()));
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public static String getLogFileName() {
-		SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-		String logFileName = LOGS_FOLDER + "/" + format.format(new Date()) + ".log";
-		return logFileName;
-	}
-
-	/**
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	public static byte[] getTodayLogFile() throws IOException {
-		try {
-			byte[] file = GeneralUtility.readFile(new File(getLogFileName()));
-			return file;
-		} catch (FileNotFoundException e) {
-			return new byte[] {};
 		}
 	}
 

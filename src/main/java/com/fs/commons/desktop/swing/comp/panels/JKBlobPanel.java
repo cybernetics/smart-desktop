@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp.panels;
 
 import java.awt.BorderLayout;
@@ -25,11 +40,14 @@ import com.fs.commons.util.GeneralUtility;
 
 public class JKBlobPanel extends JKPanel implements BindingComponent {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int MAX_LENGTH = (1024 * 1024) / 4;
+	private static final int MAX_LENGTH = 1024 * 1024 / 4;
+
+	static JFileChooser ch = SwingUtility.getFileChooser();// new
+															// JFileChooser("c:\\");
 
 	JKButton btnShowPanel = new JKButton("ADD_IMAGE");
 
@@ -47,9 +65,6 @@ public class JKBlobPanel extends JKPanel implements BindingComponent {
 
 	JKButton btnClose = new JKButton("CLOSE");
 
-	static JFileChooser ch = SwingUtility.getFileChooser();// new
-															// JFileChooser("c:\\");
-
 	byte[] object;
 
 	private String fieldName;
@@ -59,166 +74,13 @@ public class JKBlobPanel extends JKPanel implements BindingComponent {
 	public JKBlobPanel() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public JKBlobPanel(final String field) {
 		this.fieldName = field;
 		init();
-	}
-
-	/**
-	 * 
-	 */
-	private void init() {
-		setLayout(new GridLayout(1, 3));
-		btnShowPanel.setIcon("edit_picture.png");
-		add(lblThumb);
-		add(btnShowPanel);
-		add(btnRemoveImage);
-		btnRemoveImage.setVisible(false);
-		lblThumb.setVisible(false);
-		lblThumb.setPreferredSize(new Dimension(80, 80));
-		lblThumb.setStyle(ImagePanel.SCALED);
-
-		btnRemoveImage.setIcon("button_cancel_1.png");
-		initBlobUploadPanel();
-		btnShowPanel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				SwingUtility.showPanelInDialog(pnlBlob, fieldName);
-			}
-		});
-		btnRemoveImage.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setValue(null);
-			}
-		});
-	}
-
-	/**
-	 * 
-	 */
-	private void initBlobUploadPanel() {
-		pnlBlob.setPreferredSize(new Dimension(600,400));
-		pnlBlob.setLayout(new BorderLayout());
-		pnlBlob.setMaximumSize(new Dimension(300, 400));
-		JKPanel pnlButton = new JKPanel();
-		btnScan.setIcon(new ImageIcon(GeneralUtility.getIconURL("scanner.png")));
-		btnBrowse.setIcon(new ImageIcon(GeneralUtility
-				.getIconURL("fileopen.png")));
-		btnClose.setIcon(new ImageIcon(GeneralUtility
-				.getIconURL("fileclose.png")));
-		pnlButton.add(btnScan);
-		pnlButton.add(btnBrowse);
-		pnlButton.add(btnClose);
-
-		pnlBlob.add(new JScrollPane(lblImage), BorderLayout.CENTER);
-		pnlBlob.add(pnlButton, BorderLayout.SOUTH);
-		btnBrowse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleBrowse();
-			}
-		});
-		btnClose.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				getDialog().dispose();
-			}
-		});
-		btnScan.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleScan();
-			}
-		});
-
-	}
-
-	/**
-	 * @return
-	 */
-	private JKDialog getDialog() {
-		if (pnlBlob.getRootPane() != null) {
-			Container cont = pnlBlob.getRootPane().getParent();
-			if (cont instanceof JKDialog) {
-				return ((JKDialog) cont);// pack the dialog reference
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * 
-	 */
-	private void handleBrowse() {
-		if (ch.showOpenDialog(JKBlobPanel.this) == JFileChooser.APPROVE_OPTION) {
-			File file = ch.getSelectedFile();
-			if (file != null) {
-				if (!file.exists()) {
-					SwingUtility
-							.showUserErrorDialog("PLEASE_SELECT_VALID_FILE");
-				}
-				try {
-					object = GeneralUtility
-							.readStream(new FileInputStream(file));
-					setValue(object);
-				} catch (IOException e1) {
-					ExceptionUtil.handleException(e1);
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
-	 */
-	public void setValue(Object value) {
-		if (value != null && (value instanceof byte[])
-				&& ((byte[]) value).length > 0) {
-			byte[] val = (byte[]) value;
-			if (val.length > MAX_LENGTH) {
-				SwingUtility.showUserErrorDialog(Lables
-						.get("ERROR_INVALID_IMAGE_SIZE") + " " + val.length);
-				return;
-			} else {
-				this.object = val;
-				ImageIcon image = new ImageIcon(object);
-				lblImage.setIcon(image);
-				// lblImage.setPreferredSize(new
-				// Dimension(image.getIconWidth(),image.getIconHeight()));
-//				JKDialog dlg = getDialog();// if set after the dialog is shown
-//				if (dlg != null) {
-//					dlg.pack();
-//					dlg.setLocationRelativeTo(null);
-//				}
-				btnShowPanel.setText(Lables.get("SHOW"));
-				btnRemoveImage.setVisible(isEnabled());
-				lblThumb.setVisible(true);
-				lblThumb.setImage(val);
-				//SwingUtility.packWindow(this);
-			}
-		} else {
-			this.object = null;
-
-			lblImage.removeIcon();
-			lblThumb.removeImage();
-
-			invalidate();
-			repaint();
-			btnRemoveImage.setVisible(false);
-			btnShowPanel.setText(Lables.get("ADD_IMAGE"));
-			lblThumb.setVisible(false);
-		}
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////
-	public Object getValue() {
-		return object;
-	}
-
-	@Override
-	public void reset() {
-		setValue(null);
 	}
 
 	@Override
@@ -227,13 +89,21 @@ public class JKBlobPanel extends JKPanel implements BindingComponent {
 	}
 
 	@Override
-	public void setDefaultValue(Object defaultValue) {
-		this.defaultValue = defaultValue;
+	public Object getDefaultValue() {
+		return this.defaultValue;
 	}
 
-	@Override
-	public Object getDefaultValue() {
-		return defaultValue;
+	/**
+	 * @return
+	 */
+	private JKDialog getDialog() {
+		if (this.pnlBlob.getRootPane() != null) {
+			final Container cont = this.pnlBlob.getRootPane().getParent();
+			if (cont instanceof JKDialog) {
+				return (JKDialog) cont;// pack the dialog reference
+			}
+		}
+		return null;
 	}
 
 	public String getFileName() {
@@ -241,18 +111,164 @@ public class JKBlobPanel extends JKPanel implements BindingComponent {
 		return null;
 	}
 
+	// //////////////////////////////////////////////////////////////////////////////
+	@Override
+	public Object getValue() {
+		return this.object;
+	}
+
+	/**
+	 *
+	 */
+	private void handleBrowse() {
+		if (ch.showOpenDialog(JKBlobPanel.this) == JFileChooser.APPROVE_OPTION) {
+			final File file = ch.getSelectedFile();
+			if (file != null) {
+				if (!file.exists()) {
+					SwingUtility.showUserErrorDialog("PLEASE_SELECT_VALID_FILE");
+				}
+				try {
+					this.object = GeneralUtility.readStream(new FileInputStream(file));
+					setValue(this.object);
+				} catch (final IOException e1) {
+					ExceptionUtil.handleException(e1);
+				}
+			}
+		}
+	}
+
 	private void handleScan() {
 		try {
-//			byte[] image = ImageUtil.readImage();
-//			setValue(image);
-		} catch (Exception e1) {
+			// byte[] image = ImageUtil.readImage();
+			// setValue(image);
+		} catch (final Exception e1) {
 			ExceptionUtil.handleException(e1);
 		}
 	}
-	
+
+	/**
+	 *
+	 */
+	private void init() {
+		setLayout(new GridLayout(1, 3));
+		this.btnShowPanel.setIcon("edit_picture.png");
+		add(this.lblThumb);
+		add(this.btnShowPanel);
+		add(this.btnRemoveImage);
+		this.btnRemoveImage.setVisible(false);
+		this.lblThumb.setVisible(false);
+		this.lblThumb.setPreferredSize(new Dimension(80, 80));
+		this.lblThumb.setStyle(ImagePanel.SCALED);
+
+		this.btnRemoveImage.setIcon("button_cancel_1.png");
+		initBlobUploadPanel();
+		this.btnShowPanel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				SwingUtility.showPanelInDialog(JKBlobPanel.this.pnlBlob, JKBlobPanel.this.fieldName);
+			}
+		});
+		this.btnRemoveImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				setValue(null);
+			}
+		});
+	}
+
+	/**
+	 *
+	 */
+	private void initBlobUploadPanel() {
+		this.pnlBlob.setPreferredSize(new Dimension(600, 400));
+		this.pnlBlob.setLayout(new BorderLayout());
+		this.pnlBlob.setMaximumSize(new Dimension(300, 400));
+		final JKPanel pnlButton = new JKPanel();
+		this.btnScan.setIcon(new ImageIcon(GeneralUtility.getIconURL("scanner.png")));
+		this.btnBrowse.setIcon(new ImageIcon(GeneralUtility.getIconURL("fileopen.png")));
+		this.btnClose.setIcon(new ImageIcon(GeneralUtility.getIconURL("fileclose.png")));
+		pnlButton.add(this.btnScan);
+		pnlButton.add(this.btnBrowse);
+		pnlButton.add(this.btnClose);
+
+		this.pnlBlob.add(new JScrollPane(this.lblImage), BorderLayout.CENTER);
+		this.pnlBlob.add(pnlButton, BorderLayout.SOUTH);
+		this.btnBrowse.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleBrowse();
+			}
+		});
+		this.btnClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				getDialog().dispose();
+			}
+		});
+		this.btnScan.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleScan();
+			}
+		});
+
+	}
+
 	@Override
-	public void setEnabled(boolean enabled) {
+	public void reset() {
+		setValue(null);
+	}
+
+	@Override
+	public void setDefaultValue(final Object defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	@Override
+	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
-		btnShowPanel.setVisible(enabled);
+		this.btnShowPanel.setVisible(enabled);
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void setValue(final Object value) {
+		if (value != null && value instanceof byte[] && ((byte[]) value).length > 0) {
+			final byte[] val = (byte[]) value;
+			if (val.length > MAX_LENGTH) {
+				SwingUtility.showUserErrorDialog(Lables.get("ERROR_INVALID_IMAGE_SIZE") + " " + val.length);
+				return;
+			} else {
+				this.object = val;
+				final ImageIcon image = new ImageIcon(this.object);
+				this.lblImage.setIcon(image);
+				// lblImage.setPreferredSize(new
+				// Dimension(image.getIconWidth(),image.getIconHeight()));
+				// JKDialog dlg = getDialog();// if set after the dialog is
+				// shown
+				// if (dlg != null) {
+				// dlg.pack();
+				// dlg.setLocationRelativeTo(null);
+				// }
+				this.btnShowPanel.setText(Lables.get("SHOW"));
+				this.btnRemoveImage.setVisible(isEnabled());
+				this.lblThumb.setVisible(true);
+				this.lblThumb.setImage(val);
+				// SwingUtility.packWindow(this);
+			}
+		} else {
+			this.object = null;
+
+			this.lblImage.removeIcon();
+			this.lblThumb.removeImage();
+
+			invalidate();
+			repaint();
+			this.btnRemoveImage.setVisible(false);
+			this.btnShowPanel.setText(Lables.get("ADD_IMAGE"));
+			this.lblThumb.setVisible(false);
+		}
 	}
 }

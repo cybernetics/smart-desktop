@@ -1,40 +1,61 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.trigger;
 
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.exception.DaoException;
 
-public class TriggerAdapter implements Trigger{
+public class TriggerAdapter implements Trigger {
 
-	public void afterAdd(Record record) throws DaoException {
+	@Override
+	public void afterAdd(final Record record) throws DaoException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public void afterDelete(Record record) throws DaoException {
+	@Override
+	public void afterDelete(final Record record) throws DaoException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public void afterUpdate(Record oldRecord, Record newRecord)
-			throws DaoException {
+	@Override
+	public void afterFind(final Record record) throws DaoException {
+	}
+
+	@Override
+	public void afterUpdate(final Record oldRecord, final Record newRecord) throws DaoException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public void beforeAdd(Record record) throws DaoException {
+	@Override
+	public void beforeAdd(final Record record) throws DaoException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public void beforeDelete(Record record) throws DaoException {
+	@Override
+	public void beforeDelete(final Record record) throws DaoException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public void beforeUpdate(Record oldRecord, Record newRecord)throws DaoException {		
-	}
-
-	public void afterFind(Record record) throws DaoException {
+	@Override
+	public void beforeUpdate(final Record oldRecord, final Record newRecord) throws DaoException {
 	}
 
 }

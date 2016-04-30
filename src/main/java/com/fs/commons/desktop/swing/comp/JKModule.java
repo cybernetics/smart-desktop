@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Color;
@@ -10,7 +25,7 @@ import com.fs.commons.desktop.swing.Colors;
 
 public class JKModule extends JKButton {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -27,7 +42,7 @@ public class JKModule extends JKButton {
 
 	static Dimension dim = new Dimension(140, 35);
 
-	public JKModule(String str) {
+	public JKModule(final String str) {
 		super(str);
 		init();
 	}
@@ -64,7 +79,7 @@ public class JKModule extends JKButton {
 	}
 
 	@Override
-	public void setIcon(Icon defaultIcon) {
+	public void setIcon(final Icon defaultIcon) {
 		setVerticalTextPosition(SwingConstants.BOTTOM);
 		setHorizontalTextPosition(SwingConstants.CENTER);
 	}

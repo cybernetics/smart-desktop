@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.configuration.daos;
 
 import java.sql.PreparedStatement;
@@ -12,27 +27,27 @@ import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.dao.exception.RecordNotFoundException;
 
 /**
- * 
+ *
  * @author mkiswani
  *
  */
-public class ConfigurationDao extends AbstractDao{
+public class ConfigurationDao extends AbstractDao {
 
-	public Language findLang(final int langId) throws RecordNotFoundException, DaoException{
-		Language findRecord = (Language) findRecord(new DaoFinder(){
+	public Language findLang(final int langId) throws RecordNotFoundException, DaoException {
+		final Language findRecord = (Language) findRecord(new DaoFinder() {
 			@Override
 			public String getFinderSql() {
 				return "SELECT * FROM conf_languages WHERE conf_languages.lang_id = ?";
 			}
 
 			@Override
-			public void setParamters(PreparedStatement ps) throws SQLException {
-				ps.setInt(1,langId);
+			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+				return popualte(rs);
 			}
 
 			@Override
-			public Object populate(ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
-				return popualte( rs);
+			public void setParamters(final PreparedStatement ps) throws SQLException {
+				ps.setInt(1, langId);
 			}
 
 		});
@@ -40,45 +55,42 @@ public class ConfigurationDao extends AbstractDao{
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////
-	private Object popualte(ResultSet rs) throws SQLException {
-		Language lang = new Language();
-		lang.setLangId(rs.getInt("lang_id"));
-		lang.setLangName(rs.getString("lang_name"));
-		lang.setLangShortName(rs.getString("lang_short_name"));
-		return lang;
-	}
-	
-	
-	////////////////////////////////////////////////////////////////////////////////////////
-	public Module findModule(final int moduleId) throws RecordNotFoundException, DaoException{
-		Module findRecord = (Module) findRecord(new DaoFinder(){
+	public Module findModule(final int moduleId) throws RecordNotFoundException, DaoException {
+		final Module findRecord = (Module) findRecord(new DaoFinder() {
 			@Override
 			public String getFinderSql() {
 				return "SELECT * FROM conf_modules WHERE conf_modules.module_id = ?";
 			}
 
 			@Override
-			public void setParamters(PreparedStatement ps) throws SQLException {
-				ps.setInt(1,moduleId);
-			}
-
-			@Override
-			public Object populate(ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
 				return populateModule(rs);
 			}
 
-			
-			
+			@Override
+			public void setParamters(final PreparedStatement ps) throws SQLException {
+				ps.setInt(1, moduleId);
+			}
+
 		});
 		return findRecord;
 	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////	
-	private Module populateModule(ResultSet rs) throws SQLException {
-		Module module = new Module();
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	private Object popualte(final ResultSet rs) throws SQLException {
+		final Language lang = new Language();
+		lang.setLangId(rs.getInt("lang_id"));
+		lang.setLangName(rs.getString("lang_name"));
+		lang.setLangShortName(rs.getString("lang_short_name"));
+		return lang;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	private Module populateModule(final ResultSet rs) throws SQLException {
+		final Module module = new Module();
 		module.setModuleId(rs.getInt("module_id"));
 		module.setModuleName(rs.getString("module_name"));
 		return module;
 	}
-	
+
 }

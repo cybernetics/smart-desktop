@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.meta.generator;
 
 import java.sql.Connection;
@@ -19,9 +34,35 @@ import com.fs.commons.dao.exception.DaoException;
 
 public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 
+	// /////////////////////////////////////////////////////////////////////////////////////
+	public static void main(final String[] args) throws DaoException, SQLException {
+		final AbstractDataBaseAnaylazer a = (AbstractDataBaseAnaylazer) DataSourceFactory.getDefaultDataSource().getDatabaseAnasyaler();
+		System.out.println(a.connectionManager.getDefaultDatabaseName());
+		// ResultSet tableTypes = a.meta.getTableTypes();
+		// ResultSet rs=a.getPrimaryKeysFromMeta(a.meta, "FINANCE",
+		// "SEC_USERS");
+		// ResultSet resultSet = a.loadTableNamesFromMeta(a.meta,"FINANCE");
+		// a.dao.printRecordResultSet(rs,true);
+		// ArrayList<String> databaseNames = a.getDatabasesName();
+		// for (String databaseName : databaseNames) {
+		// System.out.println(databaseName);
+		System.out.println("-----------------------------------------------------");
+		// System.out.println(a.getIdField( "FINANCE", "sec_users/"));
+		System.out.println(a.getTable("sec_users"));
+		// System.out.println();
+		// }
+		// System.out.println(a.getSchemas());
+
+		System.out.println("Done");
+
+		// OracleDatabaseAnaylaser o = new OracleDatabaseAnaylaser();
+		// TableMeta meta = o.getTable("RW_OTHER_EMPLOYEES");
+		// System.out.println(meta);
+	}
+
 	private DatabaseMetaData meta;
 
-	private DataSource connectionManager;
+	private final DataSource connectionManager;
 
 	private DefaultDao dao;
 
@@ -31,23 +72,27 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
-	public AbstractDataBaseAnaylazer(DataSource connectionManager) throws DaoException, SQLException {
+	public AbstractDataBaseAnaylazer(final DataSource connectionManager) throws DaoException, SQLException {
 		this.connectionManager = connectionManager;
-		Connection connection = connectionManager.getQueryConnection();
+		final Connection connection = connectionManager.getQueryConnection();
 		try {
-			meta = connection.getMetaData();
-			dao = new DefaultDao(this.connectionManager);
+			this.meta = connection.getMetaData();
+			this.dao = new DefaultDao(this.connectionManager);
 		} finally {
 			connectionManager.close(connection);
 		}
 	}
 
+	// /////////////////////////////////////////////////////////////////////////////////////
+	protected abstract String buildEmptyRowQuery(String databaseName, String tableName);
+	// /////////////////////////////////////////////////////////////////////////////////////
+
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public ArrayList<String> getCatalogsName() throws SQLException {
-		ResultSet rs = meta.getCatalogs();
-		ArrayList<String> catalogNames = new ArrayList<String>();
-		int counter = 1;
+		final ResultSet rs = this.meta.getCatalogs();
+		final ArrayList<String> catalogNames = new ArrayList<String>();
+		final int counter = 1;
 		while (rs.next()) {
 			// for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
 			catalogNames.add(rs.getString("TABLE_CAT"));
@@ -59,62 +104,62 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	@Override
-	public ArrayList<String> getSchemas() throws SQLException {
-		ResultSet rs = meta.getSchemas();
-		ArrayList<String> schemaNames = new ArrayList<String>();
+	public ArrayList<String> getDatabasesName() throws SQLException {
+		return getCatalogsName();
+	}
+
+	/**
+	 *
+	 * @param databaseName
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+	private ArrayList<ForiegnKeyFieldMeta> getForiegnKeys(final String databaseName, final String tableName) throws SQLException {
+		final ResultSet rs = getImportedKeys(this.meta, databaseName, tableName);
+		final ArrayList<ForiegnKeyFieldMeta> fields = new ArrayList<ForiegnKeyFieldMeta>();
 		while (rs.next()) {
-			// for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-			schemaNames.add(rs.getString("TABLE_SCHEM"));
-			// }
+			final ForiegnKeyFieldMeta field = new ForiegnKeyFieldMeta();
+			field.setName(rs.getString("FKCOLUMN_NAME"));
+			field.setReferenceTable(rs.getString("PKTABLE_NAME"));
+			field.setReferenceField(rs.getString("PKCOLUMN_NAME"));
+			fields.add(field);
 		}
 		rs.close();
-		return schemaNames;
+		return fields;
 	}
 
-	@Override
-	public ArrayList<TableMeta> getTablesMeta() throws SQLException, DaoException {
-		return getTablesMeta(this.connectionManager.getDefaultDatabaseName());
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	@Override
-	public ArrayList<TableMeta> getTablesMeta(String databaseName) throws SQLException, DaoException {
-		ResultSet rs = loadTableNamesFromMeta(meta, databaseName);
-		ArrayList<TableMeta> tables = new ArrayList<TableMeta>();
-		while (rs.next()) {
-			String tableType = rs.getString("TABLE_TYPE");
-			if (tableType.toUpperCase().equals("TABLE")) {
-				String tableName = rs.getString("TABLE_NAME");
-				TableMeta meta = getTable(databaseName, tableName);
-				tables.add(meta);
+	/**
+	 *
+	 * @param databaseName
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 * @throws DaoException
+	 */
+	private IdFieldMeta getIdField(final String databaseName, final String tableName) throws SQLException, DaoException {
+		final ResultSet rs = getPrimaryKeysFromMeta(this.meta, databaseName, tableName);
+		try {
+			if (rs.next()) {
+				final IdFieldMeta id = new IdFieldMeta();
+				id.setName(rs.getString("COLUMN_NAME"));
+				final boolean autoIncrement = isAutoIncrement(databaseName, tableName);
+				id.setAutoIncrement(autoIncrement);
+				return id;
 			}
+			return null;
+		} finally {
+			rs.close();
 		}
-		rs.close();
-		return tables;
-	}
 
-	// //////////////////////////////////////////////////////////////////////////////
-	protected TableMeta getTable(String tableName) throws SQLException, DaoException {
-		return getTable(connectionManager.getDefaultDatabaseName(), tableName);
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////
-	protected TableMeta getTable(String databaseName, String tableName) throws SQLException, DaoException {
-//		System.out.println("Fetching table : " + tableName);
-		TableMeta meta = new TableMeta();
-		meta.setTableName(tableName);
-		// meta.setIdField(getIdField(databaseName, tableName));
-		loadFields(databaseName, meta);
-		return meta;
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.fs.commons.dao.dynamic.meta.generator.DataBaseAnaylser1#getDyanmicMeta
-	 * (java.lang.String)
+	 *
+	 * @see com.fs.commons.dao.dynamic.meta.generator.DataBaseAnaylser1#
+	 * getDyanmicMeta (java.lang.String)
 	 */
 	// @Override
 	// public Hashtable<String, TableMeta> getDyanmicMeta(String databaseName)
@@ -127,28 +172,114 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 	// return hash;
 	// }
 
+	// //////////////////////////////////////////////////////////////////////////
+	protected ResultSet getImportedKeys(final DatabaseMetaData meta, final String databaseName, final String tableName) throws SQLException {
+		return meta.getImportedKeys(databaseName, null, tableName);
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////////
+	protected ResultSet getPrimaryKeysFromMeta(final DatabaseMetaData meta, final String databaseName, final String tableName) throws SQLException {
+		return meta.getPrimaryKeys(databaseName, null, tableName);
+	}
+
+	// /////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public ArrayList<String> getSchemas() throws SQLException {
+		final ResultSet rs = this.meta.getSchemas();
+		final ArrayList<String> schemaNames = new ArrayList<String>();
+		while (rs.next()) {
+			// for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+			schemaNames.add(rs.getString("TABLE_SCHEM"));
+			// }
+		}
+		rs.close();
+		return schemaNames;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////
+	protected TableMeta getTable(final String tableName) throws SQLException, DaoException {
+		return getTable(this.connectionManager.getDefaultDatabaseName(), tableName);
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////
+	protected TableMeta getTable(final String databaseName, final String tableName) throws SQLException, DaoException {
+		// System.out.println("Fetching table : " + tableName);
+		final TableMeta meta = new TableMeta();
+		meta.setTableName(tableName);
+		// meta.setIdField(getIdField(databaseName, tableName));
+		loadFields(databaseName, meta);
+		return meta;
+	}
+
+	protected ResultSet getTableColumnsFromMeta(final DatabaseMetaData meta, final String database, final String tableName) throws SQLException {
+		return meta.getColumns(database, null, tableName, null);
+	}
+
+	@Override
+	public ArrayList<TableMeta> getTablesMeta() throws SQLException, DaoException {
+		return getTablesMeta(this.connectionManager.getDefaultDatabaseName());
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	@Override
+	public ArrayList<TableMeta> getTablesMeta(final String databaseName) throws SQLException, DaoException {
+		final ResultSet rs = loadTableNamesFromMeta(this.meta, databaseName);
+		final ArrayList<TableMeta> tables = new ArrayList<TableMeta>();
+		while (rs.next()) {
+			final String tableType = rs.getString("TABLE_TYPE");
+			if (tableType.toUpperCase().equals("TABLE")) {
+				final String tableName = rs.getString("TABLE_NAME");
+				final TableMeta meta = getTable(databaseName, tableName);
+				tables.add(meta);
+			}
+		}
+		rs.close();
+		return tables;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////
+	protected boolean isAutoIncrement(final String databaseName, final String tableName) throws DaoException, SQLException {
+		final String emptyRowQuery = buildEmptyRowQuery(databaseName, tableName);
+		// System.out.println("Executing : " + emptyRowQuery);
+		final CachedRowSet rowSet = this.dao.executeQuery(emptyRowQuery);
+		final boolean autoIncrement = rowSet.getMetaData().isAutoIncrement(1);
+		return autoIncrement;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public boolean isTableExist(final String tableName) throws SQLException, DaoException {
+		final ArrayList<TableMeta> tables = getTablesMeta(this.connectionManager.getDatabaseName());
+		for (final TableMeta tableMeta : tables) {
+			if (tableMeta.getTableName().trim().equalsIgnoreCase(tableName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.fs.commons.dao.dynamic.meta.generator.DataBaseAnaylser1#getFields
 	 * (java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void loadFields(String database, TableMeta tableMeta) throws SQLException, DaoException {
-//		System.out.println("Processing table : "+tableMeta.getTableName());
+	public void loadFields(final String database, final TableMeta tableMeta) throws SQLException, DaoException {
+		// System.out.println("Processing table : "+tableMeta.getTableName());
 		IdFieldMeta idField = getIdField(database, tableMeta.getTableName());
 		tableMeta.setIdField(idField);
-		ArrayList<ForiegnKeyFieldMeta> foriegnFields = getForiegnKeys(database, tableMeta.getTableName());
-		for (ForiegnKeyFieldMeta foriegnKeyFieldMeta : foriegnFields) {
+		final ArrayList<ForiegnKeyFieldMeta> foriegnFields = getForiegnKeys(database, tableMeta.getTableName());
+		for (final ForiegnKeyFieldMeta foriegnKeyFieldMeta : foriegnFields) {
 			foriegnKeyFieldMeta.setParentTable(tableMeta);
 		}
-		
-		ResultSet rs = getTableColumnsFromMeta(meta, database, tableMeta.getTableName());
+
+		final ResultSet rs = getTableColumnsFromMeta(this.meta, database, tableMeta.getTableName());
 		while (rs.next()) {
-			String fieldName = rs.getString("COLUMN_NAME");
-//			System.out.println("Processing field : "+fieldName);
+			final String fieldName = rs.getString("COLUMN_NAME");
+			// System.out.println("Processing field : "+fieldName);
 			FieldMeta fieldMeta;
 			boolean newField = true;
 			// the following check is used for primary keys and foreign keys
@@ -159,7 +290,7 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 				if (idField == null) {
 					idField = new IdFieldMeta();
 					idField.setAutoIncrement(false);
-					tableMeta.setIdField(idField);					
+					tableMeta.setIdField(idField);
 					fieldMeta = idField;
 					newField = false;
 				} else {
@@ -172,144 +303,28 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 					fieldMeta = foriegnFields.get(index);
 				}
 			}
-			int type = rs.getInt("DATA_TYPE");
-			int nullable = rs.getInt("NULLABLE");
-			String defaultValue = rs.getString("COLUMN_DEF");
-			int maxLength = rs.getInt("COLUMN_SIZE");
+			final int type = rs.getInt("DATA_TYPE");
+			final int nullable = rs.getInt("NULLABLE");
+			final String defaultValue = rs.getString("COLUMN_DEF");
+			final int maxLength = rs.getInt("COLUMN_SIZE");
 			// int decimalDigits=rs.getInt("DECIMAL_DIGITS");
 
 			fieldMeta.setMaxLength(maxLength);
 			fieldMeta.setType(type);
-			fieldMeta.setRequired((nullable == 0 ? true : false));
+			fieldMeta.setRequired(nullable == 0 ? true : false);
 			if (defaultValue != null && !defaultValue.equals("null")) {
 				fieldMeta.setDefaultValue(defaultValue);
 			}
-			if (newField) {				
+			if (newField) {
 				tableMeta.addField(fieldMeta);
 			}
 		}
 		rs.close();
 	}
 
-	protected ResultSet getTableColumnsFromMeta(DatabaseMetaData meta, String database, String tableName) throws SQLException {
-		return meta.getColumns(database, null, tableName, null);
-	}
-
-	/**
-	 * 
-	 * @param databaseName
-	 * @param tableName
-	 * @return
-	 * @throws SQLException
-	 */
-	private ArrayList<ForiegnKeyFieldMeta> getForiegnKeys(String databaseName, String tableName) throws SQLException {
-		ResultSet rs = getImportedKeys(meta, databaseName, tableName);
-		ArrayList<ForiegnKeyFieldMeta> fields = new ArrayList<ForiegnKeyFieldMeta>();
-		while (rs.next()) {
-			ForiegnKeyFieldMeta field = new ForiegnKeyFieldMeta();
-			field.setName(rs.getString("FKCOLUMN_NAME"));
-			field.setReferenceTable(rs.getString("PKTABLE_NAME"));
-			field.setReferenceField(rs.getString("PKCOLUMN_NAME"));
-			fields.add(field);
-		}
-		rs.close();
-		return fields;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////
-	protected ResultSet getImportedKeys(DatabaseMetaData meta, String databaseName, String tableName) throws SQLException {
-		return meta.getImportedKeys(databaseName, null, tableName);
-	}
-
-	/**
-	 * 
-	 * @param databaseName
-	 * @param tableName
-	 * @return
-	 * @throws SQLException
-	 * @throws DaoException
-	 */
-	private IdFieldMeta getIdField(String databaseName, String tableName) throws SQLException, DaoException {
-		ResultSet rs = getPrimaryKeysFromMeta(meta, databaseName, tableName);
-		try {
-			if (rs.next()) {
-				IdFieldMeta id = new IdFieldMeta();
-				id.setName(rs.getString("COLUMN_NAME"));
-				boolean autoIncrement = isAutoIncrement(databaseName, tableName);
-				id.setAutoIncrement(autoIncrement);
-				return id;
-			}
-			return null;
-		} finally {
-			rs.close();
-		}
-
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////
-	protected boolean isAutoIncrement(String databaseName, String tableName) throws DaoException, SQLException {
-		String emptyRowQuery = buildEmptyRowQuery(databaseName, tableName);
-//		System.out.println("Executing : " + emptyRowQuery);
-		CachedRowSet rowSet = dao.executeQuery(emptyRowQuery);
-		boolean autoIncrement = rowSet.getMetaData().isAutoIncrement(1);
-		return autoIncrement;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////////
-	protected ResultSet getPrimaryKeysFromMeta(DatabaseMetaData meta, String databaseName, String tableName) throws SQLException {
-		return meta.getPrimaryKeys(databaseName, null, tableName);
-	}
-
 	// /////////////////////////////////////////////////////////////////////////////////////
-	@Override
-	public boolean isTableExist(String tableName) throws SQLException, DaoException {
-		ArrayList<TableMeta> tables = getTablesMeta(connectionManager.getDatabaseName());
-		for (TableMeta tableMeta : tables) {
-			if (tableMeta.getTableName().trim().equalsIgnoreCase(tableName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	// /////////////////////////////////////////////////////////////////////////////////////
-	public static void main(String[] args) throws DaoException, SQLException {
-		AbstractDataBaseAnaylazer a = (AbstractDataBaseAnaylazer) DataSourceFactory.getDefaultDataSource().getDatabaseAnasyaler();
-		System.out.println(a.connectionManager.getDefaultDatabaseName());
-		//ResultSet tableTypes = a.meta.getTableTypes();
-		//ResultSet rs=a.getPrimaryKeysFromMeta(a.meta, "FINANCE", "SEC_USERS");
-//		 ResultSet resultSet = a.loadTableNamesFromMeta(a.meta,"FINANCE");
-		//a.dao.printRecordResultSet(rs,true);
-		// ArrayList<String> databaseNames = a.getDatabasesName();
-		// for (String databaseName : databaseNames) {
-		// System.out.println(databaseName);
-		System.out.println("-----------------------------------------------------");
-//		System.out.println(a.getIdField( "FINANCE", "sec_users/"));
-		System.out.println(a.getTable("sec_users"));
-//		System.out.println();
-		// }
-		// System.out.println(a.getSchemas());
-
-		System.out.println("Done");
-
-		// OracleDatabaseAnaylaser o = new OracleDatabaseAnaylaser();
-		// TableMeta meta = o.getTable("RW_OTHER_EMPLOYEES");
-		// System.out.println(meta);
-	}
-
-	// /////////////////////////////////////////////////////////////////////////////////////
-	@Override
-	public ArrayList<String> getDatabasesName() throws SQLException {
-		return getCatalogsName();
-	}
-
-	// /////////////////////////////////////////////////////////////////////////////////////
-	protected ResultSet loadTableNamesFromMeta(DatabaseMetaData meta, String dbName) throws SQLException {
+	protected ResultSet loadTableNamesFromMeta(final DatabaseMetaData meta, final String dbName) throws SQLException {
 		return meta.getTables(dbName, null, null, new String[] { "TABLE" });
 	}
-
-	// /////////////////////////////////////////////////////////////////////////////////////
-	protected abstract String buildEmptyRowQuery(String databaseName, String tableName);
-	// /////////////////////////////////////////////////////////////////////////////////////
 
 }

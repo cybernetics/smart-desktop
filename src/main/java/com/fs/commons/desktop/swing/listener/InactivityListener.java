@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.listener;
 
 import java.awt.AWTEvent;
@@ -41,68 +56,86 @@ public class InactivityListener implements ActionListener, AWTEventListener {
 	private Action action;
 	private int interval;
 	private long eventMask;
-	private Timer timer = new Timer(0, this);
+	private final Timer timer = new Timer(0, this);
 
 	/*
 	 * Use a default inactivity interval of 1 minute and listen for USER_EVENTS
 	 */
-	public InactivityListener(Action action) {
+	public InactivityListener(final Action action) {
 		this(action, 1);
 	}
 
 	/*
 	 * Specify the inactivity interval and listen for USER_EVENTS
 	 */
-	public InactivityListener(Action action, int interval) {
+	public InactivityListener(final Action action, final int interval) {
 		this(action, interval, USER_EVENTS);
 	}
 
 	/*
 	 * Specify the inactivity interval and the events to listen for
 	 */
-	public InactivityListener(Action action, int minutes, long eventMask) {
+	public InactivityListener(final Action action, final int minutes, final long eventMask) {
 		setAction(action);
 		setInterval(minutes);
 		setEventMask(eventMask);
 	}
 
+	// Implement ActionListener for the Timer
+	@Override
+	public void actionPerformed(final ActionEvent e) {
+		this.action.actionPerformed(e);
+	}
+
+	// Implement AWTEventListener
+	@Override
+	public void eventDispatched(final AWTEvent e) {
+		if (this.timer.isRunning()) {
+			this.timer.restart();
+		}
+	}
+
+	public void resetTimer() {
+		this.timer.restart();
+	}
+
 	/*
 	 * The Action to be invoked after the specified inactivity period
 	 */
-	public void setAction(Action action) {
+	public void setAction(final Action action) {
 		this.action = action;
+	}
+
+	/*
+	 * A mask specifying the events to be passed to the AWTEventListener
+	 */
+	public void setEventMask(final long eventMask) {
+		this.eventMask = eventMask;
 	}
 
 	/*
 	 * The interval before the Action is invoked specified in minutes
 	 */
-	public void setInterval(int minutes) {
+	public void setInterval(final int minutes) {
 		setIntervalInMillis(minutes * 60000);
 	}
 
 	/*
 	 * The interval before the Action is invoked specified in milliseconds
 	 */
-	public void setIntervalInMillis(int interval) {
+	public void setIntervalInMillis(final int interval) {
 		this.interval = interval;
-		timer.setInitialDelay(interval);
-	}
-
-	/*
-	 * A mask specifying the events to be passed to the AWTEventListener
-	 */
-	public void setEventMask(long eventMask) {
-		this.eventMask = eventMask;
+		this.timer.setInitialDelay(interval);
 	}
 
 	/*
 	 * Start listening for events.
 	 */
 	public void start() {
-		timer.setInitialDelay(interval);
-		timer.setRepeats(false);
-		timer.start();
-		Toolkit.getDefaultToolkit().addAWTEventListener(this, eventMask);
+		this.timer.setInitialDelay(this.interval);
+		this.timer.setRepeats(false);
+		this.timer.start();
+		Toolkit.getDefaultToolkit().addAWTEventListener(this, this.eventMask);
 	}
 
 	/*
@@ -110,21 +143,6 @@ public class InactivityListener implements ActionListener, AWTEventListener {
 	 */
 	public void stop() {
 		Toolkit.getDefaultToolkit().removeAWTEventListener(this);
-		timer.stop();
-	}
-
-	// Implement ActionListener for the Timer
-	public void actionPerformed(ActionEvent e) {
-		action.actionPerformed(e);
-	}
-
-	// Implement AWTEventListener
-	public void eventDispatched(AWTEvent e) {
-		if (timer.isRunning())
-			timer.restart();
-	}
-	
-	public void resetTimer(){
-		timer.restart();
+		this.timer.stop();
 	}
 }

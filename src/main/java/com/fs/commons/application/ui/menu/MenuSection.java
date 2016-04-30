@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.application.ui.menu;
 
@@ -8,10 +20,9 @@ import java.util.Collection;
 
 /**
  * @author u087
- * 
+ *
  */
 public class MenuSection {
-
 
 	String name;
 
@@ -28,27 +39,8 @@ public class MenuSection {
 	 * @return
 	 * @see java.util.ArrayList#add(java.lang.Object)
 	 */
-	public boolean add(Menu o) {
+	public boolean add(final Menu o) {
 		return this.menus.add(o);
-	}
-
-	public void addMenuItem(MenuItem item) {
-		menuItems.add(item);
-	}
-
-	/**
-	 * @return the menuItems
-	 */
-	public ArrayList<MenuItem> getMenuItems() {
-		return this.menuItems;
-	}
-
-	/**
-	 * @param menuItems
-	 *            the menuItems to set
-	 */
-	public void setMenuItems(ArrayList<MenuItem> menuItems) {
-		this.menuItems = menuItems;
 	}
 
 	/**
@@ -57,12 +49,16 @@ public class MenuSection {
 	 * @return
 	 * @see java.util.ArrayList#addAll(int, java.util.Collection)
 	 */
-	public boolean addAll(int index, Collection<? extends Menu> c) {
+	public boolean addAll(final int index, final Collection<? extends Menu> c) {
 		return this.menus.addAll(index, c);
 	}
 
+	public void addMenuItem(final MenuItem item) {
+		this.menuItems.add(item);
+	}
+
 	/**
-	 * 
+	 *
 	 * @see java.util.ArrayList#clear()
 	 */
 	public void clear() {
@@ -74,38 +70,8 @@ public class MenuSection {
 	 * @return
 	 * @see java.util.ArrayList#get(int)
 	 */
-	public Menu get(int index) {
+	public Menu get(final int index) {
 		return this.menus.get(index);
-	}
-
-	/**
-	 * @return
-	 * @see java.util.ArrayList#size()
-	 */
-	public int size() {
-		return this.menus.size();
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return this.name;
-	}
-
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return
-	 */
-	public ArrayList<Menu> getMenus() {
-		return menus;
 	}
 
 	/**
@@ -116,19 +82,24 @@ public class MenuSection {
 	}
 
 	/**
-	 * @param iconName
-	 *            the iconName to set
+	 * @return the menuItems
 	 */
-	public void setIconName(String iconName) {
-		this.iconName = iconName;
+	public ArrayList<MenuItem> getMenuItems() {
+		return this.menuItems;
 	}
 
 	/**
-	 * @param parseInt
+	 * @return
 	 */
-	public void setPrivligeId(int priviligeId) {
-		this.priviligeId = priviligeId;
+	public ArrayList<Menu> getMenus() {
+		return this.menus;
+	}
 
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return this.name;
 	}
 
 	/**
@@ -138,24 +109,65 @@ public class MenuSection {
 		return this.priviligeId;
 	}
 
+	public void init() {
+		for (int i = 0; i < this.menus.size(); i++) {
+			this.menus.get(i).init();
+		}
+	}
+
+	/**
+	 * @param iconName
+	 *            the iconName to set
+	 */
+	public void setIconName(final String iconName) {
+		this.iconName = iconName;
+	}
+
+	/**
+	 * @param menuItems
+	 *            the menuItems to set
+	 */
+	public void setMenuItems(final ArrayList<MenuItem> menuItems) {
+		this.menuItems = menuItems;
+	}
+
+	/**
+	 * @param menus
+	 *            the menus to set
+	 */
+	public void setMenus(final ArrayList<Menu> menus) {
+		this.menus = menus;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(final String name) {
+		this.name = name;
+	}
+
 	/**
 	 * @param priviligeId
 	 *            the priviligeId to set
 	 */
-	public void setPriviligeId(int priviligeId) {
+	public void setPriviligeId(final int priviligeId) {
 		this.priviligeId = priviligeId;
 	}
-	
+
 	/**
-	 * @param menus the menus to set
+	 * @param parseInt
 	 */
-	public void setMenus(ArrayList<Menu> menus) {
-		this.menus = menus;
+	public void setPrivligeId(final int priviligeId) {
+		this.priviligeId = priviligeId;
+
 	}
 
-	public void init() {
-		for (int i = 0; i < menus.size(); i++) {
-			menus.get(i).init();
-		}
-	}	
+	/**
+	 * @return
+	 * @see java.util.ArrayList#size()
+	 */
+	public int size() {
+		return this.menus.size();
+	}
 }

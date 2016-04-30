@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Color;
@@ -11,49 +26,50 @@ import com.fs.commons.desktop.swing.Colors;
  * <p>
  * Title:
  * </p>
- * 
+ *
  * <p>
  * Description:
  * </p>
- * 
+ *
  * <p>
  * Copyright: Copyright (c) 2007
  * </p>
- * 
+ *
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
 public class JKMenu extends JKButton {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
 	// static Color bgColor=new Color(206,222,239);
-	static Color forColor = Colors.MENU_BUTTON_FC;//new Color(22, 125, 219);
+	static Color forColor = Colors.MENU_BUTTON_FC;// new Color(22, 125, 219);
 
 	// static Color backColor = new Color(191, 215, 255);
-	static Color backColor = Colors.MENU_BUTTON_BG;//new Color(229, 238, 255);
+	static Color backColor = Colors.MENU_BUTTON_BG;// new Color(229, 238, 255);
 
-	//static Color selectedBackColor = new Color(229, 238, 255);
+	// static Color selectedBackColor = new Color(229, 238, 255);
 
-	//static Border FOCUS_BORDER = BorderFactory.createLineBorder(Color.orange);
+	// static Border FOCUS_BORDER =
+	// BorderFactory.createLineBorder(Color.orange);
 
-	//Border DEFAULT_BORDER = getBorder();
+	// Border DEFAULT_BORDER = getBorder();
 
 	// static Color selectedBackColor = new Color(255, 211, 73);
 
 	static Dimension dim = new Dimension(140, 35);
 
-	public JKMenu(String str) {
+	public JKMenu(final String str) {
 		super(str);
 		init();
 
-		//setSelectedBGColor(selectedBackColor);
+		// setSelectedBGColor(selectedBackColor);
 		// setFont(new Font("Tahoma", Font.PLAIN, 12));
 	}
 
@@ -63,14 +79,14 @@ public class JKMenu extends JKButton {
 		super.init();
 		setBackground(backColor);
 		setForeground(forColor);
-		 setPreferredSize(dim);		 
+		setPreferredSize(dim);
 		// setBackground(bgColor);
-		
+
 		// setBorder(BorderFactory.createLineBorder(forColor));
 		addMouseMotionListener(new MouseMotionAdapter() {
 
 			@Override
-			public void mouseMoved(MouseEvent e) {
+			public void mouseMoved(final MouseEvent e) {
 				// if(!hasFocus()){
 				// requestFocus();
 				// doClick();
@@ -80,7 +96,7 @@ public class JKMenu extends JKButton {
 	}
 
 	@Override
-	public void setSelected(boolean selected) {
+	public void setSelected(final boolean selected) {
 		super.setSelected(selected);
 		if (selected) {
 			setForeground(Color.black);
@@ -90,5 +106,5 @@ public class JKMenu extends JKButton {
 			// setBorder(DEFAULT_BORDER);
 		}
 	}
-	
+
 }

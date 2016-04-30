@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.application;
 
 import java.io.InputStream;
@@ -36,26 +51,24 @@ public abstract class AbstractModule implements Module {
 	private LablesLoader lablesLoader = new FilesLablesLoader();
 	private int moduleId;
 
-	/**
-	 * @return the iconName
-	 */
-	public String getIconName() {
-		return iconName;
+	@Override
+	public Application getApplication() {
+		return this.application;
 	}
 
 	/**
-	 * @param iconName
-	 *            the iconName to set
+	 * @return the configFilePath
 	 */
-	public void setIconName(String iconName) {
-		this.iconName = iconName;
+	public String getConfigFilePath() {
+		return this.configFilePath;
 	}
 
-	/**
-	 * @return the priviligeId
-	 */
-	public Privilige getPrivilige() {
-		return new Privilige(getModuleName().hashCode(), getModuleName(), null);
+	@Override
+	public DataSource getDataSource() {
+		if (this.dataSource == null) {
+			return DataSourceFactory.getDefaultDataSource();
+		}
+		return this.dataSource;
 	}
 
 	// /**
@@ -66,107 +79,13 @@ public abstract class AbstractModule implements Module {
 	// }
 
 	/**
-	 * @return the moduleName
-	 */
-	public String getModuleName() {
-		return moduleName;
-	}
-
-	/**
-	 * @param moduleName
-	 *            the moduleName to set
-	 */
-	public void setModuleName(String moduleName) {
-		this.moduleName = moduleName;
-	}
-
-	/**
-	 * 
-	 */
-	public List<Lable> getLables(String locale) throws ModuleException {
-		try {
-			LablesLoader lablesLoader2 = getLablesLoader();
-			lablesLoader2.init(this, Locale.valueOf(locale).getLanguageId());
-			List<Lable> lables = lablesLoader2.getLables();
-			if (lables == null) {
-				return new ArrayList<Lable>();
-			}
-			return lables;
-		} catch (LablesLoaderException e) {
-			throw new ModuleException(this, e);
-		}
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////////
-	public InputStream getLablesFile() {
-		String shortFileName = application.getLocale() + "_lbl.properties";
-		InputStream in = this.getClass().getResourceAsStream(getFileFullPath(shortFileName));
-		return in;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////////
-
-	public LablesLoader getLablesLoader() {
-		return lablesLoader;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////////
-	public void setLablesLoader(LablesLoader lablesLoader) {
-		this.lablesLoader = lablesLoader;
-	}
-
-	/**
-	 * 
-	 */
-	public ArrayList<Menu> getMenu() {
-		try {
-			if (menu != null) {
-				return menu;
-			}
-			String fileFullPath = getFileFullPath("menu.xml");
-			System.out.println(fileFullPath);
-			InputStream in = GeneralUtility.getFileInputStream(fileFullPath);
-			if (in != null) {
-				ModuleMenuXmlParser p = new ModuleMenuXmlParser(this);
-				menu = p.parse(in);
-			} else {
-				System.err.println("No menu.xml found for module : " + getModuleName());
-				menu = new ArrayList<Menu>();
-			}
-			return menu;
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-			// unreachable
-			return null;
-		}
-	}
-
-	/**
-	 * 
-	 */
-	public Hashtable<String, TableMeta> getTablesMeta() throws ModuleException {
-		try {
-			TableMetaXmlParser parser = new TableMetaXmlParser();
-			Hashtable<String, TableMeta> tables;
-			InputStream in = this.getClass().getResourceAsStream(getFileFullPath("meta.xml"));
-			if (in != null) {
-				tables = parser.parse(in,this.getModuleName());
-				return tables;
-			}
-			System.err.println("meta.xml not found in module in :" + getModuleName());
-			return new Hashtable<String, TableMeta>();
-		} catch (JKXmlException e) {
-			throw new ModuleException(this, e);
-		}
-	}
-
-	/**
 	 * @param shortFileName
 	 * @return
 	 */
-	public String getFileFullPath(String shortFileName) {
-		if (configFilePath != null) {
-			return configFilePath + "/" + shortFileName;
+	@Override
+	public String getFileFullPath(final String shortFileName) {
+		if (this.configFilePath != null) {
+			return this.configFilePath + "/" + shortFileName;
 		}
 		String packageName = "/" + this.getClass().getPackage().getName();
 		packageName = packageName.replaceAll("\\.", "/");
@@ -174,35 +93,160 @@ public abstract class AbstractModule implements Module {
 	}
 
 	/**
-	 * 
+	 * @return the iconName
 	 */
-	public void init() throws ModuleException {
+	@Override
+	public String getIconName() {
+		return this.iconName;
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	public ArrayList<Report> getReports(String prefix, String prefix2) throws ModuleException {
+	@Override
+	public List<Lable> getLables(final String locale) throws ModuleException {
 		try {
-			InputStream in = this.getClass().getResourceAsStream(getFileFullPath("reports.xml"));
-			if (in != null) {
-				ReportManager report = new ReportManager(in, prefix, prefix2);
-				return report.getInstanceReports();
+			final LablesLoader lablesLoader2 = getLablesLoader();
+			lablesLoader2.init(this, Locale.valueOf(locale).getLanguageId());
+			final List<Lable> lables = lablesLoader2.getLables();
+			if (lables == null) {
+				return new ArrayList<Lable>();
 			}
-			return new ArrayList<Report>();
-		} catch (JKXmlException e) {
+			return lables;
+		} catch (final LablesLoaderException e) {
 			throw new ModuleException(this, e);
 		}
 	}
 
+	// //////////////////////////////////////////////////////////////////////////////////////////
+	public InputStream getLablesFile() {
+		final String shortFileName = this.application.getLocale() + "_lbl.properties";
+		final InputStream in = this.getClass().getResourceAsStream(getFileFullPath(shortFileName));
+		return in;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////////
+
 	@Override
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		return buf.toString();
+	public LablesLoader getLablesLoader() {
+		return this.lablesLoader;
 	}
 
 	/**
-	 * 
+	 *
+	 */
+	@Override
+	public ArrayList<Menu> getMenu() {
+		try {
+			if (this.menu != null) {
+				return this.menu;
+			}
+			final String fileFullPath = getFileFullPath("menu.xml");
+			System.out.println(fileFullPath);
+			final InputStream in = GeneralUtility.getFileInputStream(fileFullPath);
+			if (in != null) {
+				final ModuleMenuXmlParser p = new ModuleMenuXmlParser(this);
+				this.menu = p.parse(in);
+			} else {
+				System.err.println("No menu.xml found for module : " + getModuleName());
+				this.menu = new ArrayList<Menu>();
+			}
+			return this.menu;
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+			// unreachable
+			return null;
+		}
+	}
+
+	// public int getModuleId() {
+	// return priviligeId;
+	// }
+	@Override
+	public int getModuleId() {
+		return this.moduleId;
+	}
+
+	/**
+	 * @return the moduleName
+	 */
+	@Override
+	public String getModuleName() {
+		return this.moduleName;
+	}
+
+	/**
+	 * @return the priviligeId
+	 */
+	@Override
+	public Privilige getPrivilige() {
+		return new Privilige(getModuleName().hashCode(), getModuleName(), null);
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public ArrayList<Report> getReports(final String prefix, final String prefix2) throws ModuleException {
+		try {
+			final InputStream in = this.getClass().getResourceAsStream(getFileFullPath("reports.xml"));
+			if (in != null) {
+				final ReportManager report = new ReportManager(in, prefix, prefix2);
+				return report.getInstanceReports();
+			}
+			return new ArrayList<Report>();
+		} catch (final JKXmlException e) {
+			throw new ModuleException(this, e);
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public Hashtable<String, TableMeta> getTablesMeta() throws ModuleException {
+		try {
+			final TableMetaXmlParser parser = new TableMetaXmlParser();
+			Hashtable<String, TableMeta> tables;
+			final InputStream in = this.getClass().getResourceAsStream(getFileFullPath("meta.xml"));
+			if (in != null) {
+				tables = parser.parse(in, getModuleName());
+				return tables;
+			}
+			System.err.println("meta.xml not found in module in :" + getModuleName());
+			return new Hashtable<String, TableMeta>();
+		} catch (final JKXmlException e) {
+			throw new ModuleException(this, e);
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public void init() throws ModuleException {
+	}
+
+	@Override
+	public boolean isDefault() {
+		return this.defaultModule;
+	}
+
+	@Override
+	public void setApplication(final Application application) {
+		this.application = application;
+	}
+
+	/**
+	 * @param configFilePath
+	 *            the configFilePath to set
+	 */
+	public void setConfigFilePath(final String configFilePath) {
+		this.configFilePath = configFilePath;
+	}
+
+	/**
+	 *
 	 * @param configFilePath
 	 */
 	public void setConfigPath(String configFilePath) {
@@ -215,64 +259,47 @@ public abstract class AbstractModule implements Module {
 		this.configFilePath = configFilePath;
 	}
 
-	/**
-	 * @return the configFilePath
-	 */
-	public String getConfigFilePath() {
-		return configFilePath;
-	}
-
-	/**
-	 * @param configFilePath
-	 *            the configFilePath to set
-	 */
-	public void setConfigFilePath(String configFilePath) {
-		this.configFilePath = configFilePath;
-	}
-
 	@Override
-	public boolean isDefault() {
-		return defaultModule;
-	}
-
-	@Override
-	public void setDefault(boolean defaultModule) {
-		this.defaultModule = defaultModule;
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		if (dataSource == null) {
-			return DataSourceFactory.getDefaultDataSource();
-		}
-		return dataSource;
-	}
-
-	@Override
-	public void setDataSource(DataSource datasource) {
+	public void setDataSource(final DataSource datasource) {
 		this.dataSource = datasource;
 	}
 
 	@Override
-	public void setApplication(Application application) {
-		this.application = application;
+	public void setDefault(final boolean defaultModule) {
+		this.defaultModule = defaultModule;
+	}
+
+	/**
+	 * @param iconName
+	 *            the iconName to set
+	 */
+	public void setIconName(final String iconName) {
+		this.iconName = iconName;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public void setLablesLoader(final LablesLoader lablesLoader) {
+		this.lablesLoader = lablesLoader;
 	}
 
 	@Override
-	public Application getApplication() {
-		return application;
-	}
-
-	// public int getModuleId() {
-	// return priviligeId;
-	// }
-	@Override
-	public int getModuleId() {
-		return moduleId;
-	}
-
-	@Override
-	public void setModuleId(int moduleId) {
+	public void setModuleId(final int moduleId) {
 		this.moduleId = moduleId;
+	}
+
+	/**
+	 * @param moduleName
+	 *            the moduleName to set
+	 */
+	@Override
+	public void setModuleName(final String moduleName) {
+		this.moduleName = moduleName;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer buf = new StringBuffer();
+		return buf.toString();
 	}
 }

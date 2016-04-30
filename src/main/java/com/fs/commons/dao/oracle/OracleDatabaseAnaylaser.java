@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.oracle;
 
 import java.sql.DatabaseMetaData;
@@ -13,63 +28,71 @@ public class OracleDatabaseAnaylaser extends AbstractDataBaseAnaylazer {
 	//////////////////////////////////////////////////////////////////////
 	public OracleDatabaseAnaylaser() throws DaoException, SQLException {
 	}
+
 	//////////////////////////////////////////////////////////////////////
-	public OracleDatabaseAnaylaser(DataSource connectionManager) throws DaoException, SQLException {
+	public OracleDatabaseAnaylaser(final DataSource connectionManager) throws DaoException, SQLException {
 		super(connectionManager);
 	}
+
+	//////////////////////////////////////////////////////////////////////
+	@Override
+	protected String buildEmptyRowQuery(final String databaseName, final String tableName) {
+		return "select * from " + databaseName + "." + tableName + " where ROWNUM=1";
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	@Override
 	public ArrayList<String> getDatabasesName() throws SQLException {
 		return getSchemas();
 	}
+
+	// //////////////////////////////////////////////////////////////////////
+	// public static void main(String[] args) throws DaoException, SQLException
+	// {
+	// OracleDatabaseAnaylaser a=new OracleDatabaseAnaylaser();
+	// ArrayList<String> catalogsName = a.getDatabasesName();
+	// for (String catalog: catalogsName) {
+	// System.out.println(catalog);
+	//// ArrayList<String> databases = a.getDatabasesName();
+	//// for (String db : databases) {
+	//// //System.out.println(db + "-->" + a.getTablesMeta(db));
+	//// }
+	// }
+	// // System.out.println(a.getSchemas());
+	//
+	// System.out.println("Done");
+	//
+	// // OracleDatabaseAnaylaser o = new OracleDatabaseAnaylaser();
+	// // TableMeta meta = o.getTable("RW_OTHER_EMPLOYEES");
+	// // System.out.println(meta);
+	// }
 	//////////////////////////////////////////////////////////////////////
 	@Override
-	protected String buildEmptyRowQuery(String databaseName, String tableName) {
-		return "select * from " + databaseName + "." + tableName + " where ROWNUM=1";
+	protected ResultSet getImportedKeys(final DatabaseMetaData meta, final String databaseName, final String tableName) throws SQLException {
+		return meta.getImportedKeys(null, databaseName, tableName);
 	}
+
 	//////////////////////////////////////////////////////////////////////
 	@Override
-	protected ResultSet loadTableNamesFromMeta(DatabaseMetaData meta, String dbName) throws SQLException {
-		return meta.getTables(null, dbName, null, new String[] { "TABLE" });
-	}
-	//////////////////////////////////////////////////////////////////////
-	@Override
-	protected ResultSet getPrimaryKeysFromMeta(DatabaseMetaData meta, String databaseName, String tableName) throws SQLException {
+	protected ResultSet getPrimaryKeysFromMeta(final DatabaseMetaData meta, final String databaseName, final String tableName) throws SQLException {
 		return meta.getPrimaryKeys(null, databaseName, tableName);
 	}
+
 	//////////////////////////////////////////////////////////////////////
 	@Override
-	protected ResultSet getTableColumnsFromMeta(DatabaseMetaData meta, String database, String tableName) throws SQLException {
+	protected ResultSet getTableColumnsFromMeta(final DatabaseMetaData meta, final String database, final String tableName) throws SQLException {
 		return meta.getColumns(null, database, tableName, "%");
 	}
-//	//////////////////////////////////////////////////////////////////////
-//	public static void main(String[] args) throws DaoException, SQLException {
-//		OracleDatabaseAnaylaser a=new OracleDatabaseAnaylaser();
-//		ArrayList<String> catalogsName = a.getDatabasesName();
-//		for (String catalog: catalogsName) {
-//			System.out.println(catalog);
-////			ArrayList<String> databases = a.getDatabasesName();
-////			for (String db : databases) {
-////				//System.out.println(db + "-->" + a.getTablesMeta(db));
-////			}
-//		}
-//		// System.out.println(a.getSchemas());
-//
-//		System.out.println("Done");
-//
-//		// OracleDatabaseAnaylaser o = new OracleDatabaseAnaylaser();
-//		// TableMeta meta = o.getTable("RW_OTHER_EMPLOYEES");
-//		// System.out.println(meta);
-//	}
-	//////////////////////////////////////////////////////////////////////
-	protected ResultSet getImportedKeys(DatabaseMetaData meta, String databaseName, String tableName) throws SQLException {
-		return meta.getImportedKeys(null,databaseName, tableName);
-	}
-	
+
 	@Override
-	protected boolean isAutoIncrement(String databaseName, String tableName) throws DaoException, SQLException {
-		return false;//since oracle doesnot support auto-increment by default
+	protected boolean isAutoIncrement(final String databaseName, final String tableName) throws DaoException, SQLException {
+		return false;// since oracle doesnot support auto-increment by default
 	}
-	
+
+	//////////////////////////////////////////////////////////////////////
+	@Override
+	protected ResultSet loadTableNamesFromMeta(final DatabaseMetaData meta, final String dbName) throws SQLException {
+		return meta.getTables(null, dbName, null, new String[] { "TABLE" });
+	}
 
 }

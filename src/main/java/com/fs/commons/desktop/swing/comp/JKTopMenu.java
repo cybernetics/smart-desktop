@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Dimension;
@@ -12,26 +27,30 @@ import com.fs.commons.locale.Lables;
 import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
 
-public class JKTopMenu extends JMenu{
+public class JKTopMenu extends JMenu {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -6565049583772116802L;
 	private BufferedImage img;
 
-	public JKTopMenu(String caption, String iconName) {
+	public JKTopMenu(final String caption, final String iconName) {
 		super(Lables.get(caption));
 		try {
-			img = javax.imageio.ImageIO.read(GeneralUtility.getIconURL(iconName));
-		} catch (IOException e) {
+			this.img = javax.imageio.ImageIO.read(GeneralUtility.getIconURL(iconName));
+		} catch (final IOException e) {
 			ExceptionUtil.handleException(e);
 		}
 		setOpaque(false);
-		setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
-		setPreferredSize(new Dimension(img.getWidth()+8, img.getHeight()+8));
+		setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+		setPreferredSize(new Dimension(this.img.getWidth() + 8, this.img.getHeight() + 8));
 	}
 
 	@Override
-	public void paint(Graphics g) {
-		g.drawImage(img, 1, 1,img.getWidth(),img.getHeight(), this);
+	public void paint(final Graphics g) {
+		g.drawImage(this.img, 1, 1, this.img.getWidth(), this.img.getHeight(), this);
 		super.paint(g);
-		
+
 	}
 }

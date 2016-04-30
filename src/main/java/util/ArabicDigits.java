@@ -1,9 +1,17 @@
-/**
- * Modification History
- * ====================================================
- * Version    Date         Developer        Purpose 
- * ====================================================
- * 1.1      10/08/2009     Jamil Shreet    -Add this method : 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package util;
@@ -21,42 +29,53 @@ import java.util.Date;
 public class ArabicDigits {
 
 	/**
+	 * @1.1
 	 * 
+	 * @param num
+	 * @return
+	 */
+	public static String format(final double num) {
+		final NumberFormat dFormatter = new DecimalFormat("#0.00");
+		final String sFformatter = dFormatter.format(num);
+		return format(sFformatter + "");
+	}
+
+	/**
+	 *
+	 * @param num
+	 *            Integer
+	 * @return String
+	 */
+	public static String format(final long num) {
+		return format(num + "");
+	}
+
+	/**
+	 *
 	 * @param str
 	 *            String
 	 * @return String
 	 */
-	public static String format(String str) {
-		NumericShaper shaper = NumericShaper
-				.getContextualShaper(NumericShaper.ARABIC);
-		char[] c = str.toCharArray();
+	public static String format(final String str) {
+		final NumericShaper shaper = NumericShaper.getContextualShaper(NumericShaper.ARABIC);
+		final char[] c = str.toCharArray();
 		shaper.shape(c, 0, c.length, NumericShaper.ARABIC);
 		return new String(c);
 	}
 
 	/**
-	 * 
-	 * @param num
-	 *            Integer
-	 * @return String
-	 */
-	public static String format(long num) {
-		return format(num + "");
-	}
-
-	/**
-	 * 
+	 *
 	 * @param date
 	 * @return
 	 */
-	public static String formatDate(Date date) {
-		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-		String str = format.format(date);
+	public static String formatDate(final Date date) {
+		final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		final String str = format.format(date);
 		return format(str);
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public static String getCurrentDateFormatted() {
@@ -64,21 +83,10 @@ public class ArabicDigits {
 	}
 
 	/**
-	 * @1.1
-	 * @param num
-	 * @return
-	 */
-	public static String format(double num) {
-		NumberFormat dFormatter = new DecimalFormat("#0.00");
-		String sFformatter = dFormatter.format(num);
-		return format(sFformatter + "");
-	}
-
-	/**
-	 * 
+	 *
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		System.out.println(getCurrentDateFormatted());
 	}
 

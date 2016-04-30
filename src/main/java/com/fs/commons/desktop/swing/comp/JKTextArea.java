@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.event.ActionListener;
@@ -14,9 +29,9 @@ import com.fs.commons.desktop.validation.Validator;
 
 public class JKTextArea extends JTextArea implements BindingComponent<String>, JKScrollable {
 
-	private FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
-
 	private static final long serialVersionUID = 1L;
+
+	private final FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
 	private String defaultValue;
 
 	private boolean transfer;
@@ -25,63 +40,47 @@ public class JKTextArea extends JTextArea implements BindingComponent<String>, J
 
 	}
 
-	public JKTextArea(Document doc, String text, int rows, int columns) {
-		super(doc, text, rows, columns);
-		init();
-	}
-
-	public JKTextArea(Document doc) {
+	public JKTextArea(final Document doc) {
 		super(doc);
 		init();
 	}
 
-	public JKTextArea(int rows, int columns) {
+	public JKTextArea(final Document doc, final String text, final int rows, final int columns) {
+		super(doc, text, rows, columns);
+		init();
+	}
+
+	public JKTextArea(final int rows, final int columns) {
 		super(rows, columns);
 		init();
 	}
 
-	public JKTextArea(String text, int rows, int columns) {
-		super(text, rows, columns);
-		init();
-	}
-
-	public JKTextArea(String text) {
+	public JKTextArea(final String text) {
 		super(text);
 		init();
 	}
 
-	void init() {
-		// setFont(JKTextField.DEFAULT_FONT);
-		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
+	public JKTextArea(final String text, final int rows, final int columns) {
+		super(text, rows, columns);
+		init();
 	}
 
 	@Override
-	public String getValue() {
-		return getText();
+	public void addActionListener(final ActionListener actionListener) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
-	public void setValue(String value) {
-		if (value != null) {
-			setText(value.toString());
-		} else {
-			setText("");
-		}
+	public void addValidator(final Validator validator) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
-	public String getDefaultValue() {
-		return defaultValue;
-	}
+	public void addValueChangeListener(final ValueChangeListener listener) {
+		// TODO Auto-generated method stub
 
-	@Override
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
-	}
-
-	@Override
-	public void reset() {
-		setValue(defaultValue);
 	}
 
 	@Override
@@ -90,52 +89,68 @@ public class JKTextArea extends JTextArea implements BindingComponent<String>, J
 	}
 
 	@Override
-	public void filterValues(BindingComponent component) {
+	public void filterValues(final BindingComponent component) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void addValidator(Validator validator) {
-		// TODO Auto-generated method stub
+	public DataSource getDataSource() {
+		return this.fsWrapper.getDataSource();
+	}
 
+	@Override
+	public String getDefaultValue() {
+		return this.defaultValue;
+	}
+
+	@Override
+	public String getValue() {
+		return getText();
+	}
+
+	void init() {
+		// setFont(JKTextField.DEFAULT_FONT);
+		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
+	}
+
+	@Override
+	public boolean isAutoTransferFocus() {
+		return this.transfer;
+	}
+
+	@Override
+	public void reset() {
+		setValue(this.defaultValue);
+	}
+
+	@Override
+	public void setAutoTransferFocus(final boolean transfer) {
+		this.transfer = transfer;
+	}
+
+	@Override
+	public void setDataSource(final DataSource manager) {
+		this.fsWrapper.setDataSource(manager);
+	}
+
+	@Override
+	public void setDefaultValue(final String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	@Override
+	public void setValue(final String value) {
+		if (value != null) {
+			setText(value.toString());
+		} else {
+			setText("");
+		}
 	}
 
 	@Override
 	public void validateValue() throws ValidationException {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void setDataSource(DataSource manager) {
-		fsWrapper.setDataSource(manager);
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		return fsWrapper.getDataSource();
-	}
-
-	@Override
-	public void addValueChangeListener(ValueChangeListener listener) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void addActionListener(ActionListener actionListener) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setAutoTransferFocus(boolean transfer) {
-		this.transfer = transfer;
-	}
-
-	@Override
-	public boolean isAutoTransferFocus() {
-		return transfer;
 	}
 }

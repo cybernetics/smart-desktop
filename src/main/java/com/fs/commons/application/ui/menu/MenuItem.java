@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fs.commons.application.ui.menu;
 
@@ -18,7 +30,7 @@ import com.fs.commons.security.Privilige;
 
 /**
  * @author u087
- * 
+ *
  */
 public class MenuItem implements UIPanelFactory {
 	String name;
@@ -38,36 +50,70 @@ public class MenuItem implements UIPanelFactory {
 
 	Menu parentMenu;
 
-	/**
-	 * @return the parentMenu
-	 */
-	public Menu getParentMenu() {
-		return parentMenu;
-	}
-
-	/**
-	 * @param parentMenu
-	 *            the parentMenu to set
-	 */
-	public void setParentMenu(Menu parentMenu) {
-		this.parentMenu = parentMenu;
-	}
-
 	private boolean iniitialized;
 
 	/**
-	 * @return the priviligeId
+	 *
+	 * @see java.util.Hashtable#clear()
 	 */
-	public int getPriviligeId() {
-		return this.priviligeId;
+	public void clear() {
+		this.properties.clear();
 	}
 
 	/**
-	 * @param priviligeId
-	 *            the priviligeId to set
+	 *
+	 * @param createNew
+	 * @return
+	 * @throws UIOPanelCreationException
 	 */
-	public void setPriviligeId(int priviligeId) {
-		this.priviligeId = priviligeId;
+	public UIPanel createPanel() throws UIOPanelCreationException {
+		return createPanel(!this.cachePanel);
+	}
+
+	/**
+	 *
+	 * @return
+	 * @throws UIOPanelCreationException
+	 */
+	public UIPanel createPanel(final boolean createNew) throws UIOPanelCreationException {
+		return createPanel(getProperties(), createNew);
+		// return factory.createPanel(getProperties());
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public UIPanel createPanel(final Properties prop, final boolean createNew) throws UIOPanelCreationException {
+		final UIPanel pnl = this.factory.createPanel(getProperties(), createNew);
+		if (pnl != null) {
+			pnl.setName(getName());
+			if (pnl instanceof DaoComponent) {
+				((DaoComponent) pnl).setDataSource(getParentMenu().getParentModule().getDataSource());
+			}
+		}
+		return pnl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	public Vector<TableMeta> getDetailTables() {
+		if (!isHasDetailTables()) {
+			throw new IllegalStateException("getTableMeta() is only allowed on table-meta");
+		}
+		final String[] tablesName = this.properties.getProperty("detail-tables").split(",");
+		final Vector<TableMeta> tables = new Vector<TableMeta>();
+		for (final String tableMetaName : tablesName) {
+			tables.add(AbstractTableMetaFactory.getTableMeta(tableMetaName));
+		}
+		return tables;
+	}
+
+	public String getFullQualifiedPath() {
+		final StringBuffer buf = new StringBuffer();
+		buf.append(getParentMenu().getFullQualifiedPath());
+		buf.append("-->");
+		buf.append(Lables.get(getName(), true));
+		return buf.toString();
 	}
 
 	/**
@@ -78,24 +124,77 @@ public class MenuItem implements UIPanelFactory {
 	}
 
 	/**
-	 * @param iconName
-	 *            the iconName to set
+	 * @return the name
 	 */
-	public void setIconName(String iconName) {
-		this.iconName = iconName;
+	public String getName() {
+		return this.name;
 	}
 
 	/**
-	 * 
+	 * @return the parentMenu
+	 */
+	public Menu getParentMenu() {
+		return this.parentMenu;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	public Privilige getPrivilige() {
+		final int privId = (getParentMenu().getParentModule().toString() + getParentMenu().getName() + getName()).hashCode();
+		return new Privilige(privId, getName(), getParentMenu().getPrivilige());
+	}
+
+	/**
+	 * @return the priviligeId
+	 */
+	public int getPriviligeId() {
+		return this.priviligeId;
+	}
+
+	/**
+	 * @return the properties
+	 */
+	public Properties getProperties() {
+		return this.properties;
+	}
+
+	/**
+	 * @param key
+	 * @return
+	 * @see java.util.Properties#getProperty(java.lang.String)
+	 */
+	public String getProperty(final String key) {
+		return this.properties.getProperty(key);
+	}
+
+	/**
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 * @see java.util.Properties#getProperty(java.lang.String, java.lang.String)
+	 */
+	public String getProperty(final String key, final String defaultValue) {
+		return this.properties.getProperty(key, defaultValue);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	public TableMeta getTableMeta() {
+		if (!isDynamicTableMeta()) {
+			throw new IllegalStateException("getTableMeta() is only allowed on table-meta");
+		}
+		return AbstractTableMetaFactory.getTableMeta(this.properties.getProperty("table-meta"));
+	}
+
+	/**
+	 *
 	 */
 	public void init() {
-		if (iniitialized) {
+		if (this.iniitialized) {
 			return;
 		}
-		iniitialized = true;
+		this.iniitialized = true;
 		// UIPanelFactoryImpl factory = new UIPanelFactoryImpl();
 		// to avoid executing this executor at startup
-		if (properties.getProperty("executor") == null) {
+		if (this.properties.getProperty("executor") == null) {
 			// if (isCachePanel()) {
 			// try {
 			// factory.createPanel(properties, true);
@@ -113,89 +212,9 @@ public class MenuItem implements UIPanelFactory {
 		return this.cachePanel;
 	}
 
-	/**
-	 * @param cachePanel
-	 *            the cachePanel to set
-	 */
-	public void setCachePanel(boolean cachePanel) {
-		this.cachePanel = cachePanel;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return this.name;
-	}
-
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * 
-	 * @param createNew
-	 * @return
-	 * @throws UIOPanelCreationException
-	 */
-	public UIPanel createPanel() throws UIOPanelCreationException {
-		return createPanel(!cachePanel);
-	}
-
-	/**
-	 * 
-	 * @return
-	 * @throws UIOPanelCreationException
-	 */
-	public UIPanel createPanel(boolean createNew) throws UIOPanelCreationException {
-		return createPanel(getProperties(), createNew);
-		// return factory.createPanel(getProperties());
-	}
-
-	/**
-	 * @return the properties
-	 */
-	public Properties getProperties() {
-		return this.properties;
-	}
-
-	/**
-	 * @param properties
-	 *            the properties to set
-	 */
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
-
-	/**
-	 * 
-	 * @see java.util.Hashtable#clear()
-	 */
-	public void clear() {
-		this.properties.clear();
-	}
-
-	/**
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 * @see java.util.Properties#getProperty(java.lang.String, java.lang.String)
-	 */
-	public String getProperty(String key, String defaultValue) {
-		return this.properties.getProperty(key, defaultValue);
-	}
-
-	/**
-	 * @param key
-	 * @return
-	 * @see java.util.Properties#getProperty(java.lang.String)
-	 */
-	public String getProperty(String key) {
-		return this.properties.getProperty(key);
+	//////////////////////////////////////////////////////////////////////////////
+	public boolean isDynamicTableMeta() {
+		return this.properties.getProperty("table-meta") != null;
 	}
 
 	/**
@@ -206,35 +225,27 @@ public class MenuItem implements UIPanelFactory {
 		return this.properties.isEmpty();
 	}
 
+	//////////////////////////////////////////////////////////////////////////////
+	public boolean isExecutor() {
+		return this.properties.getProperty("executor") != null;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	public boolean isHasDetailTables() {
+		return !this.properties.getProperty("detail-tables", "").equals("");
+	}
+
 	/**
 	 * @param key
 	 * @return
 	 * @see java.util.Hashtable#remove(java.lang.Object)
 	 */
-	public Object remove(Object key) {
+	public Object remove(final Object key) {
 		return this.properties.remove(key);
 	}
 
 	/**
-	 * @param key
-	 * @param value
-	 * @return
-	 * @see java.util.Properties#setProperty(java.lang.String, java.lang.String)
-	 */
-	public Object setProperty(String key, String value) {
-		return this.properties.setProperty(key, value);
-	}
-
-	/**
-	 * @return
-	 * @see java.util.Hashtable#size()
-	 */
-	public int size() {
-		return this.properties.size();
-	}
-
-	/**
-	 * 
+	 *
 	 * @param createNew
 	 * @return
 	 * @throws UIOPanelCreationException
@@ -253,17 +264,11 @@ public class MenuItem implements UIPanelFactory {
 	// }
 
 	/**
-	 * 
+	 * @param cachePanel
+	 *            the cachePanel to set
 	 */
-	public UIPanel createPanel(Properties prop, boolean createNew) throws UIOPanelCreationException {
-		UIPanel pnl = factory.createPanel(getProperties(), createNew);
-		if (pnl != null) {
-			pnl.setName(getName());
-			if (pnl instanceof DaoComponent) {
-				((DaoComponent) pnl).setDataSource(getParentMenu().getParentModule().getDataSource());
-			}
-		}
-		return pnl;
+	public void setCachePanel(final boolean cachePanel) {
+		this.cachePanel = cachePanel;
 	}
 
 	// /**
@@ -282,53 +287,61 @@ public class MenuItem implements UIPanelFactory {
 	// setCachePanel(cacheAtStartup);
 	// }
 
-	//////////////////////////////////////////////////////////////////////////////
-	public boolean isExecutor() {
-		return properties.getProperty("executor") != null;
+	/**
+	 * @param iconName
+	 *            the iconName to set
+	 */
+	public void setIconName(final String iconName) {
+		this.iconName = iconName;
 	}
 
-	//////////////////////////////////////////////////////////////////////////////
-	public boolean isDynamicTableMeta() {
-		return properties.getProperty("table-meta") != null;
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(final String name) {
+		this.name = name;
 	}
 
-	//////////////////////////////////////////////////////////////////////////////
-	public TableMeta getTableMeta() {
-		if (!isDynamicTableMeta()) {
-			throw new IllegalStateException("getTableMeta() is only allowed on table-meta");
-		}
-		return AbstractTableMetaFactory.getTableMeta(properties.getProperty("table-meta"));
+	/**
+	 * @param parentMenu
+	 *            the parentMenu to set
+	 */
+	public void setParentMenu(final Menu parentMenu) {
+		this.parentMenu = parentMenu;
 	}
 
-	//////////////////////////////////////////////////////////////////////////////
-	public Vector<TableMeta> getDetailTables() {
-		if (!isHasDetailTables()) {
-			throw new IllegalStateException("getTableMeta() is only allowed on table-meta");
-		}
-		String[] tablesName = properties.getProperty("detail-tables").split(",");
-		Vector<TableMeta> tables = new Vector<TableMeta>();
-		for (String tableMetaName : tablesName) {
-			tables.add(AbstractTableMetaFactory.getTableMeta(tableMetaName));
-		}
-		return tables;
+	/**
+	 * @param priviligeId
+	 *            the priviligeId to set
+	 */
+	public void setPriviligeId(final int priviligeId) {
+		this.priviligeId = priviligeId;
 	}
 
-	//////////////////////////////////////////////////////////////////////////////
-	public boolean isHasDetailTables() {		
-		return !properties.getProperty("detail-tables", "").equals("");
+	/**
+	 * @param properties
+	 *            the properties to set
+	 */
+	public void setProperties(final Properties properties) {
+		this.properties = properties;
 	}
 
-	//////////////////////////////////////////////////////////////////////////////
-	public Privilige getPrivilige() {
-		int privId=(getParentMenu().getParentModule().toString() + getParentMenu().getName() + getName()).hashCode();
-		return new Privilige(privId,getName(),getParentMenu().getPrivilige());
+	/**
+	 * @param key
+	 * @param value
+	 * @return
+	 * @see java.util.Properties#setProperty(java.lang.String, java.lang.String)
+	 */
+	public Object setProperty(final String key, final String value) {
+		return this.properties.setProperty(key, value);
 	}
 
-	public String getFullQualifiedPath() {
-		StringBuffer buf=new StringBuffer();
-		buf.append(getParentMenu().getFullQualifiedPath());
-		buf.append("-->");
-		buf.append(Lables.get(getName(),true));
-		return buf.toString();
+	/**
+	 * @return
+	 * @see java.util.Hashtable#size()
+	 */
+	public int size() {
+		return this.properties.size();
 	}
 }

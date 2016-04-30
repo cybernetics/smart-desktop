@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui.masterdetail;
 
 import java.awt.BorderLayout;
@@ -38,7 +53,7 @@ import com.fs.commons.util.ExceptionUtil;
 public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -64,96 +79,282 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 
 	JKButton btnRemove = new JKButton("REMOVE");
 
-	private ArrayList<DynDaoActionListener> listeners = new ArrayList<DynDaoActionListener>();
+	private final ArrayList<DynDaoActionListener> listeners = new ArrayList<DynDaoActionListener>();
 
 	/**
-	 * 
+	 *
 	 * @param metaTable
 	 * @throws DaoException
 	 * @throws TableMetaNotFoundException
 	 */
-	public DynCrossDaoPanel(TableMeta metaTable) throws DaoException, TableMetaNotFoundException {
+	public DynCrossDaoPanel(final TableMeta metaTable) throws DaoException, TableMetaNotFoundException {
 		this.metaTable = metaTable;
-		dao = DaoFactory.createDynamicDao(metaTable);
-		field1Meta = metaTable.lstForiegnKeyFields().get(0);
-		field2Meta = metaTable.lstForiegnKeyFields().get(1);
+		this.dao = DaoFactory.createDynamicDao(metaTable);
+		this.field1Meta = metaTable.lstForiegnKeyFields().get(0);
+		this.field2Meta = metaTable.lstForiegnKeyFields().get(1);
 
-		table1Meta = AbstractTableMetaFactory.getTableMeta(metaTable.getDataSource(), field1Meta.getReferenceTable());
-		table2Meta = AbstractTableMetaFactory.getTableMeta(metaTable.getDataSource(),field2Meta.getReferenceTable());
-		
-		//compMain = (BindingComponent) ComponentFactory.buildForeignKeyComponent(field1Meta);
-		compMain=new FieldPanelWithFilter(field1Meta.getReferenceTable());
-//		if(compMain instanceof ManageSupport){
-//			((ManageSupport) compMain).setAllowManage(false);
-//		}
-		((JComponent) compMain).setEnabled(false);
-		tblAll = new QueryJTable("", metaTable.getDataSource(), "", true);
-		tblAll.setPagRowsCount(0);
-		tblAll.setShowFilterButtons(false);
-		tblAll.setShowSortingPanel(false);
-		tblAll.setPreferredSize(new Dimension(300, 400));
-		tblAll.setVisible(metaTable.isAllowAdd() || metaTable.isAllowDelete());
+		this.table1Meta = AbstractTableMetaFactory.getTableMeta(metaTable.getDataSource(), this.field1Meta.getReferenceTable());
+		this.table2Meta = AbstractTableMetaFactory.getTableMeta(metaTable.getDataSource(), this.field2Meta.getReferenceTable());
 
-		tblRegistredValues = new QueryJTable("", metaTable.getDataSource(), "", true);
-		tblRegistredValues.setPagRowsCount(0);
-		tblRegistredValues.setShowFilterButtons(false);
-		tblRegistredValues.setShowSortingPanel(false);
-		tblRegistredValues.setPreferredSize(new Dimension(300, 400));
+		// compMain = (BindingComponent)
+		// ComponentFactory.buildForeignKeyComponent(field1Meta);
+		this.compMain = new FieldPanelWithFilter(this.field1Meta.getReferenceTable());
+		// if(compMain instanceof ManageSupport){
+		// ((ManageSupport) compMain).setAllowManage(false);
+		// }
+		((JComponent) this.compMain).setEnabled(false);
+		this.tblAll = new QueryJTable("", metaTable.getDataSource(), "", true);
+		this.tblAll.setPagRowsCount(0);
+		this.tblAll.setShowFilterButtons(false);
+		this.tblAll.setShowSortingPanel(false);
+		this.tblAll.setPreferredSize(new Dimension(300, 400));
+		this.tblAll.setVisible(metaTable.isAllowAdd() || metaTable.isAllowDelete());
+
+		this.tblRegistredValues = new QueryJTable("", metaTable.getDataSource(), "", true);
+		this.tblRegistredValues.setPagRowsCount(0);
+		this.tblRegistredValues.setShowFilterButtons(false);
+		this.tblRegistredValues.setShowSortingPanel(false);
+		this.tblRegistredValues.setPreferredSize(new Dimension(300, 400));
 		init();
 		setMasterIdValue(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see com.fs.commons.desktop.dynform.ui.detail.DetailPanel#
+	 * addDynDaoActionListener
+	 * (com.fs.commons.desktop.dynform.ui.action.DynDaoPanelActionListener)
+	 */
+	@Override
+	public void addDynDaoActionListener(final DynDaoActionListener listener) {
+		this.listeners.add(listener);
+	}
+
 	/**
-	 * 
-	 * 
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	private void callAfterAddEventOnTriggers(final Record record) throws DaoException {
+		final ArrayList<Trigger> triggers = this.metaTable.getTriggers();
+		for (int i = 0; i < triggers.size(); i++) {
+			triggers.get(i).afterAdd(record);
+		}
+	}
+
+	/**
+	 * @param record
+	 * @throws DaoException
+	 */
+	private void callAfterDeleteEventOnTriggers(final Record record) throws DaoException {
+		final ArrayList<Trigger> triggers = this.metaTable.getTriggers();
+		for (int i = 0; i < triggers.size(); i++) {
+			triggers.get(i).afterDelete(record);
+		}
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	private void callBeforeAddEventOnTriggers(final Record record) throws DaoException {
+		final ArrayList<Trigger> triggers = this.metaTable.getTriggers();
+		for (int i = 0; i < triggers.size(); i++) {
+			triggers.get(i).beforeAdd(record);
+		}
+	}
+
+	private void callBeforeDeleteEventOnTriggers(final Record record) throws DaoException {
+		final ArrayList<Trigger> triggers = this.metaTable.getTriggers();
+		for (int i = 0; i < triggers.size(); i++) {
+			triggers.get(i).beforeDelete(record);
+		}
+	}
+
+	private void enableDisable() {
+		this.btnAdd.setEnabled(this.tblAll.getModel().getRowCount() > 0);
+		this.btnRemove.setEnabled(this.tblRegistredValues.getModel().getRowCount() > 0);
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	void fireAfterAddRecord(final Record record) throws DaoException {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			final DynDaoActionListener listsner = this.listeners.get(i);
+			listsner.afterAddRecord(record);
+		}
+	}
+
+	void fireAfterDeleteRecord(final Record record) throws DaoException {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			this.listeners.get(i).afterDeleteRecord(record);
+		}
+	}
+
+	/**
+	 *
+	 */
+	private void fireAfterResetComponents() {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			this.listeners.get(i).afterResetComponents();
+		}
+
+	}
+
+	/**
+	 *
+	 * @param record
+	 * @throws DaoException
+	 */
+	void fireBeforeAddRecord(final Record record) throws DaoException {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			this.listeners.get(i).beforeAddRecord(record);
+		}
+	}
+
+	void fireBeforeDeleteRecord(final Record record) throws DaoException {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			this.listeners.get(i).beforeDeleteRecord(record);
+
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	private JKPanel getButtonsPanel() {
+		final JKPanel pnl = new JKPanel();
+		final JKPanel pnlButtons = new JKPanel(new GridLayout(2, 1, 5, 5));
+		this.btnAdd.setIcon(SwingUtility.isLeftOrientation() ? "right.png" : "left.png");
+		this.btnRemove.setIcon(SwingUtility.isLeftOrientation() ? "left.png" : "right.png");
+		pnlButtons.add(this.btnAdd);
+		pnlButtons.add(this.btnRemove);
+		this.btnAdd.setVisible(this.metaTable.isAllowAdd());
+		this.btnRemove.setVisible(this.metaTable.isAllowDelete());
+		pnl.add(pnlButtons);
+		return pnl;
+	}
+
+	/**
+	 *
+	 */
+	protected void handleAdd() {
+		try {
+			final int ids[] = this.tblAll.getSelectedIdsAsInteger();
+			for (final int id : ids) {
+				final Record record = this.metaTable.createEmptyRecord();
+				record.getField(0).setValue(this.compMain.getValue());
+				record.getField(1).setValue(id);
+				this.metaTable.validateData(record);
+				fireBeforeAddRecord(record);
+				callBeforeAddEventOnTriggers(record);
+				this.dao.insertRecord(record);
+				callAfterAddEventOnTriggers(record);
+				fireAfterAddRecord(record);
+			}
+			reload();
+		} catch (final DaoException e) {
+			ExceptionUtil.handleException(e);
+		} catch (final ValidationException e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.fs.commons.desktop.dynform.ui.detail.DetailPanel#handleFind(java.lang
+	 * .String)
+	 */
+	@Override
+	public void handleFind(final Object idValud) throws DaoException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 *
+	 */
+	protected void handleRemove() {
+		if (this.tblAll.isVisible()) {
+			try {
+				final int ids[] = this.tblRegistredValues.getSelectedIdsAsInteger();
+				for (final int id : ids) {
+					Record record = this.metaTable.createEmptyRecord();
+					record.getField(0).setValue(this.compMain.getValue());
+					record.getField(1).setValue(id);
+					record = this.dao.lstRecords(record).get(0);
+					callBeforeDeleteEventOnTriggers(record);
+					fireBeforeDeleteRecord(record);
+					this.dao.deleteRecord(record);
+					callAfterDeleteEventOnTriggers(record);
+					fireAfterDeleteRecord(record);
+				}
+				reload();
+			} catch (final DaoException e) {
+				ExceptionUtil.handleException(e);
+			}
+		}
+	}
+
+	/**
+	 *
+	 *
 	 */
 	private void init() {
 		setLayout(new BorderLayout());
-		JKPanel pnlNorth = new JKPanel();
-		if (field1Meta.isVisible()) {
-			pnlNorth.add(new JKLabledComponent(field1Meta.getName(), compMain));
+		final JKPanel pnlNorth = new JKPanel();
+		if (this.field1Meta.isVisible()) {
+			pnlNorth.add(new JKLabledComponent(this.field1Meta.getName(), this.compMain));
 		}
 
-		JKPanel pnlCenter = new JKPanel();
+		final JKPanel pnlCenter = new JKPanel();
 		pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.LINE_AXIS));
 
-		JKPanel pnl = getButtonsPanel();
+		final JKPanel pnl = getButtonsPanel();
 
-		if (metaTable.isAllowAdd() || metaTable.isAllowDelete()) {
-			pnlCenter.add(tblAll);
+		if (this.metaTable.isAllowAdd() || this.metaTable.isAllowDelete()) {
+			pnlCenter.add(this.tblAll);
 			pnlCenter.add(pnl);
 		}
-		pnlCenter.add(tblRegistredValues);
+		pnlCenter.add(this.tblRegistredValues);
 		pnlCenter.setBorder(BorderFactory.createRaisedBevelBorder());
 
 		pnlCenter.setBorder(BorderFactory.createLoweredBevelBorder());
 		add(pnlNorth, BorderLayout.NORTH);
 		add(pnlCenter, BorderLayout.CENTER);
 
-		tblAll.getTable().addKeyListener(new KeyAdapter() {
+		this.tblAll.getTable().addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-					btnAdd.doClick();
+					DynCrossDaoPanel.this.btnAdd.doClick();
 				}
 			}
 		});
-		tblRegistredValues.getTable().addKeyListener(new KeyAdapter() {
+		this.tblRegistredValues.getTable().addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-					btnRemove.doClick();
+					DynCrossDaoPanel.this.btnRemove.doClick();
 				}
 			}
 		});
 
-		btnAdd.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnAdd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleAdd();
 			}
 		});
-		btnRemove.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnRemove.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleRemove();
 
 			}
@@ -161,180 +362,47 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 	}
 
 	/**
-	 * @return
-	 */
-	private JKPanel getButtonsPanel() {
-		JKPanel pnl = new JKPanel();
-		JKPanel pnlButtons = new JKPanel(new GridLayout(2, 1, 5, 5));
-		btnAdd.setIcon(SwingUtility.isLeftOrientation() ? "right.png" : "left.png");
-		btnRemove.setIcon(SwingUtility.isLeftOrientation() ? "left.png" : "right.png");
-		pnlButtons.add(btnAdd);
-		pnlButtons.add(btnRemove);
-		btnAdd.setVisible(metaTable.isAllowAdd());
-		btnRemove.setVisible(metaTable.isAllowDelete());
-		pnl.add(pnlButtons);
-		return pnl;
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleAdd() {
-		try {
-			int ids[] = tblAll.getSelectedIdsAsInteger();
-			for (int i = 0; i < ids.length; i++) {
-				Record record = metaTable.createEmptyRecord();
-				record.getField(0).setValue(compMain.getValue());
-				record.getField(1).setValue(ids[i]);
-				metaTable.validateData(record);
-				fireBeforeAddRecord(record);
-				callBeforeAddEventOnTriggers(record);
-				dao.insertRecord(record);
-				callAfterAddEventOnTriggers(record);
-				fireAfterAddRecord(record);
-			}
-			reload();
-		} catch (DaoException e) {
-			ExceptionUtil.handleException(e);
-		} catch (ValidationException e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	private void callBeforeAddEventOnTriggers(Record record) throws DaoException {
-		ArrayList<Trigger> triggers = metaTable.getTriggers();
-		for (int i = 0; i < triggers.size(); i++) {
-			triggers.get(i).beforeAdd(record);
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	private void callAfterAddEventOnTriggers(Record record) throws DaoException {
-		ArrayList<Trigger> triggers = metaTable.getTriggers();
-		for (int i = 0; i < triggers.size(); i++) {
-			triggers.get(i).afterAdd(record);
-		}
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleRemove() {
-		if (tblAll.isVisible()) {
-			try {
-				int ids[] = tblRegistredValues.getSelectedIdsAsInteger();
-				for (int i = 0; i < ids.length; i++) {
-					Record record = metaTable.createEmptyRecord();
-					record.getField(0).setValue(compMain.getValue());
-					record.getField(1).setValue(ids[i]);
-					record = dao.lstRecords(record).get(0);
-					callBeforeDeleteEventOnTriggers(record);
-					fireBeforeDeleteRecord(record);
-					dao.deleteRecord(record);
-					callAfterDeleteEventOnTriggers(record);
-					fireAfterDeleteRecord(record);
-				}
-				reload();
-			} catch (DaoException e) {
-				ExceptionUtil.handleException(e);
-			}
-		}
-	}
-
-	/**
-	 * @param record
-	 * @throws DaoException
-	 */
-	private void callAfterDeleteEventOnTriggers(Record record) throws DaoException {
-		ArrayList<Trigger> triggers = metaTable.getTriggers();
-		for (int i = 0; i < triggers.size(); i++) {
-			triggers.get(i).afterDelete(record);
-		}
-	}
-
-	private void callBeforeDeleteEventOnTriggers(Record record) throws DaoException {
-		ArrayList<Trigger> triggers = metaTable.getTriggers();
-		for (int i = 0; i < triggers.size(); i++) {
-			triggers.get(i).beforeDelete(record);
-		}
-	}
-
-	/**
-	 * 
+	 *
 	 * o
 	 */
 	void reload() {
 		try {
-			Object value = compMain.getValue();
+			final Object value = this.compMain.getValue();
 			if (value == null) {
-				tblAll.setQuery("");
-				tblRegistredValues.setQuery("");
+				this.tblAll.setQuery("");
+				this.tblRegistredValues.setQuery("");
 			} else {
-				int parseInt = value == null ? -1 : Integer.parseInt(value.toString());
-				String notAssignedValuesQuery = dao.getNotAssignedValuesQuery(parseInt);
-				tblAll.setQuery(notAssignedValuesQuery);
-				tblRegistredValues.setQuery(dao.getAssignedValuesQuery(parseInt));
+				final int parseInt = value == null ? -1 : Integer.parseInt(value.toString());
+				final String notAssignedValuesQuery = this.dao.getNotAssignedValuesQuery(parseInt);
+				this.tblAll.setQuery(notAssignedValuesQuery);
+				this.tblRegistredValues.setQuery(this.dao.getAssignedValuesQuery(parseInt));
 			}
 			enableDisable();
-		} catch (TableMetaNotFoundException e) {
+		} catch (final TableMetaNotFoundException e) {
 			ExceptionUtil.handleException(e);
 		}
 
 	}
 
-	private void enableDisable() {
-		btnAdd.setEnabled(tblAll.getModel().getRowCount() > 0);
-		btnRemove.setEnabled(tblRegistredValues.getModel().getRowCount() > 0);
-	}
-
 	@Override
 	public void resetComponents() throws DaoException {
-		compMain.setValue(null);
-		tblAll.setQuery("");
-		tblRegistredValues.setQuery("");
+		this.compMain.setValue(null);
+		this.tblAll.setQuery("");
+		this.tblRegistredValues.setQuery("");
 		fireAfterResetComponents();
 	}
 
-	/**
-	 * 
-	 */
-	private void fireAfterResetComponents() {
-		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).afterResetComponents();
-		}
-
-	}
-
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.fs.commons.desktop.dynform.ui.detail.DetailPanel#addDynDaoActionListener
-	 * (com.fs.commons.desktop.dynform.ui.action.DynDaoPanelActionListener)
-	 */
-	public void addDynDaoActionListener(DynDaoActionListener listener) {
-		this.listeners.add(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.fs.commons.desktop.dynform.ui.detail.DetailPanel#setMasterIdValue
 	 * (java .lang.Object)
 	 */
-	public void setMasterIdValue(Object object) throws DaoException {
-//		System.out.println("Hyane at object : "+object);
-		((JComponent) compMain).setEnabled(false);
+	@Override
+	public void setMasterIdValue(final Object object) throws DaoException {
+		// System.out.println("Hyane at object : "+object);
+		((JComponent) this.compMain).setEnabled(false);
 
 		// if(compMain instanceof DaoComboBox){
 		// ((DaoComboBox)compMain).reloadData();
@@ -343,70 +411,23 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 		// ((DaoComboWithManagePanel)compMain).reloadData();
 		// }
 		// }
-		//		
+		//
 		// the purpose of this reset is to feresh the combo box data
-	//	compMain.reset();
-		compMain.setValue(object);
+		// compMain.reset();
+		this.compMain.setValue(object);
 		reload();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.fs.commons.desktop.dynform.ui.detail.DetailPanel#handleFind(java.lang
-	 * .String)
+	 *
+	 * @see com.fs.commons.desktop.dynform.ui.detail.DetailPanel#setMode(com.jk.
+	 * commons .dao.dynform.ui.DynDaoPanel.DynDaoMode)
 	 */
-	public void handleFind(Object idValud) throws DaoException {
-		// TODO Auto-generated method stub
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.fs.commons.desktop.dynform.ui.detail.DetailPanel#setMode(com.jk.commons
-	 * .dao.dynform.ui.DynDaoPanel.DynDaoMode)
-	 */
-	public void setMode(DynDaoMode mode) {
+	@Override
+	public void setMode(final DynDaoMode mode) {
 		// btnAdd.setEnabled(mode == DynDaoMode.VIEW);
 		// btnRemove.setEnabled(mode == DynDaoMode.VIEW);
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException 
-	 */
-	void fireBeforeAddRecord(Record record) throws DaoException {
-		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).beforeAddRecord(record);
-		}
-	}
-
-	void fireBeforeDeleteRecord(Record record) throws DaoException {
-		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).beforeDeleteRecord(record);
-
-		}
-	}
-
-	/**
-	 * 
-	 * @param record
-	 * @throws DaoException
-	 */
-	void fireAfterAddRecord(Record record) throws DaoException {
-		for (int i = 0; i < listeners.size(); i++) {
-			DynDaoActionListener listsner = listeners.get(i);
-			listsner.afterAddRecord(record);
-		}
-	}
-
-	void fireAfterDeleteRecord(Record record) throws DaoException {
-		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).afterDeleteRecord(record);
-		}
 	}
 
 }

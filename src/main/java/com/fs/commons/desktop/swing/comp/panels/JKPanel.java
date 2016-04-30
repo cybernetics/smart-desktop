@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp.panels;
 
 import java.awt.Color;
@@ -37,44 +52,116 @@ import com.fs.commons.locale.Lables;
 /**
  */
 public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+	// private DataSource manager;
 	private GradientType gradientType;
 	private Color gredientColor;
 	private Image backGroundImage;
 	protected FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
-	private boolean transfer;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	//private DataSource manager;
+	private boolean transfer;
 
 	public JKPanel() {
 		// super(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		initJKPanel();
 	}
 
-	public JKPanel(LayoutManager layout) {
-		super(layout);
-		initJKPanel();
+	public JKPanel(final GradientType gradientType) {
+		this.gradientType = gradientType;
 	}
 
-	public JKPanel(JComponent component) {
+	public JKPanel(final JComponent component) {
 		this();
 		add(component);
 	}
 
-	public JKPanel(GradientType gradientType) {
-		this.gradientType = gradientType;
-	}
-
-	public JKPanel(JComponent container, String title) {
+	public JKPanel(final JComponent container, final String title) {
 		this(container);
 		setTitle(title);
 	}
 
-	public void setTitle(String title) {
-		setBorder(SwingUtility.createTitledBorder(title));
+	public JKPanel(final LayoutManager layout) {
+		super(layout);
+		initJKPanel();
+	}
+
+	@Override
+	public void addActionListener(final ActionListener actionListener) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addValidator(final Validator validator) {
+		this.fsWrapper.addValidator(validator);
+	}
+
+	@Override
+	public void addValueChangeListener(final ValueChangeListener listener) {
+		this.fsWrapper.addValueChangeListsner(listener);
+	}
+
+	@Override
+	public void clear() {
+		final String methodName = "clear ";
+		handleUnAllowedMethodCall(methodName);
+	}
+
+	@Override
+	public void filterValues(final BindingComponent component) {
+
+	}
+
+	public Image getBackGroundImage() {
+		return this.backGroundImage;
+	}
+
+	@Override
+	public DataSource getDataSource() {
+		return this.fsWrapper.getDataSource();
+	};
+
+	@Override
+	public T getDefaultValue() {
+		final String methodName = "getDefaultValue ";
+		return handleUnAllowedMethodCall(methodName);
+	}
+
+	/**
+	 * @return the gradientType
+	 */
+	public GradientType getGradientType() {
+		return this.gradientType;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private Color getGredientColor(final boolean recalculate) {
+		if (this.gredientColor == null || recalculate) {
+			this.gredientColor = GraphicsFactory.createGradientColor(getBackground());
+		}
+		return this.gredientColor;
+	}
+
+	@Override
+	public T getValue() {
+		final String methodName = "getValue ";
+		return handleUnAllowedMethodCall(methodName);
+	}
+
+	/**
+	 * @param methodName
+	 */
+	private T handleUnAllowedMethodCall(final String methodName) {
+		// System.err.println(this.getClass().getName());
+		// System.err.println("calling " + methodName +
+		// "on JKPanel is not allowed");
+		return null;
 	}
 
 	private void initJKPanel() {
@@ -86,8 +173,8 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
 		addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2 && e.getButton() == e.BUTTON3) {
+			public void mouseClicked(final MouseEvent e) {
+				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON3) {
 					setVisible(false);
 				}
 			}
@@ -95,121 +182,37 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 	}
 
 	@Override
-	public void requestFocus() {
-		Runnable runnable = new Runnable() {
-			public void run() {
-				transferFocus();
-			}
-		};
-		SwingUtilities.invokeLater(runnable);
+	public boolean isAutoTransferFocus() {
+		return this.transfer;
 	}
 
-	/**
-	 * 
-	 * @throws DaoException
-	 */
-	public void resetComponents() throws DaoException {
-	}
-
+	// ///////////////////////////////////////////////////////////
 	@Override
-	public void setEnabled(boolean enabled) {
-		SwingUtility.enableContainer(this, enabled);
-	}
-
-	// ///////////////////////////////////////////////////////////
-	public void setPreferredSize(int width, int height) {
-		super.setPreferredSize(new Dimension(width, height));
-	}
-
-	// ///////////////////////////////////////////////////////////
-	public void paint(Graphics g) {
-		if (gradientType != null) {
-			Color newColor = getGredientColor(false);
-			GraphicsFactory.makeGradient(this, g, getBackground(), newColor, gradientType);
+	public void paint(final Graphics g) {
+		if (this.gradientType != null) {
+			final Color newColor = getGredientColor(false);
+			GraphicsFactory.makeGradient(this, g, getBackground(), newColor, this.gradientType);
 		}
 		super.paint(g);
-	};
+	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	private Color getGredientColor(boolean recalculate) {
-		if (gredientColor == null || recalculate) {
-			gredientColor = GraphicsFactory.createGradientColor(getBackground());
+	@Override
+	protected void paintComponent(final Graphics g) {
+		if (this.backGroundImage == null) {
+			super.paintComponent(g);
+		} else {
+			final Graphics2D g2d = (Graphics2D) g;
+
+			// scale the image to fit the size of the Panel
+			final double mw = this.backGroundImage.getWidth(null);
+			final double mh = this.backGroundImage.getHeight(null);
+
+			final double sw = getWidth() / mw;
+			final double sh = getHeight() / mh;
+
+			g2d.scale(sw, sh);
+			g2d.drawImage(this.backGroundImage, 0, 0, this);
 		}
-		return gredientColor;
-	}
-
-	public void setGredientColor(Color gredientColor) {
-		this.gredientColor = gredientColor;
-	}
-
-	@Override
-	public void setBackground(Color bg) {
-		super.setBackground(bg);
-		getGredientColor(true);
-	}
-
-	/**
-	 * @return the gradientType
-	 */
-	public GradientType getGradientType() {
-		return gradientType;
-	}
-
-	/**
-	 * @param gradientType
-	 *            the gradientType to set
-	 */
-	public void setGradientType(GradientType gradientType) {
-		this.gradientType = gradientType;
-	}
-
-	@Override
-	public T getValue() {
-		String methodName = "getValue ";
-		return handleUnAllowedMethodCall(methodName);
-	}
-
-	@Override
-	public void setValue(T value) {
-		String methodName = "setValue ";
-		handleUnAllowedMethodCall(methodName);
-	}
-
-	@Override
-	public T getDefaultValue() {
-		String methodName = "getDefaultValue ";
-		return handleUnAllowedMethodCall(methodName);
-	}
-
-	@Override
-	public void setDefaultValue(T t) {
-		String methodName = "setDefaultValue ";
-		handleUnAllowedMethodCall(methodName);
-	}
-
-	@Override
-	public void reset() {
-		String methodName = "reset ";
-		handleUnAllowedMethodCall(methodName);
-	}
-
-	@Override
-	public void clear() {
-		String methodName = "clear ";
-		handleUnAllowedMethodCall(methodName);
-	}
-
-	/**
-	 * @param methodName
-	 */
-	private T handleUnAllowedMethodCall(String methodName) {
-		// System.err.println(this.getClass().getName());
-		// System.err.println("calling " + methodName +
-		// "on JKPanel is not allowed");
-		return null;
 	}
 
 	public void refreshComponents() {
@@ -218,29 +221,134 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 	}
 
 	@Override
-	public void filterValues(BindingComponent component) {
-
+	public void requestFocus() {
+		final Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				transferFocus();
+			}
+		};
+		SwingUtilities.invokeLater(runnable);
 	}
 
 	@Override
-	public void addValidator(Validator validator) {
-		fsWrapper.addValidator(validator);
+	public void reset() {
+		final String methodName = "reset ";
+		handleUnAllowedMethodCall(methodName);
+	}
+
+	/**
+	 *
+	 * @throws DaoException
+	 */
+	public void resetComponents() throws DaoException {
+	}
+
+	@Override
+	public void setAutoTransferFocus(final boolean transfer) {
+		this.transfer = transfer;
+	}
+
+	@Override
+	public void setBackground(final Color bg) {
+		super.setBackground(bg);
+		getGredientColor(true);
+	}
+
+	public void setBackGroundImage(final Image backGroundImage) {
+		this.backGroundImage = backGroundImage;
+	}
+
+	public void setBackGroundImage(final String imageName) {
+		try {
+			setBackGroundImage(SwingUtility.getImage(imageName));
+			// add(new ImagePanel(SwingUtility.geti))
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void setBorder(final Border border) {
+		if (border instanceof TitledBorder) {
+			final TitledBorder b = (TitledBorder) border;
+			b.setTitle(Lables.get(b.getTitle(), true));
+		}
+		super.setBorder(border);
+	}
+
+	@Override
+	public void setDataSource(final DataSource manager) {
+		this.fsWrapper.setDataSource(manager);
+	}
+
+	@Override
+	public void setDefaultValue(final T t) {
+		final String methodName = "setDefaultValue ";
+		handleUnAllowedMethodCall(methodName);
+	}
+
+	@Override
+	public void setEnabled(final boolean enabled) {
+		SwingUtility.enableContainer(this, enabled);
+	}
+
+	/**
+	 * @param gradientType
+	 *            the gradientType to set
+	 */
+	public void setGradientType(final GradientType gradientType) {
+		this.gradientType = gradientType;
+	}
+
+	public void setGredientColor(final Color gredientColor) {
+		this.gredientColor = gredientColor;
+	}
+
+	@Override
+	public void setLayout(final LayoutManager mgr) {
+		if (mgr instanceof FlowLayout) {
+			final FlowLayout flow = (FlowLayout) mgr;
+			// flow.setHgap(0);
+			// flow.setVgap(0);
+		}
+		super.setLayout(mgr);
+	}
+
+	// ///////////////////////////////////////////////////////////
+	public void setPreferredSize(final int width, final int height) {
+		super.setPreferredSize(new Dimension(width, height));
+	}
+
+	public void setTitle(final String title) {
+		setBorder(SwingUtility.createTitledBorder(title));
+	}
+
+	@Override
+	public void setValue(final T value) {
+		final String methodName = "setValue ";
+		handleUnAllowedMethodCall(methodName);
 	}
 
 	@Override
 	public void validateValue() throws ValidationException {
-		//validateValues();
-		fsWrapper.validateValue();
+		// validateValues();
+		this.fsWrapper.validateValue();
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////
-	public void validateValues(JKErrorLabel fslblErrorl) throws ValidationException {
-		StringBuffer buf = new StringBuffer();
-		Vector<BindingComponent> components = SwingUtility.findBindingComponents(this);
-		for (BindingComponent bindingComponent : components) {
+	public void validateValues() throws ValidationException {
+		validateValues(null);
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////
+	public void validateValues(final JKErrorLabel fslblErrorl) throws ValidationException {
+		final StringBuffer buf = new StringBuffer();
+		final Vector<BindingComponent> components = SwingUtility.findBindingComponents(this);
+		for (final BindingComponent bindingComponent : components) {
 			try {
 				bindingComponent.validateValue();
-			} catch (UIValidationException e) {
+			} catch (final UIValidationException e) {
 				if (e.getProblems() != null && fslblErrorl != null) {
 					fslblErrorl.setText(e.getProblems().getLeadProblem().getMessage());
 				}
@@ -251,95 +359,4 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 			fslblErrorl.setText("");
 		}
 	}
-
-	// ////////////////////////////////////////////////////////////////////////////////////
-	public void validateValues() throws ValidationException {
-		validateValues(null);
-	}
-
-	@Override
-	public void setLayout(LayoutManager mgr) {
-		if (mgr instanceof FlowLayout) {
-			FlowLayout flow = (FlowLayout) mgr;
-//			flow.setHgap(0);
-//			flow.setVgap(0);
-		}
-		super.setLayout(mgr);
-	}
-
-	@Override
-	public void setBorder(Border border) {
-		if (border instanceof TitledBorder) {
-			TitledBorder b = (TitledBorder) border;
-			b.setTitle(Lables.get(b.getTitle(),true));
-		}
-		super.setBorder(border);
-	}
-
-	public Image getBackGroundImage() {
-		return backGroundImage;
-	}
-
-	public void setBackGroundImage(Image backGroundImage) {
-		this.backGroundImage = backGroundImage;
-	}
-
-	public void setBackGroundImage(String imageName) {
-		try {
-			setBackGroundImage(SwingUtility.getImage(imageName));
-			// add(new ImagePanel(SwingUtility.geti))
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	protected void paintComponent(Graphics g) {
-		if (backGroundImage == null)
-			super.paintComponent(g);
-		else {
-			Graphics2D g2d = (Graphics2D) g;
-
-			// scale the image to fit the size of the Panel
-			double mw = backGroundImage.getWidth(null);
-			double mh = backGroundImage.getHeight(null);
-
-			double sw = getWidth() / mw;
-			double sh = getHeight() / mh;
-
-			g2d.scale(sw, sh);
-			g2d.drawImage(backGroundImage, 0, 0, this);
-		}
-	}
-
-	@Override
-	public void setDataSource(DataSource manager) {
-		fsWrapper.setDataSource(manager);
-	}
-
-	@Override
-	public DataSource getDataSource() {
-		return fsWrapper.getDataSource();
-	}
-
-	@Override
-	public void addValueChangeListener(ValueChangeListener listener) {
-		fsWrapper.addValueChangeListsner(listener);
-	}
-
-	@Override
-	public void addActionListener(ActionListener actionListener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setAutoTransferFocus(boolean transfer) {
-		this.transfer = transfer;
-	}
-
-	@Override
-	public boolean isAutoTransferFocus() {
-		return transfer;
-	}	
 }

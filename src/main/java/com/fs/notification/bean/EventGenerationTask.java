@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.notification.bean;
 
 import com.fs.commons.apps.templates.beans.Query;
@@ -11,53 +26,53 @@ public class EventGenerationTask {
 	private Template template;
 	private String name;
 
-	public int getId() {
-		return id;
+	public Query getAppliedAccountsQuery() {
+		return this.appliedAccountsQuery;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public int getId() {
+		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
 	}
 
 	public NotificationType getNotType() {
-		return notType;
-	}
-
-	public void setNotType(NotificationType notType) {
-		this.notType = notType;
-	}
-
-	public Query getTemplateValues() {
-		return templateValues;
-	}
-
-	public void setTemplateValues(Query templateValues) {
-		this.templateValues = templateValues;
-	}
-
-	public Query getAppliedAccountsQuery() {
-		return appliedAccountsQuery;
-	}
-
-	public void setAppliedAccountsQuery(Query appliedAccountsQuery) {
-		this.appliedAccountsQuery = appliedAccountsQuery;
-	}
-
-	public void setTemplate(Template template) {
-		this.template = template;
+		return this.notType;
 	}
 
 	public Template getTemplate() {
-		return template;
+		return this.template;
 	}
 
-	public void setName(String name) {
+	public Query getTemplateValues() {
+		return this.templateValues;
+	}
+
+	public void setAppliedAccountsQuery(final Query appliedAccountsQuery) {
+		this.appliedAccountsQuery = appliedAccountsQuery;
+	}
+
+	public void setId(final int id) {
+		this.id = id;
+	}
+
+	public void setName(final String name) {
 		this.name = name;
 
 	}
 
-	public String getName() {
-		return name;
+	public void setNotType(final NotificationType notType) {
+		this.notType = notType;
+	}
+
+	public void setTemplate(final Template template) {
+		this.template = template;
+	}
+
+	public void setTemplateValues(final Query templateValues) {
+		this.templateValues = templateValues;
 	}
 
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.meta.xml;
 
 import java.io.IOException;
@@ -36,20 +51,34 @@ public class TableMetaXmlParser {
 	// private final String fileName;
 
 	/**
+	 *
+	 * @param args
+	 * @throws JKXmlException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	public static void main(final String[] args) throws JKXmlException {
+		// TablesCofigParser p = new TablesCofigParser();;
+	}
+
+	/**
 	 * @param abstractModule
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	public TableMetaXmlParser() {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fileName
 	 * @throws IOException
 	 * @throws SAXException
@@ -61,7 +90,7 @@ public class TableMetaXmlParser {
 	// this.fileName = fileName;
 	// }
 	/**
-	 * 
+	 *
 	 * @param source
 	 * @param fileName
 	 * @throws ParserConfigurationException
@@ -70,17 +99,17 @@ public class TableMetaXmlParser {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public Hashtable<String, TableMeta> parse(InputStream in, String source) throws JKXmlException {
+	public Hashtable<String, TableMeta> parse(final InputStream in, final String source) throws JKXmlException {
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(in);
-			NodeList tablesNode = doc.getElementsByTagName("table");
+			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			final DocumentBuilder builder = factory.newDocumentBuilder();
+			final Document doc = builder.parse(in);
+			final NodeList tablesNode = doc.getElementsByTagName("table");
 
-			Hashtable<String, TableMeta> tablesHash = new Hashtable<String, TableMeta>();
+			final Hashtable<String, TableMeta> tablesHash = new Hashtable<String, TableMeta>();
 			for (int i = 0; i < tablesNode.getLength(); i++) {
-				Element table = (Element) tablesNode.item(i);
-				TableMeta tableInstance = TableMeta.class.newInstance();
+				final Element table = (Element) tablesNode.item(i);
+				final TableMeta tableInstance = TableMeta.class.newInstance();
 				tableInstance.setTableName(table.getAttribute("name"));
 				tableInstance.setSource(source);
 				if (!table.getAttribute("id").equals("")) {
@@ -104,7 +133,8 @@ public class TableMetaXmlParser {
 				if (!table.getAttribute("filter-indices").equals("")) {
 					tableInstance.setFilters(table.getAttribute("filter-indices").split(","));
 				}
-				//TODO :ui-colunm-count is depracted , should be replaced with ui-row-count
+				// TODO :ui-colunm-count is depracted , should be replaced with
+				// ui-row-count
 				if (!table.getAttribute("ui-colunm-count").equals("")) {
 					tableInstance.setDefaultUIRowCount(Integer.parseInt(table.getAttribute("ui-colunm-count")));
 				}
@@ -129,14 +159,14 @@ public class TableMetaXmlParser {
 				if (!table.getAttribute("class").equals("")) {
 					tableInstance.setBeanName(table.getAttribute("class"));
 				}
-				//if (!table.getAttribute("privilige-id").equals("")) {
-					//tableInstance.setPriviligeId(Integer.parseInt(table.getAttribute("privilige-id")));
-				//}
-				//parse Default Group
+				// if (!table.getAttribute("privilige-id").equals("")) {
+				// tableInstance.setPriviligeId(Integer.parseInt(table.getAttribute("privilige-id")));
+				// }
+				// parse Default Group
 				// fields
-				parseGroup((Element) table, tableInstance);
+				parseGroup(table, tableInstance);
 				for (int j = 0; j < table.getChildNodes().getLength(); j++) {
-					Node node = table.getChildNodes().item(j);					
+					final Node node = table.getChildNodes().item(j);
 					if (node.getNodeName().equals("group")) {
 						parseGroup((Element) node, tableInstance);
 						// } else if (node.getNodeName().equals("id-field")) {
@@ -151,7 +181,7 @@ public class TableMetaXmlParser {
 						// tableInstance.addField(field);
 						// defaultGroup.addField(field);
 					} else if (node.getNodeName().equals("constraints")) {
-						ArrayList<Constraint> constraints = parseConstraints(tableInstance, node);
+						final ArrayList<Constraint> constraints = parseConstraints(tableInstance, node);
 						tableInstance.setConstraints(constraints);
 						// } else if
 						// (node.getNodeName().equals("filter-fields")) {
@@ -172,132 +202,39 @@ public class TableMetaXmlParser {
 				tablesHash.put(tableInstance.getTableId(), tableInstance);
 			}
 			return tablesHash;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new JKXmlException(e);
 		}
 	}
 
 	/**
-	 * 
-	 * @param tableInstance
-	 * @param node
-	 * @return
-	 * @throws Exception
-	 */
-	private void parseGroup(Element groupNode, TableMeta tableInstance) throws Exception {
-		FieldGroup group = new FieldGroup();
-		if (!groupNode.getAttribute("name").equals("")) {
-			group.setName(groupNode.getAttribute("name"));
-		}
-		if (!groupNode.getAttribute("ui-row-count").equals("")) {
-			group.setRowCount(Integer.parseInt(groupNode.getAttribute("ui-row-count")));
-		}
-		for (int j = 0; j < groupNode.getChildNodes().getLength(); j++) {
-			Node node = groupNode.getChildNodes().item(j);
-			if (node.getNodeName().equals("id-field")) {
-				IdFieldMeta id = parseIdField((Element) node, tableInstance);
-				// id.setParentTable(tableInstance);
-				//tableInstance.setIdField(id);
-				group.addField(id);
-			} else if (node.getNodeName().equals("field")) {
-				FieldMeta field = parseField((Element) node, tableInstance);
-				//tableInstance.addField(field);
-				group.addField(field);
-			}
-		}
-		tableInstance.addGroup(group);
-	}
-
-	/**
-	 * 
-	 * @param node
-	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 */
-	private HashSet<String> parseTriggers(Node node) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		HashSet<String> triggers = new HashSet<String>();
-		for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-			Node n = node.getChildNodes().item(i);
-			if (n.getNodeName().equals("trigger")) {
-				String triggerClassName = n.getTextContent().trim();
-				if (GeneralUtility.isEmpty(triggerClassName)) {
-					continue;
-				}
-				// Trigger
-				// trigger=(Trigger)Class.forName(triggerClassName).newInstance();
-				triggers.add(triggerClassName);
-			}
-		}
-		return triggers;
-	}
-
-//	/**
-//	 * 
-//	 * @param tableInstance
-//	 * @param node
-//	 * @return
-//	 */
-//	private ArrayList<String> parseFilters(TableMeta tableInstance, Node node) {
-//		ArrayList<String> filters = new ArrayList<String>();
-//		for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-//			Node n = node.getChildNodes().item(i);
-//			if (n.getNodeName().equals("field")) {
-//				Element e = (Element) n;
-//				filters.add(e.getAttribute("name"));
-//			}
-//		}
-//		return filters;
-//	}
-
-	/**
-	 * 
-	 * @param element
-	 * @return
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws ClassNotFoundException
-	 */
-	private ArrayList<Constraint> parseConstraints(TableMeta tableMeta, Node constraintsNode) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		ArrayList<Constraint> constraints = new ArrayList<Constraint>();
-		for (int i = 0; i < constraintsNode.getChildNodes().getLength(); i++) {
-			Node node = constraintsNode.getChildNodes().item(i);
-			if (node.getNodeName().equals("constraint")) {
-				Constraint cons = parseConstraint(tableMeta, (Element) node);
-				constraints.add(cons);
-			}
-		}
-		return constraints;
-	}
-
-	/**
-	 * 
+	 *
 	 * @param node
 	 * @return
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	private Constraint parseConstraint(TableMeta tableMeta, Element element) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+	private Constraint parseConstraint(final TableMeta tableMeta, final Element element)
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Constraint instance;
 		if (!element.getAttribute("class").equals("")) {
 			instance = (Constraint) Class.forName(element.getAttribute("class")).newInstance();
 		} else {
-			String constType = element.getAttribute("type");
+			final String constType = element.getAttribute("type");
 
 			if (constType.equals("no-duplicate")) {
 				instance = DuplicateDataConstraint.class.newInstance();
 			} else if (constType.equals("range")) {
-				DataRangeConstraint cons = DataRangeConstraint.class.newInstance();
+				final DataRangeConstraint cons = DataRangeConstraint.class.newInstance();
 				cons.setValueFrom(Float.parseFloat(element.getAttribute("value-from")));
 				cons.setValueTo(Float.parseFloat(element.getAttribute("value-to")));
 				instance = cons;
 			} else if (constType.equals("less-than")) {
-				LessThanContsraint cons = LessThanContsraint.class.newInstance();
+				final LessThanContsraint cons = LessThanContsraint.class.newInstance();
 				instance = cons;
 			} else if (constType.equals("no-idenetical")) {
-				IdenticalFieldsContraint cons = IdenticalFieldsContraint.class.newInstance();
+				final IdenticalFieldsContraint cons = IdenticalFieldsContraint.class.newInstance();
 				instance = cons;
 			} else {
 				instance = Constraint.class.newInstance();
@@ -305,12 +242,12 @@ public class TableMetaXmlParser {
 		}
 		instance.setName(element.getAttribute("name"));
 		for (int i = 0; i < element.getChildNodes().getLength(); i++) {
-			Node n = element.getChildNodes().item(i);
+			final Node n = element.getChildNodes().item(i);
 			if (n instanceof Element) {
-				Element fieldNode = (Element) n;
+				final Element fieldNode = (Element) n;
 				if (fieldNode.getTagName().equals("field")) {
-					String fieldName = fieldNode.getAttribute("name");
-					FieldMeta field = tableMeta.getField(fieldName);
+					final String fieldName = fieldNode.getAttribute("name");
+					final FieldMeta field = tableMeta.getField(fieldName);
 					instance.addField(field);
 				}
 			}
@@ -319,48 +256,55 @@ public class TableMetaXmlParser {
 		return instance;
 	}
 
+	// /**
+	// *
+	// * @param tableInstance
+	// * @param node
+	// * @return
+	// */
+	// private ArrayList<String> parseFilters(TableMeta tableInstance, Node
+	// node) {
+	// ArrayList<String> filters = new ArrayList<String>();
+	// for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+	// Node n = node.getChildNodes().item(i);
+	// if (n.getNodeName().equals("field")) {
+	// Element e = (Element) n;
+	// filters.add(e.getAttribute("name"));
+	// }
+	// }
+	// return filters;
+	// }
+
 	/**
-	 * 
+	 *
 	 * @param element
-	 * @param tableInstance
 	 * @return
-	 * @throws Exception
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws ClassNotFoundException
 	 */
-	private IdFieldMeta parseIdField(Element element, TableMeta tableInstance) throws Exception {
-		IdFieldMeta instance = IdFieldMeta.class.newInstance();
-		// instance.setName(element.getAttribute("name"));
-		// instance.setCaption(element.getAttribute("caption"));
-		// if (!element.getAttribute("type").equals("")) {
-		// instance.setType(Integer.parseInt(element.getAttribute("type")));
-		// }
-		// if (!element.getAttribute("property").equals("")) {
-		// instance.setPropertyName(element.getAttribute("property"));
-		// }
-		if (!element.getAttribute("auto-increment").equals("")) {
-			(instance).setAutoIncrement(Boolean.parseBoolean(element.getAttribute("auto-increment")));
+	private ArrayList<Constraint> parseConstraints(final TableMeta tableMeta, final Node constraintsNode)
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		final ArrayList<Constraint> constraints = new ArrayList<Constraint>();
+		for (int i = 0; i < constraintsNode.getChildNodes().getLength(); i++) {
+			final Node node = constraintsNode.getChildNodes().item(i);
+			if (node.getNodeName().equals("constraint")) {
+				final Constraint cons = parseConstraint(tableMeta, (Element) node);
+				constraints.add(cons);
+			}
 		}
-		// if (!element.getAttribute("width").equals("")) {
-		// instance.setWidth(Integer.parseInt(element.getAttribute("width")));
-		// }
-		// if (!element.getAttribute("visible").equals("")) {
-		// instance.setVisible(Boolean.parseBoolean(element.getAttribute("visible")));
-		// }
-		// if (!element.getAttribute("max-length").equals("")) {
-		// instance.setMaxLength(Integer.parseInt(element.getAttribute("max-length")));
-		// }
-		parseFieldProperties(element, tableInstance, instance);
-		return instance;
+		return constraints;
 	}
 
 	/**
-	 * 
+	 *
 	 * @param element
 	 * @param tableInstance
 	 * @return
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	private FieldMeta parseField(Element element, TableMeta tableInstance) throws Exception {
+	private FieldMeta parseField(final Element element, final TableMeta tableInstance) throws Exception {
 		FieldMeta instance;
 		if (!element.getAttribute("reference_table").equals("")) {
 			instance = ForiegnKeyFieldMeta.class.newInstance();
@@ -382,7 +326,7 @@ public class TableMetaXmlParser {
 	}
 
 	// ///////////////////////////////////////////////////////////////////
-	private void parseFieldProperties(Element element, TableMeta tableInstance, FieldMeta instance) throws Exception {
+	private void parseFieldProperties(final Element element, final TableMeta tableInstance, final FieldMeta instance) throws Exception {
 		instance.setParentTable(tableInstance);
 		instance.setName(element.getAttribute("name"));
 		instance.setCaption(element.getAttribute("caption"));
@@ -441,36 +385,111 @@ public class TableMetaXmlParser {
 		setFieldTriggers(element, instance);
 	}
 
-	private ArrayList<FieldTrigger> setFieldTriggers(Element element, FieldMeta instance) throws Exception {
-		ArrayList<FieldTrigger> triggers = new ArrayList<FieldTrigger>();
-		NodeList nodes = element.getChildNodes();
+	/**
+	 *
+	 * @param tableInstance
+	 * @param node
+	 * @return
+	 * @throws Exception
+	 */
+	private void parseGroup(final Element groupNode, final TableMeta tableInstance) throws Exception {
+		final FieldGroup group = new FieldGroup();
+		if (!groupNode.getAttribute("name").equals("")) {
+			group.setName(groupNode.getAttribute("name"));
+		}
+		if (!groupNode.getAttribute("ui-row-count").equals("")) {
+			group.setRowCount(Integer.parseInt(groupNode.getAttribute("ui-row-count")));
+		}
+		for (int j = 0; j < groupNode.getChildNodes().getLength(); j++) {
+			final Node node = groupNode.getChildNodes().item(j);
+			if (node.getNodeName().equals("id-field")) {
+				final IdFieldMeta id = parseIdField((Element) node, tableInstance);
+				// id.setParentTable(tableInstance);
+				// tableInstance.setIdField(id);
+				group.addField(id);
+			} else if (node.getNodeName().equals("field")) {
+				final FieldMeta field = parseField((Element) node, tableInstance);
+				// tableInstance.addField(field);
+				group.addField(field);
+			}
+		}
+		tableInstance.addGroup(group);
+	}
+
+	/**
+	 *
+	 * @param element
+	 * @param tableInstance
+	 * @return
+	 * @throws Exception
+	 */
+	private IdFieldMeta parseIdField(final Element element, final TableMeta tableInstance) throws Exception {
+		final IdFieldMeta instance = IdFieldMeta.class.newInstance();
+		// instance.setName(element.getAttribute("name"));
+		// instance.setCaption(element.getAttribute("caption"));
+		// if (!element.getAttribute("type").equals("")) {
+		// instance.setType(Integer.parseInt(element.getAttribute("type")));
+		// }
+		// if (!element.getAttribute("property").equals("")) {
+		// instance.setPropertyName(element.getAttribute("property"));
+		// }
+		if (!element.getAttribute("auto-increment").equals("")) {
+			instance.setAutoIncrement(Boolean.parseBoolean(element.getAttribute("auto-increment")));
+		}
+		// if (!element.getAttribute("width").equals("")) {
+		// instance.setWidth(Integer.parseInt(element.getAttribute("width")));
+		// }
+		// if (!element.getAttribute("visible").equals("")) {
+		// instance.setVisible(Boolean.parseBoolean(element.getAttribute("visible")));
+		// }
+		// if (!element.getAttribute("max-length").equals("")) {
+		// instance.setMaxLength(Integer.parseInt(element.getAttribute("max-length")));
+		// }
+		parseFieldProperties(element, tableInstance, instance);
+		return instance;
+	}
+
+	/**
+	 *
+	 * @param node
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 */
+	private HashSet<String> parseTriggers(final Node node) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		final HashSet<String> triggers = new HashSet<String>();
+		for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+			final Node n = node.getChildNodes().item(i);
+			if (n.getNodeName().equals("trigger")) {
+				final String triggerClassName = n.getTextContent().trim();
+				if (GeneralUtility.isEmpty(triggerClassName)) {
+					continue;
+				}
+				// Trigger
+				// trigger=(Trigger)Class.forName(triggerClassName).newInstance();
+				triggers.add(triggerClassName);
+			}
+		}
+		return triggers;
+	}
+
+	private ArrayList<FieldTrigger> setFieldTriggers(final Element element, final FieldMeta instance) throws Exception {
+		final ArrayList<FieldTrigger> triggers = new ArrayList<FieldTrigger>();
+		final NodeList nodes = element.getChildNodes();
 		for (int j = 0; j < nodes.getLength(); j++) {
-			Node node = nodes.item(j);
+			final Node node = nodes.item(j);
 			if (node.getNodeName().equals("triggers")) {
 				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-					Node n = node.getChildNodes().item(i);
+					final Node n = node.getChildNodes().item(i);
 					if (n.getNodeName().equals("trigger")) {
-						String triggerClassName = node.getTextContent().trim();
+						final String triggerClassName = node.getTextContent().trim();
 						instance.addTrigger(triggerClassName);
 					}
 				}
 			}
 		}
 		return triggers;
-	}
-
-	/**
-	 * 
-	 * @param args
-	 * @throws JKXmlException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	public static void main(String[] args) throws JKXmlException {
-		// TablesCofigParser p = new TablesCofigParser();;
 	}
 
 }

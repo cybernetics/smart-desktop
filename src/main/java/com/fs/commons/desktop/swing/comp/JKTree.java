@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Graphics;
@@ -22,39 +37,83 @@ import com.fs.commons.desktop.swing.tree.TreeUtil;
 
 public class JKTree extends JTree {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 2354424326770047463L;
+
 	public JKTree() {
 		super();
 		init();
 	}
 
-	public JKTree(Hashtable<?, ?> value) {
+	public JKTree(final Hashtable<?, ?> value) {
 		super(value);
 		init();
 	}
 
-	public JKTree(Object[] value) {
+	public JKTree(final Object[] value) {
 		super(value);
 		init();
 	}
 
-	public JKTree(TreeModel newModel) {
+	public JKTree(final TreeModel newModel) {
 		super(newModel);
 		init();
 	}
 
-	public JKTree(TreeNode root, boolean asksAllowsChildren) {
-		super(root, asksAllowsChildren);
-		init();
-	}
-
-	public JKTree(TreeNode root) {
+	public JKTree(final TreeNode root) {
 		super(new FSTreeModel(root, false));
 		init();
 	}
 
-	public JKTree(Vector<?> value) {
+	public JKTree(final TreeNode root, final boolean asksAllowsChildren) {
+		super(root, asksAllowsChildren);
+		init();
+	}
+
+	public JKTree(final Vector<?> value) {
 		super(value);
 		init();
+	}
+
+	/**
+	 *
+	 * @param listener
+	 */
+	public void addActionListener(final ActionListener listener) {
+		final MouseListener ml = new MouseAdapter() {
+			@Override
+			public void mousePressed(final MouseEvent e) {
+				final int selRow = getRowForLocation(e.getX(), e.getY());
+				if (selRow != -1) {
+					if (e.getClickCount() == 1) {
+						// mySingleClick(selRow, selPath);
+					} else if (e.getClickCount() == 2) {
+						listener.actionPerformed(null);
+					}
+				}
+			}
+		};
+		final KeyListener kl = new KeyAdapter() {
+
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					listener.actionPerformed(null);
+				}
+			}
+		};
+		addMouseListener(ml);
+		addKeyListener(kl);
+	}
+
+	public ArrayList<TreeNode> getNodesAsArray() {
+		return TreeUtil.toArray(getRoot());
+	}
+
+	public TreeNode getRoot() {
+		return (TreeNode) getModel().getRoot();
 	}
 
 	private void init() {
@@ -65,76 +124,38 @@ public class JKTree extends JTree {
 		// renderer.setBackground(Colors.MAIN_PANEL_BG);
 	}
 
-	/**
-	 * 
-	 * @param listener
-	 */
-	public void addActionListener(final ActionListener listener) {
-		MouseListener ml = new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				int selRow = getRowForLocation(e.getX(), e.getY());
-				if (selRow != -1) {
-					if (e.getClickCount() == 1) {
-						// mySingleClick(selRow, selPath);
-					} else if (e.getClickCount() == 2) {
-						listener.actionPerformed(null);
-					}
-				}
-			}
-		};
-		KeyListener kl = new KeyAdapter() {
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					listener.actionPerformed(null);
-				}
-			}
-		};
-		addMouseListener(ml);
-		addKeyListener(kl);
-	}
-
 	@Override
-	public void paint(Graphics g) {
+	public void paint(final Graphics g) {
 		super.paint(g);
 	}
 
 	/**
-	 * 
-	 * @param nodeToFind
-	 * @return
-	 */
-	public TreeNode searchNode(TreeNode nodeToFind, TreeNode searchFrom) {
-		if (searchFrom == null) {
-			searchFrom = (TreeNode) getModel().getRoot();
-		}
-		if (searchFrom.equals(nodeToFind)) {
-			return searchFrom;
-		}
-		Enumeration children = searchFrom.children();
-		while (children.hasMoreElements()) {
-			TreeNode node = searchNode(nodeToFind, (TreeNode) children.nextElement());
-			if (node != null) {
-				return node;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * 
+	 *
 	 */
 	public void refresh() {
 		invalidate();
 		repaint();
 	}
 
-	public TreeNode getRoot() {
-		return (TreeNode) getModel().getRoot();
-	}
-	
-	public ArrayList<TreeNode> getNodesAsArray(){
-		return TreeUtil.toArray(getRoot());
+	/**
+	 *
+	 * @param nodeToFind
+	 * @return
+	 */
+	public TreeNode searchNode(final TreeNode nodeToFind, TreeNode searchFrom) {
+		if (searchFrom == null) {
+			searchFrom = (TreeNode) getModel().getRoot();
+		}
+		if (searchFrom.equals(nodeToFind)) {
+			return searchFrom;
+		}
+		final Enumeration children = searchFrom.children();
+		while (children.hasMoreElements()) {
+			final TreeNode node = searchNode(nodeToFind, (TreeNode) children.nextElement());
+			if (node != null) {
+				return node;
+			}
+		}
+		return null;
 	}
 }

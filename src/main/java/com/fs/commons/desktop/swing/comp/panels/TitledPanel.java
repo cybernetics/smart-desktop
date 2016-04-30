@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp.panels;
 
 import java.awt.BorderLayout;
@@ -23,9 +38,26 @@ import com.fs.commons.desktop.swing.comp.JKFrame;
 import com.fs.commons.desktop.swing.comp.JKLabel;
 import com.fs.commons.locale.Lables;
 
+class JKTitleButton extends JKButton {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -331979725257583100L;
+
+	public JKTitleButton(final String string) {
+		super(string);
+		setFocusable(false);
+		setOpaque(false);
+		setBorder(BorderFactory.createLineBorder(Color.gray));
+		setPreferredSize(new Dimension(24, 24));
+	}
+
+}
+
 public class TitledPanel extends JKMainPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private final String title;
@@ -47,24 +79,24 @@ public class TitledPanel extends JKMainPanel {
 	JKLabel lbl;
 
 	/**
-	 * 
+	 *
 	 * @param title
 	 * @param panelFactory
 	 * @param panelProp
 	 */
-	public TitledPanel(String title, UIPanel panel) {
+	public TitledPanel(final String title, final UIPanel panel) {
 		this(title, panel, null);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param title
 	 * @param panelFactory
 	 * @param panelProp
 	 * @param icon
 	 * @param cached
 	 */
-	public TitledPanel(String title, UIPanel panel, String icon) {
+	public TitledPanel(final String title, final UIPanel panel, final String icon) {
 		this.title = title;
 		this.panel = panel;
 		this.icon = icon;
@@ -73,97 +105,73 @@ public class TitledPanel extends JKMainPanel {
 	}
 
 	/**
-	 * 
-	 */
-	protected void showPanel() {
-		add((Container)panel,BorderLayout.CENTER);
-		validate();
-		repaint();
-		if(panel instanceof JInternalFrame){
-			JInternalFrame f=(JInternalFrame) panel;
-			javax.swing.plaf.InternalFrameUI ifu= f.getUI();
-			((javax.swing.plaf.basic.BasicInternalFrameUI)ifu).setNorthPane(null);
-			f.setVisible(true);
-		}
-
-	}
-
-	/**
-	 * 
-	 */
-	private void init() {
-		setLayout(new BorderLayout());
-		JKPanel<?> titleBar = getTitleBar();
-
-		add(titleBar, BorderLayout.NORTH);
-		applyComponentOrientation(SwingUtility.getDefaultComponentOrientation());
-
-	}
-
-	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private JKPanel<?> getTitleBar() {
 		initComponenets();
-		pnlTitleBar.setGradientType(GradientType.HORIZENTAL);
-		btnClose.setShortcut("control X", "");
-		btnReload.setShortcut("control R", "");
-		pnlTitle.add(lbl);
-		
-		pnlButtons.add(btnAddToFavorites);
-		pnlButtons.add(btnShowInFrame);
-		pnlButtons.add(btnReload);
-		pnlButtons.add(btnPrevious);
-		pnlButtons.add(btnNext);
-		pnlButtons.add(btnClose);
+		this.pnlTitleBar.setGradientType(GradientType.HORIZENTAL);
+		this.btnClose.setShortcut("control X", "");
+		this.btnReload.setShortcut("control R", "");
+		this.pnlTitle.add(this.lbl);
 
-		pnlTitleBar.add(pnlTitle);
-		pnlTitleBar.add(pnlButtons);
+		this.pnlButtons.add(this.btnAddToFavorites);
+		this.pnlButtons.add(this.btnShowInFrame);
+		this.pnlButtons.add(this.btnReload);
+		this.pnlButtons.add(this.btnPrevious);
+		this.pnlButtons.add(this.btnNext);
+		this.pnlButtons.add(this.btnClose);
 
-		btnAddToFavorites.addActionListener(new ActionListener() {
+		this.pnlTitleBar.add(this.pnlTitle);
+		this.pnlTitleBar.add(this.pnlButtons);
+
+		this.btnAddToFavorites.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleAddToFavorites();
 			}
 		});
-		btnShowInFrame.addActionListener(new ActionListener() {
+		this.btnShowInFrame.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleShowInFrame();
 			}
 		});
-		btnReload.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnReload.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleReload();
 			}
 		});
 
-		btnClose.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				SwingUtility.getDefaultMainFrame().showHomePanel();
 			}
 		});
-		btnNext.addActionListener(new ActionListener() {
+		this.btnNext.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handleNext();
 			}
 		});
-		btnPrevious.addActionListener(new ActionListener() {
+		this.btnPrevious.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				handlePreviouse();
 			}
 		});
-		return pnlTitleBar;
+		return this.pnlTitleBar;
 	}
 
-	protected void handlePreviouse() {
-		// TODO Auto-generated method stub
-
+	/**
+	 *
+	 */
+	protected void handleAddToFavorites() {
+		// by default empty implementation
 	}
 
 	protected void handleNext() {
@@ -171,34 +179,60 @@ public class TitledPanel extends JKMainPanel {
 
 	}
 
+	protected void handlePreviouse() {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
-	 * 
+	 *
+	 */
+	protected void handleReload() {
+		// by default empty implementation
+	}
+
+	/**
+	 *
 	 */
 	protected void handleShowInFrame() {
-		JKFrame frame = SwingUtility.showPanelFrame(this, title);
+		final JKFrame frame = SwingUtility.showPanelFrame(this, this.title);
 		frame.setExtendedState(JKFrame.NORMAL);
 	}
 
 	/**
-	 * 
+	 *
+	 */
+	private void init() {
+		setLayout(new BorderLayout());
+		final JKPanel<?> titleBar = getTitleBar();
+
+		add(titleBar, BorderLayout.NORTH);
+		applyComponentOrientation(SwingUtility.getDefaultComponentOrientation());
+
+	}
+
+	/**
+	 *
 	 */
 	private void initComponenets() {
 		// pnlTitleBar.setBorder(BorderFactory.createLineBorder(new Color(200,
 		// 200, 200)));
-		pnlTitleBar.setBackground(Colors.JK_TITLE_BAR_BG);// new Color(191, 215,
-															// 255));
-		pnlTitleBar.setPreferredSize(new Dimension(800, 35));
-		lbl = new JKLabel();
-		lbl.setText(Lables.get(title, true));
-		lbl.setOpaque(false);
-		lbl.setForeground(Colors.JK_TITLE_BAR_FG);// new Color(22, 125, 219));
-		lbl.setPreferredSize(null);
-		lbl.setFont(new Font("Arial", Font.BOLD, 16));
-		lbl.setVerticalAlignment(SwingConstants.TOP);
-		if (icon != null) {
-			lbl.setIcon(icon);
+		this.pnlTitleBar.setBackground(Colors.JK_TITLE_BAR_BG);// new Color(191,
+																// 215,
+																// 255));
+		this.pnlTitleBar.setPreferredSize(new Dimension(800, 35));
+		this.lbl = new JKLabel();
+		this.lbl.setText(Lables.get(this.title, true));
+		this.lbl.setOpaque(false);
+		this.lbl.setForeground(Colors.JK_TITLE_BAR_FG);// new Color(22, 125,
+														// 219));
+		this.lbl.setPreferredSize(null);
+		this.lbl.setFont(new Font("Arial", Font.BOLD, 16));
+		this.lbl.setVerticalAlignment(SwingConstants.TOP);
+		if (this.icon != null) {
+			this.lbl.setIcon(this.icon);
 		}
-		pnlTitle.setOpaque(false);
+		this.pnlTitle.setOpaque(false);
 
 		// Border emptyBorder = BorderFactory.createEmptyBorder(2,5,2,5);
 		// btnAddToFavorites.setBorder(emptyBorder );
@@ -208,44 +242,35 @@ public class TitledPanel extends JKMainPanel {
 		// btnReload.setBorder(emptyBorder );
 		// btnShowInFrame.setBorder(emptyBorder );
 
-		btnShowInFrame.setToolTipText("POP_OUT_WINDOW");
+		this.btnShowInFrame.setToolTipText("POP_OUT_WINDOW");
 		// btnReload.setBorder(null);
 		// btnClose.setBorder(null);
 
-		btnReload.setIcon("small_reload_2.png");
-		btnClose.setIcon("smal_close.png");
-		btnAddToFavorites.setIcon("favorite.gif");
-		btnShowInFrame.setIcon("favorite.gif");
-		btnClose.setToolTipText("CLOSE_PANEL");
-		btnReload.setToolTipText("RELOAD");
-		btnClose.setToolTipText("CLOSE");
-		btnAddToFavorites.setToolTipText("ADD_TO_FAVORITES");
-		btnNext.setToolTipText("NEXT_WINDOW");
-		btnPrevious.setToolTipText("PREVIOUSE_WINDOW");
+		this.btnReload.setIcon("small_reload_2.png");
+		this.btnClose.setIcon("smal_close.png");
+		this.btnAddToFavorites.setIcon("favorite.gif");
+		this.btnShowInFrame.setIcon("favorite.gif");
+		this.btnClose.setToolTipText("CLOSE_PANEL");
+		this.btnReload.setToolTipText("RELOAD");
+		this.btnClose.setToolTipText("CLOSE");
+		this.btnAddToFavorites.setToolTipText("ADD_TO_FAVORITES");
+		this.btnNext.setToolTipText("NEXT_WINDOW");
+		this.btnPrevious.setToolTipText("PREVIOUSE_WINDOW");
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected void handleReload() {
-		// by default empty implementation
-	}
+	protected void showPanel() {
+		add((Container) this.panel, BorderLayout.CENTER);
+		validate();
+		repaint();
+		if (this.panel instanceof JInternalFrame) {
+			final JInternalFrame f = (JInternalFrame) this.panel;
+			final javax.swing.plaf.InternalFrameUI ifu = f.getUI();
+			((javax.swing.plaf.basic.BasicInternalFrameUI) ifu).setNorthPane(null);
+			f.setVisible(true);
+		}
 
-	/**
-	 * 
-	 */
-	protected void handleAddToFavorites() {
-		// by default empty implementation
 	}
-}
-class JKTitleButton extends JKButton{
-
-	public JKTitleButton(String string) {
-		super(string);
-		setFocusable(false);
-		setOpaque(false);
-		setBorder(BorderFactory.createLineBorder(Color.gray));
-		setPreferredSize(new Dimension(24,24));
-	}
-	
 }

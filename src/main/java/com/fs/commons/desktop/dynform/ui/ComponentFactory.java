@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui;
 
 import java.sql.Types;
@@ -33,7 +48,72 @@ public class ComponentFactory {
 	static Hashtable<FieldMeta, BindingComponent> componentsCache = new Hashtable();
 
 	// //////////////////////////////////////////////////////////////////////////////////
-	public static BindingComponent createComponent(FieldMeta field, boolean createNew) throws TableMetaNotFoundException, DaoException {
+	public static BindingComponent buildForeignKeyComponent(final ForiegnKeyFieldMeta meta) throws TableMetaNotFoundException, DaoException {
+		final TableMeta masterTable = AbstractTableMetaFactory.getTableMeta(meta.getParentTable().getDataSource(), meta.getReferenceTable());
+		BindingComponent comp = null;
+		if (!meta.isVisible()) {
+			final JKTextField txt = new JKTextField();
+			comp = txt;
+		} else {
+			if (meta.getViewMode() == ViewMode.COMBO) {
+				if (masterTable.isAllowManage()) {
+					final DaoComboWithManagePanel combo = new DaoComboWithManagePanel(meta);
+					// if (combo.getItemCount() > 20) {
+					// System.err.println("DaoComboBox with name : " +
+					// meta.getParentTable().getTableName() + "." +
+					// meta.getName()
+					// + " contains data with more than 20 items (" +
+					// combo.getItemCount()
+					// + "), it recommanded to use FSLookup or
+					// FSFieldPanelWithFilter instead");
+					// }
+					comp = combo;
+				} else {
+					final DaoComboBox combo = new DaoComboBox(meta);
+					// if (combo.getItemCount() > 20) {
+					// System.err.println("DaoComboBox with name : " +
+					// meta.getParentTable().getTableName() + "." +
+					// meta.getName()
+					// + " contains data with more than 20 items (" +
+					// combo.getItemCount()
+					// + "), it recommanded to use FSLookup or
+					// FSFieldPanelWithFilter instead");
+					// }
+					comp = combo;
+				}
+			}
+			if (meta.getViewMode() == ViewMode.DIALOG) {
+				final FieldPanelWithFilter panelWithFilter = new FieldPanelWithFilter(masterTable);
+				panelWithFilter.setAllowManage(masterTable.isAllowManage());
+				comp = panelWithFilter;
+			}
+			if (meta.getViewMode() == ViewMode.LOOKUP) {
+				final FSLookupText lookup = new FSLookupText();
+				lookup.setTableMeta(masterTable);
+				comp = lookup;
+			}
+		}
+		return comp;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////
+	private static Object calculateDefaultValue(final Object defaultValue) throws DaoException {
+		if (defaultValue == null || defaultValue != null && defaultValue.equals("-1") || defaultValue.toString().trim().equals("")) {
+			return null;
+		}
+		if (defaultValue.toString().toUpperCase().startsWith("SELECT")) {
+			try {
+				final Object obj = DaoUtil.exeuteSingleOutputQuery(defaultValue.toString());
+				return obj;
+			} catch (final RecordNotFoundException e) {
+				return null;
+			}
+		}
+		return defaultValue;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////////////
+	public static BindingComponent createComponent(final FieldMeta field, final boolean createNew) throws TableMetaNotFoundException, DaoException {
 		BindingComponent component = componentsCache.get(field);
 		if (createNew || componentsCache.get(field) == null) {
 			if (field.getOptionsQuery() != null) {
@@ -41,7 +121,7 @@ public class ComponentFactory {
 			} else if (field instanceof ForiegnKeyFieldMeta) {
 				component = buildForeignKeyComponent((ForiegnKeyFieldMeta) field);
 			} else {
-				int type = field.getType();
+				final int type = field.getType();
 				switch (type) {
 				case Types.NUMERIC:
 				case Types.INTEGER:
@@ -52,7 +132,8 @@ public class ComponentFactory {
 				case Types.REAL:
 				case Types.DOUBLE:
 				case Types.DECIMAL:
-					component = new JKTextField(new com.fs.commons.desktop.swing.comp.documents.FloatDocument(field.getMaxLength()), field.getWidth());
+					component = new JKTextField(new com.fs.commons.desktop.swing.comp.documents.FloatDocument(field.getMaxLength()),
+							field.getWidth());
 					break;
 				case Types.VARCHAR:
 					component = new JKTextField(new FSTextDocument(field.getMaxLength()), field.getWidth());
@@ -77,7 +158,7 @@ public class ComponentFactory {
 					component = new JKTextField(new AlphaDocument(field.getMaxLength()), field.getWidth());
 					break;
 				case Types.LONGVARCHAR:
-					JKTextArea txt = new JKTextArea();
+					final JKTextArea txt = new JKTextArea();
 					// txt.setPreferredSize(new Dimension(400, 100));
 					component = txt;
 					break;
@@ -94,7 +175,7 @@ public class ComponentFactory {
 					component = new JKTextField(field.getWidth());
 				}
 			}
-			Object defaultValue = calculateDefaultValue(field.getDefaultValue());
+			final Object defaultValue = calculateDefaultValue(field.getDefaultValue());
 			if (defaultValue != null) {
 				component.setDefaultValue(defaultValue);
 			}
@@ -110,65 +191,8 @@ public class ComponentFactory {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////
-	private static BindingComponent createOptionsComponent(FieldMeta field) throws DaoException {
-		DaoComboBox cmb = new DaoComboBox(field.getOptionsQuery());
+	private static BindingComponent createOptionsComponent(final FieldMeta field) throws DaoException {
+		final DaoComboBox cmb = new DaoComboBox(field.getOptionsQuery());
 		return cmb;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////
-	public static BindingComponent buildForeignKeyComponent(ForiegnKeyFieldMeta meta) throws TableMetaNotFoundException, DaoException {
-		TableMeta masterTable = AbstractTableMetaFactory.getTableMeta(meta.getParentTable().getDataSource(), meta.getReferenceTable());
-		BindingComponent comp = null;
-		if (!meta.isVisible()) {
-			JKTextField txt = new JKTextField();
-			comp = txt;
-		} else {
-			if (meta.getViewMode() == ViewMode.COMBO) {
-				if (masterTable.isAllowManage()) {
-					DaoComboWithManagePanel combo = new DaoComboWithManagePanel(meta);
-//					if (combo.getItemCount() > 20) {
-//						System.err.println("DaoComboBox with name : " + meta.getParentTable().getTableName() + "." + meta.getName()
-//								+ " contains data with more than 20 items (" + combo.getItemCount()
-//								+ "), it recommanded to use FSLookup or FSFieldPanelWithFilter instead");
-//					}
-					comp = combo;
-				} else {
-					DaoComboBox combo = new DaoComboBox(meta);
-//					if (combo.getItemCount() > 20) {
-//						System.err.println("DaoComboBox with name : " + meta.getParentTable().getTableName() + "." + meta.getName()
-//								+ " contains data with more than 20 items (" + combo.getItemCount()
-//								+ "), it recommanded to use FSLookup or FSFieldPanelWithFilter instead");
-//					}
-					comp = combo;
-				}
-			}
-			if (meta.getViewMode() == ViewMode.DIALOG) {
-				FieldPanelWithFilter panelWithFilter = new FieldPanelWithFilter(masterTable);
-				panelWithFilter.setAllowManage(masterTable.isAllowManage());
-				comp = panelWithFilter;
-			}
-			if (meta.getViewMode() == ViewMode.LOOKUP) {
-				FSLookupText lookup = new FSLookupText();
-				lookup.setTableMeta(masterTable);
-				comp = lookup;
-			}
-		}
-		return comp;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////
-	private static Object calculateDefaultValue(Object defaultValue) throws DaoException {
-		if (defaultValue == null || (defaultValue != null && defaultValue.equals("-1")) || (defaultValue.toString().trim().equals(""))) {
-			return null;
-		}
-		if (defaultValue.toString().toUpperCase().startsWith("SELECT")) {
-			try {
-				Object obj = DaoUtil.exeuteSingleOutputQuery(defaultValue.toString());
-				return obj;
-			} catch (RecordNotFoundException e) {
-				return null;
-			}
-		}
-		return defaultValue;
 	}
 }

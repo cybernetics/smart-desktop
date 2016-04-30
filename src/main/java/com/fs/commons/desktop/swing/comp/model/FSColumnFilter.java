@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.comp.model;
 
 import java.util.Vector;
@@ -18,47 +33,47 @@ public class FSColumnFilter {
 	FSTableColumn column;
 	boolean required;
 
-	public FSColumnFilter(FSTableColumn column) {
+	public FSColumnFilter(final FSTableColumn column) {
 		this.column = column;
-	}
-
-	public FilterType getType() {
-		return type;
-	}
-
-	public void setType(FilterType type) {
-		this.type = type;
-	}
-
-	public boolean isRequired() {
-		return required;
-	}
-
-	public void setRequired(boolean required) {
-		this.required = required;
 	}
 
 	public FSTableColumn getColumn() {
-		return column;
+		return this.column;
 	}
 
-	public void setColumn(FSTableColumn column) {
-		this.column = column;
+	public FilterType getType() {
+		return this.type;
 	}
 
 	public Vector getValues() {
-		return values;
+		return this.values;
 	}
 
-	public void setValues(Vector values) {
+	public boolean isRequired() {
+		return this.required;
+	}
+
+	public void setColumn(final FSTableColumn column) {
+		this.column = column;
+	}
+
+	public void setRequired(final boolean required) {
+		this.required = required;
+	}
+
+	public void setType(final FilterType type) {
+		this.type = type;
+	}
+
+	public void setValues(final Vector values) {
 		this.values = values;
 	}
 
 	public String toQueryString() {
-		StringBuffer buf = new StringBuffer();
-		Object value1 = values.get(0);
-		buf.append(column.getName());
-		switch (type) {
+		final StringBuffer buf = new StringBuffer();
+		final Object value1 = this.values.get(0);
+		buf.append(this.column.getName());
+		switch (this.type) {
 		case STARTS_WIDTH:
 			buf.append(" like '" + value1 + "%'");
 			break;

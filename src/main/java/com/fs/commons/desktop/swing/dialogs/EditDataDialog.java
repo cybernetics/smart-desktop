@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.swing.dialogs;
 
 import java.awt.BorderLayout;
@@ -20,30 +35,64 @@ import com.fs.commons.util.GeneralUtility;
 
 /**
  * @deprecated
- * <p>
- * Title:
- * </p>
- * 
- * <p>
- * Description:
- * </p>
- * 
- * <p>
- * Copyright: Copyright (c) 2007
- * </p>
- * 
- * <p>
- * Company:
- * </p>
- * 
+ *             <p>
+ *             Title:
+ *             </p>
+ *
+ *             <p>
+ *             Description:
+ *             </p>
+ *
+ *             <p>
+ *             Copyright: Copyright (c) 2007
+ *             </p>
+ *
+ *             <p>
+ *             Company:
+ *             </p>
+ *
  * @author not attributable
  * @version 1.0
  */
+@Deprecated
 public class EditDataDialog extends JKDialog {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 *
+	 * @param frm
+	 *            Frame
+	 * @param pnl
+	 *            DataPanel
+	 * @param idValue
+	 *            String
+	 * @return boolean true if the data changed , false if not
+	 * @throws DaoException
+	 */
+	public static boolean showEditDialog(final Frame frm, final DataPanel pnl, final String idValue) throws DaoException {
+		return showEditDialog(frm, pnl, idValue, true);
+	}
+
+	/**
+	 *
+	 * @param frm
+	 * @param pnl
+	 * @param idValue
+	 * @param allowDelete
+	 * @return
+	 * @throws DaoException
+	 */
+	public static boolean showEditDialog(final Frame frm, final DataPanel pnl, final String idValue, final boolean allowDelete) throws DaoException {
+		pnl.resetComponents();
+		final EditDataDialog dlg = new EditDataDialog(frm, pnl, idValue);
+		dlg.setAllowDelete(allowDelete);
+		dlg.setVisible(true);
+		// dlg.dispose();
+		return !dlg.cancelled;
+	}
 
 	DataPanel dataPanel;
 
@@ -62,40 +111,7 @@ public class EditDataDialog extends JKDialog {
 	boolean cancelled = true;
 
 	/**
-	 * 
-	 * @param frm
-	 *            Frame
-	 * @param pnl
-	 *            DataPanel
-	 * @param idValue
-	 *            String
-	 * @return boolean true if the data changed , false if not
-	 * @throws DaoException
-	 */
-	public static boolean showEditDialog(Frame frm, DataPanel pnl, String idValue) throws DaoException {
-		return showEditDialog(frm, pnl, idValue, true);
-	}
-
-	/**
-	 * 
-	 * @param frm
-	 * @param pnl
-	 * @param idValue
-	 * @param allowDelete
-	 * @return
-	 * @throws DaoException
-	 */
-	public static boolean showEditDialog(Frame frm, DataPanel pnl, String idValue, boolean allowDelete) throws DaoException {
-		pnl.resetComponents();
-		EditDataDialog dlg = new EditDataDialog(frm, pnl, idValue);
-		dlg.setAllowDelete(allowDelete);
-		dlg.setVisible(true);
-		// dlg.dispose();
-		return !dlg.cancelled;
-	}
-
-	/**
-	 * 
+	 *
 	 * @param parent
 	 *            Frame
 	 * @param dataPanel
@@ -103,16 +119,79 @@ public class EditDataDialog extends JKDialog {
 	 * @param idValue
 	 *            String
 	 */
-	public EditDataDialog(Frame parent, DataPanel dataPanel, String idValue) {
+	public EditDataDialog(final Frame parent, final DataPanel dataPanel, final String idValue) {
 		super(parent);
 		setTitle(Lables.get("VIEW_RECORD"));
 		this.dataPanel = dataPanel;
 		init();
 		try {
 			dataPanel.handleFindEvent(idValue);
-		} catch (DaoException ex) {
+		} catch (final DaoException ex) {
 			SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
 		}
+	}
+
+	public boolean getAllowDelete() {
+		return this.allowDelete;
+	}
+
+	/**
+	 *
+	 *
+	 */
+	void handleCancelEdit() {
+		this.btnEdit.setVisible(true);
+		this.btnSave.setVisible(false);
+		this.btnDelete.setVisible(false);
+		this.btnCancelEdit.setVisible(false);
+		this.btnCancel.setVisible(true);
+		this.dataPanel.enableAllComponents(false);
+	}
+
+	/**
+	 *
+	 */
+	void handleDelete() {
+		if (SwingUtility.showConfirmationDialog(this, "CONF_DELETE_RECORD")) {
+			try {
+				this.dataPanel.handleDeleteEvent();
+				SwingUtility.showSuccessDialog(this, "SUCC_RECORD_DELETED");
+				dispose();
+				this.cancelled = false;
+			} catch (final DaoException ex) {
+				SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	void handleEdit() {
+		this.btnEdit.setVisible(false);
+		this.btnSave.setVisible(true);
+		this.btnDelete.setVisible(this.allowDelete);
+		this.btnCancelEdit.setVisible(true);
+		this.btnCancel.setVisible(false);
+		this.dataPanel.enableDataFields(true);
+	}
+
+	/**
+	 *
+	 */
+	private void handleSave() {
+		try {
+			this.dataPanel.validateUpdateData();
+			this.dataPanel.handleSaveEvent();
+			SwingUtility.showSuccessDialog(this, Lables.get("SUCC_RECORD_UPDATED"));
+			dispose();
+			this.cancelled = false;
+		} catch (final ValidationException ex) {
+			SwingUtility.showUserErrorDialog(this, ex.getMessage(), ex);
+		} catch (final DaoException ex) {
+			SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
+		}
+
 	}
 
 	/**
@@ -120,47 +199,52 @@ public class EditDataDialog extends JKDialog {
 	 */
 	protected void init() {
 		setModal(true);
-		
-		dataPanel.getIdField().setEnabled(false);
-		JKPanel<?> southPanel = new JKMainPanel();
-		southPanel.add(btnEdit);
-		btnEdit.setIcon(new ImageIcon(GeneralUtility.getIconURL("filesaveas.png")));
-		southPanel.add(btnSave);
-		btnSave.setIcon(new ImageIcon(GeneralUtility.getIconURL("filesave.png")));
-		southPanel.add(btnDelete);
-		btnDelete.setIcon(new ImageIcon(GeneralUtility.getIconURL("db_remove.png")));
 
-		southPanel.add(btnCancelEdit);
-		btnCancelEdit.setIcon(new ImageIcon(GeneralUtility.getIconURL("back.png")));
+		this.dataPanel.getIdField().setEnabled(false);
+		final JKPanel<?> southPanel = new JKMainPanel();
+		southPanel.add(this.btnEdit);
+		this.btnEdit.setIcon(new ImageIcon(GeneralUtility.getIconURL("filesaveas.png")));
+		southPanel.add(this.btnSave);
+		this.btnSave.setIcon(new ImageIcon(GeneralUtility.getIconURL("filesave.png")));
+		southPanel.add(this.btnDelete);
+		this.btnDelete.setIcon(new ImageIcon(GeneralUtility.getIconURL("db_remove.png")));
 
-		southPanel.add(btnCancel);
-		btnCancel.setIcon(new ImageIcon(GeneralUtility.getIconURL("fileclose.png")));
-		add(dataPanel);
+		southPanel.add(this.btnCancelEdit);
+		this.btnCancelEdit.setIcon(new ImageIcon(GeneralUtility.getIconURL("back.png")));
+
+		southPanel.add(this.btnCancel);
+		this.btnCancel.setIcon(new ImageIcon(GeneralUtility.getIconURL("fileclose.png")));
+		add(this.dataPanel);
 		add(southPanel, BorderLayout.SOUTH);
 
-		btnEdit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnEdit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleEdit();
 			}
 		});
-		btnCancelEdit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnCancelEdit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleCancelEdit();
 			}
 		});
 
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleSave();
 			}
 		});
-		btnDelete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				handleDelete();
 			}
 		});
-		btnCancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		this.btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
 				dispose();
 			}
 		});
@@ -168,70 +252,7 @@ public class EditDataDialog extends JKDialog {
 		super.initDialog();
 	}
 
-	/**
-	 * 
-	 */
-	void handleEdit() {
-		btnEdit.setVisible(false);
-		btnSave.setVisible(true);
-		btnDelete.setVisible(allowDelete);
-		btnCancelEdit.setVisible(true);
-		btnCancel.setVisible(false);
-		dataPanel.enableDataFields(true);
-	}
-
-	/**
-	 * 
-	 * 
-	 */
-	void handleCancelEdit() {
-		btnEdit.setVisible(true);
-		btnSave.setVisible(false);
-		btnDelete.setVisible(false);
-		btnCancelEdit.setVisible(false);
-		btnCancel.setVisible(true);
-		dataPanel.enableAllComponents(false);
-	}
-
-	/**
-	 * 
-	 */
-	private void handleSave() {
-		try {
-			dataPanel.validateUpdateData();
-			dataPanel.handleSaveEvent();
-			SwingUtility.showSuccessDialog(this, Lables.get("SUCC_RECORD_UPDATED"));
-			dispose();
-			cancelled = false;
-		} catch (ValidationException ex) {
-			SwingUtility.showUserErrorDialog(this, ex.getMessage(), ex);
-		} catch (DaoException ex) {
-			SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
-		}
-
-	}
-
-	/**
-	 * 
-	 */
-	void handleDelete() {
-		if (SwingUtility.showConfirmationDialog(this, "CONF_DELETE_RECORD")) {
-			try {
-				dataPanel.handleDeleteEvent();
-				SwingUtility.showSuccessDialog(this, "SUCC_RECORD_DELETED");
-				dispose();
-				cancelled = false;
-			} catch (DaoException ex) {
-				SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
-			}
-		}
-	}
-
-	public void setAllowDelete(boolean allowDelete) {
+	public void setAllowDelete(final boolean allowDelete) {
 		this.allowDelete = allowDelete;
-	}
-
-	public boolean getAllowDelete() {
-		return allowDelete;
 	}
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui.tabular;
 
 import java.awt.BorderLayout;
@@ -56,462 +71,24 @@ public class DynTabular extends JKMainPanel {
 	JKPanel<?> pnlSum = new JKPanel<Object>();
 	private JKPanel<Object> pnlButtons;
 
-	/**
-	 * 
-	 * @param meta
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
-	 */
-	public DynTabular(TableMeta meta) throws RecordNotFoundException, DaoException {
-		this.meta = meta;
-		init();
-	}
-
-	public DynTabular(String tableName) throws RecordNotFoundException, TableMetaNotFoundException, DaoException {
+	public DynTabular(final String tableName) throws RecordNotFoundException, TableMetaNotFoundException, DaoException {
 		this(AbstractTableMetaFactory.getTableMeta(tableName));
 	}
 
 	/**
-	 * 
-	 */
-	public void createEmptyRecords(int numberOfRecords) {
-		for (int i = 0; i < numberOfRecords; i++) {
-			model.addRecord();
-		}
-	}
-
-	/**
-	 * @throws DaoException
-	 * @throws TableMetaNotFoundException
-	 * 
-	 */
-	private void init() throws TableMetaNotFoundException, DaoException {
-		setFocusable(false);
-		initTable();
-		setBorder(SwingUtility.createTitledBorder(""));
-		setLayout(new BorderLayout());
-		add(new JKScrollPane(tbl), BorderLayout.CENTER);
-		add(getButtonsPanel(), BorderLayout.LINE_END);
-		add(getSumPanel(), BorderLayout.SOUTH);
-		btnSaveTabular.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleSaveTabular();
-			}
-		});
-		btnReloadTabular.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				reloadData(true);
-			}
-		});
-		btnAddRecord.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				createRecord();
-			}
-		});
-		btnDeleteRecord.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				deleteSelectedRecords();
-			}
-		});
-		model.addTableModelListener(new TableModelListener() {
-
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				handleTableDataChanged();
-			}
-		});
-	}
-
-	private void initTable() throws TableMetaNotFoundException, DaoException {
-		model = new TableMetaModel(meta);
-		tbl.setModel(model);
-//		tbl.putClientProperty("JTable.autoStartsEdit", Boolean.TRUE);
-	}
-
-	private Component getSumPanel() {
-		pnlSum = new JKPanel<Object>();
-		return pnlSum;
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleSaveTabular() {
-		boolean reload = true;
-		try {
-			tbl.stopEditing();
-			validateData();
-			// TODO : add save action
-			// model.getDao().saveRecords(getAllRecords());
-			SwingUtility.showSuccessDialog("DATA_UPDATED_SUCC");
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-		} finally {
-			if (reload) {
-				reloadData(false);
-			}
-		}
-	}
-
-	/**
-	 * @return
-	 */
-	public Vector<FSTableRecord> getAllRecords() {
-		return model.getRecords();
-	}
-	
-	public List<Record> getAllDaoRecords() throws TableMetaNotFoundException, DaoException {
-		return model.getAllDaoRecords();
-	}
-
-	/**
-	 * @throws ValidationException
-	 * 
-	 */
-	public void validateData() throws ValidationException {
-		Vector<FSTableRecord> records = model.getRecords();
-		for (int i = 0; i < records.size(); i++) {
-			FSTableRecord record = records.get(i);
-			if (record.isModified()) {
-				try {
-					Record rec = meta.createEmptyRecord();
-					rec.setValues(record.toHash());
-					meta.validateData(rec);
-				} catch (ValidationException e) {
-					tbl.setSelectedRow(i);
-					tbl.editCellAt(i, 0);
-					throw e;
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param b
-	 * 
-	 */
-	private void reloadData(boolean showMessage) {
-		try {
-			// model.reload();
-			if (showMessage) {
-				// SwingUtility.showSuccessDialog("TABULAR_DATA_RELOADED_SUCC");
-			}
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private JKPanel<?> getButtonsPanel() {
-		if (pnlButtons == null) {
-			pnlButtons = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
-
-			pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.PAGE_AXIS));
-
-			btnAddRecord.setShortcut("control S", "Ctrl S");
-			btnAddRecord.setFocusable(false);
-			btnDeleteRecord.setFocusable(false);
-			btnDeleteRecord.setShortcut("control D", "Ctrl D");
-			pnlButtons.add(btnAddRecord);
-			pnlButtons.add(btnDeleteRecord);
-			pnlButtons.add(btnReloadTabular);
-
-			btnAddRecord.setIcon("add_something_smart_org_icon.gif");
-			btnDeleteRecord.setIcon("delete_something_smart_org_icon.gif");
-
-			// JKPanel<?> pnl2 = new JKPanel<Object>(new
-			// FlowLayout(FlowLayout.TRAILING));
-			pnlButtons.add(btnSaveTabular);
-
-			// JKPanel<?> pnl3 = new JKPanel<Object>(new java.awt.GridLayout(1,
-			// 2));
-			// pnl3.add(pnl1);
-			// pnl3.add(pnl2);
-		}
-		return pnlButtons;
-	}
-
-	// /**
-	// * @throws RecordNotFoundException
-	// * @throws DaoException
-	// */
-	// private void initTable() throws RecordNotFoundException, DaoException {
-	// //model = new DynMetaModel(this.meta, false);
-	// //tbl.setModel(model);
-	// // tbl.setAlowMutipleSelection(false);
-	// ArrayList<FieldMeta> visibleFields = meta.getVisibleFields();
-	// for (int i = 0; i < visibleFields.size(); i++) {
-	// }
-	// tbl.addKeyListener(new KeyAdapter() {
-	// @Override
-	// public void keyPressed(KeyEvent e) {
-	// handleKeyListener(e);
-	// }
-	// });
-	// }
-
-	/**
-	 * @return the tbl
-	 */
-	public JKTable getTable() {
-		return tbl;
-	}
-
-	/**
-	 * @param e
-	 */
-	private void handleKeyListener(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-			btnDeleteRecord.doClick();
-		}
-		if (e.getKeyCode() == KeyEvent.VK_INSERT) {
-			btnAddRecord.doClick();
-		}
-	}
-
-	/**
-	 * 
-	 */
-	private void deleteSelectedRecords() {
-		int[] selectedRow = tbl.getSelectedRows();
-		for (int i = selectedRow.length - 1; i >= 0; i--) {
-			int row = selectedRow[i];
-			model.deleteRow(row);
-			tbl.setSelectedRow(row);
-		}
-
-	}
-
-	/**
-	 * 
-	 */
-	private void createRecord() {
-		// int count =
-		// SwingUtility.showIntegerInput("PLEASE_ENTER_NUMBER_OF_RECORDS");
-		// if (count > 0) {
-		model.addRecord();
-		// SwingUtilities.invokeLater(new Runnable() {
-		// @Override
-		// public void run() {
-		// tbl.setSelectedRow(model.getRowCount() - 1);
-		// tbl.editCellAt(model.getRowCount() - 1, 0);
-		// }
-		// });
-		// }
-	}
-
-	/**
-	 * @return the allowDelete
-	 */
-	public boolean isAllowDelete() {
-		return allowDelete;
-	}
-
-	/**
-	 * @param allowDelete
-	 *            the allowDelete to set
-	 */
-	public void setAllowDelete(boolean allowDelete) {
-		this.allowDelete = allowDelete;
-		btnDeleteRecord.setVisible(allowDelete);
-	}
-
-	/**
-	 * @return the allowCreate
-	 */
-	public boolean isAllowCreate() {
-		return allowCreate;
-	}
-
-	/**
-	 * @param allowCreate
-	 *            the allowCreate to set
-	 */
-	public void setAllowCreate(boolean allowCreate) {
-		this.allowCreate = allowCreate;
-		btnAddRecord.setVisible(allowCreate);
-	}
-
-	/**
-	 * @return the allowReload
-	 */
-	public boolean isAllowReload() {
-		return allowReload;
-	}
-
-	/**
-	 * @param allowReload
-	 *            the allowReload to set
-	 */
-	public void setAllowReload(boolean allowReload) {
-		this.allowReload = allowReload;
-		btnReloadTabular.setVisible(allowReload);
-	}
-
-	/**
-	 * @return the allowSave
-	 */
-	public boolean isAllowSave() {
-		return allowSave;
-	}
-
-	/**
-	 * @param allowSave
-	 *            the allowSave to set
-	 */
-	public void setAllowSave(boolean allowSave) {
-		this.allowSave = allowSave;
-		btnSaveTabular.setVisible(allowSave);
-	}
-
-	/**
-	 * 
-	 * @param string
-	 * @param trxId
-	 * @throws DaoException
+	 *
+	 * @param meta
 	 * @throws RecordNotFoundException
+	 * @throws DaoException
 	 */
-	public void setFilterValue(String fieldName, String trxId) throws RecordNotFoundException, DaoException {
-		 model.setFilterValue(fieldName, trxId);
-		 //model.reload();
+	public DynTabular(final TableMeta meta) throws RecordNotFoundException, DaoException {
+		this.meta = meta;
+		init();
 	}
 
-	public void stopEditing() {
-		tbl.stopEditing();
+	public void addFSTableColumn(final FSTableColumn col) {
+		this.tbl.addFSTableColumn(col);
 	}
-
-	/**
-	 * @param showSum
-	 *            the showSum to set
-	 */
-	public void setShowSum(int colunmIndex) {
-		// if (model.isNumericClumn(colunmIndex)) {
-		JKTextField txt = new JKTextField(12, false);
-		txt.setFocusable(false);
-		String name = model.getColumnName(colunmIndex);
-		components.put(colunmIndex, txt);
-		JKLabel lbl = new JKLabel(name, false);
-		pnlSum.add(new JKLabledComponent(lbl, txt));
-		// }
-	}
-
-	/**
-	 * 
-	 */
-	protected void handleTableDataChanged() {
-		Enumeration<Integer> keys = components.keys();
-		while (keys.hasMoreElements()) {
-			Integer col = keys.nextElement();
-			components.get(col).setText(model.getColunmSum(col) + "");
-		}
-	}
-
-	/**
-	 * 
-	 * @param column
-	 * @return
-	 */
-	public double getColunmSum(int column) {
-		return model.getColunmSum(column);
-	}
-
-	@Override
-	public void setEnabled(boolean enabled) {
-		super.setEnabled(enabled);
-		tbl.setEnabled(enabled);
-		btnAddRecord.setVisible(isAllowCreate() && enabled);
-		btnDeleteRecord.setVisible(isAllowDelete() && enabled);
-		btnReloadTabular.setVisible(isAllowReload() && enabled);
-		btnSaveTabular.setVisible(isAllowSave() && enabled);
-	}
-
-	public FSTableModel getModel() {
-		return model;
-	}
-	
-	public DynMetaModel getModelAsMetaModel() {
-		//TODO
-		return null;
-	}
-
-	public void reloadRecords() throws RecordNotFoundException, DaoException {
-		// model.reload();
-	}
-
-	public void hideAllSum() {
-		components.clear();
-		pnlSum.removeAll();
-		pnlSum.invalidate();
-		pnlSum.repaint();
-	}
-
-	public FSTableRecord getRecord(int row) {
-		return getModel().getRecord(row);
-	}
-
-	public void setValueAt(Object value, int row, int col) {
-		tbl.setValueAt(value, row, col);
-	}
-
-	public Vector<FSTableRecord> getRecords() {
-		return tbl.getRecords();
-	}
-
-	public int getRowCount() {
-		return tbl.getRowCount();
-	}
-
-	public void fireTableColumnDataChanged(int col) {
-		tbl.fireTableColumnDataChanged(col);
-	}
-
-	public void fireTableCellUpdated(int row, int col) {
-		tbl.fireTableCellUpdated(row, col);
-	}
-
-	public void setColumnValue(int row, int col, Object value, boolean visibleIndex) {
-		tbl.setColumnValue(row, col, value, visibleIndex);
-	}
-
-	public int getValueAtAsInteger(int row, int col) {
-		return tbl.getValueAtAsInteger(row, col);
-	}
-
-	public double getValueAtAsDouble(int row, int col) {
-		return tbl.getValueAtAsDouble(row, col);
-	}
-
-	public void setEditableCell(int row, int col, boolean enable) {
-		tbl.setEditable(row, col, enable);
-	}
-
-	public void fireTableDataChanged() {
-		tbl.fireTableDataChanged();
-	}
-
-	public void addFSTableColumn(FSTableColumn col) {
-		tbl.addFSTableColumn(col);
-	}
-
-	// /**
-	// *
-	// * @param b
-	// */
-	// public void setShowButtons(boolean show) {
-	// btnSaveTabular.setVisible(show);
-	// btnReloadTabular.setVisible(show);
-	// }
 
 	// /**
 	// *
@@ -547,7 +124,445 @@ public class DynTabular extends JKMainPanel {
 		getModel().clearRecords();
 	}
 
+	/**
+	 *
+	 */
+	public void createEmptyRecords(final int numberOfRecords) {
+		for (int i = 0; i < numberOfRecords; i++) {
+			this.model.addRecord();
+		}
+	}
+
+	/**
+	 *
+	 */
+	private void createRecord() {
+		// int count =
+		// SwingUtility.showIntegerInput("PLEASE_ENTER_NUMBER_OF_RECORDS");
+		// if (count > 0) {
+		this.model.addRecord();
+		// SwingUtilities.invokeLater(new Runnable() {
+		// @Override
+		// public void run() {
+		// tbl.setSelectedRow(model.getRowCount() - 1);
+		// tbl.editCellAt(model.getRowCount() - 1, 0);
+		// }
+		// });
+		// }
+	}
+
+	/**
+	 *
+	 */
+	private void deleteSelectedRecords() {
+		final int[] selectedRow = this.tbl.getSelectedRows();
+		for (int i = selectedRow.length - 1; i >= 0; i--) {
+			final int row = selectedRow[i];
+			this.model.deleteRow(row);
+			this.tbl.setSelectedRow(row);
+		}
+
+	}
+
+	public void fireTableCellUpdated(final int row, final int col) {
+		this.tbl.fireTableCellUpdated(row, col);
+	}
+
+	public void fireTableColumnDataChanged(final int col) {
+		this.tbl.fireTableColumnDataChanged(col);
+	}
+
+	public void fireTableDataChanged() {
+		this.tbl.fireTableDataChanged();
+	}
+
 	public void fireTableStructureChanged() {
-		tbl.fireTableStructureChanged();
+		this.tbl.fireTableStructureChanged();
+	}
+
+	public List<Record> getAllDaoRecords() throws TableMetaNotFoundException, DaoException {
+		return this.model.getAllDaoRecords();
+	}
+
+	// /**
+	// * @throws RecordNotFoundException
+	// * @throws DaoException
+	// */
+	// private void initTable() throws RecordNotFoundException, DaoException {
+	// //model = new DynMetaModel(this.meta, false);
+	// //tbl.setModel(model);
+	// // tbl.setAlowMutipleSelection(false);
+	// ArrayList<FieldMeta> visibleFields = meta.getVisibleFields();
+	// for (int i = 0; i < visibleFields.size(); i++) {
+	// }
+	// tbl.addKeyListener(new KeyAdapter() {
+	// @Override
+	// public void keyPressed(KeyEvent e) {
+	// handleKeyListener(e);
+	// }
+	// });
+	// }
+
+	/**
+	 * @return
+	 */
+	public Vector<FSTableRecord> getAllRecords() {
+		return this.model.getRecords();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private JKPanel<?> getButtonsPanel() {
+		if (this.pnlButtons == null) {
+			this.pnlButtons = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
+
+			this.pnlButtons.setLayout(new BoxLayout(this.pnlButtons, BoxLayout.PAGE_AXIS));
+
+			this.btnAddRecord.setShortcut("control S", "Ctrl S");
+			this.btnAddRecord.setFocusable(false);
+			this.btnDeleteRecord.setFocusable(false);
+			this.btnDeleteRecord.setShortcut("control D", "Ctrl D");
+			this.pnlButtons.add(this.btnAddRecord);
+			this.pnlButtons.add(this.btnDeleteRecord);
+			this.pnlButtons.add(this.btnReloadTabular);
+
+			this.btnAddRecord.setIcon("add_something_smart_org_icon.gif");
+			this.btnDeleteRecord.setIcon("delete_something_smart_org_icon.gif");
+
+			// JKPanel<?> pnl2 = new JKPanel<Object>(new
+			// FlowLayout(FlowLayout.TRAILING));
+			this.pnlButtons.add(this.btnSaveTabular);
+
+			// JKPanel<?> pnl3 = new JKPanel<Object>(new java.awt.GridLayout(1,
+			// 2));
+			// pnl3.add(pnl1);
+			// pnl3.add(pnl2);
+		}
+		return this.pnlButtons;
+	}
+
+	/**
+	 *
+	 * @param column
+	 * @return
+	 */
+	public double getColunmSum(final int column) {
+		return this.model.getColunmSum(column);
+	}
+
+	public FSTableModel getModel() {
+		return this.model;
+	}
+
+	public DynMetaModel getModelAsMetaModel() {
+		// TODO
+		return null;
+	}
+
+	public FSTableRecord getRecord(final int row) {
+		return getModel().getRecord(row);
+	}
+
+	public Vector<FSTableRecord> getRecords() {
+		return this.tbl.getRecords();
+	}
+
+	public int getRowCount() {
+		return this.tbl.getRowCount();
+	}
+
+	private Component getSumPanel() {
+		this.pnlSum = new JKPanel<Object>();
+		return this.pnlSum;
+	}
+
+	/**
+	 * @return the tbl
+	 */
+	public JKTable getTable() {
+		return this.tbl;
+	}
+
+	public double getValueAtAsDouble(final int row, final int col) {
+		return this.tbl.getValueAtAsDouble(row, col);
+	}
+
+	public int getValueAtAsInteger(final int row, final int col) {
+		return this.tbl.getValueAtAsInteger(row, col);
+	}
+
+	/**
+	 * @param e
+	 */
+	private void handleKeyListener(final KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+			this.btnDeleteRecord.doClick();
+		}
+		if (e.getKeyCode() == KeyEvent.VK_INSERT) {
+			this.btnAddRecord.doClick();
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleSaveTabular() {
+		final boolean reload = true;
+		try {
+			this.tbl.stopEditing();
+			validateData();
+			// TODO : add save action
+			// model.getDao().saveRecords(getAllRecords());
+			SwingUtility.showSuccessDialog("DATA_UPDATED_SUCC");
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+		} finally {
+			if (reload) {
+				reloadData(false);
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	protected void handleTableDataChanged() {
+		final Enumeration<Integer> keys = this.components.keys();
+		while (keys.hasMoreElements()) {
+			final Integer col = keys.nextElement();
+			this.components.get(col).setText(this.model.getColunmSum(col) + "");
+		}
+	}
+
+	public void hideAllSum() {
+		this.components.clear();
+		this.pnlSum.removeAll();
+		this.pnlSum.invalidate();
+		this.pnlSum.repaint();
+	}
+
+	/**
+	 * @throws DaoException
+	 * @throws TableMetaNotFoundException
+	 *
+	 */
+	private void init() throws TableMetaNotFoundException, DaoException {
+		setFocusable(false);
+		initTable();
+		setBorder(SwingUtility.createTitledBorder(""));
+		setLayout(new BorderLayout());
+		add(new JKScrollPane(this.tbl), BorderLayout.CENTER);
+		add(getButtonsPanel(), BorderLayout.LINE_END);
+		add(getSumPanel(), BorderLayout.SOUTH);
+		this.btnSaveTabular.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleSaveTabular();
+			}
+		});
+		this.btnReloadTabular.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				reloadData(true);
+			}
+		});
+		this.btnAddRecord.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				createRecord();
+			}
+		});
+		this.btnDeleteRecord.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				deleteSelectedRecords();
+			}
+		});
+		this.model.addTableModelListener(new TableModelListener() {
+
+			@Override
+			public void tableChanged(final TableModelEvent e) {
+				handleTableDataChanged();
+			}
+		});
+	}
+
+	private void initTable() throws TableMetaNotFoundException, DaoException {
+		this.model = new TableMetaModel(this.meta);
+		this.tbl.setModel(this.model);
+		// tbl.putClientProperty("JTable.autoStartsEdit", Boolean.TRUE);
+	}
+
+	/**
+	 * @return the allowCreate
+	 */
+	public boolean isAllowCreate() {
+		return this.allowCreate;
+	}
+
+	/**
+	 * @return the allowDelete
+	 */
+	public boolean isAllowDelete() {
+		return this.allowDelete;
+	}
+
+	/**
+	 * @return the allowReload
+	 */
+	public boolean isAllowReload() {
+		return this.allowReload;
+	}
+
+	/**
+	 * @return the allowSave
+	 */
+	public boolean isAllowSave() {
+		return this.allowSave;
+	}
+
+	/**
+	 * @param b
+	 *
+	 */
+	private void reloadData(final boolean showMessage) {
+		try {
+			// model.reload();
+			if (showMessage) {
+				// SwingUtility.showSuccessDialog("TABULAR_DATA_RELOADED_SUCC");
+			}
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	public void reloadRecords() throws RecordNotFoundException, DaoException {
+		// model.reload();
+	}
+
+	/**
+	 * @param allowCreate
+	 *            the allowCreate to set
+	 */
+	public void setAllowCreate(final boolean allowCreate) {
+		this.allowCreate = allowCreate;
+		this.btnAddRecord.setVisible(allowCreate);
+	}
+
+	/**
+	 * @param allowDelete
+	 *            the allowDelete to set
+	 */
+	public void setAllowDelete(final boolean allowDelete) {
+		this.allowDelete = allowDelete;
+		this.btnDeleteRecord.setVisible(allowDelete);
+	}
+
+	/**
+	 * @param allowReload
+	 *            the allowReload to set
+	 */
+	public void setAllowReload(final boolean allowReload) {
+		this.allowReload = allowReload;
+		this.btnReloadTabular.setVisible(allowReload);
+	}
+
+	/**
+	 * @param allowSave
+	 *            the allowSave to set
+	 */
+	public void setAllowSave(final boolean allowSave) {
+		this.allowSave = allowSave;
+		this.btnSaveTabular.setVisible(allowSave);
+	}
+
+	public void setColumnValue(final int row, final int col, final Object value, final boolean visibleIndex) {
+		this.tbl.setColumnValue(row, col, value, visibleIndex);
+	}
+
+	public void setEditableCell(final int row, final int col, final boolean enable) {
+		this.tbl.setEditable(row, col, enable);
+	}
+
+	@Override
+	public void setEnabled(final boolean enabled) {
+		super.setEnabled(enabled);
+		this.tbl.setEnabled(enabled);
+		this.btnAddRecord.setVisible(isAllowCreate() && enabled);
+		this.btnDeleteRecord.setVisible(isAllowDelete() && enabled);
+		this.btnReloadTabular.setVisible(isAllowReload() && enabled);
+		this.btnSaveTabular.setVisible(isAllowSave() && enabled);
+	}
+
+	/**
+	 *
+	 * @param string
+	 * @param trxId
+	 * @throws DaoException
+	 * @throws RecordNotFoundException
+	 */
+	public void setFilterValue(final String fieldName, final String trxId) throws RecordNotFoundException, DaoException {
+		this.model.setFilterValue(fieldName, trxId);
+		// model.reload();
+	}
+
+	/**
+	 * @param showSum
+	 *            the showSum to set
+	 */
+	public void setShowSum(final int colunmIndex) {
+		// if (model.isNumericClumn(colunmIndex)) {
+		final JKTextField txt = new JKTextField(12, false);
+		txt.setFocusable(false);
+		final String name = this.model.getColumnName(colunmIndex);
+		this.components.put(colunmIndex, txt);
+		final JKLabel lbl = new JKLabel(name, false);
+		this.pnlSum.add(new JKLabledComponent(lbl, txt));
+		// }
+	}
+
+	public void setValueAt(final Object value, final int row, final int col) {
+		this.tbl.setValueAt(value, row, col);
+	}
+
+	// /**
+	// *
+	// * @param b
+	// */
+	// public void setShowButtons(boolean show) {
+	// btnSaveTabular.setVisible(show);
+	// btnReloadTabular.setVisible(show);
+	// }
+
+	public void stopEditing() {
+		this.tbl.stopEditing();
+	}
+
+	/**
+	 * @throws ValidationException
+	 *
+	 */
+	public void validateData() throws ValidationException {
+		final Vector<FSTableRecord> records = this.model.getRecords();
+		for (int i = 0; i < records.size(); i++) {
+			final FSTableRecord record = records.get(i);
+			if (record.isModified()) {
+				try {
+					final Record rec = this.meta.createEmptyRecord();
+					rec.setValues(record.toHash());
+					this.meta.validateData(rec);
+				} catch (final ValidationException e) {
+					this.tbl.setSelectedRow(i);
+					this.tbl.editCellAt(i, 0);
+					throw e;
+				}
+			}
+		}
 	}
 }

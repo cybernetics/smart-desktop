@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.desktop.dynform.ui;
 
 import java.awt.BorderLayout;
@@ -21,70 +36,15 @@ import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
 
 public class PnlAuditHistory extends JKMainPanel {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -5661428777683046654L;
 	private static final String AUDITS_SQL_FILE = GeneralUtility.getSqlFile("sec_audits.sql") + " WHERE record_id=? AND record_name='?'";
-	private final Object recordId;
-	private final String tableName;
-	final FSDataTable tbl = new FSDataTable();
-
-	// //////////////////////////////////////////////////////////////////////
-	public static void showHistory(int id, String tableName) {
-		PnlAuditHistory pnl = new PnlAuditHistory(id, tableName);
-		SwingUtility.showPanelInDialog(pnl, Lables.get(tableName) + " " + Lables.get("HISTORY"));
-	}
-
-	// /////////////////////////////////////////////////////////////////////
-	public PnlAuditHistory(Object recordId, String tableName) {
-		this.recordId = recordId;
-		this.tableName = tableName;
-		init();
-	}
-
-	// /////////////////////////////////////////////////////////////////////
-	private void init() {
-		setLayout(new BorderLayout());
-		add(tbl);
-		String sql = AUDITS_SQL_FILE;
-		sql = DaoUtil.compileSql(sql, recordId, tableName);
-		tbl.setQuery(sql);
-		tbl.setColumnDateFormat(1, "yyyy/MM/dd hh:mm");
-		tbl.addRecordListener(new RecordSelectionListener() {
-			@Override
-			public void recordSelected(int recordId) {
-				handleAuditSelected();
-			}
-		});
-	}
-
-	// ////////////////////////////////////////////////////////////////////////
-	private void handleAuditSelected() {
-		try {
-			int id = tbl.getSelectedIdAsInteger();
-			AbstractDao dao = DaoFactory.createDao();
-			Audit audit = dao.findAudit(id);
-			if (audit.getGui() != null) {
-				SwingUtility.showEncodedComponent(audit.getGui(), Lables.get(audit.getTableName(), true));
-			}else{
-				SwingUtility.showSuccessDialog(audit.getAuditText());
-			}
-		} catch (Exception e) {
-			ExceptionUtil.handleException(e);
-		}
-	}
-
-	// public static void testComponentSerialization(Object obj) {
-	// String xml = GeneralUtility.toXml(obj);
-	// // Object object = GeneralUtility.toObject(xml);
-	// showEncodedComponent(xml);
-	// }
-	// public static Window getActiveWindow(){
-	// KeyboardFocusManager keyboardFocusManager =
-	// KeyboardFocusManager.getCurrentKeyboardFocusManager();
-	// rkeyboardFocusManager.getActiveWindow();
-	// }
 
 	// ///////////////////////////////////////////////////////////////////////////
-	public static void enableContainer(Container container, boolean enable) {
-		int count = container.getComponentCount();
+	public static void enableContainer(final Container container, final boolean enable) {
+		final int count = container.getComponentCount();
 		Component comp;
 		for (int i = 0; i < count; i++) {
 			comp = container.getComponent(i);
@@ -102,6 +62,68 @@ public class PnlAuditHistory extends JKMainPanel {
 				}
 			}
 		}
+	}
+
+	// //////////////////////////////////////////////////////////////////////
+	public static void showHistory(final int id, final String tableName) {
+		final PnlAuditHistory pnl = new PnlAuditHistory(id, tableName);
+		SwingUtility.showPanelInDialog(pnl, Lables.get(tableName) + " " + Lables.get("HISTORY"));
+	}
+
+	private final Object recordId;
+
+	private final String tableName;
+
+	final FSDataTable tbl = new FSDataTable();
+
+	// /////////////////////////////////////////////////////////////////////
+	public PnlAuditHistory(final Object recordId, final String tableName) {
+		this.recordId = recordId;
+		this.tableName = tableName;
+		init();
+	}
+
+	// ////////////////////////////////////////////////////////////////////////
+	private void handleAuditSelected() {
+		try {
+			final int id = this.tbl.getSelectedIdAsInteger();
+			final AbstractDao dao = DaoFactory.createDao();
+			final Audit audit = dao.findAudit(id);
+			if (audit.getGui() != null) {
+				SwingUtility.showEncodedComponent(audit.getGui(), Lables.get(audit.getTableName(), true));
+			} else {
+				SwingUtility.showSuccessDialog(audit.getAuditText());
+			}
+		} catch (final Exception e) {
+			ExceptionUtil.handleException(e);
+		}
+	}
+
+	// public static void testComponentSerialization(Object obj) {
+	// String xml = GeneralUtility.toXml(obj);
+	// // Object object = GeneralUtility.toObject(xml);
+	// showEncodedComponent(xml);
+	// }
+	// public static Window getActiveWindow(){
+	// KeyboardFocusManager keyboardFocusManager =
+	// KeyboardFocusManager.getCurrentKeyboardFocusManager();
+	// rkeyboardFocusManager.getActiveWindow();
+	// }
+
+	// /////////////////////////////////////////////////////////////////////
+	private void init() {
+		setLayout(new BorderLayout());
+		add(this.tbl);
+		String sql = AUDITS_SQL_FILE;
+		sql = DaoUtil.compileSql(sql, this.recordId, this.tableName);
+		this.tbl.setQuery(sql);
+		this.tbl.setColumnDateFormat(1, "yyyy/MM/dd hh:mm");
+		this.tbl.addRecordListener(new RecordSelectionListener() {
+			@Override
+			public void recordSelected(final int recordId) {
+				handleAuditSelected();
+			}
+		});
 	}
 
 }

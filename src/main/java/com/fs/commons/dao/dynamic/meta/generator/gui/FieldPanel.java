@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2016 Jalal Kiswani.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fs.commons.dao.dynamic.meta.generator.gui;
 
 import java.awt.event.ActionEvent;
@@ -25,7 +40,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 public class FieldPanel extends JKPanel {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -39,7 +54,7 @@ public class FieldPanel extends JKPanel {
 
 	private final JKTextField txtWidth = new JKTextField(new NumberDocument(3), 15);
 
-	JKTextField txtDefaultValue=new JKTextField(20);
+	JKTextField txtDefaultValue = new JKTextField(20);
 	private final JKCheckBox chkAllowUpdate = new JKCheckBox("Allow update");
 
 	private final JKTextField txtMaxLength = new JKTextField(new NumberDocument(3), 15);
@@ -71,88 +86,70 @@ public class FieldPanel extends JKPanel {
 	JKComboBox cmbViewMode = new JKComboBox();
 
 	/**
-	 * 
+	 *
 	 * @param fieldMeta
 	 * @param tablesHash
 	 */
-	public FieldPanel(FieldMeta fieldMeta, Hashtable<String, TableMeta> tablesHash) {
+	public FieldPanel(final FieldMeta fieldMeta, final Hashtable<String, TableMeta> tablesHash) {
 		this.fieldMeta = fieldMeta;
 		this.tablesHash = tablesHash;
-		cmbReleation.addItem(Relation.ONE_TO_ONE);
-		cmbReleation.addItem(Relation.ONE_TO_MANY);
-		cmbReleation.addItem(Relation.MANY_TO_ONE);
-		cmbReleation.addItem(Relation.MANY_TO_MANY);
-		cmbReleation.addItem(Relation.ONE_TO_ONE);
+		this.cmbReleation.addItem(Relation.ONE_TO_ONE);
+		this.cmbReleation.addItem(Relation.ONE_TO_MANY);
+		this.cmbReleation.addItem(Relation.MANY_TO_ONE);
+		this.cmbReleation.addItem(Relation.MANY_TO_MANY);
+		this.cmbReleation.addItem(Relation.ONE_TO_ONE);
 
-		cmbViewMode.addItem(ViewMode.COMBO);
-		cmbViewMode.addItem(ViewMode.LIST);
-		cmbViewMode.addItem(ViewMode.DIALOG);
-		cmbViewMode.addItem(ViewMode.LOOKUP);
+		this.cmbViewMode.addItem(ViewMode.COMBO);
+		this.cmbViewMode.addItem(ViewMode.LIST);
+		this.cmbViewMode.addItem(ViewMode.DIALOG);
+		this.cmbViewMode.addItem(ViewMode.LOOKUP);
 
-		Enumeration enu = tablesHash.keys();
+		final Enumeration enu = tablesHash.keys();
 		while (enu.hasMoreElements()) {
-			TableMeta tableMeta = tablesHash.get(enu.nextElement());
-			cmbReferenceTable.addItem(tableMeta.getTableId());
+			final TableMeta tableMeta = tablesHash.get(enu.nextElement());
+			this.cmbReferenceTable.addItem(tableMeta.getTableId());
 		}
 		init();
-		txtName.setEnabled(false);
-		cmbReferenceField.setEnabled(false);
-		cmbReferenceTable.setEnabled(false);
+		this.txtName.setEnabled(false);
+		this.cmbReferenceField.setEnabled(false);
+		this.cmbReferenceTable.setEnabled(false);
 
 		modelToView();
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
 	 */
-	private void init() {
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		if (fieldMeta instanceof IdFieldMeta) {
-			add(getIdFieldPanel());
-		}
-		add(new JKLabledComponent("Name", txtName));
-		add(new JKLabledComponent("Caption", txtCaption));
-		add(new JKLabledComponent("Max length", txtMaxLength));
-		add(new JKLabledComponent("Type", txtType));
-		add(new JKLabledComponent("UI Width", txtWidth));
-		add(new JKLabledComponent("Default Value", txtDefaultValue));
-		add(new JKLabledComponent("Allow update", chkAllowUpdate));
-		add(new JKLabledComponent("Confirm User Input", chkCofirmInput));
-
-		add(new JKLabledComponent("Required", chkRequired));
-		add(new JKLabledComponent("Visible", chkVisible));
-		add(new JKLabledComponent("Enabled", chkEnabled));
-		add(new JKLabledComponent("Summary Field", chkSummaryFild));
-		if (fieldMeta instanceof ForiegnKeyFieldMeta) {
-			add(getForiegnKeyPanel());
-		}
-		JKPanel pnlButtons = new JKPanel();
-		pnlButtons.add(btnSave);
-		pnlButtons.add(btnCancel);
-
-		add(pnlButtons);
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				handleSave();
-			}
-		});
-		btnCancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleCancel();
-			}
-		});
+	private JKPanel getForiegnKeyPanel() {
+		final JKPanel panel = new JKPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.add(new JKLabledComponent("Reference table", this.cmbReferenceTable));
+		panel.add(new JKLabledComponent("Reference field", this.cmbReferenceField));
+		panel.add(new JKLabledComponent("Releation", this.cmbReleation));
+		panel.add(new JKLabledComponent("View Mode", this.cmbViewMode));
+		return panel;
 	}
 
 	/**
-	 * 
+	 *
+	 * @return
+	 */
+	private JKPanel getIdFieldPanel() {
+		final JKPanel panel = new JKPanel();
+		panel.add(new JKLabledComponent("Auto increment", this.chkAutoIncrement));
+		return panel;
+	}
+
+	/**
+	 *
 	 */
 	protected void handleCancel() {
 		SwingUtility.closePanelWindow(this);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void handleSave() {
 		viewToModel();
@@ -160,95 +157,115 @@ public class FieldPanel extends JKPanel {
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	private void viewToModel() {
-		if (fieldMeta instanceof IdFieldMeta) {
-			((IdFieldMeta) fieldMeta).setAutoIncrement(chkAutoIncrement.isSelected());
+	private void init() {
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		if (this.fieldMeta instanceof IdFieldMeta) {
+			add(getIdFieldPanel());
 		}
-		fieldMeta.setMaxLength(Integer.parseInt(txtMaxLength.getText()));
-		fieldMeta.setType(Integer.parseInt(txtType.getText()));
-		fieldMeta.setWidth(Integer.parseInt(txtWidth.getText()));
-		fieldMeta.setAllowUpdate(chkAllowUpdate.isSelected());
-		fieldMeta.setConfirmInput(chkCofirmInput.isSelected());
-		fieldMeta.setRequired(chkRequired.isSelected());
-		fieldMeta.setVisible(chkVisible.isSelected());
-		fieldMeta.setEnabled(chkEnabled.isSelected());
-		fieldMeta.setDefaultValue(txtDefaultValue.getText().trim());
-		if (fieldMeta instanceof ForiegnKeyFieldMeta) {
-			ForiegnKeyFieldMeta fk = (ForiegnKeyFieldMeta) fieldMeta;
-			fk.setRelation((Relation) cmbReleation.getSelectedItem());
-			fk.setViewMode((ViewMode) cmbViewMode.getSelectedItem());
+		add(new JKLabledComponent("Name", this.txtName));
+		add(new JKLabledComponent("Caption", this.txtCaption));
+		add(new JKLabledComponent("Max length", this.txtMaxLength));
+		add(new JKLabledComponent("Type", this.txtType));
+		add(new JKLabledComponent("UI Width", this.txtWidth));
+		add(new JKLabledComponent("Default Value", this.txtDefaultValue));
+		add(new JKLabledComponent("Allow update", this.chkAllowUpdate));
+		add(new JKLabledComponent("Confirm User Input", this.chkCofirmInput));
+
+		add(new JKLabledComponent("Required", this.chkRequired));
+		add(new JKLabledComponent("Visible", this.chkVisible));
+		add(new JKLabledComponent("Enabled", this.chkEnabled));
+		add(new JKLabledComponent("Summary Field", this.chkSummaryFild));
+		if (this.fieldMeta instanceof ForiegnKeyFieldMeta) {
+			add(getForiegnKeyPanel());
 		}
-		fieldMeta.setCaption(txtCaption.getText());
-		fieldMeta.setSummaryField(chkSummaryFild.isSelected());
+		final JKPanel pnlButtons = new JKPanel();
+		pnlButtons.add(this.btnSave);
+		pnlButtons.add(this.btnCancel);
+
+		add(pnlButtons);
+		this.btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				// TODO Auto-generated method stub
+				handleSave();
+			}
+		});
+		this.btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				handleCancel();
+			}
+		});
 	}
 
 	/**
-	 * 
-	 * @return
-	 */
-	private JKPanel getIdFieldPanel() {
-		JKPanel panel = new JKPanel();
-		panel.add(new JKLabledComponent("Auto increment", chkAutoIncrement));
-		return panel;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private JKPanel getForiegnKeyPanel() {
-		JKPanel panel = new JKPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.add(new JKLabledComponent("Reference table", cmbReferenceTable));
-		panel.add(new JKLabledComponent("Reference field", cmbReferenceField));
-		panel.add(new JKLabledComponent("Releation", cmbReleation));
-		panel.add(new JKLabledComponent("View Mode", cmbViewMode));
-		return panel;
-	}
-
-	/**
-	 * 
-	 */
-	private void modelToView() {
-		if (fieldMeta instanceof IdFieldMeta) {
-			chkAutoIncrement.setSelected(((IdFieldMeta) fieldMeta).isAutoIncrement());
-		}
-		txtMaxLength.setText(fieldMeta.getMaxLength() + "");
-		txtName.setText(fieldMeta.getName());
-		txtType.setText(fieldMeta.getType() + "");
-		txtWidth.setText(fieldMeta.getWidth() + "");
-		chkAllowUpdate.setSelected(fieldMeta.isAllowUpdate());
-		chkCofirmInput.setSelected(fieldMeta.isConfirmInput());
-		chkRequired.setSelected(fieldMeta.isRequired());
-		chkVisible.setSelected(fieldMeta.isVisible());
-		chkEnabled.setSelected(fieldMeta.isEnabled());
-		chkSummaryFild.setSelected(fieldMeta.isSummaryField());
-		txtDefaultValue.setText(fieldMeta.getDefaultValue());
-		if (fieldMeta instanceof ForiegnKeyFieldMeta) {
-			ForiegnKeyFieldMeta fk = (ForiegnKeyFieldMeta) fieldMeta;
-			cmbReferenceTable.setSelectedItem(fk.getReferenceTable());
-			loadTableFields(fk.getReferenceTable());
-			cmbReferenceField.setSelectedItem(fk.getReferenceField());
-			cmbReleation.setSelectedItem(fk.getRelation());
-			cmbViewMode.setSelectedItem(fk.getViewMode());
-		}
-		if (fieldMeta.getCaption() != null) {
-			txtCaption.setText(fieldMeta.getCaption());
-		}
-
-	}
-
-	/**
-	 * 
+	 *
 	 * @param tableName
 	 */
-	private void loadTableFields(String tableName) {
-		cmbReferenceField.removeAllItems();
-		TableMeta meta = tablesHash.get(tableName);
+	private void loadTableFields(final String tableName) {
+		this.cmbReferenceField.removeAllItems();
+		final TableMeta meta = this.tablesHash.get(tableName);
 		for (int i = 0; i < meta.getFieldList().size(); i++) {
-			cmbReferenceField.addItem(meta.getFieldList().get(i).getName());
+			this.cmbReferenceField.addItem(meta.getFieldList().get(i).getName());
 		}
+	}
+
+	/**
+	 *
+	 */
+	private void modelToView() {
+		if (this.fieldMeta instanceof IdFieldMeta) {
+			this.chkAutoIncrement.setSelected(((IdFieldMeta) this.fieldMeta).isAutoIncrement());
+		}
+		this.txtMaxLength.setText(this.fieldMeta.getMaxLength() + "");
+		this.txtName.setText(this.fieldMeta.getName());
+		this.txtType.setText(this.fieldMeta.getType() + "");
+		this.txtWidth.setText(this.fieldMeta.getWidth() + "");
+		this.chkAllowUpdate.setSelected(this.fieldMeta.isAllowUpdate());
+		this.chkCofirmInput.setSelected(this.fieldMeta.isConfirmInput());
+		this.chkRequired.setSelected(this.fieldMeta.isRequired());
+		this.chkVisible.setSelected(this.fieldMeta.isVisible());
+		this.chkEnabled.setSelected(this.fieldMeta.isEnabled());
+		this.chkSummaryFild.setSelected(this.fieldMeta.isSummaryField());
+		this.txtDefaultValue.setText(this.fieldMeta.getDefaultValue());
+		if (this.fieldMeta instanceof ForiegnKeyFieldMeta) {
+			final ForiegnKeyFieldMeta fk = (ForiegnKeyFieldMeta) this.fieldMeta;
+			this.cmbReferenceTable.setSelectedItem(fk.getReferenceTable());
+			loadTableFields(fk.getReferenceTable());
+			this.cmbReferenceField.setSelectedItem(fk.getReferenceField());
+			this.cmbReleation.setSelectedItem(fk.getRelation());
+			this.cmbViewMode.setSelectedItem(fk.getViewMode());
+		}
+		if (this.fieldMeta.getCaption() != null) {
+			this.txtCaption.setText(this.fieldMeta.getCaption());
+		}
+
+	}
+
+	/**
+	 *
+	 */
+	private void viewToModel() {
+		if (this.fieldMeta instanceof IdFieldMeta) {
+			((IdFieldMeta) this.fieldMeta).setAutoIncrement(this.chkAutoIncrement.isSelected());
+		}
+		this.fieldMeta.setMaxLength(Integer.parseInt(this.txtMaxLength.getText()));
+		this.fieldMeta.setType(Integer.parseInt(this.txtType.getText()));
+		this.fieldMeta.setWidth(Integer.parseInt(this.txtWidth.getText()));
+		this.fieldMeta.setAllowUpdate(this.chkAllowUpdate.isSelected());
+		this.fieldMeta.setConfirmInput(this.chkCofirmInput.isSelected());
+		this.fieldMeta.setRequired(this.chkRequired.isSelected());
+		this.fieldMeta.setVisible(this.chkVisible.isSelected());
+		this.fieldMeta.setEnabled(this.chkEnabled.isSelected());
+		this.fieldMeta.setDefaultValue(this.txtDefaultValue.getText().trim());
+		if (this.fieldMeta instanceof ForiegnKeyFieldMeta) {
+			final ForiegnKeyFieldMeta fk = (ForiegnKeyFieldMeta) this.fieldMeta;
+			fk.setRelation((Relation) this.cmbReleation.getSelectedItem());
+			fk.setViewMode((ViewMode) this.cmbViewMode.getSelectedItem());
+		}
+		this.fieldMeta.setCaption(this.txtCaption.getText());
+		this.fieldMeta.setSummaryField(this.chkSummaryFild.isSelected());
 	}
 }
