@@ -6,7 +6,16 @@
 		<version>0.0.5</version>
 	</parent>
 	<artifactId>smart-desktop</artifactId>
-	<version>1.0.1</version>
+
+	<name>smart-desktop</name>
+	<url>https://github.com/kiswanij/smart-desktop</url>
+	<description>Smart-Desktop</description>
+
+	<scm>
+		<url>scm:git:git@github.com:kiswanij/smart-desktop</url>
+		<connection>scm:git:git@github.com:kiswanij/smart-desktop</connection>
+		<developerConnection>kiswanij</developerConnection>
+	</scm>
 
 	<dependencies>
 		<dependency>
