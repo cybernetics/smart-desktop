@@ -40,7 +40,7 @@ public class JKModule extends JKMenu {
 
 	// Border DEFAULT_BORDER = getBorder();
 
-	static Dimension dim = new Dimension(150, 40);
+	static Dimension dim = new Dimension(200, 40);
 
 	public JKModule(final String str) {
 		super(str);
