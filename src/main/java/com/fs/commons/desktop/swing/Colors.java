@@ -73,6 +73,7 @@ public class Colors {
 	public static final Color FAVORITE_ITEM_BORDER = new Color(173, 20, 0);
 	public static final Color CELL_EDITOR_BG = MAIN_PANEL_BG;
 	public static final Color CELL_EDTIOR_FG = Color.black;
+	public static final Color JK_STATUS_BAR_BG = getColor("status_bg");
 
 	// public static final Color MENU_PANEL= SKY_BLUE;
 	// public static final Color MENU_ITEMS_PANEL= NICE_BLUE;

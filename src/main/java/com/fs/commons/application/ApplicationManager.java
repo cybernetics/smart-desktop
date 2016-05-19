@@ -334,7 +334,7 @@ public class ApplicationManager {
 			throw new ApplicationException(e);
 		} finally {
 			if (splash != null) {
-				GeneralUtility.sleep(2);
+//				GeneralUtility.sleep(2);
 				splash.dispose();
 			}
 		}

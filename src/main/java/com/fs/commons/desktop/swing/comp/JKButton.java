@@ -19,7 +19,10 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -236,6 +239,18 @@ public class JKButton extends JButton implements BindingComponent {
 					// transferFocus();
 					doClick();
 				}
+			}
+		});
+		addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				setOpaque(false);
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				setOpaque(true);
 			}
 		});
 	}

@@ -491,6 +491,8 @@ public class ApplicationFrame extends JKFrame {
 
 	private JKPanel getSouthPanel() {
 		final JKPanel pnlSouth = new JKPanel(new GridLayout(1, 3, 5, 5));
+		pnlSouth.setOpaque(true);
+		pnlSouth.setBackground(Colors.JK_STATUS_BAR_BG);
 		pnlSouth.add(this.txtGeneralStatus);
 		pnlSouth.add(this.txtUserStatus);
 		pnlSouth.add(this.txtSystemStatus);

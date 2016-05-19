@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.SwingUtilities;
 
+import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 
 public class JKStatusBar extends JKPanel {
@@ -28,7 +29,7 @@ public class JKStatusBar extends JKPanel {
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final Dimension PREFERRED_SIZE = new Dimension(800, 25);
+//	private static final Dimension PREFERRED_SIZE = new Dimension(800, 25);
 	JKLabel lblMessage = new JKLabel("", false);
 
 	public JKStatusBar() {
@@ -45,6 +46,7 @@ public class JKStatusBar extends JKPanel {
 		add(this.lblMessage);
 		setFocusable(false);
 		setBorder(BorderFactory.createLoweredBevelBorder());
+		lblMessage.setBackground(Colors.JK_STATUS_BAR_BG);
 	}
 
 	/**

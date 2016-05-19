@@ -49,7 +49,7 @@ class JKTitleButton extends JKButton {
 		super(string);
 		setFocusable(false);
 		setOpaque(false);
-		setBorder(BorderFactory.createLineBorder(Color.gray));
+		setBorder(null);
 		setPreferredSize(new Dimension(24, 24));
 	}
 

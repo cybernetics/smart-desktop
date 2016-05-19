@@ -76,24 +76,13 @@ public class JKMenu extends JKButton {
 
 //	@Override
 	void init() {
+		super.init();
 		setFocusable(false);
-//		super.init();
 		setBackground(backColor);
 		setForeground(forColor);
 		setPreferredSize(dim);
 		// setBackground(bgColor);
 
-		// setBorder(BorderFactory.createLineBorder(forColor));
-		addMouseMotionListener(new MouseMotionAdapter() {
-
-			@Override
-			public void mouseMoved(final MouseEvent e) {
-				// if(!hasFocus()){
-				// requestFocus();
-				// doClick();
-				// }
-			}
-		});
 	}
 
 	@Override
