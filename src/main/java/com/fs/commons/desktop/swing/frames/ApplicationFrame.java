@@ -196,10 +196,9 @@ public class ApplicationFrame extends JKFrame {
 		}
 		this.pnlFavorit = buildFavoritPanelsToHomePage();
 		if (this.pnlFavorit != null) {
-			// pnlFavorit.setPreferredSize(180,
-			// (int)pnlFavorit.getHeight()-200);
-			// getHomePanel().add(pnlFavorit, BorderLayout.SOUTH);
-			// pnlFavorit.requestFocusInWindow();
+//			pnlFavorit.setPreferredSize(180, 200);
+			getHomePanel().add(pnlFavorit, BorderLayout.SOUTH);
+			pnlFavorit.requestFocusInWindow();
 		}
 		getHomePanel().invalidate();
 		getHomePanel().repaint();
@@ -247,9 +246,10 @@ public class ApplicationFrame extends JKFrame {
 		final ArrayList<Entry> list = GeneralUtility.sortHashTable(this.favoritePanels, false);
 		final int minSize = Math.min(list.size(), MAX_FAVORITES_SIZE);
 		if (minSize > 0) {
-			final JKPanel<?> pnl = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
-			// pnl.setBorder(SwingUtility.createTitledBorder("Favorties_pages"));
-			// pnl.setPreferredSize(new Dimension(600, 180));
+			final JKPanel<?> pnl = new JKMainPanel(new FlowLayout(FlowLayout.CENTER));
+			pnl.setBackground(Colors.FAVORITE_BG);
+			 pnl.setBorder(SwingUtility.createTitledBorder("Favorties_pages"));
+			 pnl.setPreferredSize(new Dimension(600, 180));
 			int count = 0;
 			for (int i = 0; i < minSize; i++) {
 				final String menuItemName = (String) list.get(i).getKey();
@@ -257,7 +257,7 @@ public class ApplicationFrame extends JKFrame {
 					final MenuItem menuItem = this.application.findMenuItem(menuItemName);
 					if (menuItem != null) {
 
-						final JKPanel<?> pnlThumb = new JKPanel<Object>(new BorderLayout());
+						final JKPanel<?> pnlThumb = new JKPanel(new BorderLayout());
 						pnlThumb.setPreferredSize(new Dimension(150, 130));
 						final byte[] file = GeneralUtility.readFile(new File(getPanelFileName(menuItem.getName())));
 						final JPanel pnlItem = SwingUtility.buildImagePanel(file, ImagePanel.SCALED);
@@ -296,7 +296,7 @@ public class ApplicationFrame extends JKFrame {
 						}
 					}
 				} catch (final IOException e) {
-					System.err.println(e.getMessage());
+					e.printStackTrace();
 				} catch (final SecurityException e) {
 					// Its safe to eat this exception
 				}
@@ -312,18 +312,21 @@ public class ApplicationFrame extends JKFrame {
 	private void buildHomePanel() {
 		final JKPanel mainPanel = SwingUtility.buildImagePanel(GeneralUtility.getURL(this.application.getHomeImage()), ImagePanel.SCALED);
 		// TODO : Fix the following to be non-hard coded value
-		if (GeneralUtility.getURL("/resources/images/home.png") != null) {
-			final ImagePanel pnlImage = SwingUtility.buildImagePanel(GeneralUtility.getURL("/resources/images/home.png"), ImagePanel.ACTUAL);
-			pnlImage.setBorder(BorderFactory.createLineBorder(Colors.MENU_PANEL_BG, 5));
-			pnlImage.setSizeToFitImage();
-			mainPanel.add(pnlImage);
-		}
+		// if (GeneralUtility.getURL("/resources/images/home.png") != null) {
+		// final ImagePanel pnlImage =
+		// SwingUtility.buildImagePanel(GeneralUtility.getURL("/resources/images/home.png"),
+		// ImagePanel.ACTUAL);
+		// pnlImage.setBorder(BorderFactory.createLineBorder(Colors.MENU_PANEL_BG,
+		// 5));
+		// pnlImage.setSizeToFitImage();
+		// mainPanel.add(pnlImage);
+		// }
 		// mainPanel.setOpaque(true);
 		// mainPanel.setGradientType(GradientType.DIAGNOLE);
 		// mainPanel.setBackground(SwingUtility.getDefaultBackgroundColor());
 		setHomePanel(mainPanel);
 
-		// addFavoritePanelToHome();
+		addFavoritePanelToHome();
 	}
 
 	/**
@@ -446,8 +449,8 @@ public class ApplicationFrame extends JKFrame {
 	private JKPanel<?> getModulesPanel() {
 		if (this.pnlModules == null) {
 			this.pnlModules = new JKMainPanel();
-//			this.pnlModules.setGradientType(GradientType.HORIZENTAL);
-//			 pnlModules.setOpaque(false);
+			// this.pnlModules.setGradientType(GradientType.HORIZENTAL);
+			// pnlModules.setOpaque(false);
 			this.pnlModules.setBackground(Colors.MODULE_PANEL_BG);
 			final List<Module> modules = this.application.getModules();
 			for (int i = 0; i < modules.size(); i++) {

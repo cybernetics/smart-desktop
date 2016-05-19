@@ -15,6 +15,7 @@
  */
 package com.fs.commons.desktop.swing.comp.panels;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -58,7 +59,7 @@ public class ImagePanel extends JKPanel {
 	public ImagePanel(final BufferedImage image, final int style) {
 		this.image = image;
 		this.style = style;
-		// setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		setBackground(Colors.MAIN_PANEL_BG);
 	}
 

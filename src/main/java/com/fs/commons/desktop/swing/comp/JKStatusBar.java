@@ -47,6 +47,7 @@ public class JKStatusBar extends JKPanel {
 		setFocusable(false);
 		setBorder(BorderFactory.createLoweredBevelBorder());
 		lblMessage.setBackground(Colors.JK_STATUS_BAR_BG);
+		lblMessage.setForeground(Colors.JK_STATUS_BAR_FG);
 	}
 
 	/**
