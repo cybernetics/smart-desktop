@@ -95,6 +95,7 @@ import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
 import com.fs.commons.util.ImageUtil;
 import com.fs.commons.util.ReflicationUtil;
+import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import com.jk.exceptions.JKNotAllowedOperationException;
 import com.jk.exceptions.handler.ExceptionUtil;
 import com.jk.security.JKUser;
@@ -106,11 +107,11 @@ public class SwingUtility {
 			// PlasticXPLookAndFeel.setHighContrastFocusColorsEnabled(true);
 			// PlasticXPLookAndFeel.setPlasticTheme(new SkyBlue());
 
-			final ColorUIResource disabledBackground = new ColorUIResource(Color.white);
-			UIManager.put("ComboBox.disabledBackground", disabledBackground);
-			final ColorUIResource disabledForeground = new ColorUIResource(Color.black);
-			UIManager.put("ComboBox.disabledForeground", disabledForeground);
-			UIManager.setLookAndFeel(new com.jgoodies.looks.plastic.PlasticXPLookAndFeel());
+//			final ColorUIResource disabledBackground = new ColorUIResource(Color.white);
+//			UIManager.put("ComboBox.disabledBackground", disabledBackground);
+//			final ColorUIResource disabledForeground = new ColorUIResource(Color.black);
+//			UIManager.put("ComboBox.disabledForeground", disabledForeground);
+			UIManager.setLookAndFeel(new WindowsLookAndFeel());
 			// NativeInterface.open();
 
 			// addFocusForwardKey(KeyEvent.VK_DOWN);
@@ -827,7 +828,7 @@ public class SwingUtility {
 	 * @param keyStroke
 	 * @param actionName
 	 */
-	public static void setHotKeyFoButton(final JButton btn, final String keyStroke, final String actionName) {
+	public static void setHotKeyFoButton(final AbstractButton btn, final String keyStroke, final String actionName) {
 		// get the button's Action map
 		final ActionMap amap = btn.getActionMap();
 		// add an action to the button's action map

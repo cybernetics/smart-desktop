@@ -137,16 +137,16 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 		return this.gradientType;
 	}
 
-	/**
-	 *
-	 * @return
-	 */
-	private Color getGredientColor(final boolean recalculate) {
-		if (this.gredientColor == null || recalculate) {
-			this.gredientColor = GraphicsFactory.createGradientColor(getBackground());
-		}
-		return this.gredientColor;
-	}
+//	/**
+//	 *
+//	 * @return
+//	 */
+//	private Color getGredientColor(final boolean recalculate) {
+//		if (this.gredientColor == null || recalculate) {
+//			this.gredientColor = GraphicsFactory.createGradientColor(getBackground());
+//		}
+//		return this.gredientColor;
+//	}
 
 	@Override
 	public T getValue() {
@@ -189,10 +189,10 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 	// ///////////////////////////////////////////////////////////
 	@Override
 	public void paint(final Graphics g) {
-		if (this.gradientType != null) {
-			final Color newColor = getGredientColor(false);
-			GraphicsFactory.makeGradient(this, g, getBackground(), newColor, this.gradientType);
-		}
+//		if (this.gradientType != null) {
+//			final Color newColor = getGredientColor(false);
+//			GraphicsFactory.makeGradient(this, g, getBackground(), newColor, this.gradientType);
+//		}
 		super.paint(g);
 	}
 
@@ -252,7 +252,7 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 	@Override
 	public void setBackground(final Color bg) {
 		super.setBackground(bg);
-		getGredientColor(true);
+//		getGredientColor(true);
 	}
 
 	public void setBackGroundImage(final Image backGroundImage) {

@@ -83,7 +83,7 @@ public class Colors {
 	 * @return
 	 */
 	protected static Color getColor(final String colorStr) {
-		return getColor(colorStr, Color.black);
+		return getColor(colorStr, null);
 	}
 
 	private static Color getColor(String colorStr, final Color defaultColor) {

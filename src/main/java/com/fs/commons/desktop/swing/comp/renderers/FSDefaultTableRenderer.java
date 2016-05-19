@@ -34,9 +34,9 @@ public class FSDefaultTableRenderer extends DefaultTableCellRenderer {
 	 *
 	 */
 	private static final long serialVersionUID = 3671580631267035219L;
-	private static final Color SELECTED_ROW_COLOR = new Color(150, 150, 255);
-	private static final Color ODD_ROW_COLOR = new Color(255, 255, 255);
-	private static final Color EVEN_ROW_COLOR = Colors.TABLE_EVEN_ROW;
+//	private static final Color SELECTED_ROW_COLOR = new Color(150, 150, 255);
+//	private static final Color ODD_ROW_COLOR = new Color(255, 255, 255);
+//	private static final Color EVEN_ROW_COLOR = Colors.TABLE_EVEN_ROW;
 	private Format format;
 
 	// private Font font=new Font("arial",Font.PLAIN,11);
@@ -69,11 +69,11 @@ public class FSDefaultTableRenderer extends DefaultTableCellRenderer {
 			}
 		}
 		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-		if (!isSelected) {
-			setBackground(row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR);
-		} else {
-			setBackground(SELECTED_ROW_COLOR);
-		}
+//		if (!isSelected) {
+//			setBackground(row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR);
+//		} else {
+//			setBackground(SELECTED_ROW_COLOR);
+//		}
 
 		final Class columnClass = table.getModel().getColumnClass(column);
 		// Modify this to use the setColumnFormat in FSTable

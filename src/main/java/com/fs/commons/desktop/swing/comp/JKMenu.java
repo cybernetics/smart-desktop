@@ -20,7 +20,10 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
+import javax.swing.JMenu;
+
 import com.fs.commons.desktop.swing.Colors;
+import com.fs.commons.util.GeneralUtility;
 
 /**
  * <p>
@@ -42,7 +45,7 @@ import com.fs.commons.desktop.swing.Colors;
  * @author not attributable
  * @version 1.0
  */
-public class JKMenu extends JKButton {
+public class JKMenu extends JMenu {
 	/**
 	 *
 	 */
@@ -73,10 +76,10 @@ public class JKMenu extends JKButton {
 		// setFont(new Font("Tahoma", Font.PLAIN, 12));
 	}
 
-	@Override
+//	@Override
 	void init() {
 		setFocusable(false);
-		super.init();
+//		super.init();
 		setBackground(backColor);
 		setForeground(forColor);
 		setPreferredSize(dim);
@@ -105,6 +108,15 @@ public class JKMenu extends JKButton {
 			setForeground(forColor);
 			// setBorder(DEFAULT_BORDER);
 		}
+	}
+
+	public void setShortcutText(String string, boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setIcon(String iconName) {
+		setIcon(GeneralUtility.getIcon(iconName));
 	}
 
 }

@@ -262,18 +262,18 @@ public class JKButton extends JButton implements BindingComponent {
 		return this.showProgress;
 	}
 
-	@Override
-	public void paint(final Graphics g) {
-		if (isOpaque()) {
-			// setOpaque(false);
-			// GraphicsFactory.makeGradient(this, g, getBackground());
-			super.paint(g);
-			// setOpaque(true);
-		} else {
-			super.paint(g);
-		}
-
-	}
+//	@Override
+//	public void paint(final Graphics g) {
+//		if (isOpaque()) {
+//			// setOpaque(false);
+//			// GraphicsFactory.makeGradient(this, g, getBackground());
+//			super.paint(g);
+//			// setOpaque(true);
+//		} else {
+//			super.paint(g);
+//		}
+//
+//	}
 
 	@Override
 	public void reset() {
@@ -413,4 +413,11 @@ public class JKButton extends JButton implements BindingComponent {
 	// }
 	// return preferredSize;
 	// }
+
+	@Override
+	public void setForeground(Color fg) {
+		if (fg != null) {
+			super.setForeground(fg);
+		}
+	}
 }

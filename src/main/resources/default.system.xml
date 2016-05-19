@@ -1,7 +1,7 @@
 <application>
 	<id>786</id>
 	<name>JK-Default Application</name>
-	<splash-img>/resources/images/splash.png</splash-img>
+	<splash-img>/resources/images/splash.jpg</splash-img>
 	<home-img>/resources/images/background.jpg</home-img>
 	<config-file>system.config</config-file>
 	<locale>en</locale>

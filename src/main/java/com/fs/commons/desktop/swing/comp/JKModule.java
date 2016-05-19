@@ -23,7 +23,7 @@ import javax.swing.SwingConstants;
 
 import com.fs.commons.desktop.swing.Colors;
 
-public class JKModule extends JKButton {
+public class JKModule extends JKMenu {
 	/**
 	 *
 	 */
@@ -40,7 +40,7 @@ public class JKModule extends JKButton {
 
 	// Border DEFAULT_BORDER = getBorder();
 
-	static Dimension dim = new Dimension(140, 35);
+	static Dimension dim = new Dimension(150, 40);
 
 	public JKModule(final String str) {
 		super(str);
@@ -49,13 +49,12 @@ public class JKModule extends JKButton {
 
 	@Override
 	void init() {
+		super.init();
 		setFocusable(false);
-		setBorder(null);
-		setOpaque(false);
+		setOpaque(true);
 		setHorizontalAlignment(CENTER);
 		setBackground(backColor);
 		setForeground(forColor);
-		super.init();
 		setPreferredSize(dim);
 		// setFont(new Font(getFontName(),Font.BOLD,18));
 		// addMouseMotionListener(new MouseMotionAdapter() {
@@ -82,5 +81,10 @@ public class JKModule extends JKButton {
 	public void setIcon(final Icon defaultIcon) {
 		setVerticalTextPosition(SwingConstants.BOTTOM);
 		setHorizontalTextPosition(SwingConstants.CENTER);
+	}
+
+	public void setShortcut(String string, String string2) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -58,6 +58,7 @@ import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKFrame;
 import com.fs.commons.desktop.swing.comp.JKMenu;
+import com.fs.commons.desktop.swing.comp.JKMenuBar;
 import com.fs.commons.desktop.swing.comp.JKMenuItem;
 import com.fs.commons.desktop.swing.comp.JKModule;
 import com.fs.commons.desktop.swing.comp.JKScrollPane;
@@ -156,7 +157,7 @@ public class ApplicationFrame extends JKFrame {
 	private final ArrayList<MenuItem> history = new ArrayList<MenuItem>();
 	private int currentHistoryIndex = -1;
 	// UI Components
-	JKPanel<?> pnlModules;
+	JKMenuBar  pnlModules;
 
 	JKPanel<?> pnlMenu;
 
@@ -349,8 +350,8 @@ public class ApplicationFrame extends JKFrame {
 		final JKPanel<?> pnlNorth = new JKPanel<Object>();
 		pnlNorth.setBorder(BorderFactory.createRaisedBevelBorder());
 		pnlNorth.setLayout(new BoxLayout(pnlNorth, BoxLayout.Y_AXIS));
-		// setJMenuBar(getModulesPanel());
-		pnlNorth.add(getModulesPanel());
+		setJMenuBar(getModulesPanel());
+//		pnlNorth.add(getModulesPanel());
 		pnlNorth.add(getMenuPanel());
 		return pnlNorth;
 	}
@@ -443,11 +444,11 @@ public class ApplicationFrame extends JKFrame {
 	 *
 	 * @return
 	 */
-	private JKPanel<?> getModulesPanel() {
+	private JKMenuBar getModulesPanel() {
 		if (this.pnlModules == null) {
-			this.pnlModules = new JKPanel<Object>();
-			this.pnlModules.setGradientType(GradientType.HORIZENTAL);
-			// pnlModules.setOpaque(false);
+			this.pnlModules = new JKMenuBar();
+//			this.pnlModules.setGradientType(GradientType.HORIZENTAL);
+//			 pnlModules.setOpaque(false);
 			this.pnlModules.setBackground(Colors.MODULE_PANEL_BG);
 			final List<Module> modules = this.application.getModules();
 			for (int i = 0; i < modules.size(); i++) {
