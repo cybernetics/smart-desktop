@@ -27,7 +27,7 @@ import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKRadioButton;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class JKRadioGroup extends JKPanel<Object> {
 	/**
@@ -159,7 +159,7 @@ public class JKRadioGroup extends JKPanel<Object> {
 		try {
 			setRecords(DaoUtil.createRecordsFromSQL(sql));
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

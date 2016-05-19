@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.reports.ReportException;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
@@ -57,9 +57,9 @@ public class TableModelPdfBuilder {
 			builer.buildPdfDocument(file.getAbsolutePath());
 			GeneralUtility.executeFile(file.getAbsolutePath());
 		} catch (final ReportException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final IOException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

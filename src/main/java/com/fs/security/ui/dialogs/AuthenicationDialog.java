@@ -46,7 +46,7 @@ import com.fs.commons.desktop.swing.dialogs.JKDialog;
 import com.fs.commons.util.GeneralUtility;
 import com.fs.security.facade.SecurityFacade;
 import com.jk.exceptions.JKInvalidUserException;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKUser;
 
 /**
@@ -165,10 +165,10 @@ public class AuthenicationDialog extends JKDialog {
 					SwingUtility.showUserErrorDialog("INVAILD_USER_NAME_OR_PASSWORD", false);
 				}
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		} catch (final ValidationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

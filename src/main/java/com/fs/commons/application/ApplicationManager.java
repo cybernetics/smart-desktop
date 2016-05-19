@@ -21,19 +21,14 @@ import java.awt.event.ComponentEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-import org.apache.ibatis.jdbc.ScriptRunner;
-
 import com.fs.commons.application.config.DefaultConfigManager;
-import com.fs.commons.application.exceptions.ServerDownException;
 import com.fs.commons.application.exceptions.util.ExceptionHandlerFactory;
 import com.fs.commons.application.listener.ApplicationListener;
-import com.fs.commons.application.util.ResourceLoaderFactory;
 import com.fs.commons.application.xml.ApplicationXmlParser;
 import com.fs.commons.apps.backup.AutomaticDBBackup;
 import com.fs.commons.apps.instance.InstanceManager;
@@ -45,7 +40,6 @@ import com.fs.commons.dao.connection.JKDataSourceUtil;
 import com.fs.commons.dao.connection.JKPoolingDataSource;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.dynamic.meta.TableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
 import com.fs.commons.dao.dynamic.meta.xml.TableMetaXmlParser;
@@ -60,8 +54,9 @@ import com.fs.commons.locale.Locale;
 import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.JKInvalidUserException;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.license.client.LicenseClientFactory;
+import com.jk.resources.JKResourceLoaderFactory;
 import com.jk.security.JKSecurityManager;
 import com.jk.security.JKUser;
 
@@ -104,7 +99,7 @@ public class ApplicationManager {
 				logger.info("set default instance");
 				instance = new ApplicationManager();
 			} catch (final Exception e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 		return instance;
@@ -265,10 +260,9 @@ public class ApplicationManager {
 	public Application init() throws FileNotFoundException, ApplicationException {
 		for (String fileName : DEFAULT_SYSTEM_FILES) {
 			logger.info("trying to init application with file :" + fileName);
-			try {
-				return init(GeneralUtility.getFileInputStream(fileName));
-			} catch (final FileNotFoundException e) {
-				logger.info("not found ");
+			InputStream fileInputStream = GeneralUtility.getFileInputStream(fileName);
+			if (fileInputStream != null) {
+				return init(fileInputStream);
 			}
 		}
 		System.err.println(" config files doesnot exist, init with defaults");
@@ -365,7 +359,7 @@ public class ApplicationManager {
 		final TableMetaXmlParser parser = new TableMetaXmlParser();
 		String resourceName = "/resources/meta/meta.xml";
 		logger.info("load default meta at :" + resourceName);
-		final InputStream in = ResourceLoaderFactory.getResourceLoaderImp().getResourceAsStream(resourceName);
+		final InputStream in = JKResourceLoaderFactory.getResourceLoader().getResourceAsStream(resourceName);
 		if (in != null) {
 			logger.info("parse default meta");
 			final Hashtable<String, TableMeta> meta = parser.parse(in, "default");
@@ -411,7 +405,7 @@ public class ApplicationManager {
 			init();
 			start();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

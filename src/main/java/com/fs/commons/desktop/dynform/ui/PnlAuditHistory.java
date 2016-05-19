@@ -32,7 +32,7 @@ import com.fs.commons.desktop.swing.comp2.FSDataTable;
 import com.fs.commons.desktop.swing.listener.RecordSelectionListener;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKAudit;
 
 public class PnlAuditHistory extends JKMainPanel {
@@ -95,7 +95,7 @@ public class PnlAuditHistory extends JKMainPanel {
 				SwingUtility.showSuccessDialog(audit.getAuditText());
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

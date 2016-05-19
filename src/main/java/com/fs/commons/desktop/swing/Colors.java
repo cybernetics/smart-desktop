@@ -17,6 +17,7 @@ package com.fs.commons.desktop.swing;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import com.fs.commons.util.CollectionUtil;
@@ -25,13 +26,11 @@ import com.fs.commons.util.GeneralUtility;
 public class Colors {
 	static Properties prop = new Properties();
 	static {
-		try {
-			prop = GeneralUtility.readPropertyStream(GeneralUtility.getFileInputStream("/color.properties"));
-			// System.out.println(prop);
-		} catch (final IOException e) {
-			System.err.println("Unable to read the colors file");
-			e.printStackTrace();
-			// just eat the exception and read default values
+		InputStream inputStream = GeneralUtility.getFileInputStream("/color.properties");
+		if (inputStream != null) {
+			prop = GeneralUtility.readPropertyStream(inputStream);
+		} else {
+			System.err.println("No theme found , default theme will be loaded");
 		}
 	}
 	public static final Color DARK_BLUE = new Color(22, 125, 219);

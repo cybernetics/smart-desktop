@@ -49,7 +49,7 @@ import com.fs.commons.desktop.swing.comp.model.FSTableRecord;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DynTabular extends JKMainPanel {
 
@@ -317,7 +317,7 @@ public class DynTabular extends JKMainPanel {
 			// model.getDao().saveRecords(getAllRecords());
 			SwingUtility.showSuccessDialog("DATA_UPDATED_SUCC");
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} finally {
 			if (reload) {
 				reloadData(false);
@@ -438,7 +438,7 @@ public class DynTabular extends JKMainPanel {
 				// SwingUtility.showSuccessDialog("TABULAR_DATA_RELOADED_SUCC");
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

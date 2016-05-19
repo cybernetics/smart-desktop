@@ -42,7 +42,7 @@ import com.fs.commons.desktop.swing.dialogs.QueryDialog;
 import com.fs.commons.desktop.validation.builtin.FSValidators;
 import com.fs.commons.locale.Lables;
 import com.jk.db.dataaccess.plain.JKFinder;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class JKLookupText extends JKPanel implements BindingComponent, DaoComponent {
 	/**
@@ -247,7 +247,7 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 			clearFields(true);
 		} catch (final JKDataAccessException e) {
 			System.err.println("Error while trying  to extecute: " + query);
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -270,7 +270,7 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 			this.requestFocus();
 			this.txtName.setText(Lables.get("N/A"));
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 		this.fsWrapper.fireValueChangeListener(old, getValue());
 	}

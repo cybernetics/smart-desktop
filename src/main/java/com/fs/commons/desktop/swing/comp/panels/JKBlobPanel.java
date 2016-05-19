@@ -36,7 +36,7 @@ import com.fs.commons.desktop.swing.comp.JKLabel;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class JKBlobPanel extends JKPanel implements BindingComponent {
 	/**
@@ -131,7 +131,7 @@ public class JKBlobPanel extends JKPanel implements BindingComponent {
 					this.object = GeneralUtility.readStream(new FileInputStream(file));
 					setValue(this.object);
 				} catch (final IOException e1) {
-					ExceptionUtil.handle(e1);
+					JKExceptionUtil.handle(e1);
 				}
 			}
 		}
@@ -142,7 +142,7 @@ public class JKBlobPanel extends JKPanel implements BindingComponent {
 			// byte[] image = ImageUtil.readImage();
 			// setValue(image);
 		} catch (final Exception e1) {
-			ExceptionUtil.handle(e1);
+			JKExceptionUtil.handle(e1);
 		}
 	}
 

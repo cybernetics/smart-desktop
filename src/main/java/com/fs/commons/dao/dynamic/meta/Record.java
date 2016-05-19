@@ -31,7 +31,7 @@ import com.fs.commons.desktop.swing.comp.model.FSTableRecord;
 import com.fs.commons.desktop.swing.comp.model.FSTableRecord.RecordStatus;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class Record {
 	Field idField;
@@ -440,7 +440,7 @@ public class Record {
 			}
 			util.populate(map, bean);
 		} catch (final BeanUtilException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 		return bean;
 	}

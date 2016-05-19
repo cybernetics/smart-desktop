@@ -40,7 +40,7 @@ import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dialogs.QueryDialog;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.logging.JKLogger;
 
 /**
@@ -119,7 +119,7 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 			});
 			SwingUtility.showPanelInDialog(pnl, this.tableMeta.getTableName());
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -249,7 +249,7 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 				JKLogger.fatal("Record not found for field :" + this.tableMeta.getTableName() + " for id : " + value);
 				setValue(null);// recursion
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		} else {
 			clear();

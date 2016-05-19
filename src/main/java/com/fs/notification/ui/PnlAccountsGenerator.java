@@ -31,7 +31,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
 import com.fs.notification.facade.NotificationFacade;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class PnlAccountsGenerator extends JKPanel {
 	/**
@@ -85,7 +85,7 @@ public class PnlAccountsGenerator extends JKPanel {
 			final NotificationFacade facade = new NotificationFacade();
 			facade.syncAccounts(this.cmbAccountsCreationQuery.getSelectedIdValueAsInteger());
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

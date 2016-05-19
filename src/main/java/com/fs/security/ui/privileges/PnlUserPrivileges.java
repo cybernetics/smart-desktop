@@ -30,9 +30,9 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
 import com.fs.commons.reports.JKReport;
-import com.fs.commons.reports.ReportException;
 import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.reports.JKReportsUtil;
+import com.fs.commons.reports.ReportException;
 import com.fs.commons.util.GeneralUtility;
 import com.fs.security.util.ListsBuilder;
 

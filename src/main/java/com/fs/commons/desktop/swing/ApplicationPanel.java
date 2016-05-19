@@ -18,7 +18,6 @@ package com.fs.commons.desktop.swing;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ImageIcon;

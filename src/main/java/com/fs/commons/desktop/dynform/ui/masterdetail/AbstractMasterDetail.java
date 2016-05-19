@@ -35,7 +35,7 @@ import com.fs.commons.desktop.dynform.ui.action.DynDaoActionListener;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public abstract class AbstractMasterDetail extends JKMainPanel {
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 					this.pnlDetail.handleFind(record.getIdValue());
 					navigateNext();
 				} catch (final JKDataAccessException e) {
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				}
 			}
 		}
@@ -74,7 +74,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 						AbstractMasterDetail.this.pnlMaster.handleFindRecord(record.getIdValue());
 						navigateNext();
 					} catch (final Exception e) {
-						ExceptionUtil.handle(e);
+						JKExceptionUtil.handle(e);
 					}
 				}
 			});
@@ -94,7 +94,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 				try {
 					dao.cloneDetails(AbstractMasterDetail.this.pnlMaster.getDuplicatedRecord().getIdValue(), newRecord.getIdValue());
 				} catch (final JKDataAccessException e) {
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				}
 			}
 		}
@@ -107,7 +107,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 					pnlDetail.setMasterIdValue(masterRecord.getIdValue());
 				}
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 
@@ -128,7 +128,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 				try {
 					pnl.setMasterIdValue(null);
 				} catch (final JKDataAccessException e) {
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				}
 			}
 		}

@@ -38,7 +38,7 @@ import com.fs.commons.desktop.swing.comp.JKTextArea;
 import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class PnlFeedBack extends JKPanel<Object> {
 	/**
@@ -107,13 +107,13 @@ public class PnlFeedBack extends JKPanel<Object> {
 			SwingUtility.showSuccessDialog("FEED_BACK_SENT_SUCCESSFULLY");
 			SwingUtility.closePanel(this);
 		} catch (final ValidationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final IOException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final CompressionException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final EmailException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

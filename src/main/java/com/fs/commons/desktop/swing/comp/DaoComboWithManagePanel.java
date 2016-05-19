@@ -34,7 +34,7 @@ import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DaoComboWithManagePanel extends JKPanel<Object> {
 
@@ -128,11 +128,11 @@ public class DaoComboWithManagePanel extends JKPanel<Object> {
 			SwingUtility.packWindow(this);
 			this.btnEdit.transferFocus();
 		} catch (final TableMetaNotFoundException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final UIOPanelCreationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

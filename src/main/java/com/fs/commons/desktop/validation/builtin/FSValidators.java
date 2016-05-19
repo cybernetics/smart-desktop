@@ -15,7 +15,6 @@
  */
 package com.fs.commons.desktop.validation.builtin;
 
-import java.io.InputStream;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.Format;
@@ -28,8 +27,7 @@ import javax.swing.text.Document;
 import com.fs.commons.desktop.validation.Problems;
 import com.fs.commons.desktop.validation.Validator;
 import com.fs.commons.desktop.validation.conversion.Converter;
-import com.fs.commons.locale.Lables;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * An enumeration of validator factories for commonly needed forms of validation
@@ -153,7 +151,7 @@ public enum FSValidators implements Validator {
 //			final InputStream in = FSValidators.class.getResourceAsStream("Bundle.properties");
 //			Lables.getDefaultInstance().addLables(in);
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

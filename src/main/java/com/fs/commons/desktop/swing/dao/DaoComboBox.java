@@ -41,7 +41,7 @@ import com.fs.commons.desktop.swing.comp.DaoComponent;
 import com.fs.commons.desktop.swing.comp.FSComboBoxListCellRenderer;
 import com.fs.commons.desktop.swing.comp.JKComboBox;
 import com.fs.commons.desktop.swing.dialogs.QueryDialog;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * TODO : refactor this class : 1- Duplicate codes in constructors 2- sql code
@@ -367,7 +367,7 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 				loadData();
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -472,7 +472,7 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 				reloadData();
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 import com.fs.commons.application.config.UserPreferences;
 import com.fs.commons.application.exceptions.ModuleException;
@@ -39,9 +38,9 @@ import com.fs.commons.reports.JKReport;
 import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.JKNotAllowedOperationException;
-import com.jk.exceptions.handler.ExceptionUtil;
-import com.jk.security.JKSecurityManager;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKPrivilige;
+import com.jk.security.JKSecurityManager;
 
 public class Application {
 	private int autoLogoutInterval = 15;
@@ -276,7 +275,7 @@ public class Application {
 			System.err.println("Privlige Id : " + privilige.getPriviligeId() + " , with name : " + name + " is not allowed");
 			return false;
 		} catch (final SecurityException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 			return false;
 		}
 	}

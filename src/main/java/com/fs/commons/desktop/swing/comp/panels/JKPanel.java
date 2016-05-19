@@ -39,7 +39,6 @@ import com.fs.commons.application.ui.UIPanel;
 import com.fs.commons.bean.binding.BindingComponent;
 import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.connection.JKDataSource;
-import com.fs.commons.desktop.graphics.GraphicsFactory;
 import com.fs.commons.desktop.graphics.GraphicsFactory.GradientType;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.FSAbstractComponent;

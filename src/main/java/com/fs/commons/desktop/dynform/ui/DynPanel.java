@@ -54,7 +54,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DataPanel;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DynPanel extends DataPanel {
 	private static final long serialVersionUID = 1L;
@@ -263,7 +263,7 @@ public class DynPanel extends DataPanel {
 				try {
 					comp2.filterValues(comp1);
 				} catch (final JKDataAccessException e1) {
-					ExceptionUtil.handle(e1);
+					JKExceptionUtil.handle(e1);
 				}
 			}
 		});
@@ -571,7 +571,7 @@ public class DynPanel extends DataPanel {
 			fireOnException(record, e);
 			throw e;
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 			throw e;
 		}
 	}

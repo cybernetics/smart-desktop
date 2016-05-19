@@ -34,7 +34,7 @@ import com.fs.commons.desktop.swing.comp.model.FSTableColumn;
 import com.fs.commons.desktop.swing.comp.model.FSTableModel;
 import com.fs.commons.desktop.swing.comp.model.FSTableRecord;
 import com.fs.commons.locale.Lables;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class QueryTableModel extends FSTableModel implements DataPager {
 	enum OrderDirection {
@@ -507,7 +507,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 				refreshData();
 				// table.
 			} catch (final Exception e) {
-				ExceptionUtil.handle(new JKDataAccessException("Exception occured while trying to execute the following query : \n" + sql, e));
+				JKExceptionUtil.handle(new JKDataAccessException("Exception occured while trying to execute the following query : \n" + sql, e));
 			} finally {
 				// connectionManager.close(rs);
 				// connectionManager.close(statement);
@@ -553,7 +553,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 		try {
 			refreshData();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

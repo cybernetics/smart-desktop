@@ -16,7 +16,6 @@
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -38,9 +37,9 @@ import com.fs.commons.locale.Lables;
 import com.fs.commons.util.FormatUtil;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.JKNotAllowedOperationException;
-import com.jk.exceptions.handler.ExceptionUtil;
-import com.jk.security.JKSecurityManager;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKPrivilige;
+import com.jk.security.JKSecurityManager;
 
 public class JKButton extends JButton implements BindingComponent {
 
@@ -94,6 +93,8 @@ public class JKButton extends JButton implements BindingComponent {
 	 */
 	public JKButton(final String caption, final boolean leadingAligned, final String shortcut) {
 		super(caption);
+		setContentAreaFilled(false);
+//		setOpaque(true);
 		setShortcut(shortcut, shortcut);
 		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
 		init();
@@ -148,7 +149,7 @@ public class JKButton extends JButton implements BindingComponent {
 			try {
 				JKSecurityManager.getAuthorizer().checkAllowed(this.privlige);
 			} catch (final SecurityException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 				return;
 			}
 		}
@@ -327,7 +328,7 @@ public class JKButton extends JButton implements BindingComponent {
 				this.authorized = false;
 				setEnabled(false);
 			} catch (final SecurityException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 	}

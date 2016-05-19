@@ -24,7 +24,7 @@ import com.fs.commons.application.Module;
 import com.fs.commons.application.ui.menu.Menu;
 import com.fs.commons.application.ui.menu.MenuItem;
 import com.fs.security.facade.SecurityFacade;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class PnlSyncPriviliges implements Runnable {
 
@@ -46,7 +46,7 @@ public class PnlSyncPriviliges implements Runnable {
 				}
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

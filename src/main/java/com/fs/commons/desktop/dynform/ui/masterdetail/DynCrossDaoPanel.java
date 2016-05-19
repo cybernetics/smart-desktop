@@ -48,7 +48,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 
@@ -259,9 +259,9 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 			}
 			reload();
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final ValidationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -297,7 +297,7 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 				}
 				reload();
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 	}
@@ -379,7 +379,7 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 			}
 			enableDisable();
 		} catch (final TableMetaNotFoundException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

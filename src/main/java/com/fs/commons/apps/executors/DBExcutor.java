@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import com.fs.commons.apps.backup.CompressionException;
 import com.fs.commons.apps.backup.DataBaseBackup;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DBExcutor implements Runnable {
 
@@ -30,9 +30,9 @@ public class DBExcutor implements Runnable {
 		try {
 			dataBaseBackup.start();
 		} catch (final IOException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final CompressionException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 }

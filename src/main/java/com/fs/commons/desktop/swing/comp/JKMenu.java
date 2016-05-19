@@ -20,9 +20,6 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-import javax.swing.JMenu;
-import javax.swing.JMenu;
-
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.util.GeneralUtility;
 
@@ -46,7 +43,7 @@ import com.fs.commons.util.GeneralUtility;
  * @author not attributable
  * @version 1.0
  */
-public class JKMenu extends JMenu {
+public class JKMenu extends JKButton {
 	/**
 	 *
 	 */
@@ -67,7 +64,7 @@ public class JKMenu extends JMenu {
 
 	// static Color selectedBackColor = new Color(255, 211, 73);
 
-	static Dimension dim = new Dimension(200, 40);
+	static Dimension dim = new Dimension(180, 40);
 
 	public JKMenu(final String str) {
 		super(str);

@@ -44,7 +44,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
 import com.fs.commons.locale.Lables;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 	// ///////////////////////////////////////////////////////////////
@@ -272,7 +272,7 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 		try {
 			return this.pnlMasterDetail.getMasterPanel().getRecord().getSummaryValue();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 			// unreachable
 			return null;
 		}
@@ -312,7 +312,7 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 			this.pnlMasterDetail.setMode(DynDaoMode.ADD);
 			showDynPanel(true);
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -358,7 +358,7 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 				showDynPanel(true);
 			}
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}
@@ -374,7 +374,7 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 			// SwingUtility.showPanelInDialog(tbl, "EDIT");
 			// this.queryTable.reloadData();
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

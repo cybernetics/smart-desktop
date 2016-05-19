@@ -36,7 +36,7 @@ import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.ImagePanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.locale.Lables;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * @author u087
@@ -188,7 +188,7 @@ public class JKFrame extends JFrame implements DaoComponent {
 			setHomePanel(new ImagePanel(SwingUtility.getImage(image), type));
 			showHomePanel();
 		} catch (final IOException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

@@ -31,7 +31,7 @@ import com.fs.commons.dao.dynamic.constraints.TableDataValidatorFactory;
 import com.fs.commons.dao.dynamic.trigger.Trigger;
 import com.fs.commons.dao.sql.query.QueryComponent;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKPrivilige;
 
 public class TableMeta implements Serializable, QueryComponent {
@@ -534,7 +534,7 @@ public class TableMeta implements Serializable, QueryComponent {
 						final Trigger trigger = (Trigger) Class.forName(triggerName).newInstance();
 						this.triggers.add(trigger);
 					} catch (final Exception e) {
-						ExceptionUtil.handle(e);
+						JKExceptionUtil.handle(e);
 					}
 				}
 			}

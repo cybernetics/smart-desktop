@@ -58,7 +58,6 @@ import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKFrame;
 import com.fs.commons.desktop.swing.comp.JKMenu;
-import com.fs.commons.desktop.swing.comp.JKMenuBar;
 import com.fs.commons.desktop.swing.comp.JKMenuItem;
 import com.fs.commons.desktop.swing.comp.JKModule;
 import com.fs.commons.desktop.swing.comp.JKScrollPane;
@@ -71,10 +70,10 @@ import com.fs.commons.desktop.swing.comp.panels.TitledPanel;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.JKNotAllowedOperationException;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.license.client.LicenseClientFactory;
-import com.jk.security.JKSecurityManager;
 import com.jk.security.JKPrivilige;
+import com.jk.security.JKSecurityManager;
 
 public class ApplicationFrame extends JKFrame {
 
@@ -128,7 +127,7 @@ public class ApplicationFrame extends JKFrame {
 				this.panel = this.item.createPanel(true);
 				showPanel();
 			} catch (final UIOPanelCreationException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 	}
@@ -145,7 +144,7 @@ public class ApplicationFrame extends JKFrame {
 			// } catch (LicenseException e) {
 			// ExceptionUtil.handle(e);
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -157,6 +156,7 @@ public class ApplicationFrame extends JKFrame {
 	private final ArrayList<MenuItem> history = new ArrayList<MenuItem>();
 	private int currentHistoryIndex = -1;
 	// UI Components
+	JKPanel<?> pnlModules;
 
 	JKPanel<?> pnlMenu;
 
@@ -342,17 +342,18 @@ public class ApplicationFrame extends JKFrame {
 	}
 
 	/**
-	 * // * // * @return //
+	 *
+	 * @return
 	 */
-	// private JKPanel<?> buildNorthPanel() {
-	// final JKPanel<?> pnlNorth = new JKPanel<Object>();
-	// pnlNorth.setBorder(BorderFactory.createRaisedBevelBorder());
-	// pnlNorth.setLayout(new BoxLayout(pnlNorth, BoxLayout.Y_AXIS));
-	// setJMenuBar(getModulesPanel());
-	//// pnlNorth.add(getModulesPanel());
-	// pnlNorth.add(getMenuPanel());
-	// return pnlNorth;
-	// }
+	private JKPanel<?> buildNorthPanel() {
+		final JKPanel<?> pnlNorth = new JKPanel<Object>();
+		pnlNorth.setBorder(BorderFactory.createRaisedBevelBorder());
+		pnlNorth.setLayout(new BoxLayout(pnlNorth, BoxLayout.Y_AXIS));
+		// setJMenuBar(getModulesPanel());
+		pnlNorth.add(getModulesPanel());
+		pnlNorth.add(getMenuPanel());
+		return pnlNorth;
+	}
 
 	/**
 	 *
@@ -442,34 +443,35 @@ public class ApplicationFrame extends JKFrame {
 	 *
 	 * @return
 	 */
-	private JKMenuBar getModulesPanel() {
-		JKMenuBar menubar = new JKMenuBar();
-		// this.pnlModules.setGradientType(GradientType.HORIZENTAL);
-		// pnlModules.setOpaque(false);
-		menubar.setBackground(Colors.MODULE_PANEL_BG);
-		final List<Module> modules = this.application.getModules();
-		for (int i = 0; i < modules.size(); i++) {
-			final Module module = modules.get(i);
-			if (isAllowedCommand(module.getPrivilige())) {
-				final JKModule menModule = new JKModule(module.getModuleName());
-				final int order = i + 1;
-				menModule.setShortcut("control F" + order, "Ctrl F" + order);
-				menModule.setIcon(module.getIconName());
-				// btnModule.setPrivlige(new
-				// Privilige(module.getPriviligeId() ,
-				// module.getModuleName()));
-				menubar.add(menModule);
-				buildModuleMenu(module, menModule);
-				// menModule.addActionListener(new ActionListener() {
-				// @Override
-				// public void actionPerformed(final ActionEvent e) {
-				// showModuleMenu(module);
-				// }
-				// });
-				// module.getMenu();// to cache the panels
+	private JKPanel<?> getModulesPanel() {
+		if (this.pnlModules == null) {
+			this.pnlModules = new JKMainPanel();
+//			this.pnlModules.setGradientType(GradientType.HORIZENTAL);
+//			 pnlModules.setOpaque(false);
+			this.pnlModules.setBackground(Colors.MODULE_PANEL_BG);
+			final List<Module> modules = this.application.getModules();
+			for (int i = 0; i < modules.size(); i++) {
+				final Module module = modules.get(i);
+				if (isAllowedCommand(module.getPrivilige())) {
+					final JKModule btnModule = new JKModule(module.getModuleName());
+					final int order = i + 1;
+					btnModule.setShortcut("control F" + order, "Ctrl F" + order);
+					btnModule.setIcon(module.getIconName());
+					// btnModule.setPrivlige(new
+					// Privilige(module.getPriviligeId() ,
+					// module.getModuleName()));
+					this.pnlModules.add(btnModule);
+					btnModule.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							showModuleMenu(module);
+						}
+					});
+					module.getMenu();// to cache the panels
+				}
 			}
 		}
-		return menubar;
+		return this.pnlModules;
 	}
 
 	/**
@@ -518,10 +520,10 @@ public class ApplicationFrame extends JKFrame {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
 		// Build UI
-		// add(buildNorthPanel(), BorderLayout.NORTH);
-		setJMenuBar(getModulesPanel());
+		add(buildNorthPanel(), BorderLayout.NORTH);
+
 		final JKPanel<?> leadingPanel = buildLeadingPanel();
-		// leadingPanel.setGredientColor(Color.white);
+		leadingPanel.setGredientColor(Color.white);
 		add(new JKScrollPane(leadingPanel, JKScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JKScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
 				BorderLayout.LINE_START);
 		add(getSouthPanel(), BorderLayout.SOUTH);
@@ -562,7 +564,7 @@ public class ApplicationFrame extends JKFrame {
 			System.err.println("Privlige Id : " + priv.getPriviligeId() + " , with name : " + priv.getPriviligeName() + " is not allowed");
 			return false;
 		} catch (final SecurityException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 			return false;
 		}
 	}
@@ -586,7 +588,7 @@ public class ApplicationFrame extends JKFrame {
 		init();
 		// addAutoLogoutListener();
 		buildHomePanel();
-		// showDefaultModule(application);
+		showDefaultModule(application);
 	}
 
 	/**
@@ -609,16 +611,16 @@ public class ApplicationFrame extends JKFrame {
 		this.txtUserStatus.setText(status);
 	}
 
-	// /**
-	// *
-	// * @param application
-	// */
-	// private void showDefaultModule(final Application application) {
-	// final Module defaultModule = application.getDefaultModule();
-	// if (defaultModule != null) {
-	// showModuleMenu(defaultModule);
-	// }
-	// }
+	/**
+	 *
+	 * @param application
+	 */
+	private void showDefaultModule(final Application application) {
+		final Module defaultModule = application.getDefaultModule();
+		if (defaultModule != null) {
+			showModuleMenu(defaultModule);
+		}
+	}
 
 	/**
 	 * @param item
@@ -640,7 +642,7 @@ public class ApplicationFrame extends JKFrame {
 						}
 						if (refreshModuleAndMenu) {
 							// this block will be called from history navigation
-							// showModuleMenu(item.getParentMenu().getParentModule());
+							showModuleMenu(item.getParentMenu().getParentModule());
 							showMenuItems(item.getParentMenu());
 						}
 						handleShowPanel(panel);
@@ -649,7 +651,7 @@ public class ApplicationFrame extends JKFrame {
 						setUserStatus(item.getFullQualifiedPath());
 					}
 				} catch (final UIOPanelCreationException e) {
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				} finally {
 					// AnimationUtil.enable(ApplicationFrame.this);
 				}
@@ -690,7 +692,7 @@ public class ApplicationFrame extends JKFrame {
 			dialog.setVisible(true);
 			panel.requestFocus();
 		} catch (final UIOPanelCreationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -700,7 +702,7 @@ public class ApplicationFrame extends JKFrame {
 			final JKFrame frame = SwingUtility.showPanelFrame(panel, item.getName());
 			frame.setExtendedState(JKFrame.NORMAL);
 		} catch (final UIOPanelCreationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -748,24 +750,22 @@ public class ApplicationFrame extends JKFrame {
 	/**
 	 *
 	 * @param module
-	 * @param menModule
 	 */
-	protected void buildModuleMenu(final Module module, JKModule menModule) {
+	protected void showModuleMenu(final Module module) {
 		final ArrayList<Menu> menus = module.getMenu();
-		// final JKPanel<?> pnlMenu = new JKPanel<Object>(new
-		// FlowLayout(FlowLayout.LEADING));
+		final JKPanel<?> pnlMenu = new JKPanel<Object>(new FlowLayout(FlowLayout.CENTER));
 		// pnlMenu.setOpaque(false);
 		for (int i = 0; i < menus.size(); i++) {
 			final Menu menu = menus.get(i);
 			if (isAllowedCommand(menu.getPrivilige())) {
-				final JKMenuItem btnMenu = new JKMenuItem(menu.getName());
+				final JKMenu btnMenu = new JKMenu(menu.getName());
 				final int order = i + 1;
 				SwingUtility.setHotKeyFoButton(btnMenu, "control " + order, "control " + order);
 				btnMenu.setShortcutText("Ctrl " + order + "", false);
 				btnMenu.setIcon(menu.getIconName());
 				// btnMenu.setPrivlige(new Privilige(menu.getPriviligeId(),
 				// menu.getName()));
-				menModule.add(btnMenu);
+				pnlMenu.add(btnMenu);
 				btnMenu.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
@@ -774,18 +774,18 @@ public class ApplicationFrame extends JKFrame {
 				});
 			}
 		}
-		// this.pnlMenu.removeAll();
-		// this.pnlMenuItems.removeAll();
+		this.pnlMenu.removeAll();
+		this.pnlMenuItems.removeAll();
 		// JKTitle lblTitle = new JKTitle(module.getModuleName());
 		// lblTitle.setBackground(Colors.MENU_PANEL_TITLE_BG);
 		// lblTitle.setForeground(Colors.MENU_PANEL_TITLE_FG);
 		// lblTitle.setPreferredSize(null);
 		// this.pnlMenu.add(lblTitle, BorderLayout.LINE_START);
-		// this.pnlMenu.add(pnlMenu, BorderLayout.CENTER);
-		// if (module.getMenu().size() > 0) {
-		// // showHomePanel();
-		// showMenuItems(module.getMenu().get(0));
-		// }
+		this.pnlMenu.add(pnlMenu, BorderLayout.CENTER);
+		if (module.getMenu().size() > 0) {
+			// showHomePanel();
+			showMenuItems(module.getMenu().get(0));
+		}
 	}
 
 }

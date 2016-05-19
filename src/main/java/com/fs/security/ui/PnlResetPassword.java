@@ -29,7 +29,7 @@ import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.security.facade.SecurityFacade;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKSecurityManager;
 import com.jk.security.JKUser;
 
@@ -124,9 +124,9 @@ public class PnlResetPassword extends JKPanel<Object> {
 			SwingUtility.showSuccessDialog("PASSWORD_CHANGED_SUCC");
 			SwingUtility.closePanel(this);
 		} catch (final ValidationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

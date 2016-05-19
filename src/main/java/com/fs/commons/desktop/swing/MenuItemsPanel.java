@@ -39,7 +39,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.comp.panels.TitledPanel;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class MenuItemsPanel extends JKMainPanel {
 
@@ -100,7 +100,7 @@ public class MenuItemsPanel extends JKMainPanel {
 
 						tab.insertTab(title, icon, panel, title, sel);
 					} catch (final UIOPanelCreationException e) {
-						ExceptionUtil.handle(e);
+						JKExceptionUtil.handle(e);
 					}
 				}
 			}

@@ -24,12 +24,8 @@ import java.util.Map;
 
 import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.JKRecordNotFoundException;
-import com.fs.commons.dao.dynamic.DaoFactory;
-import com.fs.commons.dao.dynamic.DynamicDao;
-import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;

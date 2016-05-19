@@ -25,7 +25,7 @@ import java.util.Locale;
 
 import com.fs.commons.dao.DaoUtil;
 import com.fs.commons.dao.JKDataAccessException;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DateTimeUtil {
 	public enum CompareDates {
@@ -73,7 +73,7 @@ public class DateTimeUtil {
 		try {
 			return FormatUtil.formatDate(DaoUtil.getSystemDate(), "yyyy-MM-dd");
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 			// unreachable
 			return null;
 		}

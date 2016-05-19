@@ -41,7 +41,7 @@ import com.fs.commons.reports.JKReport;
 import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.reports.ReportUIPanel;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * @author u087
@@ -197,7 +197,7 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 			e.printStackTrace();
 			throw e;
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 			return null;
 		} finally {
 			// System.out.println(new Date());

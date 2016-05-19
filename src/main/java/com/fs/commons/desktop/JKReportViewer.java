@@ -23,7 +23,7 @@ import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.comp2.FSTextField;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -75,7 +75,7 @@ public class JKReportViewer extends JasperViewer {
 				}
 				dispose();
 			} catch (final JRException e1) {
-				ExceptionUtil.handle(e1);
+				JKExceptionUtil.handle(e1);
 			}
 		}
 	}

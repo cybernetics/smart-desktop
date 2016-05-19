@@ -22,7 +22,7 @@ import java.io.InputStream;
 
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DefaultConfigManager extends CommonsConfigManager {
 	private static final String FILE_NAME = System.getProperty("db.config", "config.properties");
@@ -42,12 +42,11 @@ public class DefaultConfigManager extends CommonsConfigManager {
 			// try to find within the classes
 			for (final String name : CONFIG_FILE_NAMES) {
 				InputStream in = null;
-				try {
-					in = GeneralUtility.getFileInputStream(name);
+				in = GeneralUtility.getFileInputStream(name);
+				if (in != null) {
 					load(in);
 					System.err.println("Config File : " + name + " loaded");
 					return;
-				} catch (final FileNotFoundException e) {
 				}
 			}
 
@@ -55,7 +54,9 @@ public class DefaultConfigManager extends CommonsConfigManager {
 				InputStream in = null;
 				try {
 					in = GeneralUtility.getFileInputStream("/" + name);
-					load(in);
+					if (in != null) {
+						load(in);
+					}
 					System.err.println("Config File : /" + name + " loaded");
 					return;
 				} catch (final FileNotFoundException e) {
@@ -67,7 +68,7 @@ public class DefaultConfigManager extends CommonsConfigManager {
 			SwingUtility.showUserErrorDialog(errorMessage);
 			System.exit(0);
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

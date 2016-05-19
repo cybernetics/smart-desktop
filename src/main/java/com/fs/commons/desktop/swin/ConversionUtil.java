@@ -20,7 +20,7 @@ import java.util.Date;
 
 import com.fs.commons.util.DateTimeUtil;
 import com.fs.commons.util.FormatUtil;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class ConversionUtil {
 
@@ -55,7 +55,7 @@ public class ConversionUtil {
 			try {
 				return DateTimeUtil.parseDate(value.toString(), FormatUtil.PATTERN_DEFAULT);
 			} catch (final ParseException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 

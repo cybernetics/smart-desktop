@@ -26,7 +26,7 @@ import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.util.DateTimeUtil;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  *
@@ -64,7 +64,7 @@ public class AutomaticDBBackup extends DataBaseBackup {
 					backup.startBackup(false);
 				} catch (final Exception e) {
 					SwingUtility.showUserErrorDialog("UNABLE_TO_PROCESS_AUTOAMATIC_BACKUP");
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				}
 			}
 		});
@@ -130,7 +130,7 @@ public class AutomaticDBBackup extends DataBaseBackup {
 			fileWriter = new FileWriter(getLogFileName());
 			out = new BufferedWriter(fileWriter);
 		} catch (final IOException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} finally {
 			if (out != null) {
 				try {

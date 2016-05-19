@@ -25,7 +25,7 @@ import javax.swing.JMenu;
 
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class JKTopMenu extends JMenu {
 
@@ -40,7 +40,7 @@ public class JKTopMenu extends JMenu {
 		try {
 			this.img = javax.imageio.ImageIO.read(GeneralUtility.getIconURL(iconName));
 		} catch (final IOException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 		setOpaque(false);
 		setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));

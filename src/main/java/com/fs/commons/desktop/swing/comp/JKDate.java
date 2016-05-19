@@ -40,7 +40,7 @@ import com.fs.commons.desktop.validation.builtin.FSValidators;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.DateTimeUtil;
 import com.fs.commons.util.FormatUtil;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
@@ -300,7 +300,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 				try {
 					this.defaultValue = DaoUtil.getSystemDate();
 				} catch (final Exception e) {
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				}
 				return;
 			}
@@ -319,7 +319,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 				setMaxDate(DateTimeUtil.parseShortDate(maxDate));
 			}
 		} catch (final ParseException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -334,7 +334,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 				setMinDate(DateTimeUtil.parseShortDate(date));
 			}
 		} catch (final ParseException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -367,7 +367,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 			try {
 				setDate(DateTimeUtil.parseShortDate(value.toString()));
 			} catch (final ParseException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 
 		}

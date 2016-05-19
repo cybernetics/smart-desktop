@@ -26,7 +26,7 @@ import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.JKSession;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public abstract class JKAbstractDataSource implements JKDataSource {
 	Logger logger = Logger.getLogger(getClass().getName());
@@ -160,7 +160,7 @@ public abstract class JKAbstractDataSource implements JKDataSource {
 		try {
 			Class.forName(getDriverName());
 		} catch (final ClassNotFoundException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

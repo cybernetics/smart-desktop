@@ -50,7 +50,6 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.InputMap;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -71,7 +70,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.ColorUIResource;
 
 import com.fs.commons.application.ApplicationManager;
 import com.fs.commons.application.ui.UIOPanelCreationException;
@@ -97,7 +95,7 @@ import com.fs.commons.util.ImageUtil;
 import com.fs.commons.util.ReflicationUtil;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import com.jk.exceptions.JKNotAllowedOperationException;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKUser;
 
 public class SwingUtility {
@@ -166,7 +164,7 @@ public class SwingUtility {
 				try {
 					ReflicationUtil.callMethod(obj, methodName);
 				} catch (final InvocationTargetException e1) {
-					ExceptionUtil.handle(e1.getCause());
+					JKExceptionUtil.handle(e1.getCause());
 				}
 			}
 		});
@@ -1244,7 +1242,7 @@ public class SwingUtility {
 			frame.initDefaults();
 			frm.setVisible(true);
 		} catch (final PropertyVetoException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

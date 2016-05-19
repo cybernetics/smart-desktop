@@ -43,7 +43,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * @author u087
@@ -243,7 +243,7 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 					this.pnlDetail.handleFindRecord(id);
 					this.pnlDetail.handleDelete(false);
 				} catch (final JKDataAccessException e) {
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				}
 			}
 		}
@@ -261,7 +261,7 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 				SwingUtility.showPanelInDialog(this.pnlDetail, "EDIT_RECORD");
 			}
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -276,7 +276,7 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 			try {
 				GeneralUtility.readFile(file);
 			} catch (final IOException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 	}

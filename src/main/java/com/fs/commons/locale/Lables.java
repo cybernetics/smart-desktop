@@ -28,7 +28,7 @@ import com.fs.commons.configuration.beans.Lable;
 import com.fs.commons.util.CollectionUtil;
 import com.fs.commons.util.FormatUtil;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class Lables {
 	public static final String LABLES_FILE_NAME = "/lables.properties";
@@ -76,10 +76,8 @@ public class Lables {
 
 	// // /////////////////////////////////////////////////////////////////////
 	private Lables(final InputStream in) {
-		try {
+		if (in!= null) {
 			addLables(GeneralUtility.readPropertyStream(in));
-		} catch (final IOException e) {
-			ExceptionUtil.handle(e);
 		}
 	}
 

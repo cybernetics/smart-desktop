@@ -23,8 +23,8 @@ import com.jk.exceptions.JKInvalidUserException;
 import com.jk.exceptions.JKNotAllowedOperationException;
 import com.jk.security.JKAuthenticaor;
 import com.jk.security.JKAuthorizer;
-import com.jk.security.JKSecurityManager;
 import com.jk.security.JKPrivilige;
+import com.jk.security.JKSecurityManager;
 import com.jk.security.JKUser;
 
 public class SecurityImpl implements JKAuthenticaor, JKAuthorizer {

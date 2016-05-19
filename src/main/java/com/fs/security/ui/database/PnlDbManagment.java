@@ -36,7 +36,7 @@ import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 ////////////////////////////////////////////////////////////////////
 // Author Mohamed Kiswani
@@ -100,7 +100,7 @@ public class PnlDbManagment extends JKPanel<Object> {
 			dataBaseBackup.start();
 			SwingUtility.showSuccessDialog("BACKUP_CREATION_DONE");
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}
@@ -124,7 +124,7 @@ public class PnlDbManagment extends JKPanel<Object> {
 			importManager.doImport();
 			SwingUtility.showSuccessDialog("IMPORT_DB_DONE");
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

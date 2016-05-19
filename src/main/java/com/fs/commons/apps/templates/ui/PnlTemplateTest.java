@@ -34,7 +34,7 @@ import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class PnlTemplateTest extends JKPanel<Object> {
 	/**
@@ -79,7 +79,7 @@ public class PnlTemplateTest extends JKPanel<Object> {
 			try {
 				this.template = facade.findTemplate(templateId);
 			} catch (final Exception e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		} else {
 			this.template = null;
@@ -103,7 +103,7 @@ public class PnlTemplateTest extends JKPanel<Object> {
 				// System.out.println(compiled);
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

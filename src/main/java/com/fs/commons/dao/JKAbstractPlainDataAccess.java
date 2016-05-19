@@ -15,7 +15,6 @@
  */
 package com.fs.commons.dao;
 
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,8 +30,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.sql.rowset.CachedRowSet;
-
-import org.apache.ibatis.jdbc.ScriptRunner;
 
 import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.connection.JKDataSourceFactory;

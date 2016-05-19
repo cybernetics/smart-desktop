@@ -71,7 +71,7 @@ import com.fs.commons.desktop.swing.listener.RecordSelectionListener;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.ExcelUtil;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 //////////////////////////////////////////////////////////////////////////////
 public class QueryJTable extends JKPanel implements FilterListener, RecordTraversePolicy {
@@ -760,7 +760,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			this.model.moveToFirstPage();
 			refreshComponents();
 		} catch (final PagingException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -770,7 +770,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			this.model.moveToLastPage();
 			refreshComponents();
 		} catch (final PagingException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -786,7 +786,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			this.model.moveToNextPage();
 			refreshComponents();
 		} catch (final PagingException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -796,7 +796,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			this.model.moveToPreviousePage();
 			refreshComponents();
 		} catch (final PagingException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

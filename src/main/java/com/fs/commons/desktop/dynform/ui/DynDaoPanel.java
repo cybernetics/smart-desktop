@@ -41,7 +41,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
 import com.fs.commons.desktop.swing.dialogs.QueryDialog;
 import com.fs.commons.desktop.swing.printing.PrintUtilities;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * contains DynPanel with Add,Edit,update,Delete buttons
@@ -248,7 +248,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 				resetComponents();
 				this.pnlDao.requestFocus();
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 	}
@@ -476,9 +476,9 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 				setNewRecordId(newId);
 			}
 		} catch (final ValidationException ex) {
-			ExceptionUtil.handle(ex);
+			JKExceptionUtil.handle(ex);
 		} catch (final JKDataAccessException ex) {
-			ExceptionUtil.handle(ex);
+			JKExceptionUtil.handle(ex);
 		}
 	}
 
@@ -490,7 +490,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 		try {
 			handleFindRecord(getRecord().getIdValue());
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -590,7 +590,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 			try {
 				importRecord(record.split(";"));
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 	}
@@ -642,11 +642,11 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 			this.pnlDao.validateUpdateData();
 			this.pnlDao.handleSaveEvent();
 		} catch (final ValidationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final JKRecordNotFoundException ex) {
-			ExceptionUtil.handle(ex);
+			JKExceptionUtil.handle(ex);
 		} catch (final JKDataAccessException ex) {
-			ExceptionUtil.handle(ex);
+			JKExceptionUtil.handle(ex);
 		}
 	}
 
@@ -837,14 +837,14 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 				this.traversePolicy.setCurrentRecord(getIdValueAsInteger());
 				checkPnlTraverseEnability();
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 	}
 
 	@Override
 	public void onDaoException(final Record recod, final JKDataAccessException ex) {
-		ExceptionUtil.handle(ex);
+		JKExceptionUtil.handle(ex);
 	}
 
 	@Override
@@ -1080,7 +1080,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 		try {
 			handleFindRecord(value.toString());
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

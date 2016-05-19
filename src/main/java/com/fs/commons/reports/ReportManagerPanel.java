@@ -28,7 +28,7 @@ import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKMenuItem;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * @author u087
@@ -62,9 +62,9 @@ public class ReportManagerPanel extends JKPanel<Object> {
 			validate();
 			repaint();
 		} catch (final TableMetaNotFoundException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

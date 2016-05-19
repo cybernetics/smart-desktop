@@ -20,7 +20,7 @@ import java.io.FileNotFoundException;
 import com.fs.commons.application.ApplicationException;
 import com.fs.commons.application.ApplicationManager;
 import com.fs.commons.desktop.swing.SwingUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class Startup {
 	public static void main(final String[] args) {
@@ -30,9 +30,9 @@ public class Startup {
 			instance.init();
 			instance.start();
 		} catch (final FileNotFoundException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		} catch (final ApplicationException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

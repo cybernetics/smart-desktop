@@ -29,7 +29,7 @@ import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.desktop.dynform.ui.ComponentFactory;
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.comp.JKTable;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class DynCellFactory {
 	static class DynFieldEditor extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
@@ -49,7 +49,7 @@ public class DynCellFactory {
 				this.component = (JComponent) ComponentFactory.createComponent(field, true);
 				this.component.setPreferredSize(null);
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			}
 		}
 

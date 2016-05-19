@@ -35,7 +35,7 @@ import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * @author u087
@@ -98,7 +98,7 @@ public class ReportUIPanel extends JKPanel<Object> implements UIPanel {
 		try {
 			JKReportsUtil.printReport(this.report, map);
 		} catch (final ReportException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

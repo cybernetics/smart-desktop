@@ -31,7 +31,7 @@ import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class FrmLabelsUtil extends JKFrame {
 	/**
@@ -129,7 +129,7 @@ public class FrmLabelsUtil extends JKFrame {
 			newProp.store(new FileOutputStream(this.txtFile2.getText()), "");
 			System.out.println("Done ....");
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}
@@ -155,7 +155,7 @@ public class FrmLabelsUtil extends JKFrame {
 			prop2.store(new FileOutputStream(this.txtFile2.getText()), "");
 			System.out.println("Done ....");
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -180,7 +180,7 @@ public class FrmLabelsUtil extends JKFrame {
 			}
 			System.out.println("Done ....");
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}

@@ -31,7 +31,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class PnlResetPrivilegs extends JKMainPanel {
 	/**
@@ -83,7 +83,7 @@ public class PnlResetPrivilegs extends JKMainPanel {
 				} catch (final JKRecordNotFoundException e) {
 				}
 			} catch (final JKDataAccessException e) {
-				ExceptionUtil.handle(e);
+				JKExceptionUtil.handle(e);
 			} finally {
 				this.tblPrivileges.reloadData();
 			}

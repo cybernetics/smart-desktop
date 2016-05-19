@@ -26,7 +26,7 @@ import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  *
@@ -134,7 +134,7 @@ public abstract class PnlMappingFields extends JKPanel {
 			this.target.reloadData();
 			this.source.reloadData();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 
 	}
@@ -154,7 +154,7 @@ public abstract class PnlMappingFields extends JKPanel {
 			}
 			this.target.reloadData();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -171,7 +171,7 @@ public abstract class PnlMappingFields extends JKPanel {
 			this.target.reloadData();
 			this.source.reloadData();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -186,7 +186,7 @@ public abstract class PnlMappingFields extends JKPanel {
 			this.target.reloadData();
 			this.source.reloadData();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
@@ -201,7 +201,7 @@ public abstract class PnlMappingFields extends JKPanel {
 			}
 			this.target.reloadData();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

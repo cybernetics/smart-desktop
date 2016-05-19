@@ -15,7 +15,6 @@
  */
 package com.fs.commons.util;
 
-
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -73,13 +72,13 @@ import org.apache.commons.beanutils.PropertyUtils;
 
 import com.fs.commons.application.exceptions.DatabaseDownException;
 import com.fs.commons.application.exceptions.ServerDownException;
-import com.fs.commons.application.util.ResourceLoaderFactory;
 import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.Record;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.logging.JKLogger;
+import com.jk.resources.JKResourceLoaderFactory;
 import com.jk.security.JKEncDec;
 import com.lowagie.text.pdf.codec.Base64;
 
@@ -141,7 +140,6 @@ public class GeneralUtility {
 	public static Locale Locale = new Locale("EN", "US");
 
 	static SecretKeySpec spec = new SecretKeySpec("123456781234567812345678".getBytes(), "DESEDE");
-
 
 	// ////////////////////////
 	private static String FILE_READ_HARDDISK_SERIAL = "diskid32.exe";
@@ -284,7 +282,7 @@ public class GeneralUtility {
 		try {
 			return Class.forName(className).newInstance();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 			return null;// unreachable
 		}
 	}
@@ -363,7 +361,7 @@ public class GeneralUtility {
 	 * @return String
 	 * @throws DecryptionException
 	 */
-	public static String decrypt(final String str)  {
+	public static String decrypt(final String str) {
 		return JKEncDec.decrypt(str);
 	}
 
@@ -420,7 +418,7 @@ public class GeneralUtility {
 	 * @return String
 	 * @throws EncryptionException
 	 */
-	public static String encrypt(final String str)  {
+	public static String encrypt(final String str) {
 		return JKEncDec.encrypt(str);
 	}
 
@@ -482,15 +480,8 @@ public class GeneralUtility {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static InputStream getFileInputStream(final String fileName) throws FileNotFoundException {
-		if (ResourceLoaderFactory.getResourceLoaderImp().getResourceAsStream(fileName) != null) {
-			final InputStream in = ResourceLoaderFactory.getResourceLoaderImp().getResourceAsStream(fileName);
-			if (in == null) {
-				throw new FileNotFoundException(fileName);
-			}
-			return in;
-		}
-		return new FileInputStream(fileName);
+	public static InputStream getFileInputStream(final String fileName) {
+		return JKResourceLoaderFactory.getResourceLoader().getResourceAsStream(fileName);
 	}
 
 	/**
@@ -680,11 +671,7 @@ public class GeneralUtility {
 	 * @return String
 	 */
 	public static InputStream getReportFileAsStream(final String fileName) {
-		try {
-			return getFileInputStream("/resources/reports/" + fileName);
-		} catch (final FileNotFoundException e) {
-			return null;
-		}
+		return getFileInputStream("/resources/reports/" + fileName);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -710,7 +697,7 @@ public class GeneralUtility {
 			return getFileText("/resources/sql/" + fileName);
 			// }
 		} catch (final Exception ex) {
-			ExceptionUtil.handle(ex);
+			JKExceptionUtil.handle(ex);
 			return null;
 		}
 	}
@@ -722,7 +709,7 @@ public class GeneralUtility {
 	 * @return InputStream
 	 */
 	public static URL getURL(final String fileName) {
-		final URL resourceUrl = ResourceLoaderFactory.getResourceLoaderImp().getResourceUrl(fileName);
+		final URL resourceUrl = JKResourceLoaderFactory.getResourceLoader().getResourceUrl(fileName);
 		if (resourceUrl == null) {
 			System.err.println("Unable to load resource : " + fileName);
 		}
@@ -784,7 +771,7 @@ public class GeneralUtility {
 				return list.get(0).getFieldValueAsString("query_text");
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 		return null;
 	}
@@ -914,7 +901,10 @@ public class GeneralUtility {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Properties readPropertyStream(final InputStream in) throws IOException {
+	public static Properties readPropertyStream(final InputStream in) {
+		if (in == null) {
+			return new Properties();
+		}
 		try {
 			final Properties prop = new Properties();
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -934,7 +924,14 @@ public class GeneralUtility {
 			reader.close();
 			return prop;
 		} catch (final IOException e) {
-			throw e;
+			JKExceptionUtil.handle(e);
+			return null;
+		}finally{
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -982,7 +979,7 @@ public class GeneralUtility {
 		try {
 			PropertyUtils.setProperty(source, fieldName, value);
 		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.connection.JKDataSourceFactory;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class AbstractTableMetaFactory {
 	static Logger logger = Logger.getLogger(AbstractTableMetaFactory.class.getName());
@@ -33,7 +33,7 @@ public class AbstractTableMetaFactory {
 			final TableMetaFactory defaultFactory = new TableMetaFactory(defaultConnectionManager);
 			metaFactorys.put(defaultConnectionManager, defaultFactory);
 		} catch (final JKDataAccessException e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

@@ -36,7 +36,7 @@ import com.fs.commons.locale.Locale;
 import com.fs.commons.reports.JKReport;
 import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.util.GeneralUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKPrivilige;
 
 public abstract class AbstractModule implements Module {
@@ -141,8 +141,7 @@ public abstract class AbstractModule implements Module {
 			if (this.menu != null) {
 				return this.menu;
 			}
-			final String fileFullPath = getFileFullPath("menu.xml");
-			System.out.println(fileFullPath);
+			final String fileFullPath = getFileFullPath("menu.xml");			
 			final InputStream in = GeneralUtility.getFileInputStream(fileFullPath);
 			if (in != null) {
 				final ModuleMenuXmlParser p = new ModuleMenuXmlParser(this);
@@ -153,7 +152,7 @@ public abstract class AbstractModule implements Module {
 			}
 			return this.menu;
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 			// unreachable
 			return null;
 		}

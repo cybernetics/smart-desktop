@@ -26,7 +26,7 @@ import javax.swing.JInternalFrame;
 
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.SwingUtility;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class JKDesktopPane extends JDesktopPane {
 
@@ -79,7 +79,7 @@ public class JKDesktopPane extends JDesktopPane {
 		try {
 			this.backGroundImage = SwingUtility.getImage(path);
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 

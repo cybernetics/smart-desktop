@@ -30,7 +30,7 @@ import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionAdapter;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionListener;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  * @author u087
@@ -121,7 +121,7 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 					setMasterIdValue(DetailOneToOnePanel.this.masterIdValue);
 					// change to find mode
 				} catch (final JKDataAccessException e) {
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				}
 			}
 
@@ -132,7 +132,7 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 				try {
 					setMasterIdValue(DetailOneToOnePanel.this.masterIdValue);
 				} catch (final JKDataAccessException e) {
-					ExceptionUtil.handle(e);
+					JKExceptionUtil.handle(e);
 				}
 			}
 		});

@@ -27,7 +27,7 @@ import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
-import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 /**
  *
@@ -142,7 +142,7 @@ public abstract class PnlMappingWithLookUp extends PnlMappingFields {
 			this.target.reloadData();
 			this.source.reloadData();
 		} catch (final Exception e) {
-			ExceptionUtil.handle(e);
+			JKExceptionUtil.handle(e);
 		}
 	}
 
