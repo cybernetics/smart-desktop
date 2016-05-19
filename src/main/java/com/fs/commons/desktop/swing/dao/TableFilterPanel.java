@@ -46,11 +46,11 @@ import com.fs.commons.util.GeneralUtility;
 import com.lowagie.text.Font;
 
 public class TableFilterPanel extends JKPanel {
-	private static final ImageIcon CANCEL_ICON = new ImageIcon(GeneralUtility.getIconURL("button_cancel_small.png"));
+	private static final ImageIcon CANCEL_ICON = GeneralUtility.getIcon("button_cancel_small.png");
 
-	private static final ImageIcon OK_ICON = new ImageIcon(GeneralUtility.getIconURL("button_ok_small.png"));
+	private static final ImageIcon OK_ICON = GeneralUtility.getIcon("button_ok_small.png");
 
-	private static final ImageIcon CLEAR_ICON = new ImageIcon(GeneralUtility.getIconURL("clear_left.png"));
+	private static final ImageIcon CLEAR_ICON = GeneralUtility.getIcon("clear_left.png");
 
 	/**
 	 *

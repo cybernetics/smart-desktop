@@ -1,0 +1,13 @@
+<application>
+	<id>786</id>
+	<name>JK-Default Application</name>
+	<splash-img>/resources/images/splash.png</splash-img>
+	<home-img>/resources/images/background.jpg</home-img>
+	<config-file>system.config</config-file>
+	<locale>en</locale>
+	<auto-logout-interval>15</auto-logout-interval>
+	<module id="1" name="System" config-path="com.fs.commons.apps.system.meta"  default="true"/>
+	<module id="2" name="Security" class="com.fs.security.SecurityModule"  />
+	<module id="2" name="Application" config-path="/meta"  />
+</application>
+

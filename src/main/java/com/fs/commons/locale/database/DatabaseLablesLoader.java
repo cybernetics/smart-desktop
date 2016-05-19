@@ -22,13 +22,13 @@ import com.fs.commons.application.AbstractModule;
 import com.fs.commons.application.Module;
 import com.fs.commons.configuration.beans.Lable;
 import com.fs.commons.configuration.daos.LablesDao;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.importers.ImportListener;
 import com.fs.commons.importers.Importer;
 import com.fs.commons.locale.LablesLoader;
 import com.fs.commons.locale.LablesLoaderException;
 import com.fs.commons.locale.database.importer.ui.LablesImporter;
-import com.fs.commons.logging.Logger;
+import com.jk.logging.JKLogger;
 
 /**
  *
@@ -45,7 +45,7 @@ public class DatabaseLablesLoader implements LablesLoader {
 		try {
 			final LablesDao dao = new LablesDao();
 			return dao.listModuleLabels(this.module.getModuleId(), this.locale);
-		} catch (final DaoException e) {
+		} catch (final JKDataAccessException e) {
 			throw new LablesLoaderException(e);
 		}
 	}
@@ -71,18 +71,18 @@ public class DatabaseLablesLoader implements LablesLoader {
 
 				@Override
 				public void fireEndImport(final Importer importer) {
-					Logger.info("Number Of Added Lables is : " + ((LablesImporter) importer).getNumberOfAddedLables());
-					Logger.info("Import " + this.moduleName + " Lables Finished ");
+					JKLogger.info("Number Of Added Lables is : " + ((LablesImporter) importer).getNumberOfAddedLables());
+					JKLogger.info("Import " + this.moduleName + " Lables Finished ");
 				}
 
 				@Override
 				public void fireStartImport(final Importer importer) {
-					Logger.info("Import " + this.moduleName + " Lables Started ");
+					JKLogger.info("Import " + this.moduleName + " Lables Started ");
 				}
 
 				@Override
 				public void onException(final Exception e, final Importer importer) {
-					Logger.fatal("Error occuers while importing " + this.moduleName + " lables possabile reson : " + e.getMessage());
+					JKLogger.fatal("Error occuers while importing " + this.moduleName + " lables possabile reson : " + e.getMessage());
 				}
 			});
 			importer.imporT();

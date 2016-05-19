@@ -21,24 +21,24 @@ import com.fs.commons.apps.templates.beans.Template;
 import com.fs.commons.apps.templates.beans.TemplateVariable;
 import com.fs.commons.apps.templates.beans.Variable;
 import com.fs.commons.apps.templates.dao.TemplateDao;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 
 public class TemplateFacade {
 
 	TemplateDao templateDao = new TemplateDao();
 
 	// ///////////////////////////////////////////////////////////////
-	public Template findTemplate(final int tempId) throws RecordNotFoundException, DaoException {
+	public Template findTemplate(final int tempId) throws JKRecordNotFoundException, JKDataAccessException {
 		return this.templateDao.findTemplate(tempId);
 	}
 
-	public Variable findVariable(final int varId) throws RecordNotFoundException, DaoException {
+	public Variable findVariable(final int varId) throws JKRecordNotFoundException, JKDataAccessException {
 		return this.templateDao.findVariable(varId);
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public ArrayList<TemplateVariable> lstTemplateVariables(final int tempId) throws RecordNotFoundException, DaoException {
+	public ArrayList<TemplateVariable> lstTemplateVariables(final int tempId) throws JKRecordNotFoundException, JKDataAccessException {
 		return this.templateDao.lstTemplateVariables(tempId);
 	}
 

@@ -22,13 +22,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.DaoFinder;
-import com.fs.commons.dao.DaoUpdater;
 import com.fs.commons.dao.DaoUtil;
-import com.fs.commons.dao.Session;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.fs.commons.dao.JKSession;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
@@ -36,22 +37,24 @@ import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.dynamic.trigger.Trigger;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
-import com.fs.commons.security.Audit;
-import com.fs.commons.security.AuditType;
+import com.jk.db.dataaccess.plain.JKFinder;
+import com.jk.db.dataaccess.plain.JKUpdater;
+import com.jk.security.JKAudit;
+import com.jk.security.JKAuditType;
 
-public class DynamicDao extends AbstractDao {
+public class DynamicDao extends JKAbstractPlainDataAccess {
+	Logger logger = Logger.getLogger(getClass().getName());
 	protected final TableMeta tableMeta;
 	protected MetaSqlBuilder sqlBuilder;
 
 	// //////////////////////////////////////////////////////////////
 	public DynamicDao(final String tableMetaName) {
 		this(AbstractTableMetaFactory.getTableMeta(tableMetaName));
+		logger.info(tableMetaName);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public DynamicDao(final String tableMetaName, final Session session) {
+	public DynamicDao(final String tableMetaName, final JKSession session) {
 		this(AbstractTableMetaFactory.getTableMeta(session.getConnectionManager(), tableMetaName));
 		setSession(session);
 	}
@@ -62,40 +65,43 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected DynamicDao(final TableMeta tableMeta, final DataSource connectionManager) {
+	protected DynamicDao(final TableMeta tableMeta, final JKDataSource connectionManager) {
 		super(connectionManager);
 		this.tableMeta = tableMeta;
 		this.sqlBuilder = new MetaSqlBuilder(tableMeta);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public DynamicDao(final TableMeta meta, final Session session) {
+	public DynamicDao(final TableMeta meta, final JKSession session) {
 		this(meta);
 		setSession(session);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void addDeleteAudit(final Record record) throws DaoException {
-		final Audit audit = createAudit(record, AuditType.AUDIT_DELETE_RECORD);
+	protected void addDeleteAudit(final Record record) throws JKDataAccessException {
+		logger.info(record.toString());
+		final JKAudit audit = createAudit(record, JKAuditType.AUDIT_DELETE_RECORD);
 		addAudit(audit);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void addInsertAudit(final Record record) throws DaoException {
-		final AuditType aUDIT_ADD_RECORD = AuditType.AUDIT_ADD_RECORD;
-		final Audit audit = createAudit(record, aUDIT_ADD_RECORD);
+	protected void addInsertAudit(final Record record) throws JKDataAccessException {
+		logger.info(record.toString());
+		final JKAuditType aUDIT_ADD_RECORD = JKAuditType.AUDIT_ADD_RECORD;
+		final JKAudit audit = createAudit(record, aUDIT_ADD_RECORD);
 		addAudit(audit);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void addUpdateAudit(final Record oldRecord, final Record newRecord) throws DaoException {
-		final Audit audit = createAudit(newRecord, AuditType.AUDIT_UPDATE_RECORD);
+	protected void addUpdateAudit(final Record oldRecord, final Record newRecord) throws JKDataAccessException {
+		logger.info(oldRecord == null ? newRecord.toString() : oldRecord.toString());
+		final JKAudit audit = createAudit(newRecord, JKAuditType.AUDIT_UPDATE_RECORD);
 		audit.setOldValue(oldRecord.toString(true));
 		addAudit(audit);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void callAfterAddEventOnTriggers(final Record record) throws DaoException {
+	protected void callAfterAddEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.tableMeta.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).afterAdd(record);
@@ -103,14 +109,14 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void callAfterDeleteEventOnTriggers(final Record record) throws DaoException {
+	protected void callAfterDeleteEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.tableMeta.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).afterDelete(record);
 		}
 	}
 
-	protected void callAfterFindEventOnTriggers(final Record record) throws DaoException {
+	protected void callAfterFindEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.tableMeta.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).afterFind(record);
@@ -118,7 +124,7 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void callAfterUpdateEventOnTriggers(final Record oldRecord, final Record newRecord) throws DaoException {
+	protected void callAfterUpdateEventOnTriggers(final Record oldRecord, final Record newRecord) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.tableMeta.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).afterUpdate(oldRecord, newRecord);
@@ -126,7 +132,7 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void callBeforeAddEventOnTriggers(final Record record) throws DaoException {
+	protected void callBeforeAddEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.tableMeta.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).beforeAdd(record);
@@ -134,7 +140,7 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void callBeforeDeleteEventOnTriggers(final Record record) throws DaoException {
+	protected void callBeforeDeleteEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.tableMeta.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).beforeDelete(record);
@@ -142,7 +148,7 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	protected void callBeforeUpdateEventOnTriggers(final Record oldRecord, final Record newRecord) throws DaoException {
+	protected void callBeforeUpdateEventOnTriggers(final Record oldRecord, final Record newRecord) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.tableMeta.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).beforeUpdate(oldRecord, newRecord);
@@ -150,11 +156,11 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////////////
-	public void cloneDetails(final Object sourceIdValue, final Object targetIdValue) throws DaoException {
+	public void cloneDetails(final Object sourceIdValue, final Object targetIdValue) throws JKDataAccessException {
 		// TODO : refactor this method to be extarced to facade and avoid direct
 		// calls from UI
 		final ArrayList<ForiegnKeyFieldMeta> detailFields = this.tableMeta.getDetailFields();
-		final Session session = getDataSource().createSession();
+		final JKSession session = getDataSource().createSession();
 		boolean commit = false;
 		try {
 			for (final ForiegnKeyFieldMeta foriegnKeyFieldMeta : detailFields) {
@@ -178,8 +184,8 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public Audit createAudit(final Record record, final AuditType auditType) {
-		final Audit audit = new Audit();
+	public JKAudit createAudit(final Record record, final JKAuditType auditType) {
+		final JKAudit audit = new JKAudit();
 		audit.setAuditType(auditType);
 		audit.setBusinessRecordId(record.getIdValueAsInteger());
 		audit.setTableName(record.getTableMeta().getTableName());
@@ -201,11 +207,12 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void deleteAllRecords() throws DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public void deleteAllRecords() throws JKDataAccessException {
+		logger.info("deleteAllRecords for tablemeta : " + tableMeta);
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return DynamicDao.this.sqlBuilder.buildDelete();
 			}
 
@@ -216,7 +223,8 @@ public class DynamicDao extends AbstractDao {
 		executeUpdate(updater);
 	}
 
-	public void deleteByFieldsValues(final HashMap<String, String> fieldNameToValue) throws DaoException {
+	public void deleteByFieldsValues(final HashMap<String, String> fieldNameToValue) throws JKDataAccessException {
+		logger.info(fieldNameToValue.toString());
 		try {
 			final Record filterRecord = this.tableMeta.createEmptyRecord();
 			final Set<String> keySet = fieldNameToValue.keySet();
@@ -228,28 +236,31 @@ public class DynamicDao extends AbstractDao {
 				deleteRecord(record);
 			}
 
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 		}
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void deleteByFieldValue(final String fieldName, final Object value) throws RecordNotFoundException, DaoException {
+	public void deleteByFieldValue(final String fieldName, final Object value) throws JKRecordNotFoundException, JKDataAccessException {
+		logger.info(fieldName + " = " + value);
 		final Record record = createEmptyRecord(false);
 		record.setFieldValue(fieldName, value);
 		deleteRecord(record.getField(fieldName), false);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void deleteRecord(final Field field) throws RecordNotFoundException, DaoException {
+	public void deleteRecord(final Field field) throws JKRecordNotFoundException, JKDataAccessException {
+		logger.info(field.toString());
 		deleteRecord(field, true);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void deleteRecord(final Field field, final boolean addAudit) throws RecordNotFoundException, DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public void deleteRecord(final Field field, final boolean addAudit) throws JKRecordNotFoundException, JKDataAccessException {
+		logger.info(field + " , add audit : " + addAudit);
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return DynamicDao.this.sqlBuilder.buildDelete(field);
 			}
 
@@ -268,14 +279,14 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void deleteRecord(final Object recordId) throws RecordNotFoundException, DaoException {
+	public void deleteRecord(final Object recordId) throws JKRecordNotFoundException, JKDataAccessException {
 		final Record record = createEmptyRecord(false);
 		record.setIdValue(recordId);
 		deleteRecord(record);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void deleteRecord(final Record record) throws RecordNotFoundException, DaoException {
+	public void deleteRecord(final Record record) throws JKRecordNotFoundException, JKDataAccessException {
 		callBeforeDeleteEventOnTriggers(record);
 		deleteRecord(record.getIdField());
 		callAfterDeleteEventOnTriggers(record);
@@ -286,7 +297,7 @@ public class DynamicDao extends AbstractDao {
 	 *
 	 * @throws DaoException
 	 */
-	public void deleteRecords(final Record filter) throws DaoException {
+	public void deleteRecords(final Record filter) throws JKDataAccessException {
 		final ArrayList<Record> findRecord = lstRecords(filter);
 		for (final Record record : findRecord) {
 			deleteRecord(record);
@@ -294,11 +305,11 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void executeUpdateQuery(final String sql, final Object[] objects) throws DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public void executeUpdateQuery(final String sql, final Object[] objects) throws JKDataAccessException {
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return sql;
 			}
 
@@ -313,25 +324,25 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public ArrayList<Record> findByFieldValue(final String fieldName, final Object value) throws DaoException {
+	public ArrayList<Record> findByFieldValue(final String fieldName, final Object value) throws JKDataAccessException {
 		final Record filterRecord = this.tableMeta.createEmptyRecord();
 		filterRecord.setFieldValue(fieldName, value);
 		return lstRecords(filterRecord);
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public Record findRecord(final Object id) throws RecordNotFoundException, DaoException {
+	public Record findRecord(final Object id) throws JKRecordNotFoundException, JKDataAccessException {
 		// System.err.println("tring to find ID (" + id + ")on table " +
 		// tableMeta.getTableName());
-		final DaoFinder finder = new DaoFinder() {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return DynamicDao.this.sqlBuilder.buildFindById(id.toString());
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return DaoUtil.readRecord(rs, DynamicDao.this.tableMeta);
 			}
 
@@ -345,15 +356,15 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public Record findRecord(final Record filter) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Record findRecord(final Record filter) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return DynamicDao.this.sqlBuilder.buildFindByFilter(filter);
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return DaoUtil.readRecord(rs, DynamicDao.this.tableMeta);
 			}
 
@@ -364,7 +375,7 @@ public class DynamicDao extends AbstractDao {
 		return (Record) findRecord(finder);
 	}
 
-	public Record findRecordByFieldValue(final HashMap<String, String> fieldNameToValue) throws RecordNotFoundException, DaoException {
+	public Record findRecordByFieldValue(final HashMap<String, String> fieldNameToValue) throws JKRecordNotFoundException, JKDataAccessException {
 		final Record filterRecord = this.tableMeta.createEmptyRecord();
 		for (final String fieldName : fieldNameToValue.keySet()) {
 			filterRecord.setFieldValue(fieldName, fieldNameToValue.get(fieldName));
@@ -373,7 +384,7 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public Record findRecordByFieldValue(final String fieldName, final Object value) throws RecordNotFoundException, DaoException {
+	public Record findRecordByFieldValue(final String fieldName, final Object value) throws JKRecordNotFoundException, JKDataAccessException {
 		final Record filterRecord = this.tableMeta.createEmptyRecord();
 		filterRecord.setFieldValue(fieldName, value);
 		return findRecord(filterRecord);
@@ -403,7 +414,8 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public Record getFirstRecordInTable() throws RecordNotFoundException, DaoException {
+	public Record getFirstRecordInTable() throws JKRecordNotFoundException, JKDataAccessException {
+		logger.info("First record");
 		final ArrayList<Record> r = lstRecords();
 		if (r.size() > 0) {
 			return r.get(0);
@@ -443,11 +455,11 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public String insertRecord(final Record record) throws DaoException {
+	public String insertRecord(final Record record) throws JKDataAccessException {
 		callBeforeAddEventOnTriggers(record);
-		final DaoUpdater updater = new DaoUpdater() {
+		final JKUpdater updater = new JKUpdater() {
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return DynamicDao.this.sqlBuilder.buildInsert(record);
 			}
 
@@ -464,7 +476,7 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void insertRecords(final ArrayList<Record> records) throws DaoException {
+	public void insertRecords(final ArrayList<Record> records) throws JKDataAccessException {
 		if (records.size() > 0) {
 			final String insert = this.sqlBuilder.buildFatInsert(records);
 			executeUpdate(insert);
@@ -472,33 +484,35 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public boolean isIdExists(final Object id) throws DaoException {
+	public boolean isIdExists(final Object id) throws JKDataAccessException {
 		try {
 			findRecord(id.toString());
 			return true;
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			// just each the exception
 			return false;
-		} catch (final DaoException e) {
+		} catch (final JKDataAccessException e) {
 			throw e;
 		}
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public ArrayList<Record> lstRecords() throws RecordNotFoundException, DaoException {
+	public ArrayList<Record> lstRecords() throws JKRecordNotFoundException, JKDataAccessException {
+		logger.info("lstRecords : " + tableMeta.getTableName());
 		return lstRecords(createEmptyRecord(false));
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public ArrayList<Record> lstRecords(final Record filter) throws DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public ArrayList<Record> lstRecords(final Record filter) throws JKDataAccessException {
+		logger.info(filter.toString());
+		final JKFinder finder = new JKFinder() {
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return DynamicDao.this.sqlBuilder.buildFindByFilter(filter);
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return DaoUtil.readRecord(rs, DynamicDao.this.tableMeta);
 			}
 
@@ -510,16 +524,16 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public ArrayList<Record> lstRecordsByReportSql() throws DaoException {
-		final DaoFinder daoFinder = new DaoFinder() {
+	public ArrayList<Record> lstRecordsByReportSql() throws JKDataAccessException {
+		final JKFinder daoFinder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return DynamicDao.this.tableMeta.getReportSql();
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return DaoUtil.readRecord(rs, DynamicDao.this.tableMeta);
 			}
 
@@ -531,7 +545,7 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public boolean saveRecord(final Record record) throws DaoException, RecordNotFoundException {
+	public boolean saveRecord(final Record record) throws JKDataAccessException, JKRecordNotFoundException {
 		if (record.isNewRecord() && record.isModified()) {
 			insertRecord(record);
 			return true;
@@ -547,23 +561,23 @@ public class DynamicDao extends AbstractDao {
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void saveRecords(final ArrayList<Record> records) throws DaoException {
-		final DaoException allExceptions = new DaoException();
+	public void saveRecords(final ArrayList<Record> records) throws JKDataAccessException {
+		final JKDataAccessException allExceptions = new JKDataAccessException();
 		for (final Record record : records) {
 			try {
 				saveRecord(record);
-			} catch (final DaoException e) {
+			} catch (final JKDataAccessException e) {
 				allExceptions.add(e);
 			}
 		}
 	}
 
 	// //////////////////////////////////////////////////////////////
-	public void updateRecord(final Record record) throws RecordNotFoundException, DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public void updateRecord(final Record record) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return DynamicDao.this.sqlBuilder.buildUpdate(record);
 			}
 

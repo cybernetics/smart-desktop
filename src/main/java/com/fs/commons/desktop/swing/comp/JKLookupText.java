@@ -27,22 +27,22 @@ import java.sql.SQLException;
 import java.util.Vector;
 
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.DaoFinder;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dialogs.QueryDialog;
 import com.fs.commons.desktop.validation.builtin.FSValidators;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.db.dataaccess.plain.JKFinder;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class JKLookupText extends JKPanel implements BindingComponent, DaoComponent {
 	/**
@@ -54,7 +54,7 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 	private String query;
 	JKTextField txtNum = new JKTextField();
 	JKTextField txtName = new JKTextField();
-	private DataSource datasource;
+	private JKDataSource datasource;
 	private Object defaultValue;
 	// String tableName;
 	// String idFieldName;
@@ -100,7 +100,7 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 
 	// ////////////////////////////////////////////////////////////
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.datasource;
 	}
 
@@ -111,7 +111,7 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////
-	public Object getFieldValue(final String fieldName) throws RecordNotFoundException, DaoException {
+	public Object getFieldValue(final String fieldName) throws JKRecordNotFoundException, JKDataAccessException {
 		if (getValue() == null) {
 			return null;
 		}
@@ -243,11 +243,11 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 		query += " AND " + getIdFieldName() + "=" + this.recordId;
 		try {
 			loadQuery(query);
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			clearFields(true);
-		} catch (final DaoException e) {
+		} catch (final JKDataAccessException e) {
 			System.err.println("Error while trying  to extecute: " + query);
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -265,12 +265,12 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 		query += " AND " + getNumberFieldName() + "='" + number + "'";
 		try {
 			loadQuery(query);
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			clearFields(false);
 			this.requestFocus();
 			this.txtName.setText(Lables.get("N/A"));
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 		this.fsWrapper.fireValueChangeListener(old, getValue());
 	}
@@ -320,17 +320,17 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 	}
 
 	// /////////////////////////////////////////////////////////////
-	private void loadQuery(final String query) throws RecordNotFoundException, DaoException {
-		final AbstractDao dao = getDao();
-		dao.findRecord(new DaoFinder() {
+	private void loadQuery(final String query) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKAbstractPlainDataAccess dao = getDao();
+		dao.findRecord(new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return query;
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final int columnCount = rs.getMetaData().getColumnCount();
 				if (columnCount < 3) {
 					throw new IllegalStateException("Query " + query + " should return at least three cols only");
@@ -359,7 +359,7 @@ public class JKLookupText extends JKPanel implements BindingComponent, DaoCompon
 
 	// ///////////////////////////////////////////////////////////////////////////
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.datasource = manager;
 	}
 

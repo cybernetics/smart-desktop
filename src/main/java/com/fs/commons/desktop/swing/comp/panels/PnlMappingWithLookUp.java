@@ -19,15 +19,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.fs.commons.application.ApplicationManager;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  *
@@ -85,7 +85,7 @@ public abstract class PnlMappingWithLookUp extends PnlMappingFields {
 	private final DaoComboBox cmd = new DaoComboBox(this.meta);
 	private final JKButton addBtn = new JKButton("ADD");
 
-	public PnlMappingWithLookUp() throws DaoException {
+	public PnlMappingWithLookUp() throws JKDataAccessException {
 
 	}
 
@@ -142,7 +142,7 @@ public abstract class PnlMappingWithLookUp extends PnlMappingFields {
 			this.target.reloadData();
 			this.source.reloadData();
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

@@ -18,7 +18,7 @@ package com.fs.commons.desktop.swing.comp2;
 import javax.swing.ImageIcon;
 
 import com.fs.commons.desktop.swing.comp.JKButton;
-import com.fs.commons.security.Privilige;
+import com.jk.security.JKPrivilige;
 
 public class FSButton extends JKButton {
 
@@ -62,7 +62,7 @@ public class FSButton extends JKButton {
 		// TODO Auto-generated constructor stub
 	}
 
-	public FSButton(final String caption, final String shortcut, final Privilige privlige) {
+	public FSButton(final String caption, final String shortcut, final JKPrivilige privlige) {
 		super(caption, shortcut, privlige);
 		// TODO Auto-generated constructor stub
 	}

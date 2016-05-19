@@ -18,6 +18,7 @@ package com.fs.commons.desktop.swing;
 import java.awt.BorderLayout;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -37,8 +38,8 @@ import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.comp.panels.TitledPanel;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class MenuItemsPanel extends JKMainPanel {
 
@@ -50,7 +51,7 @@ public class MenuItemsPanel extends JKMainPanel {
 	public static void main(final String[] args) throws FileNotFoundException, ApplicationException, UIOPanelCreationException {
 		ApplicationManager.getInstance().init();
 		final Application application = ApplicationManager.getInstance().getApplication();
-		final ArrayList<Module> modules = application.getModules();
+		final List<Module> modules = application.getModules();
 		final MenuItemsPanel m = new MenuItemsPanel(modules.get(4).getMenu().get(1));
 		SwingUtility.testPanel(m);
 	}
@@ -99,7 +100,7 @@ public class MenuItemsPanel extends JKMainPanel {
 
 						tab.insertTab(title, icon, panel, title, sel);
 					} catch (final UIOPanelCreationException e) {
-						ExceptionUtil.handleException(e);
+						ExceptionUtil.handle(e);
 					}
 				}
 			}

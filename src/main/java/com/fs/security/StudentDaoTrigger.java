@@ -15,21 +15,21 @@
  */
 package com.fs.security;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.trigger.TriggerAdapter;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.util.GeneralUtility;
 
 public class StudentDaoTrigger extends TriggerAdapter {
 	@Override
-	public void beforeAdd(final Record record) throws DaoException {
+	public void beforeAdd(final Record record) throws JKDataAccessException {
 		String value = record.getField("password").getValue();
 		value = GeneralUtility.encode(value);
 		record.getField("password").setValue(value);
 	}
 
 	@Override
-	public void beforeUpdate(final Record oldRecord, final Record newRecord) throws DaoException {
+	public void beforeUpdate(final Record oldRecord, final Record newRecord) throws JKDataAccessException {
 		beforeAdd(newRecord);
 	}
 }

@@ -37,7 +37,7 @@ public class ReportXmlParser {
 
 	String outPath;
 
-	ArrayList<Report> reports = new ArrayList<Report>();
+	ArrayList<JKReport> reports = new ArrayList<JKReport>();
 
 	/**
 	 *
@@ -48,7 +48,7 @@ public class ReportXmlParser {
 	/**
 	 * @return the reports
 	 */
-	public ArrayList<Report> getReports() {
+	public ArrayList<JKReport> getReports() {
 		return this.reports;
 	}
 
@@ -57,7 +57,7 @@ public class ReportXmlParser {
 	 * @param in
 	 * @throws JKXmlException
 	 */
-	public ArrayList<Report> parse(final InputStream in) throws JKXmlException {
+	public ArrayList<JKReport> parse(final InputStream in) throws JKXmlException {
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
 		try {
@@ -72,7 +72,7 @@ public class ReportXmlParser {
 				} else if (list.item(i).getNodeName().equals("out-path")) {
 					this.outPath = list.item(i).getTextContent();
 				} else if (list.item(i).getNodeName().equals("report")) {
-					final Report report = parseReport(list.item(i));
+					final JKReport report = parseReport(list.item(i));
 					this.reports.add(report);
 				}
 			}
@@ -116,8 +116,8 @@ public class ReportXmlParser {
 	 * @param item
 	 * @return
 	 */
-	private Report parseReport(final Node item) {
-		final Report report = new Report();
+	private JKReport parseReport(final Node item) {
+		final JKReport report = new JKReport();
 		// report.setSourcePath(sourcePath);
 		// report.setOutPath(outPath);
 		final Element e = (Element) item;

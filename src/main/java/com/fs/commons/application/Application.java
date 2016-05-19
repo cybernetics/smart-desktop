@@ -20,34 +20,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
+import java.util.Vector;
 
 import com.fs.commons.application.config.UserPreferences;
 import com.fs.commons.application.exceptions.ModuleException;
 import com.fs.commons.application.listener.ApplicationListener;
 import com.fs.commons.application.ui.menu.Menu;
 import com.fs.commons.application.ui.menu.MenuItem;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaFactory;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.frames.ApplicationFrame;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.reports.Report;
-import com.fs.commons.reports.ReportManager;
-import com.fs.commons.security.Privilige;
-import com.fs.commons.security.SecurityManager;
-import com.fs.commons.security.exceptions.NotAllowedOperationException;
-import com.fs.commons.security.exceptions.SecurityException;
-import com.fs.commons.util.ExceptionUtil;
+import com.fs.commons.reports.JKReport;
+import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.JKNotAllowedOperationException;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.security.JKSecurityManager;
+import com.jk.security.JKPrivilige;
 
 public class Application {
 	private int autoLogoutInterval = 15;
 	String applicationName;
 
-	ArrayList<Module> modules;
-	ArrayList<ApplicationListener> listeners = new ArrayList<ApplicationListener>();
+	List<Module> modules;
+	List<ApplicationListener> listeners = new ArrayList<ApplicationListener>();
 
 	private String configFileName;
 
@@ -107,14 +108,14 @@ public class Application {
 	 * @param menuItemName
 	 * @return
 	 * @throws SecurityException
-	 * @throws NotAllowedOperationException
+	 * @throws JKNotAllowedOperationException
 	 */
-	public MenuItem findMenuItem(final String menuItemName) throws NotAllowedOperationException, SecurityException {
+	public MenuItem findMenuItem(final String menuItemName) throws JKNotAllowedOperationException, SecurityException {
 		for (final Module module : getModules()) {
 			for (final Menu menu : module.getMenu()) {
 				for (final MenuItem item : menu.getItems()) {
 					if (item.getName().equals(menuItemName)) {
-						SecurityManager.getAuthorizer().checkAllowed(item.getPrivilige());
+						JKSecurityManager.getAuthorizer().checkAllowed(item.getPrivilige());
 						return item;
 					}
 				}
@@ -142,7 +143,7 @@ public class Application {
 	 *
 	 * @return
 	 */
-	public ArrayList<ApplicationListener> getApplicationListeners() {
+	public List<ApplicationListener> getApplicationListeners() {
 		return this.listeners;
 	}
 
@@ -215,7 +216,7 @@ public class Application {
 	/**
 	 * @return the modules
 	 */
-	public ArrayList<Module> getModules() {
+	public List<Module> getModules() {
 		return this.modules;
 	}
 
@@ -235,25 +236,24 @@ public class Application {
 			Lables.getDefaultInstance().addLables(loadCommonsLabel(getLocale()));
 			// boolean debugPriviliges =
 			// System.getProperty("fs.debug.priviliges") != null;
-			final boolean debugMeta = System.getProperty("fs.debug.meta") != null;
-			for (int i = 0; i < this.modules.size(); i++) {
-				final Module module = this.modules.get(i);
-				module.init();
-				final Hashtable<String, TableMeta> tablesMeta = module.getTablesMeta();
-				final TableMetaFactory tableMetaFactory = AbstractTableMetaFactory.addTablesMeta(module.getDataSource(), tablesMeta);
-				Lables.getDefaultInstance().addLables(module.getLables(getLocale()));
-				// MenuSection section=new MenuSection();
-				// section.setName(module.getModuleName());
-				// section.setMenus(module.getMenu());
-				// mainMenu.add(section);
-				final ArrayList<Report> reports = module.getReports(getLocale() + "_", getInActiveLocale() + "_");
-				if (reports.size() > 0) {
-					ReportManager.addReports(reports);
-				}
-				// if (debugPriviliges) {
-				// printModuleDebugInfo(module, i != 0);
-				// }
-				if (debugMeta) {
+			if (modules != null) {
+				for (int i = 0; i < this.modules.size(); i++) {
+					final Module module = this.modules.get(i);
+					module.init();
+					final Hashtable<String, TableMeta> tablesMeta = module.getTablesMeta();
+					final TableMetaFactory tableMetaFactory = AbstractTableMetaFactory.addTablesMeta(module.getDataSource(), tablesMeta);
+					Lables.getDefaultInstance().addLables(module.getLables(getLocale()));
+					// MenuSection section=new MenuSection();
+					// section.setName(module.getModuleName());
+					// section.setMenus(module.getMenu());
+					// mainMenu.add(section);
+					final ArrayList<JKReport> reports = module.getReports(getLocale() + "_", getInActiveLocale() + "_");
+					if (reports.size() > 0) {
+						JKReportManager.addReports(reports);
+					}
+					// if (debugPriviliges) {
+					// printModuleDebugInfo(module, i != 0);
+					// }
 					tableMetaFactory.writeDynamicMeta(new FileOutputStream(module.getModuleName() + "_meta-out.xml"));
 				}
 			}
@@ -261,22 +261,22 @@ public class Application {
 			throw new ApplicationException(e);
 		} catch (final IOException e) {
 			throw new ApplicationException(e);
-		} catch (final DaoException e) {
+		} catch (final JKDataAccessException e) {
 			throw new ApplicationException(e);
 		}
 
 	}
 
 	// ///////////////////////////////////////////////////////
-	public boolean isAllowedCommand(final Privilige privilige, final String name) {
+	public boolean isAllowedCommand(final JKPrivilige privilige, final String name) {
 		try {
-			SecurityManager.getAuthorizer().checkAllowed(privilige);
+			JKSecurityManager.getAuthorizer().checkAllowed(privilige);
 			return true;
-		} catch (final NotAllowedOperationException e) {
+		} catch (final JKNotAllowedOperationException e) {
 			System.err.println("Privlige Id : " + privilige.getPriviligeId() + " , with name : " + name + " is not allowed");
 			return false;
 		} catch (final SecurityException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			return false;
 		}
 	}

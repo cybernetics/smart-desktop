@@ -18,19 +18,19 @@ package com.fs.commons.desktop.dynform.ui.masterdetail;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionAdapter;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionListener;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * @author u087
@@ -47,10 +47,10 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 
 	/**
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 *
 	 */
-	public DetailOneToOnePanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws TableMetaNotFoundException, DaoException {
+	public DetailOneToOnePanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws TableMetaNotFoundException, JKDataAccessException {
 		this.foriegnKeyFieldMeta = foriegnKeyFieldMeta;
 		this.foriegnKeyFieldMeta.setEnabled(false);
 		this.pnlDetail = new DynDaoPanel(getDetailTableMeta());
@@ -72,13 +72,13 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 	/**
 	 * @param masterIdValue2
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private Record findByMasterId(final Object masterIdValue) throws RecordNotFoundException, DaoException {
+	private Record findByMasterId(final Object masterIdValue) throws JKRecordNotFoundException, JKDataAccessException {
 		final DynamicDao dao = new DynamicDao(getDetailTableMeta());
 		final ArrayList<Record> records = dao.findByFieldValue(this.foriegnKeyFieldMeta.getName(), masterIdValue);
 		if (records.size() == 0) {
-			throw new RecordNotFoundException();
+			throw new JKRecordNotFoundException();
 		}
 		// Guaranteed to be only one record because it is OneToOne relation ,
 		// right?
@@ -104,7 +104,7 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 	 *
 	 */
 	@Override
-	public void handleFind(final Object idValue) throws DaoException {
+	public void handleFind(final Object idValue) throws JKDataAccessException {
 		this.pnlDetail.handleFindRecord(idValue);
 		this.pnlDetail.setMode(DynDaoMode.VIEW);// TODO : check the purpose of
 												// this statement
@@ -120,8 +120,8 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 				try {
 					setMasterIdValue(DetailOneToOnePanel.this.masterIdValue);
 					// change to find mode
-				} catch (final DaoException e) {
-					ExceptionUtil.handleException(e);
+				} catch (final JKDataAccessException e) {
+					ExceptionUtil.handle(e);
 				}
 			}
 
@@ -131,8 +131,8 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 				// master value
 				try {
 					setMasterIdValue(DetailOneToOnePanel.this.masterIdValue);
-				} catch (final DaoException e) {
-					ExceptionUtil.handleException(e);
+				} catch (final JKDataAccessException e) {
+					ExceptionUtil.handle(e);
 				}
 			}
 		});
@@ -143,7 +143,7 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 	 *
 	 */
 	@Override
-	public void resetComponents() throws DaoException {
+	public void resetComponents() throws JKDataAccessException {
 		setMasterIdValue(null);
 	}
 
@@ -151,7 +151,7 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 	 *
 	 */
 	@Override
-	public void setMasterIdValue(final Object masterIdValue) throws DaoException {
+	public void setMasterIdValue(final Object masterIdValue) throws JKDataAccessException {
 		if (masterIdValue == null || masterIdValue.toString().trim().equals("")) {
 			this.masterIdValue = null;
 			this.pnlDetail.resetComponents();
@@ -166,7 +166,7 @@ public class DetailOneToOnePanel extends JKMainPanel implements DetailPanel {
 			try {
 				final Record record = findByMasterId(masterIdValue);
 				handleFind(record.getIdValue());
-			} catch (final RecordNotFoundException e) {
+			} catch (final JKRecordNotFoundException e) {
 				setMode(DynDaoMode.ADD);
 				this.pnlDetail.setComponentValue(this.foriegnKeyFieldMeta.getName(), masterIdValue);
 			}

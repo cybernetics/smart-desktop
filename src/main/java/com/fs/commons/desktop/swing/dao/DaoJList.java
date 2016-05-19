@@ -27,8 +27,8 @@ import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
 import com.fs.commons.dao.DaoUtil;
 import com.fs.commons.dao.IdValueRecord;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.swing.comp.FSAbstractComponent;
 import com.fs.commons.desktop.swing.comp.FSComboBoxListCellRenderer;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
@@ -51,9 +51,9 @@ public class DaoJList extends JList implements BindingComponent<String> {
 	 *
 	 * @param sql
 	 *            String
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public DaoJList(final String sql) throws DaoException {
+	public DaoJList(final String sql) throws JKDataAccessException {
 		setModel(this.model);
 		this.sql = sql;
 		init();
@@ -84,13 +84,13 @@ public class DaoJList extends JList implements BindingComponent<String> {
 	}
 
 	@Override
-	public void filterValues(final BindingComponent comp1) throws DaoException {
+	public void filterValues(final BindingComponent comp1) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.fsWrapper.getDataSource();
 	}
 
@@ -145,10 +145,10 @@ public class DaoJList extends JList implements BindingComponent<String> {
 	}
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 *
 	 */
-	public void loadData() throws DaoException {
+	public void loadData() throws JKDataAccessException {
 		final List v = DaoUtil.createRecordsFromSQL(this.sql);
 		for (int i = 0; i < v.size(); i++) {
 			this.model.addElement(v.get(i));
@@ -156,10 +156,10 @@ public class DaoJList extends JList implements BindingComponent<String> {
 	}
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 *
 	 */
-	public void reloadData() throws DaoException {
+	public void reloadData() throws JKDataAccessException {
 		this.model.removeAllElements();
 		loadData();
 		setSelectedIndex(-1);
@@ -175,7 +175,7 @@ public class DaoJList extends JList implements BindingComponent<String> {
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.fsWrapper.setDataSource(manager);
 	}
 

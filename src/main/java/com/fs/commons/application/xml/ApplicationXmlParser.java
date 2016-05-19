@@ -31,7 +31,7 @@ import com.fs.commons.application.Application;
 import com.fs.commons.application.DefaultModule;
 import com.fs.commons.application.Module;
 import com.fs.commons.application.listener.ApplicationListener;
-import com.fs.commons.dao.connection.PoolingDataSource;
+import com.fs.commons.dao.connection.JKPoolingDataSource;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
 import com.fs.commons.locale.LablesLoader;
 import com.fs.commons.util.ReflicationUtil;
@@ -144,7 +144,7 @@ public class ApplicationXmlParser {
 			module.setDefault(Boolean.parseBoolean(e.getAttribute("default")));
 		}
 		if (!e.getAttribute("datasource-config").trim().equals("")) {
-			module.setDataSource(new PoolingDataSource(e.getAttribute("datasource-config")));
+			module.setDataSource(new JKPoolingDataSource(e.getAttribute("datasource-config")));
 		}
 		if (!e.getAttribute("lables-loader").trim().equals("")) {
 			module.setLablesLoader(parseLablesLoader(e.getAttribute("lables-loader")));

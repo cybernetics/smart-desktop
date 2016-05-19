@@ -21,8 +21,8 @@ import java.io.IOException;
 import com.fs.commons.desktop.swing.dao.PnlQueryFields;
 import com.fs.commons.desktop.swing.dao.QueryTableModel;
 import com.fs.commons.desktop.swing.dao.TableModelHtmlBuilder;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * <p>
@@ -76,7 +76,7 @@ public class PrintUtil {
 					// REPORT_PANE_NAME + " " + file.getAbsolutePath());
 					Runtime.getRuntime().exec("cmd /c start " + file.getAbsolutePath());
 				} catch (final IOException ex) {
-					ExceptionUtil.handleException(ex);
+					ExceptionUtil.handle(ex);
 				}
 			}
 		});
@@ -94,7 +94,7 @@ public class PrintUtil {
 			final String data = builder.buildHtml();
 			printHtml(data);
 		} catch (final Exception ex) {
-			ExceptionUtil.handleException(new Exception("ERROR_PRINT" + "\n" + ex.getMessage(), ex));
+			ExceptionUtil.handle(new Exception("ERROR_PRINT" + "\n" + ex.getMessage(), ex));
 		}
 	}
 

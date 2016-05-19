@@ -15,6 +15,7 @@
  */
 package com.fs.commons.util;
 
+
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -73,15 +74,13 @@ import org.apache.commons.beanutils.PropertyUtils;
 import com.fs.commons.application.exceptions.DatabaseDownException;
 import com.fs.commons.application.exceptions.ServerDownException;
 import com.fs.commons.application.util.ResourceLoaderFactory;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.Record;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.exception.ExceptionUtil;
-import com.fs.commons.logging.Logger;
-import com.fs.commons.security.EncDecImpl;
-import com.fs.commons.security.exceptions.DecryptionException;
-import com.fs.commons.security.exceptions.EncryptionException;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.logging.JKLogger;
+import com.jk.security.JKEncDec;
 import com.lowagie.text.pdf.codec.Base64;
 
 class FakeRunnable implements Runnable {
@@ -143,7 +142,6 @@ public class GeneralUtility {
 
 	static SecretKeySpec spec = new SecretKeySpec("123456781234567812345678".getBytes(), "DESEDE");
 
-	static EncDecImpl encDecUtil = new EncDecImpl(spec);
 
 	// ////////////////////////
 	private static String FILE_READ_HARDDISK_SERIAL = "diskid32.exe";
@@ -260,7 +258,7 @@ public class GeneralUtility {
 			final Object deepCopy = ois.readObject();
 			return deepCopy;
 		} catch (final Exception e) {
-			// ExceptionUtil.handleException(e);
+			// ExceptionUtil.handle(e);
 			System.err.println("Failed to copy object of class : " + source.getClass().getName() + " / " + e.getMessage());
 			e.printStackTrace();
 			return null;// unreachable
@@ -286,7 +284,7 @@ public class GeneralUtility {
 		try {
 			return Class.forName(className).newInstance();
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			return null;// unreachable
 		}
 	}
@@ -365,8 +363,8 @@ public class GeneralUtility {
 	 * @return String
 	 * @throws DecryptionException
 	 */
-	public static String decrypt(final String str) throws DecryptionException {
-		return new String(encDecUtil.decrypt(str.getBytes()));
+	public static String decrypt(final String str)  {
+		return JKEncDec.decrypt(str);
 	}
 
 	/**
@@ -422,8 +420,8 @@ public class GeneralUtility {
 	 * @return String
 	 * @throws EncryptionException
 	 */
-	public static String encrypt(final String str) throws EncryptionException {
-		return new String(encDecUtil.encrypt(str.getBytes()));
+	public static String encrypt(final String str)  {
+		return JKEncDec.encrypt(str);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
@@ -446,7 +444,7 @@ public class GeneralUtility {
 	 */
 	public static Process executeFile(final String fileName) throws IOException {
 		final String command = "cmd /c \"" + fileName + "\"";
-		Logger.info(command);
+		JKLogger.info(command);
 		return Runtime.getRuntime().exec(command);
 	}
 
@@ -712,7 +710,7 @@ public class GeneralUtility {
 			return getFileText("/resources/sql/" + fileName);
 			// }
 		} catch (final Exception ex) {
-			ExceptionUtil.handleException(ex);
+			ExceptionUtil.handle(ex);
 			return null;
 		}
 	}
@@ -776,7 +774,7 @@ public class GeneralUtility {
 	/**
 	 * @param fileName
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	public static String loadSqlFromDatabase(final String fileName) {
 		try {
@@ -786,7 +784,7 @@ public class GeneralUtility {
 				return list.get(0).getFieldValueAsString("query_text");
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 		return null;
 	}
@@ -831,7 +829,7 @@ public class GeneralUtility {
 		return files;
 	}
 
-	public static void main(final String[] args) throws IOException, EncryptionException {
+	public static void main(final String[] args) throws IOException {
 		System.out.println(decode("ZnNAdW5pX3Bhc3N3b3Jk"));
 	}
 
@@ -984,7 +982,7 @@ public class GeneralUtility {
 		try {
 			PropertyUtils.setProperty(source, fieldName, value);
 		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

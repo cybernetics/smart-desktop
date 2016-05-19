@@ -17,10 +17,10 @@ package com.fs.commons.dao.dynamic;
 
 import java.util.ArrayList;
 
-import com.fs.commons.dao.Session;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKSession;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.dynamic.meta.Record;
-import com.fs.commons.dao.exception.DaoException;
 
 public class DynamicFacade {
 
@@ -28,10 +28,10 @@ public class DynamicFacade {
 	 * @param master
 	 * @param detailRecords
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public String addMasterDetailRecord(final Record master, final ArrayList<Record> detailRecords) throws DaoException {
-		final Session session = DataSourceFactory.getDefaultDataSource().createSession();
+	public String addMasterDetailRecord(final Record master, final ArrayList<Record> detailRecords) throws JKDataAccessException {
+		final JKSession session = JKDataSourceFactory.getDefaultDataSource().createSession();
 		boolean commit = false;
 		try {
 			final DynamicDao dao = new DynamicDao(master.getTableMeta());

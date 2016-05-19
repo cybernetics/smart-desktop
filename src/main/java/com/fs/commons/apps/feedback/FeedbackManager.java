@@ -23,12 +23,10 @@ import org.apache.commons.mail.EmailException;
 
 import com.fs.commons.apps.backup.CompressionException;
 import com.fs.commons.apps.backup.DatabaseInfo;
-import com.fs.commons.apps.backup.MySqlUtil;
-import com.fs.commons.mail.Attachment;
-import com.fs.commons.mail.MailInfo;
-import com.fs.commons.mail.MailSender;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.FormatUtil;
+import com.jk.mail.Attachment;
+import com.jk.mail.MailInfo;
+import com.jk.mail.MailSender;
 
 /**
  * @1.1
@@ -59,20 +57,21 @@ public class FeedbackManager {
 	 * @throws IOException
 	 */
 	private String compressFiles(final DatabaseInfo info, final boolean includeDatabaseBackup) throws IOException {
-		final String logFileName = ExceptionUtil.getLogFileName();
-		final String dbCompressedFileName = getFileName("feeback", "rar");
-		String[] filestoCompress;
-		if (includeDatabaseBackup) {
-			final String dbFileName = getFileName("DB", "sql");
-			info.setFileName(dbFileName);
-			MySqlUtil.export(info);
-			filestoCompress = new String[] { dbFileName, logFileName };
-		} else {
-			filestoCompress = new String[] { logFileName };
-		}
-
-		// CompressionUtil.compressFiles(filestoCompress, dbCompressedFileName);
-		return dbCompressedFileName;
+//		final String logFileName = ExceptionUtil.getLogFileName();
+//		final String dbCompressedFileName = getFileName("feeback", "rar");
+//		String[] filestoCompress;
+//		if (includeDatabaseBackup) {
+//			final String dbFileName = getFileName("DB", "sql");
+//			info.setFileName(dbFileName);
+//			MySqlUtil.export(info);
+//			filestoCompress = new String[] { dbFileName, logFileName };
+//		} else {
+//			filestoCompress = new String[] { logFileName };
+//		}
+//
+//		// CompressionUtil.compressFiles(filestoCompress, dbCompressedFileName);
+//		return dbCompressedFileName;
+		return null;
 	}
 
 	/**

@@ -32,6 +32,8 @@ import javax.swing.BoxLayout;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.constraints.exceptions.DuplicateDataException;
@@ -42,8 +44,6 @@ import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionListener;
 import com.fs.commons.desktop.swin.ConversionUtil;
 import com.fs.commons.desktop.swing.comp.JKLabel;
@@ -53,8 +53,8 @@ import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DataPanel;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class DynPanel extends DataPanel {
 	private static final long serialVersionUID = 1L;
@@ -91,19 +91,19 @@ public class DynPanel extends DataPanel {
 	/**
 	 *
 	 * @param tableMetaName
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 */
-	public DynPanel(final String tableMetaName) throws TableMetaNotFoundException, DaoException {
+	public DynPanel(final String tableMetaName) throws TableMetaNotFoundException, JKDataAccessException {
 		this(AbstractTableMetaFactory.getTableMeta(tableMetaName));
 	}
 
 	/**
 	 * @param tableMeta
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public DynPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException {
+	public DynPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException {
 		this(tableMeta, true);
 	}
 
@@ -111,9 +111,9 @@ public class DynPanel extends DataPanel {
 	 *
 	 * @param tableMeta
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public DynPanel(final TableMeta tableMeta, final boolean init) throws TableMetaNotFoundException, DaoException {
+	public DynPanel(final TableMeta tableMeta, final boolean init) throws TableMetaNotFoundException, JKDataAccessException {
 		this.tableMeta = tableMeta;
 		this.dao = DaoFactory.createDynamicDao(tableMeta);
 
@@ -141,9 +141,9 @@ public class DynPanel extends DataPanel {
 	 * @param tableMeta
 	 * @param visibleFieldNames
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public DynPanel(final TableMeta tableMeta, final int uIColunmCount) throws TableMetaNotFoundException, DaoException {
+	public DynPanel(final TableMeta tableMeta, final int uIColunmCount) throws TableMetaNotFoundException, JKDataAccessException {
 		this(tableMeta, false);
 		this.uIColunmCount = uIColunmCount;
 		init();
@@ -153,9 +153,9 @@ public class DynPanel extends DataPanel {
 	 * @param tableMeta
 	 * @param visibleFieldNames
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public DynPanel(final TableMeta tableMeta, final String[] visibleFieldNames) throws TableMetaNotFoundException, DaoException {
+	public DynPanel(final TableMeta tableMeta, final String[] visibleFieldNames) throws TableMetaNotFoundException, JKDataAccessException {
 		this(tableMeta, false);
 		this.visibleFieldNames = visibleFieldNames;
 		init();
@@ -165,10 +165,10 @@ public class DynPanel extends DataPanel {
 	 * @param tableMeta
 	 * @param visibleFieldNames
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	public DynPanel(final TableMeta tableMeta, final String[] visibleFieldNames, final int uIColunmCount)
-			throws TableMetaNotFoundException, DaoException {
+			throws TableMetaNotFoundException, JKDataAccessException {
 		this(tableMeta, false);
 		this.visibleFieldNames = visibleFieldNames;
 		this.uIColunmCount = uIColunmCount;
@@ -234,9 +234,9 @@ public class DynPanel extends DataPanel {
 	/**
 	 * @param record
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	protected String addRecord(final Record record) throws DaoException {
+	protected String addRecord(final Record record) throws JKDataAccessException {
 		record.setGui(GeneralUtility.toXml(this));
 		return this.dao.insertRecord(record);
 	}
@@ -244,9 +244,9 @@ public class DynPanel extends DataPanel {
 	/**
 	 *
 	 * @param field
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private void attachFilters(final FieldMeta field) throws DaoException {
+	private void attachFilters(final FieldMeta field) throws JKDataAccessException {
 		final FieldMeta filteredBy = getTableMeta().getField(field.getFilteredBy());
 		if (filteredBy == null) {
 			System.err.println("Filtered by contains invalid field name : " + field.getName() + " in table :" + getTableMeta().getTableId());
@@ -262,8 +262,8 @@ public class DynPanel extends DataPanel {
 			public void actionPerformed(final ActionEvent e) {
 				try {
 					comp2.filterValues(comp1);
-				} catch (final DaoException e1) {
-					ExceptionUtil.handleException(e1);
+				} catch (final JKDataAccessException e1) {
+					ExceptionUtil.handle(e1);
 				}
 			}
 		});
@@ -281,10 +281,10 @@ public class DynPanel extends DataPanel {
 
 	/**
 	 * @param record
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
+	 * @throws JKRecordNotFoundException
+	 * @throws JKDataAccessException
 	 */
-	protected void deleteRecord(final Record record) throws RecordNotFoundException, DaoException {
+	protected void deleteRecord(final Record record) throws JKRecordNotFoundException, JKDataAccessException {
 		record.setGui(GeneralUtility.toXml(this));
 		this.dao.deleteRecord(record);
 	}
@@ -316,19 +316,19 @@ public class DynPanel extends DataPanel {
 	/**
 	 * @param id
 	 * @return
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
+	 * @throws JKRecordNotFoundException
+	 * @throws JKDataAccessException
 	 */
-	protected Record findRecord(final Object id) throws RecordNotFoundException, DaoException {
+	protected Record findRecord(final Object id) throws JKRecordNotFoundException, JKDataAccessException {
 		return this.dao.findRecord(id);
 	}
 
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	void fireAfterAddRecord(final Record record) throws DaoException {
+	void fireAfterAddRecord(final Record record) throws JKDataAccessException {
 		for (int i = this.listeners.size() - 1; i >= 0; i--) {
 			final DynDaoActionListener listsner = this.listeners.get(i);
 			listsner.afterAddRecord(record);
@@ -348,9 +348,9 @@ public class DynPanel extends DataPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	void fireAfterDeleteRecord(final Record record) throws DaoException {
+	void fireAfterDeleteRecord(final Record record) throws JKDataAccessException {
 		for (int i = this.listeners.size() - 1; i >= 0; i--) {
 			this.listeners.get(i).afterDeleteRecord(record);
 		}
@@ -369,9 +369,9 @@ public class DynPanel extends DataPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	void fireAfterUpdateRecord(final Record record) throws DaoException {
+	void fireAfterUpdateRecord(final Record record) throws JKDataAccessException {
 		for (int i = this.listeners.size() - 1; i >= 0; i--) {
 			this.listeners.get(i).afterUpdateRecord(record);
 		}
@@ -380,9 +380,9 @@ public class DynPanel extends DataPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	void fireBeforeAddRecord(final Record record) throws DaoException {
+	void fireBeforeAddRecord(final Record record) throws JKDataAccessException {
 		for (int i = this.listeners.size() - 1; i >= 0; i--) {
 			this.listeners.get(i).beforeAddRecord(record);
 		}
@@ -401,9 +401,9 @@ public class DynPanel extends DataPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	void fireBeforeDeleteRecord(final Record record) throws DaoException {
+	void fireBeforeDeleteRecord(final Record record) throws JKDataAccessException {
 		for (int i = this.listeners.size() - 1; i >= 0; i--) {
 			this.listeners.get(i).beforeDeleteRecord(record);
 
@@ -423,9 +423,9 @@ public class DynPanel extends DataPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	void fireBeforeUpdateRecord(final Record record) throws DaoException {
+	void fireBeforeUpdateRecord(final Record record) throws JKDataAccessException {
 		for (int i = this.listeners.size() - 1; i >= 0; i--) {
 			this.listeners.get(i).beforeUpdateRecord(record);
 		}
@@ -436,7 +436,7 @@ public class DynPanel extends DataPanel {
 	 * @param record
 	 * @param ex
 	 */
-	void fireOnException(final Record record, final DaoException ex) {
+	void fireOnException(final Record record, final JKDataAccessException ex) {
 		for (int i = this.listeners.size() - 1; i >= 0; i--) {
 			this.listeners.get(i).onDaoException(record, ex);
 
@@ -458,7 +458,7 @@ public class DynPanel extends DataPanel {
 	 * @param recordId
 	 * @param ex
 	 */
-	void fireRecordNotFound(final Object recordId, final DaoException ex) {
+	void fireRecordNotFound(final Object recordId, final JKDataAccessException ex) {
 		for (int i = this.listeners.size() - 1; i >= 0; i--) {
 			this.listeners.get(i).onRecordNotFound(recordId, ex);
 		}
@@ -555,7 +555,7 @@ public class DynPanel extends DataPanel {
 	 *
 	 */
 	@Override
-	public String handleAddEvent() throws DaoException {
+	public String handleAddEvent() throws JKDataAccessException {
 		final Record record = viewToRecord();
 		fireBeforeAddRecord(record);
 		try {
@@ -570,8 +570,8 @@ public class DynPanel extends DataPanel {
 		} catch (final DuplicateDataException e) {
 			fireOnException(record, e);
 			throw e;
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 			throw e;
 		}
 	}
@@ -580,7 +580,7 @@ public class DynPanel extends DataPanel {
 	 * @1.1 @1.2
 	 */
 	@Override
-	public void handleDeleteEvent() throws DaoException {
+	public void handleDeleteEvent() throws JKDataAccessException {
 		fireBeforeDeleteRecord(this.currentRecord);
 		final Record record = this.currentRecord;
 		deleteRecord(record);
@@ -592,15 +592,15 @@ public class DynPanel extends DataPanel {
 	 *
 	 */
 	@Override
-	public void handleFindEvent(final Object id) throws DaoException {
+	public void handleFindEvent(final Object id) throws JKDataAccessException {
 		handleFindEvent(id, true);
 	}
 
 	/**
 	 * @param id
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	protected void handleFindEvent(final Object id, final boolean fireEvents) throws DaoException {
+	protected void handleFindEvent(final Object id, final boolean fireEvents) throws JKDataAccessException {
 		setIdValue(id);
 		try {
 			final Record record = findRecord(id);
@@ -609,13 +609,13 @@ public class DynPanel extends DataPanel {
 			if (fireEvents) {
 				fireRecordFound(record);
 			}
-		} catch (final DaoException e) {
+		} catch (final JKDataAccessException e) {
 			fireRecordNotFound(id, e);
 			throw e;
 		}
 	}
 
-	public void handleFindEventByField(final String fieldName, final Object value) throws DaoException {
+	public void handleFindEventByField(final String fieldName, final Object value) throws JKDataAccessException {
 		final ArrayList<Record> records = this.dao.findByFieldValue(fieldName, value);
 		if (records.size() > 0) {
 			handleFindEvent(records.get(0).getIdValue());
@@ -627,7 +627,7 @@ public class DynPanel extends DataPanel {
 	 *
 	 */
 	@Override
-	public void handleSaveEvent() throws DaoException {
+	public void handleSaveEvent() throws JKDataAccessException {
 		final Record record = viewToRecord();
 		fireBeforeUpdateRecord(record);
 		updateRecord(record);
@@ -751,7 +751,7 @@ public class DynPanel extends DataPanel {
 	}
 
 	@Override
-	public void resetComponents() throws DaoException {
+	public void resetComponents() throws JKDataAccessException {
 		// will be used to set the current values
 		final Record latestRecord = viewToRecord();
 		fireBeforeResetComponents();
@@ -802,10 +802,10 @@ public class DynPanel extends DataPanel {
 
 	/**
 	 * @param record
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
+	 * @throws JKRecordNotFoundException
+	 * @throws JKDataAccessException
 	 */
-	protected void updateRecord(final Record record) throws RecordNotFoundException, DaoException {
+	protected void updateRecord(final Record record) throws JKRecordNotFoundException, JKDataAccessException {
 		if (System.getProperty("security.audit.gui.enabled", "true").toLowerCase().equals("false")) {
 			record.setGui(GeneralUtility.toXml(this));
 		}
@@ -816,7 +816,7 @@ public class DynPanel extends DataPanel {
 	 *
 	 */
 	@Override
-	public void validateAddData(final boolean validateId) throws ValidationException, DaoException {
+	public void validateAddData(final boolean validateId) throws ValidationException, JKDataAccessException {
 		final Record record = viewToRecord();
 		// if (validateId) {
 		// SwingValidator.checkEmpty((UIComponent) compId);
@@ -846,7 +846,7 @@ public class DynPanel extends DataPanel {
 	}
 
 	@Override
-	public void validateUpdateData() throws ValidationException, DaoException {
+	public void validateUpdateData() throws ValidationException, JKDataAccessException {
 		validateAddData(false);
 	}
 

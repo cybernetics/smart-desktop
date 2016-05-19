@@ -19,13 +19,13 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.locale.Lables;
 
 public class DynMetaModel extends AbstractTableModel {
@@ -40,12 +40,12 @@ public class DynMetaModel extends AbstractTableModel {
 	private Record filterRecord;
 
 	// ////////////////////////////////////////////////////
-	public DynMetaModel(final TableMeta meta, final boolean loadRecords) throws RecordNotFoundException, DaoException {
+	public DynMetaModel(final TableMeta meta, final boolean loadRecords) throws JKRecordNotFoundException, JKDataAccessException {
 		this(meta, new DynamicDao(meta), loadRecords);
 	}
 
 	// ////////////////////////////////////////////////////
-	public DynMetaModel(final TableMeta meta, final DynamicDao dynamicDao, final boolean loadRecords) throws RecordNotFoundException, DaoException {
+	public DynMetaModel(final TableMeta meta, final DynamicDao dynamicDao, final boolean loadRecords) throws JKRecordNotFoundException, JKDataAccessException {
 		this.meta = meta;
 		this.dao = dynamicDao;
 		setFilterRecord(this.dao.createEmptyRecord(false));
@@ -184,14 +184,14 @@ public class DynMetaModel extends AbstractTableModel {
 	}
 
 	// ////////////////////////////////////////////////////
-	private void loadRecords() throws RecordNotFoundException, DaoException {
+	private void loadRecords() throws JKRecordNotFoundException, JKDataAccessException {
 		this.records = this.dao.lstRecords(this.filterRecord);
 	}
 
 	/*
 	 *
 	 */
-	public void reload() throws RecordNotFoundException, DaoException {
+	public void reload() throws JKRecordNotFoundException, JKDataAccessException {
 		this.records.clear();
 		this.deletedRecords.clear();
 		loadRecords();

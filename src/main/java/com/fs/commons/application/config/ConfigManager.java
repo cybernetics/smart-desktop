@@ -38,7 +38,7 @@
 // SwingUtility.showUserErrorDialog(errorMessage);
 // System.exit(0);
 // } catch (Exception e) {
-// ExceptionUtil.handleException(e);
+// ExceptionUtil.handle(e);
 // }
 // }
 //

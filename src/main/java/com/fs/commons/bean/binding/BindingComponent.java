@@ -27,7 +27,7 @@ import javax.swing.InputMap;
 import javax.swing.border.Border;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.desktop.swing.comp.DaoComponent;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.validation.Validator;
@@ -47,7 +47,7 @@ public interface BindingComponent<T> extends DaoComponent, FormField, Serializab
 	// /////////////////////////////////////////////////////////////////////
 	public void clear();
 
-	public void filterValues(BindingComponent comp1) throws DaoException;
+	public void filterValues(BindingComponent comp1) throws JKDataAccessException;
 
 	public ActionMap getActionMap();
 

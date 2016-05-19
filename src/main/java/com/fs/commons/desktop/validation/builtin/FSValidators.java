@@ -29,7 +29,7 @@ import com.fs.commons.desktop.validation.Problems;
 import com.fs.commons.desktop.validation.Validator;
 import com.fs.commons.desktop.validation.conversion.Converter;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * An enumeration of validator factories for commonly needed forms of validation
@@ -150,10 +150,10 @@ public enum FSValidators implements Validator {
 
 	static {
 		try {
-			final InputStream in = FSValidators.class.getResourceAsStream("Bundle.properties");
-			Lables.getDefaultInstance().addLables(in);
+//			final InputStream in = FSValidators.class.getResourceAsStream("Bundle.properties");
+//			Lables.getDefaultInstance().addLables(in);
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

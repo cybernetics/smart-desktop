@@ -24,6 +24,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import com.jk.exceptions.handler.ExceptionUtil;
+
 public class FormatUtil {
 
 	public static final String PATTERN_SHORT_DATE = "dd-MM-yyyy";
@@ -66,7 +68,7 @@ public class FormatUtil {
 			date2 = DateTimeUtil.parseShortDate(date);
 			return FormatUtil.formatMysqlDate(date2);
 		} catch (final ParseException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			return null;
 		}
 	}

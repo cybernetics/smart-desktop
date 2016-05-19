@@ -25,7 +25,7 @@ import java.awt.print.PrinterJob;
 
 import javax.swing.RepaintManager;
 
-import com.fs.commons.logging.Logger;
+import com.jk.logging.JKLogger;
 
 /**
  *
@@ -86,7 +86,7 @@ public class SwingPrintUtility implements Printable {
 			try {
 				printJob.print();
 			} catch (final PrinterException pe) {
-				Logger.fatal("Error printing: " + pe);
+				JKLogger.fatal("Error printing: " + pe);
 				pe.printStackTrace();
 			}
 		}

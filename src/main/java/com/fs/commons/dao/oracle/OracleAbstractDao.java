@@ -26,14 +26,14 @@ import java.sql.Timestamp;
 
 import javax.sql.rowset.CachedRowSet;
 
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.DaoFinder;
-import com.fs.commons.dao.Session;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.fs.commons.dao.JKSession;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.jk.db.dataaccess.plain.JKFinder;
 
-public class OracleAbstractDao extends AbstractDao {
+public class OracleAbstractDao extends JKAbstractPlainDataAccess {
 
 	// /////////////////////////////////////////////////////////////////////
 	public static byte[] blobToByteArray(final Blob blob) throws IOException, SQLException {
@@ -52,17 +52,17 @@ public class OracleAbstractDao extends AbstractDao {
 		super();
 	}
 
-	public OracleAbstractDao(final DataSource connectionManager) {
+	public OracleAbstractDao(final JKDataSource connectionManager) {
 		super(connectionManager);
 	}
 
-	public OracleAbstractDao(final Session session) {
+	public OracleAbstractDao(final JKSession session) {
 		super(session);
 	}
 
 	// ///////////////////////////////////////////////////////////////////
 	@Override
-	public CachedRowSet executeQuery(final String query, final int fromRowIndex, final int toRowIndex) throws DaoException {
+	public CachedRowSet executeQuery(final String query, final int fromRowIndex, final int toRowIndex) throws JKDataAccessException {
 		final String sql = "SELECT *  from ( select a.*, rownum r  from ( " + query + ") a  where rownum <= " + toRowIndex + " ) where r > "
 				+ fromRowIndex;
 
@@ -72,28 +72,28 @@ public class OracleAbstractDao extends AbstractDao {
 	/**
 	 * @param squenceName
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws SQLException
 	 */
-	public int getNextSequence(final String squenceName) throws DaoException, SQLException {
+	public int getNextSequence(final String squenceName) throws JKDataAccessException, SQLException {
 		final Object output = super.exeuteSingleOutputQuery("SELECT " + squenceName + ".NEXTVAL from DUAL");
 		if (output instanceof Integer || output instanceof Long) {
 			return new Integer(output.toString());
 		}
-		throw new DaoException("Unable to get sequence of sequence : " + squenceName + " , value returned " + output);
+		throw new JKDataAccessException("Unable to get sequence of sequence : " + squenceName + " , value returned " + output);
 	}
 
 	@Override
-	public Timestamp getSystemDate() throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Timestamp getSystemDate() throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT SYSDATE  FROM DUAL";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final Timestamp date = rs.getTimestamp(1);
 				return date;
 			}

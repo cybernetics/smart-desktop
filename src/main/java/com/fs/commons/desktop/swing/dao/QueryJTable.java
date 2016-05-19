@@ -48,7 +48,7 @@ import javax.swing.table.TableModel;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.event.RecordActionListener;
 import com.fs.commons.dao.paging.PagingException;
@@ -70,8 +70,8 @@ import com.fs.commons.desktop.swing.dao.QueryTableModel.OrderDirection;
 import com.fs.commons.desktop.swing.listener.RecordSelectionListener;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.ExcelUtil;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 //////////////////////////////////////////////////////////////////////////////
 public class QueryJTable extends JKPanel implements FilterListener, RecordTraversePolicy {
@@ -178,7 +178,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 		this(sql, "", true);
 	}
 
-	public QueryJTable(final String title, final DataSource resource, final String sql, final boolean allowFiltering) {
+	public QueryJTable(final String title, final JKDataSource resource, final String sql, final boolean allowFiltering) {
 		this(new QueryTableModel(resource, sql), title, allowFiltering);
 	}
 
@@ -760,7 +760,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			this.model.moveToFirstPage();
 			refreshComponents();
 		} catch (final PagingException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -770,7 +770,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			this.model.moveToLastPage();
 			refreshComponents();
 		} catch (final PagingException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -786,7 +786,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			this.model.moveToNextPage();
 			refreshComponents();
 		} catch (final PagingException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -796,7 +796,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			this.model.moveToPreviousePage();
 			refreshComponents();
 		} catch (final PagingException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -1272,7 +1272,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 	public void setQuery(final String sql, final int orderByColunmIndex) {
 		if (isVisible()) {
 			final String staticSql = this.model.getStaticWhere();
-			final DataSource manager = this.model.getReourceManager();
+			final JKDataSource manager = this.model.getReourceManager();
 			final int pagesRowsCount = this.model.getPageRowsCount();
 			final String oldSql = this.model.getSql();
 			final boolean showIdColunm = this.model.getShowIdColunm();

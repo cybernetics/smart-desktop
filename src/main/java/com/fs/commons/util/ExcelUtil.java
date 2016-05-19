@@ -46,8 +46,8 @@ import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.desktop.swing.comp.model.FSTableModel;
-import com.fs.commons.logging.Logger;
 import com.fs.commons.parsers.ParserException;
+import com.jk.logging.JKLogger;
 
 /**
  *
@@ -293,7 +293,7 @@ public class ExcelUtil {
 		} else if (value instanceof Date) {
 			cell.setCellValue((Date) value);
 		} else {
-			Logger.info("No Special excel r endering for class : " + value.getClass().getName());
+			JKLogger.info("No Special excel r endering for class : " + value.getClass().getName());
 			cell.setCellValue(value.toString());
 		}
 	}

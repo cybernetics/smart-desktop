@@ -15,27 +15,27 @@
  */
 package com.fs.commons.desktop.swing.dao;
 
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 
 public interface DaoActionsListener {
 	/**
 	 *
 	 */
-	public String handleAddEvent() throws DaoException;
+	public String handleAddEvent() throws JKDataAccessException;
 
 	/**
 	 *
 	 */
-	public void handleDeleteEvent() throws DaoException;
+	public void handleDeleteEvent() throws JKDataAccessException;
 
 	/**
 	 *
 	 */
-	public void handleFindEvent(Object id) throws DaoException;
+	public void handleFindEvent(Object id) throws JKDataAccessException;
 
 	/**
 	 *
 	 */
-	public void handleSaveEvent() throws DaoException;
+	public void handleSaveEvent() throws JKDataAccessException;
 
 }

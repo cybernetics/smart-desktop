@@ -29,19 +29,19 @@ import java.util.Vector;
 import javax.swing.JComboBox;
 
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.DefaultDao;
 import com.fs.commons.dao.IdValueRecord;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKDefaultDataAccess;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.comp.DaoComponent;
 import com.fs.commons.desktop.swing.comp.FSComboBoxListCellRenderer;
 import com.fs.commons.desktop.swing.comp.JKComboBox;
 import com.fs.commons.desktop.swing.dialogs.QueryDialog;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * TODO : refactor this class : 1- Duplicate codes in constructors 2- sql code
@@ -73,7 +73,7 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 	private int defauleSelectedIndex = -1;
 	private String originalSql;
 	private boolean autoShowPopup = false;
-	private transient DataSource datasource;
+	private transient JKDataSource datasource;
 	private final List<DaoComboBox> notifiers = new ArrayList<DaoComboBox>();
 
 	private TableMeta tableMeta;
@@ -108,7 +108,7 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 	/**
 	 * @param sql
 	 *            String
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	public DaoComboBox(final String sql) {
 		this(sql, true);
@@ -188,7 +188,7 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 	}
 
 	@Override
-	public void filterValues(final BindingComponent component) throws DaoException {
+	public void filterValues(final BindingComponent component) throws JKDataAccessException {
 		filterValues(component, component.getName(), false);
 	}
 
@@ -211,12 +211,12 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 	}
 
 	public void forceReload() {
-		AbstractDao.removeListCache(getSql());
+		JKAbstractPlainDataAccess.removeListCache(getSql());
 		reloadData();
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.datasource;
 	}
 
@@ -327,13 +327,13 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 	}
 
 	/**
-	 * @throws DaoException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
+	 * @throws JKDataAccessException
 	 *
 	 */
-	private void loadData() throws DaoException {
+	private void loadData() throws JKDataAccessException {
 		if (this.originalSql != null && !this.originalSql.equals("")) {
-			final DefaultDao dao = new DefaultDao(getDataSource());
+			final JKDefaultDataAccess dao = new JKDefaultDataAccess(getDataSource());
 			final List v = dao.createRecordsFromSQL(this.sql);
 			// the below config will help imporoving the performance by limit
 			// the size of the combo box to be 30 by default
@@ -354,8 +354,8 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 
 	/**
 	 * @param b
-	 * @throws DaoException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
+	 * @throws JKDataAccessException
 	 *
 	 */
 	public void reloadData(final boolean callReset) {
@@ -367,7 +367,7 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 				loadData();
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -408,14 +408,14 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 	}
 
 	@Override
-	public void setDataSource(final DataSource datasource) {
+	public void setDataSource(final JKDataSource datasource) {
 		this.datasource = datasource;
 	}
 
 	/**
 	 *
 	 * @param defaultValue
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	@Override
 	public void setDefaultValue(final Object defaultValue) {
@@ -472,7 +472,7 @@ public class DaoComboBox extends JKComboBox implements DaoComponent {
 				reloadData();
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

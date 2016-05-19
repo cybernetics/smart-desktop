@@ -23,15 +23,15 @@ import java.io.FileNotFoundException;
 
 import com.fs.commons.application.ApplicationException;
 import com.fs.commons.application.ApplicationManager;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.notification.facade.NotificationFacade;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class PnlAccountsGenerator extends JKPanel {
 	/**
@@ -39,7 +39,7 @@ public class PnlAccountsGenerator extends JKPanel {
 	 */
 	private static final long serialVersionUID = 5651844701066302120L;
 
-	public static void main(final String[] args) throws FileNotFoundException, ApplicationException, DaoException {
+	public static void main(final String[] args) throws FileNotFoundException, ApplicationException, JKDataAccessException {
 		ApplicationManager.getInstance().init();
 		SwingUtility.testPanel(new PnlAccountsGenerator());
 	}
@@ -49,9 +49,9 @@ public class PnlAccountsGenerator extends JKPanel {
 	JKButton btnGenerateAccounts = new JKButton("GENERATE_ACCOUNTS");
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public PnlAccountsGenerator() throws DaoException {
+	public PnlAccountsGenerator() throws JKDataAccessException {
 		init();
 	}
 
@@ -85,7 +85,7 @@ public class PnlAccountsGenerator extends JKPanel {
 			final NotificationFacade facade = new NotificationFacade();
 			facade.syncAccounts(this.cmbAccountsCreationQuery.getSelectedIdValueAsInteger());
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

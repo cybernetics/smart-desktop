@@ -24,12 +24,12 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import com.fs.commons.bean.binding.BindingComponent;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.ComponentFactory;
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.comp.JKTable;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class DynCellFactory {
 	static class DynFieldEditor extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
@@ -48,8 +48,8 @@ public class DynCellFactory {
 			try {
 				this.component = (JComponent) ComponentFactory.createComponent(field, true);
 				this.component.setPreferredSize(null);
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			}
 		}
 

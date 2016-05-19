@@ -25,7 +25,7 @@ import java.awt.print.PrinterJob;
 
 import javax.swing.RepaintManager;
 
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class PrintUtilities implements Printable {
 	// //////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ public class PrintUtilities implements Printable {
 			try {
 				printJob.print();
 			} catch (final PrinterException pe) {
-				ExceptionUtil.handleException(pe);
+				ExceptionUtil.handle(pe);
 			}
 		}
 	}

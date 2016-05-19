@@ -77,8 +77,8 @@ import com.fs.commons.application.ApplicationManager;
 import com.fs.commons.application.ui.UIOPanelCreationException;
 import com.fs.commons.application.ui.menu.MenuItem;
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKFrame;
 import com.fs.commons.desktop.swing.comp.JKInternalFrame;
@@ -92,13 +92,12 @@ import com.fs.commons.desktop.swing.dao.QueryJTable;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
 import com.fs.commons.desktop.swing.frames.ApplicationFrame;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.security.User;
-import com.fs.commons.security.exceptions.NotAllowedOperationException;
-import com.fs.commons.security.exceptions.SecurityException;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
 import com.fs.commons.util.ImageUtil;
 import com.fs.commons.util.ReflicationUtil;
+import com.jk.exceptions.JKNotAllowedOperationException;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.security.JKUser;
 
 public class SwingUtility {
 	static {
@@ -166,7 +165,7 @@ public class SwingUtility {
 				try {
 					ReflicationUtil.callMethod(obj, methodName);
 				} catch (final InvocationTargetException e1) {
-					ExceptionUtil.handleException(e1.getCause());
+					ExceptionUtil.handle(e1.getCause());
 				}
 			}
 		});
@@ -219,7 +218,7 @@ public class SwingUtility {
 		frame.applyComponentOrientation(getDefaultComponentOrientation());
 	}
 
-	public static void applyDataSource(final Container comp, final DataSource manager) {
+	public static void applyDataSource(final Container comp, final JKDataSource manager) {
 		final Vector<BindingComponent> bindingComponents = SwingUtility.findBindingComponents(comp);
 		for (final BindingComponent bindingComponent : bindingComponents) {
 			bindingComponent.setDataSource(manager);
@@ -683,7 +682,7 @@ public class SwingUtility {
 			final Robot robot = new Robot();
 			robot.keyPress(key);
 		} catch (final AWTException e) {
-			// ExceptionUtil.handleException(e);
+			// ExceptionUtil.handle(e);
 		}
 	}
 
@@ -716,9 +715,9 @@ public class SwingUtility {
 	/**
 	 *
 	 * @param component
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static void resetComponent(final Component component) throws DaoException {
+	public static void resetComponent(final Component component) throws JKDataAccessException {
 		if (component instanceof BindingComponent) {
 			((BindingComponent<?>) component).reset();
 		} else if (component instanceof JComboBox) {
@@ -733,9 +732,9 @@ public class SwingUtility {
 	/**
 	 *
 	 * @param component
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static void resetComponent(final Object component) throws DaoException {
+	public static void resetComponent(final Object component) throws JKDataAccessException {
 		if (component instanceof BindingComponent) {
 			((BindingComponent) component).reset();
 		} else if (component instanceof JComboBox) {
@@ -1244,12 +1243,12 @@ public class SwingUtility {
 			frame.initDefaults();
 			frm.setVisible(true);
 		} catch (final PropertyVetoException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
-	public static void testMenuItem(final String name) throws NotAllowedOperationException, SecurityException, UIOPanelCreationException {
-		com.fs.commons.security.SecurityManager.setCurrentUser(new User(1));
+	public static void testMenuItem(final String name) throws JKNotAllowedOperationException, SecurityException, UIOPanelCreationException {
+		com.jk.security.JKSecurityManager.setCurrentUser(new JKUser(1));
 		final MenuItem item = ApplicationManager.getInstance().getApplication().findMenuItem(name);
 		// PnlStudentManagement pnl=new PnlStudentManagement();
 		// pnl.setTableMeta(AbstractTableMetaFactory.getTableMeta("reg_active_students"));

@@ -27,15 +27,15 @@ import javax.swing.JComponent;
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.application.ui.UIPanel;
 import com.fs.commons.bean.binding.BindingComponent;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.SwingValidator;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * @author u087
@@ -47,7 +47,7 @@ public class ReportUIPanel extends JKPanel<Object> implements UIPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private final Report report;
+	private final JKReport report;
 
 	private Hashtable<String, BindingComponent> paramters;
 
@@ -58,11 +58,11 @@ public class ReportUIPanel extends JKPanel<Object> implements UIPanel {
 	JKButton btnClose = new JKButton("CLOSE");
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 *
 	 */
-	public ReportUIPanel(final Report report) throws TableMetaNotFoundException, DaoException {
+	public ReportUIPanel(final JKReport report) throws TableMetaNotFoundException, JKDataAccessException {
 		this.report = report;
 		init();
 	}
@@ -96,18 +96,18 @@ public class ReportUIPanel extends JKPanel<Object> implements UIPanel {
 	protected void handlePrint() {
 		final HashMap map = buildMapFromParamters();
 		try {
-			ReportsUtil.printReport(this.report, map);
+			JKReportsUtil.printReport(this.report, map);
 		} catch (final ReportException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 *
 	 */
-	private void init() throws TableMetaNotFoundException, DaoException {
+	private void init() throws TableMetaNotFoundException, JKDataAccessException {
 		final JKPanel<?> pnl = new JKPanel<Object>();
 		if (this.report.getParamtersCount() > 1) {
 			// to avoid nested borders especially with DynDaoPanel

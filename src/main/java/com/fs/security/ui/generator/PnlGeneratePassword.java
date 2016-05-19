@@ -23,7 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKTextField;
@@ -31,8 +31,8 @@ import com.fs.commons.desktop.swing.comp.documents.NumberDocument;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKRadioGroup;
-import com.fs.commons.security.User;
-import com.fs.commons.util.PasswordGenerator;
+import com.jk.security.JK;
+import com.jk.security.JKUser;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Author : Mohamed Kiswani
@@ -48,7 +48,7 @@ public class PnlGeneratePassword extends JKPanel {
 	private static final long serialVersionUID = 1L;
 
 	public static void main(final String[] args) {
-		final User user = new User();
+		final JKUser user = new JKUser();
 		user.setUserRecordId(1);
 		user.setUserId("admin");
 		user.setFullName("admin");
@@ -105,7 +105,7 @@ public class PnlGeneratePassword extends JKPanel {
 	}
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	protected void handleGenerate() {
 
@@ -116,13 +116,13 @@ public class PnlGeneratePassword extends JKPanel {
 		final GenerationType type = (GenerationType) this.rbgPasswordType.getSelectedItem();
 		switch (type) {
 		case NUMERIC:
-			this.txtNewPassword.setText(PasswordGenerator.generateNumricPassword(getPasswordLength()));
+			this.txtNewPassword.setText(JK.generateNumricPassword(getPasswordLength()));
 			break;
 		case ALPHA:
-			this.txtNewPassword.setText(PasswordGenerator.getAlphapticPassowrds(getPasswordLength(), false));
+			this.txtNewPassword.setText(JK.getAlphapticPassowrds(getPasswordLength(), false));
 			break;
 		case ALPH_NEMRIC:
-			this.txtNewPassword.setText(PasswordGenerator.generateMixPassword(getPasswordLength()));
+			this.txtNewPassword.setText(JK.generateMixPassword(getPasswordLength()));
 			break;
 
 		}

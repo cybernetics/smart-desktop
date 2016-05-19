@@ -26,13 +26,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 
 import com.fs.commons.application.ui.UIOPanelCreationException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.DuplicateDataException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.event.RecordActionAdapter;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 import com.fs.commons.desktop.dynform.ui.MasterPanelFactory;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionAdapter;
@@ -44,7 +44,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 	// ///////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 		}
 
 		@Override
-		public void onDaoException(final Record recod, final DaoException ex) {
+		public void onDaoException(final Record recod, final JKDataAccessException ex) {
 			// check for record before use , because it maybe null
 			if (ex instanceof DuplicateDataException) {
 				final String recordId = ((DuplicateDataException) ex).getIdValue();
@@ -157,21 +157,21 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 
 	/**
 	 * @throws UIOPanelCreationException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 *
 	 */
-	public DynMasterDetailCRUDLPanel(final String tableName) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public DynMasterDetailCRUDLPanel(final String tableName) throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		this(AbstractTableMetaFactory.getTableMeta(tableName));
 	}
 
 	/**
 	 * @param tableMeta
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws UIOPanelCreationException
 	 */
-	public DynMasterDetailCRUDLPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public DynMasterDetailCRUDLPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		initPanels(tableMeta);
 	}
 
@@ -196,10 +196,10 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 	/**
 	 * @param tableMeta
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws UIOPanelCreationException
 	 */
-	protected AbstractMasterDetail createMasterDetailPanel(final TableMeta tableMeta) throws DaoException, UIOPanelCreationException {
+	protected AbstractMasterDetail createMasterDetailPanel(final TableMeta tableMeta) throws JKDataAccessException, UIOPanelCreationException {
 		AbstractMasterDetail panel;
 		panel = MasterPanelFactory.createMasterPanel(tableMeta);
 		panel.addMasterDaoActionListener(new MasterPanelListener());
@@ -272,7 +272,7 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 		try {
 			return this.pnlMasterDetail.getMasterPanel().getRecord().getSummaryValue();
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			// unreachable
 			return null;
 		}
@@ -311,8 +311,8 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 		try {
 			this.pnlMasterDetail.setMode(DynDaoMode.ADD);
 			showDynPanel(true);
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -334,7 +334,7 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 					try {
 						this.pnlMasterDetail.handleFind(i);
 						this.pnlMasterDetail.getMasterPanel().getPnlDao().handleDeleteEvent();
-					} catch (final DaoException e) {
+					} catch (final JKDataAccessException e) {
 						SwingUtility.showUserErrorDialog(Lables.get("UNABLE_TO_DELETE_RECORD") + " : (" + getSummaryValue() + ")\n" + e.getMessage(),
 								false);
 					}
@@ -357,8 +357,8 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 				// to avoid re-view the panel
 				showDynPanel(true);
 			}
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 
 	}
@@ -373,8 +373,8 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 			SwingUtility.getDefaultMainFrame().handleShowPanel(tbl);
 			// SwingUtility.showPanelInDialog(tbl, "EDIT");
 			// this.queryTable.reloadData();
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 
 	}
@@ -435,10 +435,10 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 	 *
 	 * @param tableMeta
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws UIOPanelCreationException
 	 */
-	protected void initPanels(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	protected void initPanels(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		this.tableMeta = tableMeta;
 		getTitle();
 		this.table = new QueryJTable(tableMeta);
@@ -461,18 +461,18 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 	}
 
 	@Override
-	public void resetComponents() throws DaoException {
+	public void resetComponents() throws JKDataAccessException {
 		this.pnlMasterDetail.resetComponents();
 	}
 
 	/**
 	 * @param tableMeta
 	 *            the tableMeta to set
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 * @throws UIOPanelCreationException
 	 */
-	public void setTableMeta(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public void setTableMeta(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		initPanels(tableMeta);
 	}
 

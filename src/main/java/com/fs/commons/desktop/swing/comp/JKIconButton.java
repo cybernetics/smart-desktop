@@ -23,8 +23,8 @@ import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JMenu;
 
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class JKIconButton extends JMenu {
 
@@ -39,7 +39,7 @@ public class JKIconButton extends JMenu {
 		try {
 			this.img = javax.imageio.ImageIO.read(GeneralUtility.getIconURL(iconName));
 		} catch (final IOException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 		setOpaque(false);
 		setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));

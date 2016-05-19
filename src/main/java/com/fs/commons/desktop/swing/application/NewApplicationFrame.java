@@ -20,8 +20,8 @@
 // import com.fs.commons.desktop.swing.comp.JKStatusBar;
 // import com.fs.commons.desktop.swing.listener.ActionAdapter;
 // import com.fs.commons.desktop.swing.listener.InactivityListener;
-// import com.fs.commons.security.SecurityManager;
-// import com.fs.commons.security.User;
+// import com.jk.security.JKSecurityManager;
+// import com.jk.security.User;
 // import com.fs.commons.util.ExceptionUtil;
 //
 // public class NewApplicationFrame extends JKFrame {
@@ -91,7 +91,7 @@
 // try {
 // ApplicationManager.getInstance().logout();
 // } catch (ApplicationException e1) {
-// ExceptionUtil.handleException(e1);
+// ExceptionUtil.handle(e1);
 // }
 // }
 // };
@@ -141,7 +141,7 @@
 //// */
 //// private boolean isAllowedCommand(int priviligeId, String name) {
 //// try {
-//// SecurityManager.getAuthorizer().checkAllowed(new Privilige(priviligeId,
+//// JKSecurityManager.getAuthorizer().checkAllowed(new Privilige(priviligeId,
 // name));
 //// return true;
 //// } catch (NotAllowedOperationException e) {
@@ -149,7 +149,7 @@
 // name + " is not allowed");
 //// return false;
 //// } catch (SecurityException e) {
-//// ExceptionUtil.handleException(e);
+//// ExceptionUtil.handle(e);
 //// return false;
 //// }
 //// }
@@ -183,7 +183,7 @@
 // public static void main(String[] args) throws UIOPanelCreationException,
 // FileNotFoundException, ApplicationException {
 // ApplicationManager.getInstance().init();
-// SecurityManager.setCurrentUser(new User(1));
+// JKSecurityManager.setCurrentUser(new User(1));
 // SwingUtility.setDefaultComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 // Application application = ApplicationManager.getInstance().getApplication();
 //

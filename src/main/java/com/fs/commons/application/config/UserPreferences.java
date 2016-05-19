@@ -20,7 +20,7 @@ import java.util.Hashtable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class UserPreferences {
 	private static Preferences systemRoot = Preferences.userRoot();
@@ -229,7 +229,7 @@ public class UserPreferences {
 		try {
 			systemRoot.sync();
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

@@ -30,6 +30,7 @@ import javax.swing.JComponent;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
@@ -38,7 +39,6 @@ import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.dynamic.trigger.Trigger;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 import com.fs.commons.desktop.dynform.ui.FieldPanelWithFilter;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionListener;
@@ -48,7 +48,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 
@@ -84,10 +84,10 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 	/**
 	 *
 	 * @param metaTable
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 */
-	public DynCrossDaoPanel(final TableMeta metaTable) throws DaoException, TableMetaNotFoundException {
+	public DynCrossDaoPanel(final TableMeta metaTable) throws JKDataAccessException, TableMetaNotFoundException {
 		this.metaTable = metaTable;
 		this.dao = DaoFactory.createDynamicDao(metaTable);
 		this.field1Meta = metaTable.lstForiegnKeyFields().get(0);
@@ -134,9 +134,9 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private void callAfterAddEventOnTriggers(final Record record) throws DaoException {
+	private void callAfterAddEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.metaTable.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).afterAdd(record);
@@ -145,9 +145,9 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 
 	/**
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private void callAfterDeleteEventOnTriggers(final Record record) throws DaoException {
+	private void callAfterDeleteEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.metaTable.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).afterDelete(record);
@@ -157,16 +157,16 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private void callBeforeAddEventOnTriggers(final Record record) throws DaoException {
+	private void callBeforeAddEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.metaTable.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).beforeAdd(record);
 		}
 	}
 
-	private void callBeforeDeleteEventOnTriggers(final Record record) throws DaoException {
+	private void callBeforeDeleteEventOnTriggers(final Record record) throws JKDataAccessException {
 		final ArrayList<Trigger> triggers = this.metaTable.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
 			triggers.get(i).beforeDelete(record);
@@ -181,16 +181,16 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	void fireAfterAddRecord(final Record record) throws DaoException {
+	void fireAfterAddRecord(final Record record) throws JKDataAccessException {
 		for (int i = 0; i < this.listeners.size(); i++) {
 			final DynDaoActionListener listsner = this.listeners.get(i);
 			listsner.afterAddRecord(record);
 		}
 	}
 
-	void fireAfterDeleteRecord(final Record record) throws DaoException {
+	void fireAfterDeleteRecord(final Record record) throws JKDataAccessException {
 		for (int i = 0; i < this.listeners.size(); i++) {
 			this.listeners.get(i).afterDeleteRecord(record);
 		}
@@ -209,15 +209,15 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 	/**
 	 *
 	 * @param record
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	void fireBeforeAddRecord(final Record record) throws DaoException {
+	void fireBeforeAddRecord(final Record record) throws JKDataAccessException {
 		for (int i = 0; i < this.listeners.size(); i++) {
 			this.listeners.get(i).beforeAddRecord(record);
 		}
 	}
 
-	void fireBeforeDeleteRecord(final Record record) throws DaoException {
+	void fireBeforeDeleteRecord(final Record record) throws JKDataAccessException {
 		for (int i = 0; i < this.listeners.size(); i++) {
 			this.listeners.get(i).beforeDeleteRecord(record);
 
@@ -258,10 +258,10 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 				fireAfterAddRecord(record);
 			}
 			reload();
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		} catch (final ValidationException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -273,7 +273,7 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 	 * .String)
 	 */
 	@Override
-	public void handleFind(final Object idValud) throws DaoException {
+	public void handleFind(final Object idValud) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 	}
 
@@ -296,8 +296,8 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 					fireAfterDeleteRecord(record);
 				}
 				reload();
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			}
 		}
 	}
@@ -379,13 +379,13 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 			}
 			enableDisable();
 		} catch (final TableMetaNotFoundException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 
 	}
 
 	@Override
-	public void resetComponents() throws DaoException {
+	public void resetComponents() throws JKDataAccessException {
 		this.compMain.setValue(null);
 		this.tblAll.setQuery("");
 		this.tblRegistredValues.setQuery("");
@@ -400,7 +400,7 @@ public class DynCrossDaoPanel extends JKMainPanel implements DetailPanel {
 	 * (java .lang.Object)
 	 */
 	@Override
-	public void setMasterIdValue(final Object object) throws DaoException {
+	public void setMasterIdValue(final Object object) throws JKDataAccessException {
 		// System.out.println("Hyane at object : "+object);
 		((JComponent) this.compMain).setEnabled(false);
 

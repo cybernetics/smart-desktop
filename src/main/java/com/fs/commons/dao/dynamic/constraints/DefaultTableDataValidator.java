@@ -18,12 +18,12 @@ package com.fs.commons.dao.dynamic.constraints;
 import java.util.ArrayList;
 
 import com.fs.commons.application.exceptions.ValidationException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.ConstraintException;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.dao.dynamic.meta.IdFieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
 
 public class DefaultTableDataValidator implements TableDataValidator {
 
@@ -52,7 +52,7 @@ public class DefaultTableDataValidator implements TableDataValidator {
 				constraints.get(i).validate(record);
 			} catch (final ConstraintException e) {
 				throw new ValidationException(e.getMessage(), e);
-			} catch (final DaoException e) {
+			} catch (final JKDataAccessException e) {
 				throw new ValidationException(e);
 			}
 		}

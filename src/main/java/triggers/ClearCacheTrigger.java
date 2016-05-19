@@ -15,14 +15,14 @@
  */
 package triggers;
 
-import com.fs.commons.dao.AbstractDao;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.trigger.TriggerAdapter;
-import com.fs.commons.dao.exception.DaoException;
 
 public class ClearCacheTrigger extends TriggerAdapter {
 	@Override
-	public void afterUpdate(final Record oldRecord, final Record newRecord) throws DaoException {
-		AbstractDao.resetCache();
+	public void afterUpdate(final Record oldRecord, final Record newRecord) throws JKDataAccessException {
+		JKAbstractPlainDataAccess.resetCache();
 	}
 }

@@ -16,21 +16,22 @@
 package com.fs.commons.apps.executors;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fs.commons.application.Application;
 import com.fs.commons.application.ApplicationManager;
 import com.fs.commons.application.Module;
 import com.fs.commons.application.ui.menu.Menu;
 import com.fs.commons.application.ui.menu.MenuItem;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.security.facade.SecurityFacade;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class PnlSyncPriviliges implements Runnable {
 
 	@Override
 	public void run() {
 		final Application application = ApplicationManager.getInstance().getApplication();
-		final ArrayList<Module> modules = application.getModules();
+		final List<Module> modules = application.getModules();
 		final SecurityFacade facade = new SecurityFacade();
 		try {
 			for (final Module module : modules) {
@@ -45,7 +46,7 @@ public class PnlSyncPriviliges implements Runnable {
 				}
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 
 	}

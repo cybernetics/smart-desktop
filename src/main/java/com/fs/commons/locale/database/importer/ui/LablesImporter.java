@@ -24,7 +24,7 @@ import java.util.Enumeration;
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.configuration.beans.Lable;
 import com.fs.commons.configuration.daos.LablesDao;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.importers.Importer;
 import com.fs.commons.util.FSProperties;
 
@@ -48,7 +48,7 @@ public class LablesImporter extends Importer {
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////////
-	public LablesImporter(final int moduleId, final File selectedFile, final int langId) throws DaoException, IOException, ValidationException {
+	public LablesImporter(final int moduleId, final File selectedFile, final int langId) throws JKDataAccessException, IOException, ValidationException {
 		super(new FileInputStream(selectedFile));
 		this.moduleId = moduleId;
 		this.langId = langId;

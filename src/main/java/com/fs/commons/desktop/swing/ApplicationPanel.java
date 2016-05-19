@@ -19,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
@@ -32,9 +33,9 @@ import com.fs.commons.desktop.swing.comp.JKTabbedPane;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.security.SecurityManager;
-import com.fs.commons.security.User;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.security.JKSecurityManager;
+import com.jk.security.JKUser;
 
 public class ApplicationPanel extends JKMainPanel {
 
@@ -49,7 +50,7 @@ public class ApplicationPanel extends JKMainPanel {
 		SwingUtility.setDefaultComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 		final Application application = ApplicationManager.getInstance().getApplication();
 
-		SecurityManager.setCurrentUser(new User(1));
+		JKSecurityManager.setCurrentUser(new JKUser(1));
 		// ArrayList<Module> modules = application.getModules();
 		final ApplicationPanel m = new ApplicationPanel(application);
 
@@ -70,7 +71,7 @@ public class ApplicationPanel extends JKMainPanel {
 		final JTabbedPane tab = new JKTabbedPane();
 		tab.setOpaque(true);
 		tab.setUI(new AquaBarTabbedPaneUI());
-		final ArrayList<Module> modules = this.appliaction.getModules();
+		final List<Module> modules = this.appliaction.getModules();
 		for (int i = 0; i < modules.size(); i++) {
 			final Module module = modules.get(i);
 			final String title = Lables.get(module.getModuleName());

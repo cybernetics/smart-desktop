@@ -27,10 +27,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.fs.commons.application.ui.UIOPanelCreationException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKTabbedPane;
@@ -61,12 +61,12 @@ public class DynMasterDetailPanel extends AbstractMasterDetail {
 		super();
 	}
 
-	public DynMasterDetailPanel(final String tableMetaName) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public DynMasterDetailPanel(final String tableMetaName) throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		this(AbstractTableMetaFactory.getTableMeta(tableMetaName));
 	}
 
 	// /////////////////////////////////////////////////////////////////
-	public DynMasterDetailPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public DynMasterDetailPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		super(tableMeta);
 	}
 

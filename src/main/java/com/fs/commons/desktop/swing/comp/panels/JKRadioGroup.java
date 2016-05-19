@@ -23,11 +23,11 @@ import javax.swing.ButtonGroup;
 
 import com.fs.commons.dao.DaoUtil;
 import com.fs.commons.dao.IdValueRecord;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKRadioButton;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class JKRadioGroup extends JKPanel<Object> {
 	/**
@@ -151,15 +151,15 @@ public class JKRadioGroup extends JKPanel<Object> {
 	/**
 	 * @param sql
 	 *            the sql to set
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	private void setSql(final String sql) {
 		this.sql = sql;
 		this.radios.clear();
 		try {
 			setRecords(DaoUtil.createRecordsFromSQL(sql));
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 
 	}

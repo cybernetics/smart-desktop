@@ -25,7 +25,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -38,7 +37,6 @@ import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.locale.Lables;
 
 public class JKDialog extends JDialog {
-	public static final ImageIcon shadowImage = new ImageIcon(JKDialog.class.getResource("dialogShadow.png"));
 	/**
 	 *
 	 */

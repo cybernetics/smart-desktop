@@ -24,13 +24,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionAdapter;
 import com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailCRUDLPanel;
 import com.fs.commons.desktop.swing.SwingUtility;
@@ -40,8 +40,8 @@ import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dialogs.QueryDialog;
-import com.fs.commons.logging.Logger;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.logging.JKLogger;
 
 /**
  * @author u087
@@ -54,7 +54,7 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 	JKButton btnAdd = new JKButton("ADD");
 	private TableMeta tableMeta;
 	private Object defaultValue;
-	private DataSource manager;
+	private JKDataSource manager;
 	private boolean allowManage;
 
 	public FieldPanelWithFilter() {
@@ -87,7 +87,7 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.manager;
 	}
 
@@ -113,13 +113,13 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 			final DynMasterDetailCRUDLPanel pnl = new DynMasterDetailCRUDLPanel(this.tableMeta);
 			pnl.addMasterDaoActionListener(new DynDaoActionAdapter() {
 				@Override
-				public void afterAddRecord(final Record record) throws DaoException {
+				public void afterAddRecord(final Record record) throws JKDataAccessException {
 					setValue(record.getIdValue());
 				}
 			});
 			SwingUtility.showPanelInDialog(pnl, this.tableMeta.getTableName());
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -213,7 +213,7 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.manager = manager;
 	}
 
@@ -245,11 +245,11 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 				final DynamicDao dao = new DynamicDao(this.tableMeta);
 				this.record = dao.findRecord(value);
 				this.txtView.setValue(this.record.getSummaryValue());
-			} catch (final RecordNotFoundException e) {
-				Logger.fatal("Record not found for field :" + this.tableMeta.getTableName() + " for id : " + value);
+			} catch (final JKRecordNotFoundException e) {
+				JKLogger.fatal("Record not found for field :" + this.tableMeta.getTableName() + " for id : " + value);
 				setValue(null);// recursion
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			}
 		} else {
 			clear();

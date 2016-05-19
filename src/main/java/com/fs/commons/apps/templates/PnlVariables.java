@@ -22,9 +22,9 @@ import javax.swing.JComboBox;
 
 import com.fs.commons.application.ui.UIOPanelCreationException;
 import com.fs.commons.dao.DaoUtil;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
 import com.fs.commons.util.GeneralUtility;
@@ -37,7 +37,7 @@ public class PnlVariables extends DynMasterDetailPanel {
 	private static final long serialVersionUID = 1L;
 
 	// ////////////////////////////////////////////////////////////////////////
-	public PnlVariables() throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public PnlVariables() throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		super(AbstractTableMetaFactory.getTableMeta("conf_vars"));
 		init();
 		getTableNameCombo().addActionListener(new ActionListener() {

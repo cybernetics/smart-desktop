@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.fs.commons.desktop.swing.SwingUtility;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class DefaultConfigManager extends CommonsConfigManager {
 	private static final String FILE_NAME = System.getProperty("db.config", "config.properties");
@@ -67,7 +67,7 @@ public class DefaultConfigManager extends CommonsConfigManager {
 			SwingUtility.showUserErrorDialog(errorMessage);
 			System.exit(0);
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

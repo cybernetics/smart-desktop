@@ -48,22 +48,22 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import com.fs.commons.application.exceptions.ServerDownException;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
-import com.fs.commons.dao.connection.PoolingDataSource;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
+import com.fs.commons.dao.connection.JKPoolingDataSource;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKComboBox;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.fs.commons.logging.Logger;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
 
 public class DataBaseAnalyzerFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -71,13 +71,13 @@ public class DataBaseAnalyzerFrame extends JFrame {
 	/**
 	 *
 	 * @param args
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws SQLException
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 * @throws ServerDownException
 	 */
-	public static void main(final String[] args) throws DaoException, SQLException, FileNotFoundException, IOException, ServerDownException {
+	public static void main(final String[] args) throws JKDataAccessException, SQLException, FileNotFoundException, IOException, ServerDownException {
 		final Properties prop = new Properties();
 		if (args.length > 0) {
 			prop.load(new FileInputStream(args[0]));
@@ -87,7 +87,7 @@ public class DataBaseAnalyzerFrame extends JFrame {
 		prop.getProperty("db-name", "");
 		prop.getProperty("user-name", "root");
 		prop.getProperty("password", "123456");
-		DataSourceFactory.setDefaultDataSource(new PoolingDataSource());// host,
+		JKDataSourceFactory.setDefaultDataSource(new JKPoolingDataSource());// host,
 																		// port,
 																		// dbName,
 																		// userName,
@@ -128,15 +128,15 @@ public class DataBaseAnalyzerFrame extends JFrame {
 
 	JFileChooser chooser = new JFileChooser(".");
 
-	private final DataSource dataSource;
+	private final JKDataSource dataSource;
 
 	/**
 	 *
 	 * @throws SQLException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public DataBaseAnalyzerFrame() throws SQLException, DaoException {
-		this.dataSource = DataSourceFactory.getDefaultDataSource();
+	public DataBaseAnalyzerFrame() throws SQLException, JKDataAccessException {
+		this.dataSource = JKDataSourceFactory.getDefaultDataSource();
 		this.analyzer = this.dataSource.getDatabaseAnasyaler();
 		init();
 		populate();
@@ -204,26 +204,26 @@ public class DataBaseAnalyzerFrame extends JFrame {
 	}
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 *
 	 */
-	protected void handleCompare() throws DaoException {
+	protected void handleCompare() throws JKDataAccessException {
 		try {
 			final ArrayList<TableMeta> databaseTables = this.analyzer.getTablesMeta(getCurrentCatalogName());
 			for (int i = 0; i < databaseTables.size(); i++) {
 				final TableMeta databaseMeta = databaseTables.get(i);
 				final TableMeta currentTableMeta = this.tablesHash.get(databaseMeta.getTableName());
 				if (currentTableMeta == null) {
-					Logger.info("Table  : " + databaseMeta.getTableName() + " exists in the database and doesnot exist the current meta");
+					JKLogger.info("Table  : " + databaseMeta.getTableName() + " exists in the database and doesnot exist the current meta");
 				} else {
-					Logger.info("Comparing Table  : " + currentTableMeta.getTableName());
+					JKLogger.info("Comparing Table  : " + currentTableMeta.getTableName());
 					final List<FieldMeta> databaseTableFields = databaseMeta.getFieldList();
 					databaseMeta.getFieldList();
 					for (int j = 0; j < databaseTableFields.size(); j++) {
 						final String fildName = databaseTableFields.get(i).getName();
 						final FieldMeta field = currentTableMeta.getField(fildName);
 						if (field == null) {
-							Logger.info("Field : " + fildName + " doesnot exist");
+							JKLogger.info("Field : " + fildName + " doesnot exist");
 						}
 					}
 				}
@@ -235,9 +235,9 @@ public class DataBaseAnalyzerFrame extends JFrame {
 
 	/**
 	 * @throws SQLException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	protected void handleDatabaseChanged() throws SQLException, DaoException {
+	protected void handleDatabaseChanged() throws SQLException, JKDataAccessException {
 		this.dataSource.setDatabaseName(getCurrentCatalogName());
 		final ArrayList<TableMeta> tables = this.analyzer.getTablesMeta(getCurrentCatalogName());
 		this.tablesHash = new Hashtable<String, TableMeta>();
@@ -323,10 +323,10 @@ public class DataBaseAnalyzerFrame extends JFrame {
 	}
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 *
 	 */
-	private void init() throws DaoException {
+	private void init() throws JKDataAccessException {
 		setExtendedState(MAXIMIZED_BOTH);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		final JPanel pnl = new JPanel(new BorderLayout());
@@ -365,7 +365,7 @@ public class DataBaseAnalyzerFrame extends JFrame {
 					handleDatabaseChanged();
 				} catch (final SQLException e1) {
 					e1.printStackTrace();
-				} catch (final DaoException e2) {
+				} catch (final JKDataAccessException e2) {
 					e2.printStackTrace();
 				}
 			}
@@ -465,7 +465,7 @@ public class DataBaseAnalyzerFrame extends JFrame {
 			public void actionPerformed(final ActionEvent e) {
 				try {
 					handleCompare();
-				} catch (final DaoException e1) {
+				} catch (final JKDataAccessException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}

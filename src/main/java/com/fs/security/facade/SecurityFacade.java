@@ -16,20 +16,21 @@
 package com.fs.security.facade;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
-import com.fs.commons.security.Privilige;
-import com.fs.commons.security.User;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.security.dao.UserDao;
+import com.jk.security.JKPrivilige;
+import com.jk.security.JKUser;
 
 public class SecurityFacade {
 	UserDao dao = new UserDao();
 
-	public void checkPrivlige(final Privilige privilige) throws DaoException {
+	public void checkPrivlige(final JKPrivilige privilige) throws JKDataAccessException {
 		try {
 			this.dao.findPrivilige(privilige.getPriviligeId());
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			this.dao.addPrivlige(privilige);
 			System.err.println("Adding new privilige : " + privilige);
 		}
@@ -39,10 +40,10 @@ public class SecurityFacade {
 	 *
 	 * @param priviligeId
 	 * @return
-	 * @throws DaoException
-	 * @throws RecordNotFoundException
+	 * @throws JKDataAccessException
+	 * @throws JKRecordNotFoundException
 	 */
-	public Privilige findPrivilige(final int priviligeId) throws RecordNotFoundException, DaoException {
+	public JKPrivilige findPrivilige(final int priviligeId) throws JKRecordNotFoundException, JKDataAccessException {
 		return this.dao.findPrivilige(priviligeId);
 	}
 
@@ -50,10 +51,10 @@ public class SecurityFacade {
 	 *
 	 * @param userId
 	 * @return
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
+	 * @throws JKRecordNotFoundException
+	 * @throws JKDataAccessException
 	 */
-	public User findUser(final int userId) throws RecordNotFoundException, DaoException {
+	public JKUser findUser(final int userId) throws JKRecordNotFoundException, JKDataAccessException {
 		return this.dao.findUser(userId);
 	}
 
@@ -65,21 +66,22 @@ public class SecurityFacade {
 	 * @param userName
 	 * @param userPrivilige
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public boolean isAllowedOperation(final User user, final Privilige userPrivilige) throws DaoException {
+	public boolean isAllowedOperation(final JKUser user, final JKPrivilige userPrivilige) throws JKDataAccessException {
 		checkPrivlige(userPrivilige);
-		final ArrayList<Privilige> list = this.dao.lstUserPriviliges(user.getUserId());
-
-		for (int i = 0; i < list.size(); i++) {
-			final Privilige currentPrivilige = list.get(i);
-			if (currentPrivilige.getPriviligeId() == userPrivilige.getPriviligeId()) {
-				if (userPrivilige.getPriviligeName().equals("private")
-						|| currentPrivilige.getPriviligeName().equals(userPrivilige.getPriviligeName())) {
+		if (user.getPriviliges() == null) {
+			user.setPriviliges(this.dao.lstUserPriviliges(user.getUserId()));
+		}
+		List<JKPrivilige> privliges = user.getPriviliges();
+		for (JKPrivilige privilige : privliges) {
+			if (privilige.getPriviligeId() == userPrivilige.getPriviligeId()) {
+				if (userPrivilige.getPriviligeName().equals("private") || privilige.getPriviligeName().equals(userPrivilige.getPriviligeName())) {
 					return true;
 				}
 			}
 		}
+
 		// check if prilige exists : debuging info
 		// try{
 		// dao.findPrivilige(privilige.getPriviligeId());
@@ -95,19 +97,19 @@ public class SecurityFacade {
 	 * @param userName
 	 * @param password
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 
-	public boolean isValidUser(final User user) throws DaoException {
+	public boolean isValidUser(final JKUser user) throws JKDataAccessException {
 		try {
 			// the method will fill the user object by reference
-			final User localUser = this.dao.getUser(user.getUserId());
+			final JKUser localUser = this.dao.getUser(user.getUserId());
 			user.setUserRecordId(localUser.getUserRecordId());
 			user.setUserId(localUser.getUserId());
 			user.setFullName(localUser.getFullName());
 			user.setDisabled(localUser.isDisabled());
 			return user.getPassword().equals(localUser.getPassword());
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			return false;
 		}
 	}
@@ -115,18 +117,18 @@ public class SecurityFacade {
 	/**
 	 *
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public ArrayList<Privilige> lstPrivilige() throws DaoException {
+	public ArrayList<JKPrivilige> lstPrivilige() throws JKDataAccessException {
 		return this.dao.lstPrivilige(null);
 	}
 
 	/**
 	 *
 	 * @param user
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public void updateUser(final User user) throws DaoException {
+	public void updateUser(final JKUser user) throws JKDataAccessException {
 		final UserDao dao = new UserDao();
 		dao.updateUser(user);
 	}

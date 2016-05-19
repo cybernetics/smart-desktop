@@ -23,20 +23,20 @@ import java.util.ArrayList;
 
 import javax.sql.rowset.CachedRowSet;
 
-import com.fs.commons.dao.DefaultDao;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKDefaultDataAccess;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.IdFieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
 
 public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
-	public static void main(final String[] args) throws DaoException, SQLException {
-		final AbstractDataBaseAnaylazer a = (AbstractDataBaseAnaylazer) DataSourceFactory.getDefaultDataSource().getDatabaseAnasyaler();
+	public static void main(final String[] args) throws JKDataAccessException, SQLException {
+		final AbstractDataBaseAnaylazer a = (AbstractDataBaseAnaylazer) JKDataSourceFactory.getDefaultDataSource().getDatabaseAnasyaler();
 		System.out.println(a.connectionManager.getDefaultDatabaseName());
 		// ResultSet tableTypes = a.meta.getTableTypes();
 		// ResultSet rs=a.getPrimaryKeysFromMeta(a.meta, "FINANCE",
@@ -62,22 +62,22 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 
 	private DatabaseMetaData meta;
 
-	private final DataSource connectionManager;
+	private final JKDataSource connectionManager;
 
-	private DefaultDao dao;
+	private JKDefaultDataAccess dao;
 
 	// ///////////////////////////////////////////////////////////////////////
-	public AbstractDataBaseAnaylazer() throws DaoException, SQLException {
-		this(DataSourceFactory.getDefaultDataSource());
+	public AbstractDataBaseAnaylazer() throws JKDataAccessException, SQLException {
+		this(JKDataSourceFactory.getDefaultDataSource());
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
-	public AbstractDataBaseAnaylazer(final DataSource connectionManager) throws DaoException, SQLException {
+	public AbstractDataBaseAnaylazer(final JKDataSource connectionManager) throws JKDataAccessException, SQLException {
 		this.connectionManager = connectionManager;
 		final Connection connection = connectionManager.getQueryConnection();
 		try {
 			this.meta = connection.getMetaData();
-			this.dao = new DefaultDao(this.connectionManager);
+			this.dao = new JKDefaultDataAccess(this.connectionManager);
 		} finally {
 			connectionManager.close(connection);
 		}
@@ -135,9 +135,9 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 	 * @param tableName
 	 * @return
 	 * @throws SQLException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private IdFieldMeta getIdField(final String databaseName, final String tableName) throws SQLException, DaoException {
+	private IdFieldMeta getIdField(final String databaseName, final String tableName) throws SQLException, JKDataAccessException {
 		final ResultSet rs = getPrimaryKeysFromMeta(this.meta, databaseName, tableName);
 		try {
 			if (rs.next()) {
@@ -197,12 +197,12 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////
-	protected TableMeta getTable(final String tableName) throws SQLException, DaoException {
+	protected TableMeta getTable(final String tableName) throws SQLException, JKDataAccessException {
 		return getTable(this.connectionManager.getDefaultDatabaseName(), tableName);
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////
-	protected TableMeta getTable(final String databaseName, final String tableName) throws SQLException, DaoException {
+	protected TableMeta getTable(final String databaseName, final String tableName) throws SQLException, JKDataAccessException {
 		// System.out.println("Fetching table : " + tableName);
 		final TableMeta meta = new TableMeta();
 		meta.setTableName(tableName);
@@ -216,13 +216,13 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 	}
 
 	@Override
-	public ArrayList<TableMeta> getTablesMeta() throws SQLException, DaoException {
+	public ArrayList<TableMeta> getTablesMeta() throws SQLException, JKDataAccessException {
 		return getTablesMeta(this.connectionManager.getDefaultDatabaseName());
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
-	public ArrayList<TableMeta> getTablesMeta(final String databaseName) throws SQLException, DaoException {
+	public ArrayList<TableMeta> getTablesMeta(final String databaseName) throws SQLException, JKDataAccessException {
 		final ResultSet rs = loadTableNamesFromMeta(this.meta, databaseName);
 		final ArrayList<TableMeta> tables = new ArrayList<TableMeta>();
 		while (rs.next()) {
@@ -238,7 +238,7 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
-	protected boolean isAutoIncrement(final String databaseName, final String tableName) throws DaoException, SQLException {
+	protected boolean isAutoIncrement(final String databaseName, final String tableName) throws JKDataAccessException, SQLException {
 		final String emptyRowQuery = buildEmptyRowQuery(databaseName, tableName);
 		// System.out.println("Executing : " + emptyRowQuery);
 		final CachedRowSet rowSet = this.dao.executeQuery(emptyRowQuery);
@@ -248,7 +248,7 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	@Override
-	public boolean isTableExist(final String tableName) throws SQLException, DaoException {
+	public boolean isTableExist(final String tableName) throws SQLException, JKDataAccessException {
 		final ArrayList<TableMeta> tables = getTablesMeta(this.connectionManager.getDatabaseName());
 		for (final TableMeta tableMeta : tables) {
 			if (tableMeta.getTableName().trim().equalsIgnoreCase(tableName)) {
@@ -267,7 +267,7 @@ public abstract class AbstractDataBaseAnaylazer implements DataBaseAnaylser {
 	 * (java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void loadFields(final String database, final TableMeta tableMeta) throws SQLException, DaoException {
+	public void loadFields(final String database, final TableMeta tableMeta) throws SQLException, JKDataAccessException {
 		// System.out.println("Processing table : "+tableMeta.getTableName());
 		IdFieldMeta idField = getIdField(database, tableMeta.getTableName());
 		tableMeta.setIdField(idField);

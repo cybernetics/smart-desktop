@@ -15,11 +15,11 @@
  */
 package com.fs.commons.dao.dynamic.constraints;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.ConstraintException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.ValueLessThanAnotherValueException;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
-import com.fs.commons.dao.exception.DaoException;
 
 public class LessThanContsraint extends Constraint {
 	@Override
@@ -33,7 +33,7 @@ public class LessThanContsraint extends Constraint {
 	}
 
 	@Override
-	public void validate(final Record record) throws ConstraintException, DaoException {
+	public void validate(final Record record) throws ConstraintException, JKDataAccessException {
 		final FieldMeta field1 = getFields().get(0);
 		final FieldMeta field2 = getFields().get(1);
 		final Float value1 = record.getField(field1.getName()).getValueAsFloat();

@@ -17,12 +17,12 @@ package com.fs.commons.dao.dynamic.constraints;
 
 import java.util.ArrayList;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.constraints.exceptions.ConstraintException;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
 
 public class Constraint {
 	String name;
@@ -74,6 +74,6 @@ public class Constraint {
 		return buf.toString();
 	}
 
-	public void validate(final Record record) throws ConstraintException, DaoException {
+	public void validate(final Record record) throws ConstraintException, JKDataAccessException {
 	}
 }

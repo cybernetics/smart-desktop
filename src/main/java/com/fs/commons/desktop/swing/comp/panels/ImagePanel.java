@@ -28,7 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
 import com.fs.commons.desktop.swing.Colors;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class ImagePanel extends JKPanel {
 	/**
@@ -161,7 +161,7 @@ public class ImagePanel extends JKPanel {
 			invalidate();
 			repaint();
 		} catch (final IOException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

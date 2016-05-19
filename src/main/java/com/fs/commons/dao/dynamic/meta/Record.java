@@ -23,15 +23,15 @@ import java.util.Hashtable;
 
 import com.fs.commons.bean.util.BeanUtil;
 import com.fs.commons.bean.util.BeanUtilException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.DynamicDao;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.swin.ConversionUtil;
 import com.fs.commons.desktop.swing.comp.model.FSTableRecord;
 import com.fs.commons.desktop.swing.comp.model.FSTableRecord.RecordStatus;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class Record {
 	Field idField;
@@ -185,10 +185,10 @@ public class Record {
 	/**
 	 *
 	 * @return
-	 * @throws DaoException
-	 * @throws RecordNotFoundException
+	 * @throws JKDataAccessException
+	 * @throws JKRecordNotFoundException
 	 */
-	public String getSummaryValue() throws RecordNotFoundException, DaoException {
+	public String getSummaryValue() throws JKRecordNotFoundException, JKDataAccessException {
 		final ArrayList<Field> fields = lstSummaryFields();
 		final StringBuffer buffer = new StringBuffer();
 		for (int i = 0; i < fields.size(); i++) {
@@ -307,7 +307,7 @@ public class Record {
 
 	}
 
-	public void populateTo(final FSTableRecord fsTableRecord) throws TableMetaNotFoundException, DaoException {
+	public void populateTo(final FSTableRecord fsTableRecord) throws TableMetaNotFoundException, JKDataAccessException {
 		final ArrayList<Field> fields = getFields();
 		for (final Field field : fields) {
 			fsTableRecord.addEmptyValue(field.getMeta().toFSTableColumn());
@@ -440,7 +440,7 @@ public class Record {
 			}
 			util.populate(map, bean);
 		} catch (final BeanUtilException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 		return bean;
 	}

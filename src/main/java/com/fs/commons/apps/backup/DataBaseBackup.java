@@ -18,10 +18,10 @@ package com.fs.commons.apps.backup;
 
 import java.io.IOException;
 
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
-import com.fs.commons.logging.Logger;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
 
 /**
  * @author ahmad
@@ -39,18 +39,18 @@ public class DataBaseBackup {
 		// Settings/jamil/Desktop/mrk/zxczxczxc.sql");
 	}
 
-	private final DataSource dataSource;
+	private final JKDataSource dataSource;
 	private boolean compress;
 
 	private String outputPath;
 
 	// /////////////////////////////////////////////////////////
 	public DataBaseBackup() {
-		this(DataSourceFactory.getDefaultDataSource());
+		this(JKDataSourceFactory.getDefaultDataSource());
 	}
 
 	// /////////////////////////////////////////////////////////
-	public DataBaseBackup(final DataSource dataSource) {
+	public DataBaseBackup(final JKDataSource dataSource) {
 		this.dataSource = dataSource;
 
 	}
@@ -95,9 +95,9 @@ public class DataBaseBackup {
 				// CompressionUtil.compressAndSetPassword(info.getFileName(),
 				// info.getDatabasePassword());
 				GeneralUtility.writeLog("after compress", logFilePath);
-				Logger.info("Done Compress sql file");
+				JKLogger.info("Done Compress sql file");
 				GeneralUtility.deleteFile(getOutputPath() + ".sql");
-				Logger.info("After delete sql file");
+				JKLogger.info("After delete sql file");
 			}
 		}
 	}

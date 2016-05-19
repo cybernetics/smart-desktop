@@ -22,7 +22,7 @@ import javax.swing.BoxLayout;
 import com.fs.commons.application.ApplicationException;
 import com.fs.commons.application.ApplicationManager;
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
@@ -63,7 +63,7 @@ public class PnlLablesImporter extends PnlImport {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
-	public static void main(final String[] args) throws FileNotFoundException, ApplicationException, DaoException {
+	public static void main(final String[] args) throws FileNotFoundException, ApplicationException, JKDataAccessException {
 		final ApplicationManager instance = ApplicationManager.getInstance();
 		instance.init();
 		SwingUtility.testPanel(new PnlLablesImporter());

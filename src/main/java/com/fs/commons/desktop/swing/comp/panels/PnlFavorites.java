@@ -25,7 +25,7 @@
 // import com.fs.commons.desktop.swing.comp.JKMenuItem;
 // import
 // com.fs.commons.desktop.swing.comp.panels.PnlMenuItems.MenuItemSelectionListener;
-// import com.fs.commons.security.SecurityManager;
+// import com.jk.security.JKSecurityManager;
 // import com.fs.commons.util.GeneralUtility;
 //
 // public class PnlFavorites extends JKPanel {
@@ -138,7 +138,7 @@
 //
 // // ////////////////////////////////////////////////////////////////////////
 // private String getKeyName() {
-// return SecurityManager.getCurrentUser().getUserId() + "-panels";
+// return JKSecurityManager.getCurrentUser().getUserId() + "-panels";
 // }
 //
 // // ///////////////////////////////////////////////////////

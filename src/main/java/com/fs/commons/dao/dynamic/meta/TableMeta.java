@@ -22,17 +22,17 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.dynamic.MetaSqlBuilder;
 import com.fs.commons.dao.dynamic.constraints.Constraint;
 import com.fs.commons.dao.dynamic.constraints.TableDataValidator;
 import com.fs.commons.dao.dynamic.constraints.TableDataValidatorFactory;
 import com.fs.commons.dao.dynamic.trigger.Trigger;
 import com.fs.commons.dao.sql.query.QueryComponent;
-import com.fs.commons.security.Privilige;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.security.JKPrivilige;
 
 public class TableMeta implements Serializable, QueryComponent {
 	/**
@@ -119,7 +119,7 @@ public class TableMeta implements Serializable, QueryComponent {
 
 	private ArrayList<FieldMeta> visibleFields;
 
-	private transient DataSource dataSource;
+	private transient JKDataSource dataSource;
 
 	private String source;
 
@@ -127,7 +127,7 @@ public class TableMeta implements Serializable, QueryComponent {
 
 	Vector<FieldGroup> groups = new Vector();
 
-	private Privilige parentPrivilige;
+	private JKPrivilige parentPrivilige;
 
 	// number of visible rows at a time
 
@@ -274,9 +274,9 @@ public class TableMeta implements Serializable, QueryComponent {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		if (this.dataSource == null) {
-			return DataSourceFactory.getDefaultDataSource();
+			return JKDataSourceFactory.getDefaultDataSource();
 		}
 		return this.dataSource;
 	}
@@ -441,12 +441,12 @@ public class TableMeta implements Serializable, QueryComponent {
 		return this.panelClassName;
 	}
 
-	public Privilige getParentPrivilige() {
+	public JKPrivilige getParentPrivilige() {
 		return this.parentPrivilige;
 	}
 
-	public Privilige getPrivilige() {
-		return new Privilige(getTableName().hashCode(), getTableName(), getParentPrivilige());
+	public JKPrivilige getPrivilige() {
+		return new JKPrivilige(getTableName().hashCode(), getTableName(), getParentPrivilige());
 	}
 
 	/**
@@ -474,10 +474,10 @@ public class TableMeta implements Serializable, QueryComponent {
 	}
 
 	public String getShortReportSql() {
-		final String sql = GeneralUtility.loadSqlFromDatabase("Short_" + getTableId());
-		if (sql != null) {
-			return sql;
-		}
+//		final String sql = GeneralUtility.loadSqlFromDatabase("Short_" + getTableId());
+//		if (sql != null) {
+//			return sql;
+//		}
 		if (this.shortReportSql == null) {
 			return new MetaSqlBuilder(this).buildDefaultShortSql();
 		}
@@ -534,7 +534,7 @@ public class TableMeta implements Serializable, QueryComponent {
 						final Trigger trigger = (Trigger) Class.forName(triggerName).newInstance();
 						this.triggers.add(trigger);
 					} catch (final Exception e) {
-						ExceptionUtil.handleException(e);
+						ExceptionUtil.handle(e);
 					}
 				}
 			}
@@ -575,7 +575,7 @@ public class TableMeta implements Serializable, QueryComponent {
 	 */
 	public boolean isAllowAdd() {
 		try {
-			// SecurityManager.checkAllowedPrivilige(new
+			// JKSecurityManager.checkAllowedPrivilige(new
 			// Privilige((getTableName() + ADD_RECORD_PRIVILIGE).hashCode(),
 			// "ADD", getPrivilige()));
 			return this.allowAdd;
@@ -589,7 +589,7 @@ public class TableMeta implements Serializable, QueryComponent {
 	 */
 	public boolean isAllowDelete() {
 		try {
-			// SecurityManager.checkAllowedPrivilige(new
+			// JKSecurityManager.checkAllowedPrivilige(new
 			// Privilige((getTableName() + DELETE_RECORD_PRIVILIGE).hashCode(),
 			// "DELETE", getPrivilige()));
 			return this.allowDelete;
@@ -600,7 +600,7 @@ public class TableMeta implements Serializable, QueryComponent {
 
 	public boolean isAllowDeleteAll() {
 		try {
-			// SecurityManager.checkAllowedPrivilige(getDeleteAllPriviligeId());
+			// JKSecurityManager.checkAllowedPrivilige(getDeleteAllPriviligeId());
 			return isAllowDelete();
 		} catch (final Exception e) {
 			return false;
@@ -618,7 +618,7 @@ public class TableMeta implements Serializable, QueryComponent {
 	 */
 	public boolean isAllowUpdate() {
 		try {
-			// SecurityManager.checkAllowedPrivilige(getUpdatePriviligeId());
+			// JKSecurityManager.checkAllowedPrivilige(getUpdatePriviligeId());
 			return this.allowUpdate;
 		} catch (final Exception e) {
 			return false;
@@ -774,7 +774,7 @@ public class TableMeta implements Serializable, QueryComponent {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////
-	public void setDataSource(final DataSource connectionManager) {
+	public void setDataSource(final JKDataSource connectionManager) {
 		this.dataSource = connectionManager;
 	}
 
@@ -901,7 +901,7 @@ public class TableMeta implements Serializable, QueryComponent {
 		this.panelClassName = panelClassName;
 	}
 
-	public void setParentPrivilige(final Privilige parentPrivilige) {
+	public void setParentPrivilige(final JKPrivilige parentPrivilige) {
 		this.parentPrivilige = parentPrivilige;
 	}
 

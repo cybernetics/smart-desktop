@@ -33,19 +33,18 @@ import com.fs.commons.application.exceptions.util.ExceptionHandler;
 import com.fs.commons.application.exceptions.util.ExceptionLogging;
 import com.fs.commons.application.ui.UIOPanelCreationException;
 import com.fs.commons.apps.instance.InstanceException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.ConstraintException;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.dao.exception.DaoValidationException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.reports.EmptyReportException;
 import com.fs.commons.reports.ReportException;
-import com.fs.commons.security.exceptions.InvalidUserException;
-import com.fs.commons.security.exceptions.SecurityException;
 import com.fs.commons.util.GeneralUtility;
-import com.fs.license.LicenseException;
+import com.jk.exceptions.JKInvalidUserException;
+import com.jk.license.LicenseException;
 
 public class DesktopExceptionHandler implements ExceptionHandler {
 
@@ -98,12 +97,12 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			System.exit(0);
 		}
 
-		if (e instanceof RecordNotFoundException) {
+		if (e instanceof JKRecordNotFoundException) {
 			showError(e, e.getMessage(), "recordnotfound2.gif", false);
 			return;
 		}
-		if (e instanceof DaoException) {
-			final DaoException ex = (DaoException) e;
+		if (e instanceof JKDataAccessException) {
+			final JKDataAccessException ex = (JKDataAccessException) e;
 			if (e instanceof DaoValidationException) {
 				showError(e, e.getMessage(), "GeneralDatabaseerror.gif", false);
 				return;
@@ -153,7 +152,7 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			throw new RuntimeException();
 		}
 		if (e instanceof SQLException) {
-			handleException(new DaoException(e));
+			handleException(new JKDataAccessException(e));
 			return;
 		}
 		if (e instanceof ReportException) {
@@ -166,7 +165,7 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			SwingUtility.showUserErrorDialog("License Error : \n\t" + e.getMessage() + " \n Error Code : " + ex.getErrorCode(), false);
 			System.exit(0);
 		}
-		if (e instanceof InvalidUserException) {
+		if (e instanceof JKInvalidUserException) {
 			SwingUtility.showUserErrorDialog(e.getMessage(), false);
 			return;
 		}
@@ -181,7 +180,7 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 		}
 		if (e instanceof ApplicationException) {
 			try {
-				if (e.getCause() instanceof InvalidUserException) {
+				if (e.getCause() instanceof JKInvalidUserException) {
 					// just eat the exception since it is already handled in the
 					// security framework
 				} else if (e.getCause() instanceof LicenseException) {

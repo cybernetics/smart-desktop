@@ -19,8 +19,8 @@ import java.text.ParseException;
 import java.util.Date;
 
 import com.fs.commons.util.DateTimeUtil;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.FormatUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class ConversionUtil {
 
@@ -55,7 +55,7 @@ public class ConversionUtil {
 			try {
 				return DateTimeUtil.parseDate(value.toString(), FormatUtil.PATTERN_DEFAULT);
 			} catch (final ParseException e) {
-				ExceptionUtil.handleException(e);
+				ExceptionUtil.handle(e);
 			}
 		}
 

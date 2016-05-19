@@ -15,7 +15,9 @@
  */
 package com.fs.commons.dao.exception;
 
-public class DaoValidationException extends DaoException {
+import com.fs.commons.dao.JKDataAccessException;
+
+public class DaoValidationException extends JKDataAccessException {
 
 	/**
 	 *

@@ -32,8 +32,8 @@ import com.fs.commons.importers.ImportListener;
 import com.fs.commons.importers.ImportListenerAdapter;
 import com.fs.commons.importers.Importer;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.ReflicationUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  *
@@ -134,7 +134,7 @@ public class PnlImport extends JKPanel {
 				handleImport(selectedFile);
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

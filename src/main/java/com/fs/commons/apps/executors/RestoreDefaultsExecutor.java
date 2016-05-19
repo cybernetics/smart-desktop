@@ -16,8 +16,8 @@
 package com.fs.commons.apps.executors;
 
 import com.fs.commons.application.config.UserPreferences;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class RestoreDefaultsExecutor implements Runnable {
 
@@ -28,7 +28,7 @@ public class RestoreDefaultsExecutor implements Runnable {
 			GeneralUtility.clearTempFiles();
 			System.exit(0);
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

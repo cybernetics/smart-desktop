@@ -150,7 +150,7 @@
 // showDynPanel(true);
 //
 // } catch (DaoException e) {
-// ExceptionUtil.handleException(e);
+// ExceptionUtil.handle(e);
 // }
 // }
 //

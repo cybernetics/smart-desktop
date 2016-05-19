@@ -24,17 +24,17 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 
 import com.fs.commons.application.ui.UIOPanelCreationException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailCRUDLPanel;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class DaoComboWithManagePanel extends JKPanel<Object> {
 
@@ -49,16 +49,16 @@ public class DaoComboWithManagePanel extends JKPanel<Object> {
 	public DaoComboWithManagePanel() {
 	}
 
-	public DaoComboWithManagePanel(final ForiegnKeyFieldMeta meta) throws DaoException {
+	public DaoComboWithManagePanel(final ForiegnKeyFieldMeta meta) throws JKDataAccessException {
 		this(AbstractTableMetaFactory.getTableMeta(meta.getParentTable().getDataSource(), meta.getReferenceTable()));
 		this.combo.setName(meta.getName());
 	}
 
 	/**
 	 * @param tableMeta
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public DaoComboWithManagePanel(final TableMeta tableMeta) throws DaoException {
+	public DaoComboWithManagePanel(final TableMeta tableMeta) throws JKDataAccessException {
 		this.tableMeta = tableMeta;
 		this.combo = new DaoComboBox(tableMeta);
 		init();
@@ -71,10 +71,10 @@ public class DaoComboWithManagePanel extends JKPanel<Object> {
 
 	/**
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws UIOPanelCreationException
 	 */
-	private JKPanel createManagePanel() throws DaoException, UIOPanelCreationException {
+	private JKPanel createManagePanel() throws JKDataAccessException, UIOPanelCreationException {
 		final DynMasterDetailCRUDLPanel pnl = new DynMasterDetailCRUDLPanel(this.tableMeta);
 		return pnl;
 	}
@@ -128,11 +128,11 @@ public class DaoComboWithManagePanel extends JKPanel<Object> {
 			SwingUtility.packWindow(this);
 			this.btnEdit.transferFocus();
 		} catch (final TableMetaNotFoundException e) {
-			ExceptionUtil.handleException(e);
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		} catch (final UIOPanelCreationException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 
 	}
@@ -166,7 +166,7 @@ public class DaoComboWithManagePanel extends JKPanel<Object> {
 		});
 	}
 
-	public void reloadData() throws DaoException {
+	public void reloadData() throws JKDataAccessException {
 		this.combo.forceReload();
 	}
 

@@ -21,21 +21,21 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.fs.commons.apps.templates.dao.TemplateDao;
-import com.fs.commons.dao.DaoFinder;
-import com.fs.commons.dao.DaoUpdater;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.notification.bean.Account;
 import com.fs.notification.bean.AccountEvent;
 import com.fs.notification.bean.Event;
 import com.fs.notification.bean.EventGenerationTask;
 import com.fs.notification.bean.NotificationType;
 import com.fs.notification.bean.Status;
+import com.jk.db.dataaccess.plain.JKFinder;
+import com.jk.db.dataaccess.plain.JKUpdater;
 
 public class NotificationDao extends TemplateDao {
 
 	// //////////////////////////////////////////////////////////////////////
-	public static void main(final String[] args) throws RecordNotFoundException, DaoException {
+	public static void main(final String[] args) throws JKRecordNotFoundException, JKDataAccessException {
 		final NotificationDao dao = new NotificationDao();
 		final ArrayList<AccountEvent> accountEvents = dao.lstEventAccounts(1);
 		for (int i = 0; i < accountEvents.size(); i++) {
@@ -47,11 +47,11 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////
-	public void addAccount(final Account account) throws DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public void addAccount(final Account account) throws JKDataAccessException {
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return "INSERT INTO not_accounts (account_id_str,account_name,email,mobile, active) VALUES(?,?,?,?,?)";
 			}
 
@@ -70,11 +70,11 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	public int addAccountEvent(final AccountEvent event) throws DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public int addAccountEvent(final AccountEvent event) throws JKDataAccessException {
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return "INSERT INTO not_account_events (account_id,event_id,status_id) VALUES(?,?,?)";
 			}
 
@@ -89,11 +89,11 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	// //////////////////////////////////////////////////////////////////////
-	public void addEvent(final Event event) throws DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public void addEvent(final Event event) throws JKDataAccessException {
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return "insert into not_events(event_title, event_text, status_id,not_type_id) values (?, ?, ?,?)";
 			}
 
@@ -111,16 +111,16 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	// //////////////////////////////////////////////////////////////////////
-	public Account findAccount(final int id) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Account findAccount(final int id) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM not_accounts WHERE account_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return populateAccount(rs);
 			}
 
@@ -133,16 +133,16 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	// //////////////////////////////////////////////////////////////////////
-	public Account findAccount(final String number, final String name) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Account findAccount(final String number, final String name) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM not_accounts WHERE account_id_str = ? AND account_name=?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return populateAccount(rs);
 			}
 
@@ -156,16 +156,16 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	// //////////////////////////////////////////////////////////////////////
-	public Event findEvent(final int id) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Event findEvent(final int id) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM not_events WHERE event_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final Event event = new Event();
 				event.setId(rs.getInt("event_id"));
 				event.setTitle(rs.getString("event_title"));
@@ -184,15 +184,15 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	// //////////////////////////////////////////////////////////////////////
-	public EventGenerationTask findEventGenerationTask(final int id) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public EventGenerationTask findEventGenerationTask(final int id) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM not_event_generation_task WHERE task_id=?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final EventGenerationTask task = new EventGenerationTask();
 				task.setId(rs.getInt("task_id"));
 				task.setName(rs.getString("task_name"));
@@ -214,16 +214,16 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	// //////////////////////////////////////////////////////////////////////
-	public Status findEventStatus(final int statusId) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Status findEventStatus(final int statusId) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM not_event_status WHERE status_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return populateStatus(rs);
 			}
 
@@ -236,16 +236,16 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	// //////////////////////////////////////////////////////////////////////
-	public NotificationType findNotificationType(final int id) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public NotificationType findNotificationType(final int id) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM not_notification_types WHERE not_type_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return populateNotificationType(rs);
 			}
 
@@ -259,16 +259,16 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	// //////////////////////////////////////////////////////////////////////
-	public ArrayList<AccountEvent> lstEventAccounts(final int eventId) throws DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public ArrayList<AccountEvent> lstEventAccounts(final int eventId) throws JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM not_account_events WHERE event_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final AccountEvent accountEvent = new AccountEvent();
 				accountEvent.setId(rs.getInt("account_event_id"));
 				accountEvent.setAccount(findAccount(rs.getInt("account_id")));
@@ -318,11 +318,11 @@ public class NotificationDao extends TemplateDao {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
-	public void updateAccount(final Account account) throws DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public void updateAccount(final Account account) throws JKDataAccessException {
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return "UPDATE not_accounts SET email=? ,mobile=?  , active=? WHERE account_id=?";
 			}
 
@@ -339,11 +339,11 @@ public class NotificationDao extends TemplateDao {
 
 	// //////////////////////////////////////////////////////////////////////
 	// its just update the event status
-	public void updateEvent(final Event event) throws DaoException {
-		final DaoUpdater updater = new DaoUpdater() {
+	public void updateEvent(final Event event) throws JKDataAccessException {
+		final JKUpdater updater = new JKUpdater() {
 
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return "update not_events set status_id = ? WHERE event_id = ?";
 			}
 

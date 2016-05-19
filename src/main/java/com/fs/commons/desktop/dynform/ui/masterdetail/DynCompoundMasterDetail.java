@@ -61,7 +61,7 @@
 // try {
 // pnlMaster.handleFindRecord(record.getIdValue());
 // } catch (DaoException e) {
-// ExceptionUtil.handleException(e);
+// ExceptionUtil.handle(e);
 // }
 // }
 //
@@ -88,7 +88,7 @@
 // detail.setMasterIdValue(masterRecord.getIdValue());
 // }
 // } catch (DaoException e) {
-// ExceptionUtil.handleException(e);
+// ExceptionUtil.handle(e);
 // }
 // }
 //
@@ -100,7 +100,7 @@
 // try {
 // pnl.setMasterIdValue(null);
 // } catch (DaoException e) {
-// ExceptionUtil.handleException(e);
+// ExceptionUtil.handle(e);
 // }
 // }
 // }

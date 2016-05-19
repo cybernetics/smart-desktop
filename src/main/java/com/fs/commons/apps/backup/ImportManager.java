@@ -16,7 +16,7 @@
 package com.fs.commons.apps.backup;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.util.GeneralUtility;
 
 /**
@@ -38,7 +38,7 @@ public class ImportManager {
 	}
 
 	public boolean doImport() throws Exception {
-		final DatabaseInfo dbInfo = new DatabaseInfo(DataSourceFactory.getDefaultDataSource());
+		final DatabaseInfo dbInfo = new DatabaseInfo(JKDataSourceFactory.getDefaultDataSource());
 		dbInfo.setFileName(this.sqlFilePath);
 		MySqlUtil.importDb(dbInfo);
 		return true;

@@ -20,7 +20,7 @@ import java.awt.LayoutManager;
 
 import javax.swing.JComponent;
 
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.graphics.GraphicsFactory.GradientType;
 
 public class JKMainPanel extends JKPanel {
@@ -29,7 +29,7 @@ public class JKMainPanel extends JKPanel {
 	 *
 	 */
 	private static final long serialVersionUID = -8131024627205038198L;
-	private DataSource manager;
+	private JKDataSource manager;
 
 	public JKMainPanel() {
 		super();

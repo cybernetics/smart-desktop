@@ -24,8 +24,8 @@ import java.util.Properties;
 import com.fs.commons.application.AbstractModule;
 import com.fs.commons.application.Module;
 import com.fs.commons.configuration.beans.Lable;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.util.GeneralUtility;
 
 /**
@@ -39,7 +39,7 @@ public class FilesLablesLoader implements LablesLoader {
 	private int locale;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private List<Lable> bindLables(final Properties lables) throws RecordNotFoundException, DaoException {
+	private List<Lable> bindLables(final Properties lables) throws JKRecordNotFoundException, JKDataAccessException {
 		final List<Lable> lablesList = new ArrayList<Lable>();
 		final Enumeration<Object> keys = lables.keys();
 		while (keys.hasMoreElements()) {

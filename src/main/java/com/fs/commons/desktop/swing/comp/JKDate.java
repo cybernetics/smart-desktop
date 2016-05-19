@@ -28,7 +28,7 @@ import javax.swing.JFormattedTextField;
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
 import com.fs.commons.dao.DaoUtil;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.listeners.TransferFocusOnEnterKeyListener;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
@@ -39,8 +39,8 @@ import com.fs.commons.desktop.validation.Validator;
 import com.fs.commons.desktop.validation.builtin.FSValidators;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.DateTimeUtil;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.FormatUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
@@ -172,7 +172,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.fsWrapper.getDataSource();
 	}
 
@@ -287,7 +287,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.fsWrapper.setDataSource(manager);
 	}
 
@@ -300,7 +300,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 				try {
 					this.defaultValue = DaoUtil.getSystemDate();
 				} catch (final Exception e) {
-					ExceptionUtil.handleException(e);
+					ExceptionUtil.handle(e);
 				}
 				return;
 			}
@@ -319,7 +319,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 				setMaxDate(DateTimeUtil.parseShortDate(maxDate));
 			}
 		} catch (final ParseException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -334,7 +334,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 				setMinDate(DateTimeUtil.parseShortDate(date));
 			}
 		} catch (final ParseException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -367,7 +367,7 @@ public class JKDate extends JDateChooser implements BindingComponent {
 			try {
 				setDate(DateTimeUtil.parseShortDate(value.toString()));
 			} catch (final ParseException e) {
-				ExceptionUtil.handleException(e);
+				ExceptionUtil.handle(e);
 			}
 
 		}

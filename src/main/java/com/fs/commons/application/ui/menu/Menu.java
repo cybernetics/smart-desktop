@@ -20,7 +20,7 @@ import java.util.Collection;
 
 import com.fs.commons.application.Module;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.security.Privilige;
+import com.jk.security.JKPrivilige;
 
 /**
  * @author u087
@@ -128,9 +128,9 @@ public class Menu {
 	/**
 	 * @return the priviligeId
 	 */
-	public Privilige getPrivilige() {
+	public JKPrivilige getPrivilige() {
 		final int privId = (getParentModule().getModuleName() + getName()).hashCode();
-		return new Privilige(privId, getName(), getParentModule().getPrivilige());
+		return new JKPrivilige(privId, getName(), getParentModule().getPrivilige());
 	}
 
 	public void init() {

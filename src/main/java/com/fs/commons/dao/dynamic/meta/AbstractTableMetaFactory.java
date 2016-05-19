@@ -17,27 +17,30 @@ package com.fs.commons.dao.dynamic.meta;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.logging.Logger;
 
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.util.ExceptionUtil;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class AbstractTableMetaFactory {
-	static Hashtable<DataSource, TableMetaFactory> metaFactorys = new Hashtable<DataSource, TableMetaFactory>();
-	static DataSource defaultConnectionManager = DataSourceFactory.getDefaultDataSource();
+	static Logger logger = Logger.getLogger(AbstractTableMetaFactory.class.getName());
+	static Hashtable<JKDataSource, TableMetaFactory> metaFactorys = new Hashtable<JKDataSource, TableMetaFactory>();
+	static JKDataSource defaultConnectionManager = JKDataSourceFactory.getDefaultDataSource();
 	static {
 		try {
 			final TableMetaFactory defaultFactory = new TableMetaFactory(defaultConnectionManager);
 			metaFactorys.put(defaultConnectionManager, defaultFactory);
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////////
-	public static TableMetaFactory addTablesMeta(final DataSource connectionManager, final Hashtable<String, TableMeta> newTables)
-			throws DaoException {
+	public static TableMetaFactory addTablesMeta(final JKDataSource connectionManager, final Hashtable<String, TableMeta> newTables)
+			throws JKDataAccessException {
+		logger.info("addTablesMeta: " + newTables);
 		final TableMetaFactory metaFactory = getMetaFactory(connectionManager);
 		metaFactory.addTablesMeta(newTables);
 		return metaFactory;
@@ -57,7 +60,7 @@ public class AbstractTableMetaFactory {
 	// }
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////////
-	public static TableMetaFactory getMetaFactory(final DataSource connectionManager) throws DaoException {
+	public static TableMetaFactory getMetaFactory(final JKDataSource connectionManager) throws JKDataAccessException {
 		TableMetaFactory metaFactory = metaFactorys.get(connectionManager);
 		if (metaFactory == null) {
 			metaFactory = new TableMetaFactory(connectionManager);
@@ -67,7 +70,8 @@ public class AbstractTableMetaFactory {
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////
-	public static TableMeta getTableMeta(final DataSource connectionManager, final String metaName) {
+	public static TableMeta getTableMeta(final JKDataSource connectionManager, final String metaName) {
+		logger.info("getTableMeta :" + metaName);
 		return metaFactorys.get(connectionManager).getTableMeta(metaName);
 	}
 
@@ -99,12 +103,15 @@ public class AbstractTableMetaFactory {
 	 * @throws TableMetaNotFoundException
 	 */
 	public static TableMeta getTableMeta(final String tableName) throws TableMetaNotFoundException {
+		logger.info("2getTableMeta : " + tableName);
 		final TableMetaFactory defaultMetaFactory = getDefaultMetaFactory();
 		if (defaultMetaFactory.isMetaExists(tableName)) {
+			logger.info("get from default datasource");
 			return defaultMetaFactory.getTableMeta(tableName);
 		}
 		// look in other connections
-		final Enumeration<DataSource> keys = metaFactorys.keys();
+		logger.info("not found inside default datasource , look into other connections");
+		final Enumeration<JKDataSource> keys = metaFactorys.keys();
 		while (keys.hasMoreElements()) {
 			final TableMetaFactory tableMetaFactory = metaFactorys.get(keys.nextElement());
 			if (defaultMetaFactory != tableMetaFactory) {
@@ -116,7 +123,7 @@ public class AbstractTableMetaFactory {
 		throw new TableMetaNotFoundException("TableMeta : " + tableName + " doesnot exists");
 	}
 
-	public static void registerFactory(final DataSource manager, final TableMetaFactory factory) {
+	public static void registerFactory(final JKDataSource manager, final TableMetaFactory factory) {
 		metaFactorys.put(manager, factory);
 	}
 

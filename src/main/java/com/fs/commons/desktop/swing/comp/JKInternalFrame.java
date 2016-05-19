@@ -24,8 +24,8 @@ import java.beans.PropertyVetoException;
 import javax.swing.JInternalFrame;
 
 import com.fs.commons.application.ui.UIPanel;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.locale.Lables;
@@ -35,7 +35,7 @@ public class JKInternalFrame extends JInternalFrame implements UIPanel, DaoCompo
 	private static final long serialVersionUID = 675269917755097366L;
 	private static final int DEFAULT_HEIGHT = 400;
 	private static final int DEFAULT_WIDTH = 400;
-	private DataSource connectionManager;
+	private JKDataSource connectionManager;
 
 	public JKInternalFrame() throws HeadlessException {
 		super();
@@ -56,9 +56,9 @@ public class JKInternalFrame extends JInternalFrame implements UIPanel, DaoCompo
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		if (this.connectionManager == null) {
-			return DataSourceFactory.getDefaultDataSource();
+			return JKDataSourceFactory.getDefaultDataSource();
 		}
 		return this.connectionManager;
 	}
@@ -84,7 +84,7 @@ public class JKInternalFrame extends JInternalFrame implements UIPanel, DaoCompo
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.connectionManager = manager;
 		applyDataSource();
 	}

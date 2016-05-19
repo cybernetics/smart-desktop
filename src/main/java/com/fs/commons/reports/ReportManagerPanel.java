@@ -23,12 +23,12 @@ import java.util.ArrayList;
 
 import javax.swing.Box;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKMenuItem;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * @author u087
@@ -51,7 +51,7 @@ public class ReportManagerPanel extends JKPanel<Object> {
 	/**
 	 * @param report
 	 */
-	protected void handleShowReport(final Report report) {
+	protected void handleShowReport(final JKReport report) {
 		try {
 			final ReportUIPanel pnl = new ReportUIPanel(report);
 			if (this.mainPanel != null) {
@@ -62,9 +62,9 @@ public class ReportManagerPanel extends JKPanel<Object> {
 			validate();
 			repaint();
 		} catch (final TableMetaNotFoundException e) {
-			ExceptionUtil.handleException(e);
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -73,13 +73,13 @@ public class ReportManagerPanel extends JKPanel<Object> {
 	 */
 	private void init() {
 		setLayout(new BorderLayout());
-		final ArrayList<Report> reports = ReportManager.getReports();
+		final ArrayList<JKReport> reports = JKReportManager.getReports();
 		final JKPanel<?> pnlMenu = new JKPanel<Object>();
 		pnlMenu.setBorder(SwingUtility.createTitledBorder("AVAILABLE_REPORTS"));
 		pnlMenu.setPreferredSize(new Dimension(180, 800));
 		// pnlMenu.setLayout(new BoxLayout(pnlMenu, BoxLayout.Y_AXIS));
 		for (int i = 0; i < reports.size(); i++) {
-			final Report report = reports.get(i);
+			final JKReport report = reports.get(i);
 			if (report.isVisible()) {
 				final JKMenuItem btn = new JKMenuItem(report.getTitle());
 				// btn.setPreferredSize(new Dimension(400, 30));

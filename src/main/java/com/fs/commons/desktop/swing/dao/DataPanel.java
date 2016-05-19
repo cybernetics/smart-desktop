@@ -29,7 +29,7 @@ import com.fs.commons.bean.binding.BindingComponent;
 import com.fs.commons.bean.binding.ModelViewBiding;
 import com.fs.commons.bean.binding.ViewContainer;
 import com.fs.commons.bean.util.BeanUtilException;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 
@@ -213,11 +213,11 @@ public abstract class DataPanel extends JKPanel implements DaoActionsListener, V
 	// }
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 *
 	 */
 	@Override
-	public void resetComponents() throws DaoException {
+	public void resetComponents() throws JKDataAccessException {
 		for (int i = 0; i < this.components.size(); i++) {
 			if (this.components.get(i) instanceof Container) {
 				resetComponents((Container) this.components.get(i));
@@ -235,9 +235,9 @@ public abstract class DataPanel extends JKPanel implements DaoActionsListener, V
 	 *
 	 * @param container
 	 *            Container
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	protected void resetComponents(final Container container) throws DaoException {
+	protected void resetComponents(final Container container) throws JKDataAccessException {
 		final Component[] components = container.getComponents();
 		for (final Component component2 : components) {
 			if (component2 instanceof Container) {
@@ -292,16 +292,16 @@ public abstract class DataPanel extends JKPanel implements DaoActionsListener, V
 	 * @throws ValidationException
 	 * @param validateId
 	 *            boolean
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public abstract void validateAddData(boolean validateId) throws ValidationException, DaoException;
+	public abstract void validateAddData(boolean validateId) throws ValidationException, JKDataAccessException;
 
 	/**
 	 *
 	 * @throws ValidationException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public abstract void validateUpdateData() throws ValidationException, DaoException;
+	public abstract void validateUpdateData() throws ValidationException, JKDataAccessException;
 
 	/**
 	 *

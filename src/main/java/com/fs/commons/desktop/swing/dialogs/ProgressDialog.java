@@ -38,6 +38,7 @@ import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKLabel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.locale.Lables;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * A useful class which displays a dialog box with a progress bar, then runs a
@@ -105,10 +106,12 @@ public class ProgressDialog extends JKDialog {
 					}
 					this.task.run();
 				} catch (final Throwable t) {
+					ExceptionUtil.handle(t);
+				} finally {
+					ProgressDialog.this.conteniueProcessing = false;
+					finished();
 				}
 			}
-			ProgressDialog.this.conteniueProcessing = false;
-			finished();
 		}
 
 		@Override

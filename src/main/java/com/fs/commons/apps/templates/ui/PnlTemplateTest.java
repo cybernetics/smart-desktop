@@ -26,15 +26,15 @@ import com.fs.commons.apps.templates.TemplateManager;
 import com.fs.commons.apps.templates.beans.Template;
 import com.fs.commons.apps.templates.beans.TemplateVariable;
 import com.fs.commons.apps.templates.facade.TemplateFacade;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class PnlTemplateTest extends JKPanel<Object> {
 	/**
@@ -48,7 +48,7 @@ public class PnlTemplateTest extends JKPanel<Object> {
 	private Template template;
 	private ArrayList<JKTextField> variablesList;
 
-	public PnlTemplateTest() throws DaoException {
+	public PnlTemplateTest() throws JKDataAccessException {
 		init();
 		handleTemplateChanged();
 	}
@@ -79,7 +79,7 @@ public class PnlTemplateTest extends JKPanel<Object> {
 			try {
 				this.template = facade.findTemplate(templateId);
 			} catch (final Exception e) {
-				ExceptionUtil.handleException(e);
+				ExceptionUtil.handle(e);
 			}
 		} else {
 			this.template = null;
@@ -103,7 +103,7 @@ public class PnlTemplateTest extends JKPanel<Object> {
 				// System.out.println(compiled);
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

@@ -17,11 +17,11 @@ package com.fs.commons.dao.dynamic.constraints.exceptions;
 
 import java.util.ArrayList;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.constraints.Constraint;
 import com.fs.commons.dao.dynamic.meta.Field;
-import com.fs.commons.dao.exception.DaoException;
 
-public class ConstraintException extends DaoException {
+public class ConstraintException extends JKDataAccessException {
 	/**
 	 *
 	 */

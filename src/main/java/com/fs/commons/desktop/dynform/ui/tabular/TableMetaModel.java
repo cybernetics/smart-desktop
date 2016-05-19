@@ -19,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.swing.comp.model.FSTableModel;
 import com.fs.commons.desktop.swing.comp.model.FSTableRecord;
 
@@ -41,9 +41,9 @@ public class TableMetaModel extends FSTableModel {
 	 *
 	 * @param tableMeta
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public TableMetaModel(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException {
+	public TableMetaModel(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException {
 		this.tableMeta = tableMeta;
 		this.dao = DaoFactory.createDynamicDao(tableMeta);
 		init();
@@ -59,7 +59,7 @@ public class TableMetaModel extends FSTableModel {
 		return record;
 	}
 
-	public List<Record> getAllDaoRecords() throws TableMetaNotFoundException, DaoException {
+	public List<Record> getAllDaoRecords() throws TableMetaNotFoundException, JKDataAccessException {
 		final Vector<FSTableRecord> records = getRecords();
 		final List<Record> daoRecords = new Vector();
 		for (final FSTableRecord fsTableRecord : records) {
@@ -73,16 +73,16 @@ public class TableMetaModel extends FSTableModel {
 	/**
 	 *
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private void init() throws TableMetaNotFoundException, DaoException {
+	private void init() throws TableMetaNotFoundException, JKDataAccessException {
 		final Vector<FieldMeta> fieldList = this.tableMeta.getAllFields();
 		for (final FieldMeta fieldMeta : fieldList) {
 			addFSTableColumn(fieldMeta.toFSTableColumn());
 		}
 	}
 
-	public void setFilterValue(final String fieldName, final Object value) throws DaoException {
+	public void setFilterValue(final String fieldName, final Object value) throws JKDataAccessException {
 		clearRecords();
 		final ArrayList<Record> records = this.dao.findByFieldValue(fieldName, value);
 		for (final Record record : records) {

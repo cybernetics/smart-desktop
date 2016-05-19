@@ -26,15 +26,15 @@ import java.sql.Timestamp;
 
 import javax.sql.rowset.CachedRowSet;
 
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.DaoFinder;
 import com.fs.commons.dao.DaoUtil;
-import com.fs.commons.dao.Session;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.fs.commons.dao.JKSession;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.jk.db.dataaccess.plain.JKFinder;
 
-public class MysqlAbstractDao extends AbstractDao {
+public class MysqlAbstractDao extends JKAbstractPlainDataAccess {
 
 	// /////////////////////////////////////////////////////////////////////
 	public static byte[] blobToByteArray(final Blob blob) throws IOException, SQLException {
@@ -53,17 +53,17 @@ public class MysqlAbstractDao extends AbstractDao {
 		super();
 	}
 
-	public MysqlAbstractDao(final DataSource connectionManager) {
+	public MysqlAbstractDao(final JKDataSource connectionManager) {
 		super(connectionManager);
 	}
 
-	public MysqlAbstractDao(final Session session) {
+	public MysqlAbstractDao(final JKSession session) {
 		super(session);
 	}
 
 	// ///////////////////////////////////////////////////////////////////
 	@Override
-	public CachedRowSet executeQuery(final String query, final int fromRowIndex, final int toRowIndex) throws DaoException {
+	public CachedRowSet executeQuery(final String query, final int fromRowIndex, final int toRowIndex) throws JKDataAccessException {
 		final String sql = "select * FROM (?) AS T  limit ?,?";
 		final String compiledSql = DaoUtil.compileSql(sql, new Object[] { query, fromRowIndex, toRowIndex - fromRowIndex });
 		return executeQuery(compiledSql);
@@ -71,23 +71,23 @@ public class MysqlAbstractDao extends AbstractDao {
 
 	@Override
 	// ///////////////////////////////////////////////////////////////////
-	public int getRowsCount(final String query) throws NumberFormatException, DaoException {
+	public int getRowsCount(final String query) throws NumberFormatException, JKDataAccessException {
 		final String sql = "SELECT COUNT(*) FROM (" + query + ") as T";
 		// System.out.println(sql);
 		return new Integer(exeuteSingleOutputQuery(sql).toString());
 	}
 
 	@Override
-	public Timestamp getSystemDate() throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Timestamp getSystemDate() throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT NOW()  ";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final Timestamp date = rs.getTimestamp(1);
 				return date;
 			}

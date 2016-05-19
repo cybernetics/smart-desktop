@@ -17,17 +17,17 @@ package com.fs.commons.dao.paging;
 
 import javax.sql.rowset.CachedRowSet;
 
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.dynamic.DaoFactory;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.util.DateTimeUtil;
 
 public class DataBasePager implements DataPager {
 
 	// /////////////////////////////////////////////////////
-	public static void main(final String[] args) throws NumberFormatException, DaoException, PagingException {
+	public static void main(final String[] args) throws NumberFormatException, JKDataAccessException, PagingException {
 		final DataBasePager p = new DataBasePager();
 		p.setQuery("SELECT * FROM GEN_NATIONAL_NUMBERS");
 		DateTimeUtil.printCurrentTime(1);
@@ -55,7 +55,7 @@ public class DataBasePager implements DataPager {
 	private int pagesCount;
 	private int currentPage;
 	private int allRowsCount;
-	DataSource datasource;
+	JKDataSource datasource;
 
 	private CachedRowSet resultSet;
 
@@ -76,14 +76,14 @@ public class DataBasePager implements DataPager {
 	}
 
 	// /////////////////////////////////////////////////////
-	private AbstractDao getDao() {
-		final AbstractDao dao = DaoFactory.createDao(getDatasource());
+	private JKAbstractPlainDataAccess getDao() {
+		final JKAbstractPlainDataAccess dao = DaoFactory.createDao(getDatasource());
 		return dao;
 	}
 
 	// /////////////////////////////////////////////////////
-	public DataSource getDatasource() {
-		return this.datasource == null ? DataSourceFactory.getDefaultDataSource() : this.datasource;
+	public JKDataSource getDatasource() {
+		return this.datasource == null ? JKDataSourceFactory.getDefaultDataSource() : this.datasource;
 	}
 
 	// /////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ public class DataBasePager implements DataPager {
 	}
 
 	// /////////////////////////////////////////////////////
-	public void setDatasource(final DataSource datasource) {
+	public void setDatasource(final JKDataSource datasource) {
 		this.datasource = datasource;
 	}
 
@@ -164,9 +164,9 @@ public class DataBasePager implements DataPager {
 	}
 
 	// /////////////////////////////////////////////////////
-	public void setQuery(final String query) throws NumberFormatException, DaoException, PagingException {
+	public void setQuery(final String query) throws NumberFormatException, JKDataAccessException, PagingException {
 		this.query = query;
-		final AbstractDao dao = getDao();
+		final JKAbstractPlainDataAccess dao = getDao();
 		if (getPageRowsCount() == 0) {
 			this.pagesCount = 1;
 		} else {

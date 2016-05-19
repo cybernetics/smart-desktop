@@ -20,7 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.reports.ReportException;
 import com.fs.commons.util.GeneralUtility;
 
@@ -28,20 +28,20 @@ public abstract class AbstractPdfReport {
 
 	/**
 	 * @throws IOException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws ReportException
 	 *
 	 */
-	public final File buildReport() throws ReportException, DaoException, IOException {
+	public final File buildReport() throws ReportException, JKDataAccessException, IOException {
 		File file = GeneralUtility.createTempFile("pdf");
 		buildReport(file.getAbsolutePath());
 		file = new File(file.getAbsolutePath());// to reload new information
 		return file;
 	}
 
-	public abstract void buildReport(OutputStream out) throws ReportException, DaoException;
+	public abstract void buildReport(OutputStream out) throws ReportException, JKDataAccessException;
 
-	public final void buildReport(final String fileName) throws IOException, ReportException, DaoException {
+	public final void buildReport(final String fileName) throws IOException, ReportException, JKDataAccessException {
 		OutputStream out = null;
 		try {
 			out = new FileOutputStream(fileName);

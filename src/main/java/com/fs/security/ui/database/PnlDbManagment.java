@@ -28,15 +28,15 @@ import javax.swing.JFrame;
 import com.fs.commons.application.exceptions.ServerDownException;
 import com.fs.commons.apps.backup.DataBaseBackup;
 import com.fs.commons.apps.backup.ImportManager;
-import com.fs.commons.dao.connection.DataSourceFactory;
-import com.fs.commons.dao.connection.PoolingDataSource;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
+import com.fs.commons.dao.connection.JKPoolingDataSource;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 ////////////////////////////////////////////////////////////////////
 // Author Mohamed Kiswani
@@ -51,8 +51,8 @@ public class PnlDbManagment extends JKPanel<Object> {
 	private static final long serialVersionUID = 1L;
 
 	// //////////////////////////////////////////////////////////////////////////////
-	public static void main(final String[] args) throws ServerDownException, DaoException, IOException {
-		DataSourceFactory.setDefaultDataSource(new PoolingDataSource("system.config"));
+	public static void main(final String[] args) throws ServerDownException, JKDataAccessException, IOException {
+		JKDataSourceFactory.setDefaultDataSource(new JKPoolingDataSource("system.config"));
 		// user =SecurityManager.getCurrentUser();
 		SwingUtility.setDefaultComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		SwingUtility.showPanelInDialog(new PnlDbManagment(), "TEST");
@@ -100,7 +100,7 @@ public class PnlDbManagment extends JKPanel<Object> {
 			dataBaseBackup.start();
 			SwingUtility.showSuccessDialog("BACKUP_CREATION_DONE");
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 
 	}
@@ -124,7 +124,7 @@ public class PnlDbManagment extends JKPanel<Object> {
 			importManager.doImport();
 			SwingUtility.showSuccessDialog("IMPORT_DB_DONE");
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 
 	}

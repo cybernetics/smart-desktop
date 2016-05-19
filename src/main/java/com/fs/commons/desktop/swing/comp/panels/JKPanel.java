@@ -37,8 +37,8 @@ import javax.swing.border.TitledBorder;
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.application.ui.UIPanel;
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.graphics.GraphicsFactory;
 import com.fs.commons.desktop.graphics.GraphicsFactory.GradientType;
 import com.fs.commons.desktop.swing.SwingUtility;
@@ -120,7 +120,7 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.fsWrapper.getDataSource();
 	};
 
@@ -239,9 +239,9 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 
 	/**
 	 *
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public void resetComponents() throws DaoException {
+	public void resetComponents() throws JKDataAccessException {
 	}
 
 	@Override
@@ -278,7 +278,7 @@ public class JKPanel<T> extends JPanel implements UIPanel, BindingComponent<T> {
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.fsWrapper.setDataSource(manager);
 	}
 

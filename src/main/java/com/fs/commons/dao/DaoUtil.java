@@ -31,14 +31,12 @@ import java.util.List;
 
 import javax.sql.rowset.CachedRowSet;
 
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.util.GeneralUtility;
 
 /**
@@ -50,7 +48,7 @@ import com.fs.commons.util.GeneralUtility;
 public class DaoUtil {
 
 	public static void clearCache(final TableMeta tableMeta) {
-		AbstractDao.removeListCache(tableMeta.getListSql());
+		JKAbstractPlainDataAccess.removeListCache(tableMeta.getListSql());
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
@@ -67,20 +65,20 @@ public class DaoUtil {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
-	public static List<IdValueRecord> createRecordsFromSQL(final String sql) throws DaoException {
-		final DefaultDao dao = new DefaultDao();
+	public static List<IdValueRecord> createRecordsFromSQL(final String sql) throws JKDataAccessException {
+		final JKDefaultDataAccess dao = new JKDefaultDataAccess();
 		return dao.createRecordsFromSQL(sql);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////////////////
-	public static CachedRowSet executeQuery(final String query) throws DaoException {
-		final DefaultDao dao = new DefaultDao();
+	public static CachedRowSet executeQuery(final String query) throws JKDataAccessException {
+		final JKDefaultDataAccess dao = new JKDefaultDataAccess();
 		return dao.executeQuery(query);
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////
-	public static Object[] executeQueryAsArray(final String query) throws DaoException {
-		final DefaultDao dao = new DefaultDao();
+	public static Object[] executeQueryAsArray(final String query) throws JKDataAccessException {
+		final JKDefaultDataAccess dao = new JKDefaultDataAccess();
 		return dao.exeuteQueryAsArray(query);
 		// String out= dao.executeOutputQuery(templateParamtersQuery,"|","\n");
 		// String[] records = out.split("\n");
@@ -92,8 +90,8 @@ public class DaoUtil {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////////
-	public static String exeuteOutputQuery(final String query) throws DaoException {
-		final DefaultDao dao = new DefaultDao();
+	public static String exeuteOutputQuery(final String query) throws JKDataAccessException {
+		final JKDefaultDataAccess dao = new JKDefaultDataAccess();
 		return dao.executeOutputQuery(query, " ", "\n");
 	}
 
@@ -101,14 +99,14 @@ public class DaoUtil {
 	// ConnectionManagerFactory.getDefaultConnectionManager();
 	// static DefaultDao dao=new DefaultDao();
 	// /////////////////////////////////////////////////////////////////////////////////////////////
-	public static Object exeuteSingleOutputQuery(final DataSource con, final String query) throws DaoException {
-		final DefaultDao dao = new DefaultDao(con);
+	public static Object exeuteSingleOutputQuery(final JKDataSource con, final String query) throws JKDataAccessException {
+		final JKDefaultDataAccess dao = new JKDefaultDataAccess(con);
 		return dao.exeuteSingleOutputQuery(query);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////////////////
-	public static Object exeuteSingleOutputQuery(final String query) throws DaoException {
-		final DefaultDao dao = new DefaultDao();
+	public static Object exeuteSingleOutputQuery(final String query) throws JKDataAccessException {
+		final JKDefaultDataAccess dao = new JKDefaultDataAccess();
 		return dao.exeuteSingleOutputQuery(query);
 	}
 
@@ -159,16 +157,16 @@ public class DaoUtil {
 		}
 	}
 
-	public static Date getSystemDate() throws RecordNotFoundException, DaoException {
+	public static Date getSystemDate() throws JKRecordNotFoundException, JKDataAccessException {
 		return DaoFactory.createDao().getSystemDate();
 	}
 
-	public static java.sql.Date getSystemDateAsSqlDate() throws RecordNotFoundException, DaoException {
+	public static java.sql.Date getSystemDateAsSqlDate() throws JKRecordNotFoundException, JKDataAccessException {
 		return new java.sql.Date(getSystemDate().getTime());
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////////
-	public static Record readRecord(final ResultSet rs, final TableMeta tableMeta) throws RecordNotFoundException, DaoException, SQLException {
+	public static Record readRecord(final ResultSet rs, final TableMeta tableMeta) throws JKRecordNotFoundException, JKDataAccessException, SQLException {
 		final Record record = tableMeta.createEmptyRecord();
 		record.setIdValue(rs.getObject(tableMeta.getIdField().getName()));
 		// Field idField = record.getIdField();

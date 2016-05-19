@@ -24,10 +24,10 @@ import com.fs.commons.application.ApplicationManager;
 import com.fs.commons.apps.templates.TemplateManager;
 import com.fs.commons.apps.templates.beans.Query;
 import com.fs.commons.dao.DaoUtil;
-import com.fs.commons.dao.Session;
-import com.fs.commons.dao.connection.DataSourceFactory;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.fs.commons.dao.JKSession;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.notification.bean.Account;
 import com.fs.notification.bean.AccountEvent;
 import com.fs.notification.bean.Event;
@@ -37,7 +37,7 @@ import com.fs.notification.dao.NotificationDao;
 
 public class NotificationFacade {
 	///////////////////////////////////////////////////////////////////////////////
-	public static void main(final String[] args) throws FileNotFoundException, ApplicationException, RecordNotFoundException, DaoException {
+	public static void main(final String[] args) throws FileNotFoundException, ApplicationException, JKRecordNotFoundException, JKDataAccessException {
 		ApplicationManager.getInstance().init();
 		final NotificationFacade f = new NotificationFacade();
 		System.out.println(f.syncAccounts(6).size());
@@ -45,9 +45,9 @@ public class NotificationFacade {
 
 	NotificationDao dao = new NotificationDao();
 
-	public void generateEvent(final int specId) throws RecordNotFoundException, DaoException {
+	public void generateEvent(final int specId) throws JKRecordNotFoundException, JKDataAccessException {
 		boolean commit = false;
-		final Session session = getSession();
+		final JKSession session = getSession();
 		try {
 			final EventGenerationTask spec = this.dao.findEventGenerationTask(specId);
 			final String[] group = TemplateManager.compileTemplateGroup(spec.getTemplate(), spec.getTemplateValues().getQueryText());
@@ -79,8 +79,8 @@ public class NotificationFacade {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
-	private Session getSession() throws DaoException {
-		final Session session = DataSourceFactory.getDefaultDataSource().createSession();
+	private JKSession getSession() throws JKDataAccessException {
+		final JKSession session = JKDataSourceFactory.getDefaultDataSource().createSession();
 		this.dao.setSession(session);
 		return session;
 	}
@@ -90,9 +90,9 @@ public class NotificationFacade {
 	 * 
 	 * @param query
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private ArrayList<Account> loadAccounts(final Query query) throws DaoException {
+	private ArrayList<Account> loadAccounts(final Query query) throws JKDataAccessException {
 		final Object[] records = DaoUtil.executeQueryAsArray(query.getQueryText());
 		final ArrayList<Account> accounts = new ArrayList<Account>();
 		for (final Object record : records) {
@@ -118,19 +118,19 @@ public class NotificationFacade {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
-	private Account syncAccount(Account account) throws DaoException {
+	private Account syncAccount(Account account) throws JKDataAccessException {
 		try {
 			account = this.dao.findAccount(account.getNumber(), account.getName());
 			// account.setId(account1.getId());
 			// dao.updateAccount(account);
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			this.dao.addAccount(account);
 		}
 		return account;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
-	public ArrayList<Account> syncAccounts(final int queryId) throws RecordNotFoundException, DaoException {
+	public ArrayList<Account> syncAccounts(final int queryId) throws JKRecordNotFoundException, JKDataAccessException {
 		final Query query = this.dao.findQuery(queryId);
 		return syncAccounts(query);
 	}
@@ -140,7 +140,7 @@ public class NotificationFacade {
 	 * Load accounts from query Build array list of accounts for each accout ,
 	 * check if not exists in the database , add it
 	 */
-	private ArrayList<Account> syncAccounts(final Query query) throws DaoException {
+	private ArrayList<Account> syncAccounts(final Query query) throws JKDataAccessException {
 		final ArrayList<Account> accounts = loadAccounts(query);
 		for (int i = 0; i < accounts.size(); i++) {
 			final Account account = accounts.get(i);

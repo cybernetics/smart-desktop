@@ -23,6 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Scanner;
+import java.util.logging.Logger;
+
+import org.apache.ibatis.jdbc.ScriptRunner;
 
 import com.fs.commons.application.config.DefaultConfigManager;
 import com.fs.commons.application.exceptions.ServerDownException;
@@ -32,13 +37,18 @@ import com.fs.commons.application.util.ResourceLoaderFactory;
 import com.fs.commons.application.xml.ApplicationXmlParser;
 import com.fs.commons.apps.backup.AutomaticDBBackup;
 import com.fs.commons.apps.instance.InstanceManager;
-import com.fs.commons.dao.connection.DataSourceFactory;
-import com.fs.commons.dao.connection.PoolingDataSource;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKDefaultDataAccess;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSourceUtil;
+import com.fs.commons.dao.connection.JKPoolingDataSource;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
+import com.fs.commons.dao.dynamic.meta.TableMetaFactory;
+import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
 import com.fs.commons.dao.dynamic.meta.xml.TableMetaXmlParser;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.DesktopExceptionHandler;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
@@ -47,18 +57,17 @@ import com.fs.commons.desktop.swing.frames.ApplicationFrame;
 import com.fs.commons.desktop.swing.frames.Splash;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.locale.Locale;
-import com.fs.commons.reports.ReportManager;
-import com.fs.commons.security.SecurityManager;
-import com.fs.commons.security.User;
-import com.fs.commons.security.exceptions.InvalidUserException;
-import com.fs.commons.security.exceptions.SecurityException;
-import com.fs.commons.util.ExceptionUtil;
+import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.util.GeneralUtility;
-import com.fs.license.client.LicenseClientFactory;
+import com.jk.exceptions.JKInvalidUserException;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.license.client.LicenseClientFactory;
+import com.jk.security.JKSecurityManager;
+import com.jk.security.JKUser;
 
 public class ApplicationManager {
-
-	private static final String DEFAULT_SYSTEM_FILE = "/system.xml";
+	static Logger logger = Logger.getLogger(ApplicationManager.class.getName());
+	private static final String[] DEFAULT_SYSTEM_FILES = { "/system.xml", "/default.system.xml" };
 	private static final int LOGIN_RETRIES = 3;
 	private static ApplicationManager instance;
 	private static ClientInfo client;
@@ -86,19 +95,38 @@ public class ApplicationManager {
 	 */
 	public static ApplicationManager getInstance() {
 		if (instance == null) {
+			logger.info("set default exception handler");
 			ExceptionHandlerFactory.setDefaultHandler(new DesktopExceptionHandler());
 			try {
-				DataSourceFactory.setDefaultDataSource(new PoolingDataSource());
+				logger.info("set default datasource");
+				JKDataSourceFactory.setDefaultDataSource(new JKPoolingDataSource());
+				checkScriptsInstalled();
+				logger.info("set default instance");
 				instance = new ApplicationManager();
-			} catch (final ServerDownException e) {
-				ExceptionUtil.handleException(e);
-			} catch (final DaoException e) {
-				// unable to get database connection for the following reasons
-				// the username / password / databse name are invalid
-				ExceptionUtil.handleException(e);
+			} catch (final Exception e) {
+				ExceptionUtil.handle(e);
 			}
 		}
 		return instance;
+	}
+
+	private static void checkScriptsInstalled() throws FileNotFoundException, IOException {
+		// TODO : add generic way to apply db-scripts
+		JKDataSource source = JKDataSourceFactory.getDefaultDataSource();
+		if (JKDataSourceUtil.isMysql(source)) {
+			try {
+				TableMeta tableMeta = AbstractTableMetaFactory.getTableMeta("sec_users");
+			} catch (TableMetaNotFoundException e) {
+
+				System.err.println("It looks like a first usage , apply security script on DB?(y,n)");
+				Scanner scanner = new Scanner(System.in);
+				String next = scanner.next();
+				if (next.toLowerCase().startsWith("y")) {
+					JKDefaultDataAccess dao = new JKDefaultDataAccess();
+					dao.runScript("/scripts/mysql/security.sql");
+				}
+			}
+		}
 	}
 
 	public static void main(final String[] args) {
@@ -106,6 +134,7 @@ public class ApplicationManager {
 	}
 
 	public static void setCurrentClient(final ClientInfo client) {
+		logger.info("Set default client info : " + client);
 		ApplicationManager.client = client;
 		TableModelHtmlBuilder.setCompanyName(client.getClientName());
 		TableModelHtmlBuilder.setCompanyLogo(client.getLogo());
@@ -119,6 +148,7 @@ public class ApplicationManager {
 	 *
 	 */
 	public void closeMainFrame() {
+		logger.info("close main frame");
 		if (this.application != null && this.applicationFrame != null) {
 			this.applicationFrame.dispose();
 		}
@@ -139,6 +169,7 @@ public class ApplicationManager {
 
 	// ////////////////////////////////////////////////////////////////////////////////////
 	private Application createDefaultApplication() {
+		logger.info("create default application");
 		final Application a = new Application();
 		return a;
 	}
@@ -147,14 +178,14 @@ public class ApplicationManager {
 	 *
 	 */
 	private void fireAfterApplicationInit() {
-		final ArrayList<ApplicationListener> listeners = this.application.getApplicationListeners();
+		final List<ApplicationListener> listeners = this.application.getApplicationListeners();
 		for (int i = 0; i < listeners.size(); i++) {
 			listeners.get(i).afterInit(this.application);
 		}
 	}
 
 	private void fireAfterApplicationStart() {
-		final ArrayList<ApplicationListener> listeners = this.application.getApplicationListeners();
+		final List<ApplicationListener> listeners = this.application.getApplicationListeners();
 		for (int i = 0; i < listeners.size(); i++) {
 			listeners.get(i).afterStart(this.application);
 		}
@@ -164,14 +195,14 @@ public class ApplicationManager {
 	 *
 	 */
 	private void fireBeforeApplicationInit() {
-		final ArrayList<ApplicationListener> listeners = this.application.getApplicationListeners();
+		final List<ApplicationListener> listeners = this.application.getApplicationListeners();
 		for (int i = 0; i < listeners.size(); i++) {
 			listeners.get(i).beforeInit(this.application);
 		}
 	}
 
 	private void fireBeforeApplicationStart() {
-		final ArrayList<ApplicationListener> listeners = this.application.getApplicationListeners();
+		final List<ApplicationListener> listeners = this.application.getApplicationListeners();
 		for (int i = 0; i < listeners.size(); i++) {
 			listeners.get(i).beforeStart(this.application);
 		}
@@ -182,7 +213,7 @@ public class ApplicationManager {
 	 * @param e
 	 */
 	private void fireException(final Exception e) {
-		final ArrayList<ApplicationListener> listeners = this.application.getApplicationListeners();
+		final List<ApplicationListener> listeners = this.application.getApplicationListeners();
 		for (int i = 0; i < listeners.size(); i++) {
 			listeners.get(i).onException(this.application, e);
 		}
@@ -232,13 +263,17 @@ public class ApplicationManager {
 	 * @throws ApplicationException
 	 */
 	public Application init() throws FileNotFoundException, ApplicationException {
-		final String fileName = DEFAULT_SYSTEM_FILE;
-		try {
-			return init(GeneralUtility.getFileInputStream(fileName));
-		} catch (final FileNotFoundException e) {
-			System.err.println(DEFAULT_SYSTEM_FILE + " doesnot exist, init with defaults");
-			return init(null);
+		for (String fileName : DEFAULT_SYSTEM_FILES) {
+			logger.info("trying to init application with file :" + fileName);
+			try {
+				return init(GeneralUtility.getFileInputStream(fileName));
+			} catch (final FileNotFoundException e) {
+				logger.info("not found ");
+			}
 		}
+		System.err.println(" config files doesnot exist, init with defaults");
+		return init(null);
+
 	}
 
 	/**
@@ -246,34 +281,45 @@ public class ApplicationManager {
 	 * @throws JKXmlException
 	 */
 	public Application init(final InputStream in) throws ApplicationException {
+		logger.info("init with inputstream");
 		Splash splash = null;
 		try {
+			logger.info("initConfig");
 			initConfig();
+			logger.info("init labels");
 			Lables.getDefaultInstance();// to foce init
 			// loadDefaultLables();
+			logger.info("loadDefaultMeta()");
 			loadDefaultMeta();
 			if (in != null) {
+				logger.info("parse application");
 				final ApplicationXmlParser parser = new ApplicationXmlParser();
 				this.application = parser.parseApplication(in);
 			} else {
+				logger.info("create default application");
 				this.application = createDefaultApplication();
 			}
 			if (this.application.getSplashImage() != null) {
+				logger.info("show splash");
 				splash = new Splash(this.application.getSplashImage());
 				splash.setVisible(true);
 			}
+			logger.info("validate license");
 			LicenseClientFactory.getClient().validateLicense();
 			fireBeforeApplicationInit();
 			if (this.application.getLocale() != null) {
+				logger.info("set locale to : " + application.getLocale());
 				SwingUtility.setDefaultLocale(this.application.getLocale());
 			} else {
 				System.err.println("null locale");
 			}
-			ExceptionUtil.initExceptionLogging();
+			// ExceptionUtil.initExceptionLogging();
+			logger.info("application.init");
 			this.application.init();
 			// WE DELAY THE CHECK UNTIL NOW TO BE SURE THAT WE HAVE LOADED THE
 			// LABLES
 			if (firstRun && isAllowSingleInstanceOnly()) {
+				logger.info("single instance only");
 				// to avoid any issues with swicthLocale or restart
 				InstanceManager.registerInstance(this.application.getApplicationId());
 				firstRun = false;
@@ -313,12 +359,17 @@ public class ApplicationManager {
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////
-	private void loadDefaultMeta() throws JKXmlException, DaoException {
+	private void loadDefaultMeta() throws JKXmlException, JKDataAccessException {
+		logger.info("start loading default meta");
 		final TableMetaXmlParser parser = new TableMetaXmlParser();
-		final InputStream in = ResourceLoaderFactory.getResourceLoaderImp().getResourceAsStream("/resources/meta/meta.xml");
+		String resourceName = "/resources/meta/meta.xml";
+		logger.info("load default meta at :" + resourceName);
+		final InputStream in = ResourceLoaderFactory.getResourceLoaderImp().getResourceAsStream(resourceName);
 		if (in != null) {
+			logger.info("parse default meta");
 			final Hashtable<String, TableMeta> meta = parser.parse(in, "default");
-			AbstractTableMetaFactory.addTablesMeta(DataSourceFactory.getDefaultDataSource(), meta);
+			logger.info("add meta to abstract table meta factory : " + meta);
+			AbstractTableMetaFactory.addTablesMeta(JKDataSourceFactory.getDefaultDataSource(), meta);
 		}
 
 	}
@@ -335,7 +386,7 @@ public class ApplicationManager {
 		// throw new ApplicationException(e);
 		// }
 		closeMainFrame();
-		SecurityManager.setCurrentUser(null);
+		JKSecurityManager.setCurrentUser(null);
 		start();
 	}
 
@@ -359,7 +410,7 @@ public class ApplicationManager {
 			init();
 			start();
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -371,9 +422,9 @@ public class ApplicationManager {
 		fireBeforeApplicationStart();
 		Splash splash = null;
 		try {
-			if (!SecurityManager.isUserLoggedIn()) {
-				final User user = SecurityManager.getAuthenticaor().authenticate(this.application.getApplicationName(), LOGIN_RETRIES);
-				SecurityManager.setCurrentUser(user);
+			if (!JKSecurityManager.isUserLoggedIn()) {
+				final JKUser user = JKSecurityManager.getAuthenticaor().authenticate(this.application.getApplicationName(), LOGIN_RETRIES);
+				JKSecurityManager.setCurrentUser(user);
 				AutomaticDBBackup.processDatabaseAutobackup();
 			}
 			if (this.application.getSplashImage() != null) {
@@ -394,7 +445,7 @@ public class ApplicationManager {
 				}
 			});
 			fireAfterApplicationStart();
-		} catch (final InvalidUserException e) {
+		} catch (final JKInvalidUserException e) {
 			fireException(e);
 			throw new ApplicationException(e);
 		} catch (final SecurityException e) {
@@ -417,7 +468,7 @@ public class ApplicationManager {
 			@Override
 			public void run() {
 				closeMainFrame();
-				ReportManager.clearReports();
+				JKReportManager.clearReports();
 				ApplicationManager.this.application = getApplication();
 				ApplicationManager.this.application.setLocale(ApplicationManager.this.application.getInActiveLocale(), false);
 				SwingUtility.setDefaultLocale(ApplicationManager.this.application.getLocale());
@@ -436,9 +487,9 @@ public class ApplicationManager {
 	public void testPanel(final JKPanel panel) {
 		try {
 			// init();
-			final User currentUser = new User(1);
+			final JKUser currentUser = new JKUser(1);
 			currentUser.setUserId("admin");
-			SecurityManager.setCurrentUser(currentUser);
+			JKSecurityManager.setCurrentUser(currentUser);
 			SwingUtility.testPanel(panel);
 		} catch (final Exception e) {
 			e.printStackTrace();

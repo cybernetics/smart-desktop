@@ -15,14 +15,14 @@
  */
 package com.fs.commons.desktop.dynform.ui.action;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.Record;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 
 public class DynDaoActionAdapter implements DynDaoActionListener {
 
 	@Override
-	public void afterAddRecord(final Record record) throws DaoException {
+	public void afterAddRecord(final Record record) throws JKDataAccessException {
 
 	}
 
@@ -32,7 +32,7 @@ public class DynDaoActionAdapter implements DynDaoActionListener {
 	}
 
 	@Override
-	public void afterDeleteRecord(final Record record) throws DaoException {
+	public void afterDeleteRecord(final Record record) throws JKDataAccessException {
 
 	}
 
@@ -47,12 +47,12 @@ public class DynDaoActionAdapter implements DynDaoActionListener {
 	}
 
 	@Override
-	public void afterUpdateRecord(final Record record) throws DaoException {
+	public void afterUpdateRecord(final Record record) throws JKDataAccessException {
 
 	}
 
 	@Override
-	public void beforeAddRecord(final Record record) throws DaoException {
+	public void beforeAddRecord(final Record record) throws JKDataAccessException {
 
 	}
 
@@ -62,7 +62,7 @@ public class DynDaoActionAdapter implements DynDaoActionListener {
 	}
 
 	@Override
-	public void beforeDeleteRecord(final Record record) throws DaoException {
+	public void beforeDeleteRecord(final Record record) throws JKDataAccessException {
 
 	}
 
@@ -77,12 +77,12 @@ public class DynDaoActionAdapter implements DynDaoActionListener {
 	}
 
 	@Override
-	public void beforeUpdateRecord(final Record record) throws DaoException {
+	public void beforeUpdateRecord(final Record record) throws JKDataAccessException {
 
 	}
 
 	@Override
-	public void onDaoException(final Record recod, final DaoException ex) {
+	public void onDaoException(final Record recod, final JKDataAccessException ex) {
 
 	}
 
@@ -92,7 +92,7 @@ public class DynDaoActionAdapter implements DynDaoActionListener {
 	}
 
 	@Override
-	public void onRecordNotFound(final Object recordId, final DaoException e) {
+	public void onRecordNotFound(final Object recordId, final JKDataAccessException e) {
 
 	}
 }

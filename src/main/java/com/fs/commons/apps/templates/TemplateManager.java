@@ -23,11 +23,11 @@ import com.fs.commons.apps.templates.beans.TemplateVariable;
 import com.fs.commons.apps.templates.beans.Variable;
 import com.fs.commons.apps.templates.facade.TemplateFacade;
 import com.fs.commons.dao.DaoUtil;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.dao.sql.query.FieldCondition;
 import com.fs.commons.dao.sql.query.Keyword;
 import com.fs.commons.dao.sql.query.Query;
@@ -58,7 +58,7 @@ public class TemplateManager {
 		return query.compile();
 	}
 
-	public static String compile(final int templateId, final Object[] ids) throws RecordNotFoundException, DaoException {
+	public static String compile(final int templateId, final Object[] ids) throws JKRecordNotFoundException, JKDataAccessException {
 		final TemplateFacade facade = new TemplateFacade();
 		final Template template = facade.findTemplate(templateId);
 		return compile(template, ids);
@@ -70,9 +70,9 @@ public class TemplateManager {
 	 * @param queryIds
 	 *            []
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static String compile(final Template template, final Object[] queryIds) throws DaoException {
+	public static String compile(final Template template, final Object[] queryIds) throws JKDataAccessException {
 		String output = template.getTempText();
 		System.out.println("Compling Template : " + template.getTempName());
 		System.out.println(template.getTempText());
@@ -86,9 +86,9 @@ public class TemplateManager {
 
 	/**
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static String[] compileTemplateGroup(final Template template, final Object[] entityParamaters) throws DaoException {
+	public static String[] compileTemplateGroup(final Template template, final Object[] entityParamaters) throws JKDataAccessException {
 		final String[] compiledTemplates = new String[entityParamaters.length];
 		for (int i = 0; i < entityParamaters.length; i++) {
 			final Object[] queryIds = (Object[]) entityParamaters[i];
@@ -103,9 +103,9 @@ public class TemplateManager {
 	 * @param template
 	 * @param entityParamaters
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static String[] compileTemplateGroup(final Template template, final String templateParamtersQuery) throws DaoException {
+	public static String[] compileTemplateGroup(final Template template, final String templateParamtersQuery) throws JKDataAccessException {
 		System.out.println("Compling group by paramters query : \n" + templateParamtersQuery);
 		return compileTemplateGroup(template, DaoUtil.executeQueryAsArray(templateParamtersQuery));
 
@@ -115,9 +115,9 @@ public class TemplateManager {
 	 * @param var
 	 * @param id
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	private static Object fetchVariable(final Variable var, final Object id) throws DaoException {
+	private static Object fetchVariable(final Variable var, final Object id) throws JKDataAccessException {
 		String queryText;
 		if (var.getQuery() == null) {
 			queryText = buildVariableFetchQuery(var, id);

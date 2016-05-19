@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
@@ -50,7 +51,7 @@ import com.fs.commons.application.ui.UIOPanelCreationException;
 import com.fs.commons.application.ui.menu.Menu;
 import com.fs.commons.application.ui.menu.MenuItem;
 import com.fs.commons.apps.executors.CloseExecutor;
-import com.fs.commons.dao.AbstractDao;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
 import com.fs.commons.desktop.graphics.GraphicsFactory.GradientType;
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.SwingUtility;
@@ -67,14 +68,12 @@ import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.comp.panels.TitledPanel;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
-import com.fs.commons.security.Privilige;
-import com.fs.commons.security.SecurityManager;
-import com.fs.commons.security.exceptions.NotAllowedOperationException;
-import com.fs.commons.security.exceptions.SecurityException;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
-import com.fs.license.client.LicenseClientFactory;
-//import com.fs.commons.desktop.swing.listener.InactivityListener;
+import com.jk.exceptions.JKNotAllowedOperationException;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.license.client.LicenseClientFactory;
+import com.jk.security.JKSecurityManager;
+import com.jk.security.JKPrivilige;
 
 public class ApplicationFrame extends JKFrame {
 
@@ -123,12 +122,12 @@ public class ApplicationFrame extends JKFrame {
 		protected void handleReload() {
 			try {
 				remove((Container) this.panel);
-				AbstractDao.resetCache();
+				JKAbstractPlainDataAccess.resetCache();
 				SwingUtility.resetComponents();
 				this.panel = this.item.createPanel(true);
 				showPanel();
 			} catch (final UIOPanelCreationException e) {
-				ExceptionUtil.handleException(e);
+				ExceptionUtil.handle(e);
 			}
 		}
 	}
@@ -143,9 +142,9 @@ public class ApplicationFrame extends JKFrame {
 		try {
 			LicenseClientFactory.getClient().validateLicense();
 			// } catch (LicenseException e) {
-			// ExceptionUtil.handleException(e);
+			// ExceptionUtil.handle(e);
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -213,7 +212,7 @@ public class ApplicationFrame extends JKFrame {
 	// try {
 	// ApplicationManager.getInstance().logout();
 	// } catch (ApplicationException e1) {
-	// ExceptionUtil.handleException(e1);
+	// ExceptionUtil.handle(e1);
 	// }
 	// }
 	// };
@@ -423,7 +422,7 @@ public class ApplicationFrame extends JKFrame {
 	 * @return
 	 */
 	private String getFavortiesPanelKeyName() {
-		return SecurityManager.getCurrentUser().getUserId() + "-panels";
+		return JKSecurityManager.getCurrentUser().getUserId() + "-panels";
 	}
 
 	/**
@@ -450,7 +449,7 @@ public class ApplicationFrame extends JKFrame {
 			this.pnlModules.setGradientType(GradientType.HORIZENTAL);
 			// pnlModules.setOpaque(false);
 			this.pnlModules.setBackground(Colors.MODULE_PANEL_BG);
-			final ArrayList<Module> modules = this.application.getModules();
+			final List<Module> modules = this.application.getModules();
 			for (int i = 0; i < modules.size(); i++) {
 				final Module module = modules.get(i);
 				if (isAllowedCommand(module.getPrivilige())) {
@@ -505,7 +504,7 @@ public class ApplicationFrame extends JKFrame {
 		this.closeExecutor.run();
 	}
 
-	public void handleShowPanel(final String menuItemName) throws NotAllowedOperationException, SecurityException {
+	public void handleShowPanel(final String menuItemName) throws JKNotAllowedOperationException, SecurityException {
 		final MenuItem item = getApplication().findMenuItem(menuItemName);
 		showMenuItemPanel(item, false, false);
 	}
@@ -557,15 +556,15 @@ public class ApplicationFrame extends JKFrame {
 	 * @param priviligeId
 	 * @return
 	 */
-	private boolean isAllowedCommand(final Privilige priv) {
+	private boolean isAllowedCommand(final JKPrivilige priv) {
 		try {
-			SecurityManager.getAuthorizer().checkAllowed(priv);
+			JKSecurityManager.getAuthorizer().checkAllowed(priv);
 			return true;
-		} catch (final NotAllowedOperationException e) {
+		} catch (final JKNotAllowedOperationException e) {
 			System.err.println("Privlige Id : " + priv.getPriviligeId() + " , with name : " + priv.getPriviligeName() + " is not allowed");
 			return false;
 		} catch (final SecurityException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			return false;
 		}
 	}
@@ -652,7 +651,7 @@ public class ApplicationFrame extends JKFrame {
 						setUserStatus(item.getFullQualifiedPath());
 					}
 				} catch (final UIOPanelCreationException e) {
-					ExceptionUtil.handleException(e);
+					ExceptionUtil.handle(e);
 				} finally {
 					// AnimationUtil.enable(ApplicationFrame.this);
 				}
@@ -666,11 +665,11 @@ public class ApplicationFrame extends JKFrame {
 	 * @param menuItemName
 	 * @param addToHistory
 	 * @param refreshModuleAndMenu
-	 * @throws NotAllowedOperationException
+	 * @throws JKNotAllowedOperationException
 	 * @throws SecurityException
 	 */
 	public void showMenuItemPanel(final String menuItemName, final boolean addToHistory, final boolean refreshModuleAndMenu)
-			throws NotAllowedOperationException, SecurityException {
+			throws JKNotAllowedOperationException, SecurityException {
 		final MenuItem item = getApplication().findMenuItem(menuItemName);
 		showMenuItemPanel(item, addToHistory, refreshModuleAndMenu);
 	}
@@ -693,7 +692,7 @@ public class ApplicationFrame extends JKFrame {
 			dialog.setVisible(true);
 			panel.requestFocus();
 		} catch (final UIOPanelCreationException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -703,7 +702,7 @@ public class ApplicationFrame extends JKFrame {
 			final JKFrame frame = SwingUtility.showPanelFrame(panel, item.getName());
 			frame.setExtendedState(JKFrame.NORMAL);
 		} catch (final UIOPanelCreationException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

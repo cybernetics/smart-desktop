@@ -24,9 +24,9 @@ import java.util.Vector;
 
 import javax.sql.rowset.CachedRowSet;
 
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.paging.DataBasePager;
 import com.fs.commons.dao.paging.DataPager;
 import com.fs.commons.dao.paging.PagingException;
@@ -34,7 +34,7 @@ import com.fs.commons.desktop.swing.comp.model.FSTableColumn;
 import com.fs.commons.desktop.swing.comp.model.FSTableModel;
 import com.fs.commons.desktop.swing.comp.model.FSTableRecord;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class QueryTableModel extends FSTableModel implements DataPager {
 	enum OrderDirection {
@@ -86,7 +86,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 	// private ConnectionManager connectionManager =
 	// ConnectionManagerFactory.getDefaultConnectionManager();
 
-	private DataSource dataSource;
+	private JKDataSource dataSource;
 
 	private String orderByStatement = "";
 
@@ -108,7 +108,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 	 *
 	 * @param connectionManager
 	 */
-	public QueryTableModel(final DataSource connectionManager) {
+	public QueryTableModel(final JKDataSource connectionManager) {
 		this();
 		setDataSource(connectionManager);
 	}
@@ -117,7 +117,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 	 * @param manager
 	 * @param sql
 	 */
-	public QueryTableModel(final DataSource reourceManager, final String sql) {
+	public QueryTableModel(final JKDataSource reourceManager, final String sql) {
 		this(reourceManager, sql, 0);
 	}
 
@@ -126,7 +126,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 	 * @param sql2
 	 * @param orderByColunmIndex2
 	 */
-	public QueryTableModel(final DataSource manager, final String sql, final int orderByColunmIndex) {
+	public QueryTableModel(final JKDataSource manager, final String sql, final int orderByColunmIndex) {
 		setReourceManager(manager);
 		setOrderByColunmIndex(orderByColunmIndex);
 		setSql(sql);
@@ -216,7 +216,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 	// }
 	// return clas;
 	// } catch (Exception e) {
-	// ExceptionUtil.handleException(e);
+	// ExceptionUtil.handle(e);
 	// return null;
 	// }
 	// }
@@ -230,11 +230,11 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 	/**
 	 * @return the connectionManager
 	 */
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		if (this.dataSource != null) {
 			return this.dataSource;
 		}
-		return DataSourceFactory.getDefaultDataSource();
+		return JKDataSourceFactory.getDefaultDataSource();
 	}
 
 	// /**
@@ -288,7 +288,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 		return recordId != null ? Integer.parseInt(recordId.toString()) : 0;
 	}
 
-	public DataSource getReourceManager() {
+	public JKDataSource getReourceManager() {
 		return this.dataSource;
 	}
 
@@ -507,7 +507,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 				refreshData();
 				// table.
 			} catch (final Exception e) {
-				ExceptionUtil.handleException(new DaoException("Exception occured while trying to execute the following query : \n" + sql, e));
+				ExceptionUtil.handle(new JKDataAccessException("Exception occured while trying to execute the following query : \n" + sql, e));
 			} finally {
 				// connectionManager.close(rs);
 				// connectionManager.close(statement);
@@ -553,7 +553,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 		try {
 			refreshData();
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -625,7 +625,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 	 * @param connectionManager
 	 *            the connectionManager to set
 	 */
-	public void setDataSource(final DataSource connectionManager) {
+	public void setDataSource(final JKDataSource connectionManager) {
 		this.dataSource = connectionManager;
 	}
 
@@ -657,7 +657,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 		// loadData();
 	}
 
-	public void setReourceManager(final DataSource reourceManager) {
+	public void setReourceManager(final JKDataSource reourceManager) {
 		this.dataSource = reourceManager;
 	}
 

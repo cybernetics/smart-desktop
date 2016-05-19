@@ -26,13 +26,13 @@ import java.io.IOException;
 
 import javax.swing.JFileChooser;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.event.RecordActionAdapter;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionAdapter;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionListener;
@@ -42,8 +42,8 @@ import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * @author u087
@@ -73,10 +73,10 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 
 	/**
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 *
 	 */
-	public DetailOneToManyPanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws TableMetaNotFoundException, DaoException {
+	public DetailOneToManyPanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws TableMetaNotFoundException, JKDataAccessException {
 		// fix me
 		this.masterTableMeta = foriegnKeyFieldMeta.getReferenceTableMeta();
 		this.foriegnKeyFieldMeta = foriegnKeyFieldMeta;
@@ -89,7 +89,7 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 		resetComponents();
 	}
 
-	public DetailOneToManyPanel(final String detailTableName, final String foriegKeyFieldName) throws TableMetaNotFoundException, DaoException {
+	public DetailOneToManyPanel(final String detailTableName, final String foriegKeyFieldName) throws TableMetaNotFoundException, JKDataAccessException {
 		this((ForiegnKeyFieldMeta) AbstractTableMetaFactory.getTableMeta(detailTableName).getField(foriegKeyFieldName));
 	}
 
@@ -109,10 +109,10 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 	 * p
 	 *
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 */
-	protected DynDaoPanel createDetailPanel() throws TableMetaNotFoundException, DaoException {
+	protected DynDaoPanel createDetailPanel() throws TableMetaNotFoundException, JKDataAccessException {
 		final DynDaoPanel pnlDetail = new DynDaoPanel(getDetailTableMeta());
 		pnlDetail.setAllowClose(false);
 		pnlDetail.setAllowDuplicate(true);
@@ -242,8 +242,8 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 				try {
 					this.pnlDetail.handleFindRecord(id);
 					this.pnlDetail.handleDelete(false);
-				} catch (final DaoException e) {
-					ExceptionUtil.handleException(e);
+				} catch (final JKDataAccessException e) {
+					ExceptionUtil.handle(e);
 				}
 			}
 		}
@@ -260,8 +260,8 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 			if (isShowDaoPanelInDialog()) {
 				SwingUtility.showPanelInDialog(this.pnlDetail, "EDIT_RECORD");
 			}
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -276,7 +276,7 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 			try {
 				GeneralUtility.readFile(file);
 			} catch (final IOException e) {
-				ExceptionUtil.handleException(e);
+				ExceptionUtil.handle(e);
 			}
 		}
 	}
@@ -378,7 +378,7 @@ public class DetailOneToManyPanel extends JKMainPanel implements DetailPanel {
 	}
 
 	@Override
-	public void resetComponents() throws DaoException {
+	public void resetComponents() throws JKDataAccessException {
 		setMasterIdValue(null);
 		// queryTable.setQuery("");
 		// pnlDetail.resetComponents();

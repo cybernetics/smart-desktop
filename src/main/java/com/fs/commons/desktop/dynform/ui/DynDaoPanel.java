@@ -25,14 +25,14 @@ import javax.swing.JButton;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionListener;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
@@ -41,7 +41,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
 import com.fs.commons.desktop.swing.dialogs.QueryDialog;
 import com.fs.commons.desktop.swing.printing.PrintUtilities;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * contains DynPanel with Add,Edit,update,Delete buttons
@@ -131,10 +131,10 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	private boolean showRecordAfterAdd = false;
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 */
-	public DynDaoPanel(final DynPanel dynPanel) throws TableMetaNotFoundException, DaoException {
+	public DynDaoPanel(final DynPanel dynPanel) throws TableMetaNotFoundException, JKDataAccessException {
 		this.tableMeta = dynPanel.getTableMeta();
 		this.pnlDao = dynPanel;
 		this.pnlDao.addDynDaoActionListener(this);
@@ -143,7 +143,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 		setTraversePolicy(null);
 	}
 
-	public DynDaoPanel(final String tableName) throws TableMetaNotFoundException, DaoException {
+	public DynDaoPanel(final String tableName) throws TableMetaNotFoundException, JKDataAccessException {
 		this(AbstractTableMetaFactory.getTableMeta(tableName));
 	}
 
@@ -151,9 +151,9 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	 *
 	 * @param tableMeta
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public DynDaoPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException {
+	public DynDaoPanel(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException {
 		this(new DynPanel(tableMeta));
 	}
 
@@ -172,7 +172,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	 * Override the DaoActionListner
 	 */
 	@Override
-	public void afterAddRecord(final Record record) throws DaoException {
+	public void afterAddRecord(final Record record) throws JKDataAccessException {
 		// SwingUtility.showSuccessDialog("SUCC_RECORD_ADDED");
 		if (this.showRecordAfterAdd) {
 			handleFindRecord(record.getIdValue());
@@ -193,7 +193,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	 *
 	 */
 	@Override
-	public void afterDeleteRecord(final Record record) throws DaoException {
+	public void afterDeleteRecord(final Record record) throws JKDataAccessException {
 		setMode(DynDaoMode.ADD);
 	}
 
@@ -218,7 +218,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	}
 
 	@Override
-	public void afterUpdateRecord(final Record record) throws DaoException {
+	public void afterUpdateRecord(final Record record) throws JKDataAccessException {
 		this.pnlDao.handleFindEvent(record.getIdValue());
 	}
 
@@ -231,7 +231,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	}
 
 	@Override
-	public void beforeDeleteRecord(final Record record) throws DaoException {
+	public void beforeDeleteRecord(final Record record) throws JKDataAccessException {
 	}
 
 	@Override
@@ -247,14 +247,14 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 			try {
 				resetComponents();
 				this.pnlDao.requestFocus();
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			}
 		}
 	}
 
 	@Override
-	public void beforeUpdateRecord(final Record record) throws DaoException {
+	public void beforeUpdateRecord(final Record record) throws JKDataAccessException {
 	}
 
 	/**
@@ -476,9 +476,9 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 				setNewRecordId(newId);
 			}
 		} catch (final ValidationException ex) {
-			ExceptionUtil.handleException(ex);
-		} catch (final DaoException ex) {
-			ExceptionUtil.handleException(ex);
+			ExceptionUtil.handle(ex);
+		} catch (final JKDataAccessException ex) {
+			ExceptionUtil.handle(ex);
 		}
 	}
 
@@ -489,8 +489,8 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 		// setMode(DynDaoMode.VIEW);
 		try {
 			handleFindRecord(getRecord().getIdValue());
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -517,7 +517,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 		if (!confirm || confirm && SwingUtility.showConfirmationDialog("CONFIRM_DELETE_RECORD")) {
 			try {
 				this.pnlDao.handleDeleteEvent();
-			} catch (final DaoException ex) {
+			} catch (final JKDataAccessException ex) {
 				SwingUtility.showDatabaseErrorDialog(ex.getMessage(), ex);
 			}
 		}
@@ -539,7 +539,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 
 	/**
 	 *
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	protected void handleEdit() {
 		setMode(DynDaoMode.EDIT);
@@ -555,10 +555,10 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 			if (id != null) {
 				handleFindRecord(id);
 			}
-		} catch (final RecordNotFoundException ex) {
+		} catch (final JKRecordNotFoundException ex) {
 			SwingUtility.showMessageDialog(ex.getMessage(), ex);
 			this.pnlDao.requestFocus();
-		} catch (final DaoException ex) {
+		} catch (final JKDataAccessException ex) {
 			SwingUtility.showDatabaseErrorDialog(ex.getMessage(), ex);
 		}
 
@@ -568,9 +568,9 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	 * Created to fix the recursion issue at refined method
 	 *
 	 * @param recordId
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public void handleFind(final String recordId, final boolean setViewMode) throws DaoException {
+	public void handleFind(final String recordId, final boolean setViewMode) throws JKDataAccessException {
 		this.pnlDao.handleFindEvent(recordId);
 		if (setViewMode) {
 			setMode(DynDaoMode.VIEW);
@@ -580,7 +580,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	/**
 	 *
 	 */
-	public void handleFindRecord(final Object id) throws DaoException {
+	public void handleFindRecord(final Object id) throws JKDataAccessException {
 		handleFind(id.toString(), true);
 	}
 
@@ -589,8 +589,8 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 		if (record != null) {
 			try {
 				importRecord(record.split(";"));
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			}
 		}
 	}
@@ -642,11 +642,11 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 			this.pnlDao.validateUpdateData();
 			this.pnlDao.handleSaveEvent();
 		} catch (final ValidationException e) {
-			ExceptionUtil.handleException(e);
-		} catch (final RecordNotFoundException ex) {
-			ExceptionUtil.handleException(ex);
-		} catch (final DaoException ex) {
-			ExceptionUtil.handleException(ex);
+			ExceptionUtil.handle(e);
+		} catch (final JKRecordNotFoundException ex) {
+			ExceptionUtil.handle(ex);
+		} catch (final JKDataAccessException ex) {
+			ExceptionUtil.handle(ex);
 		}
 	}
 
@@ -659,9 +659,9 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 
 	/**
 	 * @param data
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public void importRecord(final String[] data) throws DaoException {
+	public void importRecord(final String[] data) throws JKDataAccessException {
 		final Record emptyRecord = getDao().createEmptyRecord(true);
 		final ArrayList<Field> fields = emptyRecord.getFields();
 		int index = 0;
@@ -836,15 +836,15 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 				handleFindRecord(recordId);
 				this.traversePolicy.setCurrentRecord(getIdValueAsInteger());
 				checkPnlTraverseEnability();
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			}
 		}
 	}
 
 	@Override
-	public void onDaoException(final Record recod, final DaoException ex) {
-		ExceptionUtil.handleException(ex);
+	public void onDaoException(final Record recod, final JKDataAccessException ex) {
+		ExceptionUtil.handle(ex);
 	}
 
 	@Override
@@ -853,7 +853,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	}
 
 	@Override
-	public void onRecordNotFound(final Object recordId, final DaoException e) {
+	public void onRecordNotFound(final Object recordId, final JKDataAccessException e) {
 	}
 
 	/**
@@ -872,9 +872,9 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	 * (COMBO BOX FOR EXAM) FROM CUSTOMIZED PANEL , like PnlClassCourses in
 	 * smart-school
 	 *
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public void reFind() throws DaoException {
+	public void reFind() throws JKDataAccessException {
 		if (getMode() == DynDaoMode.VIEW) {
 			this.pnlDao.handleFindEvent(getIdValue(), false);
 			// pnlDao.findRecord(getIdValue());
@@ -893,7 +893,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	}
 
 	@Override
-	public void resetComponents() throws DaoException {
+	public void resetComponents() throws JKDataAccessException {
 		this.pnlDao.resetComponents();
 
 	}
@@ -991,7 +991,7 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	/**
 	 *
 	 * @param mode
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	public void setMode(DynDaoMode mode) {
 		fireBeforeSetMode(mode);
@@ -1079,8 +1079,8 @@ public class DynDaoPanel extends JKMainPanel implements DynDaoActionListener, Bi
 	public void setValue(final Object value) {
 		try {
 			handleFindRecord(value.toString());
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 	}
 

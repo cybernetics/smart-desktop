@@ -19,14 +19,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 
-import com.fs.commons.dao.DaoUpdater;
 import com.fs.commons.dao.DaoUtil;
-import com.fs.commons.dao.Session;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.fs.commons.dao.JKSession;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.jk.db.dataaccess.plain.JKUpdater;
 
 public class OracleDynamicDao extends DynamicDao {
 	private final OracleAbstractDao oracleDao = new OracleAbstractDao();
@@ -37,7 +37,7 @@ public class OracleDynamicDao extends DynamicDao {
 	}
 
 	// /////////////////////////////////////////////////////////////////
-	public OracleDynamicDao(final String tableMetaName, final Session session) {
+	public OracleDynamicDao(final String tableMetaName, final JKSession session) {
 		super(tableMetaName, session);
 	}
 
@@ -47,7 +47,7 @@ public class OracleDynamicDao extends DynamicDao {
 	}
 
 	// /////////////////////////////////////////////////////////////////
-	public OracleDynamicDao(final TableMeta meta, final Session session) {
+	public OracleDynamicDao(final TableMeta meta, final JKSession session) {
 		super(meta, session);
 	}
 
@@ -60,21 +60,21 @@ public class OracleDynamicDao extends DynamicDao {
 	}
 
 	@Override
-	public Date getSystemDate() throws RecordNotFoundException, DaoException {
+	public Date getSystemDate() throws JKRecordNotFoundException, JKDataAccessException {
 		return this.oracleDao.getSystemDate();
 	}
 
 	// //////////////////////////////////////////////////////////////
 	@Override
-	public String insertRecord(final Record record) throws DaoException {
+	public String insertRecord(final Record record) throws JKDataAccessException {
 		if (record.getIdValue() == null) {
 			final int nextId = this.oracleDao.getNextId(this.tableMeta.getTableName(), record.getIdField().getFieldName());
 			record.setIdValue(nextId);
 		}
 		callBeforeAddEventOnTriggers(record);
-		final DaoUpdater updater = new DaoUpdater() {
+		final JKUpdater updater = new JKUpdater() {
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return OracleDynamicDao.this.sqlBuilder.buildInsert(record);
 			}
 
@@ -91,7 +91,7 @@ public class OracleDynamicDao extends DynamicDao {
 
 	// //////////////////////////////////////////////////////////////
 	@Override
-	public void setSession(final Session session) {
+	public void setSession(final JKSession session) {
 		super.setSession(session);
 		this.oracleDao.setSession(session);
 	}

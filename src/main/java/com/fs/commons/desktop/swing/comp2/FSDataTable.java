@@ -15,7 +15,7 @@
  */
 package com.fs.commons.desktop.swing.comp2;
 
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
 import com.fs.commons.desktop.swing.dao.QueryTableModel;
@@ -42,7 +42,7 @@ public class FSDataTable extends QueryJTable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public FSDataTable(final String title, final DataSource resource, final String sql, final boolean allowFiltering) {
+	public FSDataTable(final String title, final JKDataSource resource, final String sql, final boolean allowFiltering) {
 		super(title, resource, sql, allowFiltering);
 		// TODO Auto-generated constructor stub
 	}

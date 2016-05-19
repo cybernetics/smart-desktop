@@ -24,7 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
@@ -70,9 +70,9 @@ public class EditDataDialog extends JKDialog {
 	 * @param idValue
 	 *            String
 	 * @return boolean true if the data changed , false if not
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static boolean showEditDialog(final Frame frm, final DataPanel pnl, final String idValue) throws DaoException {
+	public static boolean showEditDialog(final Frame frm, final DataPanel pnl, final String idValue) throws JKDataAccessException {
 		return showEditDialog(frm, pnl, idValue, true);
 	}
 
@@ -83,9 +83,9 @@ public class EditDataDialog extends JKDialog {
 	 * @param idValue
 	 * @param allowDelete
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static boolean showEditDialog(final Frame frm, final DataPanel pnl, final String idValue, final boolean allowDelete) throws DaoException {
+	public static boolean showEditDialog(final Frame frm, final DataPanel pnl, final String idValue, final boolean allowDelete) throws JKDataAccessException {
 		pnl.resetComponents();
 		final EditDataDialog dlg = new EditDataDialog(frm, pnl, idValue);
 		dlg.setAllowDelete(allowDelete);
@@ -126,7 +126,7 @@ public class EditDataDialog extends JKDialog {
 		init();
 		try {
 			dataPanel.handleFindEvent(idValue);
-		} catch (final DaoException ex) {
+		} catch (final JKDataAccessException ex) {
 			SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
 		}
 	}
@@ -158,7 +158,7 @@ public class EditDataDialog extends JKDialog {
 				SwingUtility.showSuccessDialog(this, "SUCC_RECORD_DELETED");
 				dispose();
 				this.cancelled = false;
-			} catch (final DaoException ex) {
+			} catch (final JKDataAccessException ex) {
 				SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
 			}
 		}
@@ -188,7 +188,7 @@ public class EditDataDialog extends JKDialog {
 			this.cancelled = false;
 		} catch (final ValidationException ex) {
 			SwingUtility.showUserErrorDialog(this, ex.getMessage(), ex);
-		} catch (final DaoException ex) {
+		} catch (final JKDataAccessException ex) {
 			SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
 		}
 

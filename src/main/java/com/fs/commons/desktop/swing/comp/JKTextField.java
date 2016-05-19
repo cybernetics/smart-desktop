@@ -28,8 +28,8 @@ import javax.swing.text.PlainDocument;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.swin.ConversionUtil;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.SwingValidator;
@@ -220,13 +220,13 @@ public class JKTextField extends JTextField implements BindingComponent {
 	}
 
 	@Override
-	public void filterValues(final BindingComponent comp1) throws DaoException {
+	public void filterValues(final BindingComponent comp1) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.fsWrapper.getDataSource();
 	}
 
@@ -437,7 +437,7 @@ public class JKTextField extends JTextField implements BindingComponent {
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.fsWrapper.setDataSource(manager);
 	}
 

@@ -23,7 +23,7 @@ import javax.swing.JRadioButton;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.validation.Validator;
 import com.fs.commons.locale.Lables;
@@ -105,7 +105,7 @@ public class JKRadioButton extends JRadioButton implements BindingComponent<Obje
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.fsWrapper.getDataSource();
 	}
 
@@ -153,7 +153,7 @@ public class JKRadioButton extends JRadioButton implements BindingComponent<Obje
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.fsWrapper.setDataSource(manager);
 	}
 

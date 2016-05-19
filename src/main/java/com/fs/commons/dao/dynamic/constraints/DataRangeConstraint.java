@@ -17,12 +17,12 @@ package com.fs.commons.dao.dynamic.constraints;
 
 import java.util.ArrayList;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.ConstraintException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.DataOutOfRangeException;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
-import com.fs.commons.dao.exception.DaoException;
 
 public class DataRangeConstraint extends Constraint {
 	float valueFrom;
@@ -56,7 +56,7 @@ public class DataRangeConstraint extends Constraint {
 	}
 
 	@Override
-	public void validate(final Record record) throws ConstraintException, DaoException {
+	public void validate(final Record record) throws ConstraintException, JKDataAccessException {
 		final ArrayList<FieldMeta> fields = getFields();
 		for (int i = 0; i < fields.size(); i++) {
 			final FieldMeta fieldMeta = fields.get(i);

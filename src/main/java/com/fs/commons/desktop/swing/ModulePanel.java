@@ -18,6 +18,7 @@ package com.fs.commons.desktop.swing;
 import java.awt.BorderLayout;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
@@ -43,7 +44,7 @@ public class ModulePanel extends JKPanel {
 		ApplicationManager.getInstance().init();
 		// ApplicationManager.getInstance().start();
 		final Application application = ApplicationManager.getInstance().getApplication();
-		final ArrayList<Module> modules = application.getModules();
+		final List<Module> modules = application.getModules();
 		final ModulePanel m = new ModulePanel(modules.get(7));
 		SwingUtility.testPanel(m);
 	}

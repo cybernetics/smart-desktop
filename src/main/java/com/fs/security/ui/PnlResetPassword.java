@@ -21,17 +21,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKPasswordField;
 import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.fs.commons.security.SecurityManager;
-import com.fs.commons.security.User;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.security.facade.SecurityFacade;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.security.JKSecurityManager;
+import com.jk.security.JKUser;
 
 public class PnlResetPassword extends JKPanel<Object> {
 
@@ -45,19 +45,19 @@ public class PnlResetPassword extends JKPanel<Object> {
 	private final JKPasswordField txtConfirmPassword = new JKPasswordField(12, 20);
 	private final JKButton btnSave = new JKButton("SAVE");
 	private final JKButton btnCancel = new JKButton("CLOSE_PANEL");
-	private final User user;
+	private final JKUser user;
 
 	/**
 	 *
 	 */
 	public PnlResetPassword() {
-		this(SecurityManager.getCurrentUser());
+		this(JKSecurityManager.getCurrentUser());
 	}
 
 	/**
 	 *
 	 */
-	public PnlResetPassword(final User user) {
+	public PnlResetPassword(final JKUser user) {
 		this.user = user;
 		init();
 		modelToView();
@@ -113,20 +113,20 @@ public class PnlResetPassword extends JKPanel<Object> {
 	}
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	protected void handleSave() {
 		try {
 			checkValues();
-			final User user = viewToModel();
+			final JKUser user = viewToModel();
 			final SecurityFacade facade = new SecurityFacade();
 			facade.updateUser(user);
 			SwingUtility.showSuccessDialog("PASSWORD_CHANGED_SUCC");
 			SwingUtility.closePanel(this);
 		} catch (final ValidationException e) {
-			ExceptionUtil.handleException(e);
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -158,7 +158,7 @@ public class PnlResetPassword extends JKPanel<Object> {
 
 	/**
 	 * @param employee
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
 	public void modelToView() {
 		this.txtUserName.setText(this.user.getUserId());
@@ -168,7 +168,7 @@ public class PnlResetPassword extends JKPanel<Object> {
 	 *
 	 * @return
 	 */
-	private User viewToModel() {
+	private JKUser viewToModel() {
 		this.user.setPassword(this.txtNewPassword.getText());
 		return this.user;
 	}

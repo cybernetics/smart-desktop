@@ -15,9 +15,9 @@
  */
 package com.fs.commons.dao.dynamic;
 
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.mysql.MysqlAbstractDao;
@@ -25,12 +25,12 @@ import com.fs.commons.dao.oracle.OracleAbstractDao;
 import com.fs.commons.dao.oracle.OracleDynamicDao;
 
 public class DaoFactory {
-	public static AbstractDao createDao() {
-		return createDao(DataSourceFactory.getDefaultDataSource());
+	public static JKAbstractPlainDataAccess createDao() {
+		return createDao(JKDataSourceFactory.getDefaultDataSource());
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////////////
-	public static AbstractDao createDao(final DataSource dataSource) {
+	public static JKAbstractPlainDataAccess createDao(final JKDataSource dataSource) {
 		final String url = dataSource.getDatabaseUrl().toLowerCase();
 		if (url.contains("oracle")) {
 			return new OracleAbstractDao();
@@ -38,7 +38,7 @@ public class DaoFactory {
 		if (url.contains("mysql")) {
 			return new MysqlAbstractDao();
 		}
-		return new AbstractDao();
+		return new JKAbstractPlainDataAccess();
 	}
 
 	public static DynamicDao createDynamicDao(final String tableMetaName) {
@@ -47,7 +47,7 @@ public class DaoFactory {
 
 	// ///////////////////////////////////////////////////////////////////////////////////////
 	public static DynamicDao createDynamicDao(final TableMeta tableMeta) {
-		final DataSource dataSource = tableMeta.getDataSource();
+		final JKDataSource dataSource = tableMeta.getDataSource();
 		if (dataSource.getDatabaseUrl().toLowerCase().contains("oracle")) {
 			return new OracleDynamicDao(tableMeta);
 		}

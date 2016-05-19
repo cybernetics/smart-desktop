@@ -24,7 +24,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import com.fs.commons.dao.DaoUtil;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class DateTimeUtil {
 	public enum CompareDates {
@@ -71,8 +72,8 @@ public class DateTimeUtil {
 	public static String formatCurrentDatabaseDate() {
 		try {
 			return FormatUtil.formatDate(DaoUtil.getSystemDate(), "yyyy-MM-dd");
-		} catch (final DaoException e) {
-			ExceptionUtil.handleException(e);
+		} catch (final JKDataAccessException e) {
+			ExceptionUtil.handle(e);
 			// unreachable
 			return null;
 		}
@@ -241,20 +242,20 @@ public class DateTimeUtil {
 	 * @param startDate
 	 * @param endDate
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static boolean isPeriodActive(final Date startDate, final Date endDate) throws DaoException {
+	public static boolean isPeriodActive(final Date startDate, final Date endDate) throws JKDataAccessException {
 		if (startDate == null && endDate == null) {
 			return true;
 		}
 		if (startDate == null) {
-			throw new DaoException("START_DATE_CAN_NOT_BE_NULL");
+			throw new JKDataAccessException("START_DATE_CAN_NOT_BE_NULL");
 		}
 		if (endDate == null) {
-			throw new DaoException("END_DATE_CAN_NOT_BE_NULL");
+			throw new JKDataAccessException("END_DATE_CAN_NOT_BE_NULL");
 		}
 		if (compareTwoDates(startDate, endDate).equals(CompareDates.DATE1_GREATER_THAN_DATE2)) {
-			throw new DaoException("START_DATE_MUST_BE_BEFORE_END_DATE");
+			throw new JKDataAccessException("START_DATE_MUST_BE_BEFORE_END_DATE");
 		}
 		final boolean startLessThanCurrent = compareTwoDates(startDate, DaoUtil.getSystemDate()).equals(CompareDates.DATE1_LESS_THAN_DATE2);
 		final boolean endGreaterThanCurrent = compareTwoDates(endDate, DaoUtil.getSystemDate()).equals(CompareDates.DATE1_GREATER_THAN_DATE2);

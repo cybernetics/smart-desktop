@@ -15,26 +15,25 @@
  */
 package com.fs.security;
 
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
-import com.fs.commons.security.Authenticaor;
-import com.fs.commons.security.Authorizer;
-import com.fs.commons.security.Privilige;
-import com.fs.commons.security.SecurityManager;
-import com.fs.commons.security.User;
-import com.fs.commons.security.exceptions.InvalidUserException;
-import com.fs.commons.security.exceptions.NotAllowedOperationException;
-import com.fs.commons.security.exceptions.SecurityException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.security.facade.SecurityFacade;
 import com.fs.security.ui.dialogs.AuthenicationDialog;
+import com.jk.exceptions.JKInvalidUserException;
+import com.jk.exceptions.JKNotAllowedOperationException;
+import com.jk.security.JKAuthenticaor;
+import com.jk.security.JKAuthorizer;
+import com.jk.security.JKSecurityManager;
+import com.jk.security.JKPrivilige;
+import com.jk.security.JKUser;
 
-public class SecurityImpl implements Authenticaor, Authorizer {
+public class SecurityImpl implements JKAuthenticaor, JKAuthorizer {
 
 	/**
 	 *
 	 */
 	@Override
-	public User authenticate(final String title, final int maxRetries) throws InvalidUserException, SecurityException {
+	public JKUser authenticate(final String title, final int maxRetries) throws JKInvalidUserException, SecurityException {
 		return AuthenicationDialog.authenticateUser(null, title, maxRetries);
 	}
 
@@ -42,15 +41,15 @@ public class SecurityImpl implements Authenticaor, Authorizer {
 	 *
 	 */
 	@Override
-	public void checkAllowed(final Privilige privilige) throws SecurityException {
-		checkAllowed(SecurityManager.getCurrentUser(), privilige);
+	public void checkAllowed(final JKPrivilige privilige) throws SecurityException {
+		checkAllowed(JKSecurityManager.getCurrentUser(), privilige);
 	}
 
 	/**
 	 *
 	 */
 	@Override
-	public void checkAllowed(final User user, final Privilige privilige) throws SecurityException {
+	public void checkAllowed(final JKUser user, final JKPrivilige privilige) throws SecurityException {
 		final SecurityFacade facade = new SecurityFacade();
 		try {
 			// Moved the admin checking to insure privliges sync with db
@@ -60,22 +59,22 @@ public class SecurityImpl implements Authenticaor, Authorizer {
 			if (user.getUserId().equals("admin")) {
 				return;
 			}
-		} catch (final DaoException e) {
+		} catch (final JKDataAccessException e) {
 			throw new SecurityException(e);
 		}
-		throw new NotAllowedOperationException();
+		throw new JKNotAllowedOperationException();
 	}
 
 	@Override
-	public boolean isValidPrivilige(final Privilige privilige) throws SecurityException {
+	public boolean isValidPrivilige(final JKPrivilige privilige) throws SecurityException {
 		final SecurityFacade facade = new SecurityFacade();
-		Privilige priv;
+		JKPrivilige priv;
 		try {
 			priv = facade.findPrivilige(privilige.getPriviligeId());
 			return priv.getPriviligeName().equals(privilige.getPriviligeName());
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			return false;
-		} catch (final DaoException e) {
+		} catch (final JKDataAccessException e) {
 			throw new SecurityException(e);
 		}
 

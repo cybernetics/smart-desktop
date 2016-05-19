@@ -22,11 +22,11 @@ import java.util.List;
 import com.fs.commons.application.exceptions.ModuleException;
 import com.fs.commons.application.ui.menu.Menu;
 import com.fs.commons.configuration.beans.Lable;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.locale.LablesLoader;
-import com.fs.commons.reports.Report;
-import com.fs.commons.security.Privilige;
+import com.fs.commons.reports.JKReport;
+import com.jk.security.JKPrivilige;
 
 public interface Module {
 
@@ -40,7 +40,7 @@ public interface Module {
 	 *
 	 * @return
 	 */
-	public DataSource getDataSource();
+	public JKDataSource getDataSource();
 
 	/**
 	 *
@@ -87,7 +87,7 @@ public interface Module {
 	 *
 	 * @return
 	 */
-	public Privilige getPrivilige();
+	public JKPrivilige getPrivilige();
 
 	/**
 	 *
@@ -95,7 +95,7 @@ public interface Module {
 	 * @return
 	 * @throws ModuleException
 	 */
-	public ArrayList<Report> getReports(String prefix, String prefix2) throws ModuleException;
+	public ArrayList<JKReport> getReports(String prefix, String prefix2) throws ModuleException;
 
 	/**
 	 *
@@ -132,7 +132,7 @@ public interface Module {
 	 *
 	 * @param connectionManager
 	 */
-	public void setDataSource(DataSource connectionManager);
+	public void setDataSource(JKDataSource connectionManager);
 
 	/**
 	 *

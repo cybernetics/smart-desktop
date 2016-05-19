@@ -24,8 +24,8 @@ import com.fs.commons.application.exceptions.ModuleException;
 import com.fs.commons.application.ui.menu.Menu;
 import com.fs.commons.application.xml.ModuleMenuXmlParser;
 import com.fs.commons.configuration.beans.Lable;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
 import com.fs.commons.dao.dynamic.meta.xml.TableMetaXmlParser;
@@ -33,11 +33,11 @@ import com.fs.commons.locale.FilesLablesLoader;
 import com.fs.commons.locale.LablesLoader;
 import com.fs.commons.locale.LablesLoaderException;
 import com.fs.commons.locale.Locale;
-import com.fs.commons.reports.Report;
-import com.fs.commons.reports.ReportManager;
-import com.fs.commons.security.Privilige;
-import com.fs.commons.util.ExceptionUtil;
+import com.fs.commons.reports.JKReport;
+import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.security.JKPrivilige;
 
 public abstract class AbstractModule implements Module {
 	String moduleName;
@@ -46,7 +46,7 @@ public abstract class AbstractModule implements Module {
 	String iconName;
 	private ArrayList<Menu> menu;
 	private boolean defaultModule;
-	private DataSource dataSource;
+	private JKDataSource dataSource;
 	private Application application;
 	private LablesLoader lablesLoader = new FilesLablesLoader();
 	private int moduleId;
@@ -64,9 +64,9 @@ public abstract class AbstractModule implements Module {
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		if (this.dataSource == null) {
-			return DataSourceFactory.getDefaultDataSource();
+			return JKDataSourceFactory.getDefaultDataSource();
 		}
 		return this.dataSource;
 	}
@@ -153,7 +153,7 @@ public abstract class AbstractModule implements Module {
 			}
 			return this.menu;
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			// unreachable
 			return null;
 		}
@@ -179,22 +179,22 @@ public abstract class AbstractModule implements Module {
 	 * @return the priviligeId
 	 */
 	@Override
-	public Privilige getPrivilige() {
-		return new Privilige(getModuleName().hashCode(), getModuleName(), null);
+	public JKPrivilige getPrivilige() {
+		return new JKPrivilige(getModuleName().hashCode(), getModuleName(), null);
 	}
 
 	/**
 	 *
 	 */
 	@Override
-	public ArrayList<Report> getReports(final String prefix, final String prefix2) throws ModuleException {
+	public ArrayList<JKReport> getReports(final String prefix, final String prefix2) throws ModuleException {
 		try {
 			final InputStream in = this.getClass().getResourceAsStream(getFileFullPath("reports.xml"));
 			if (in != null) {
-				final ReportManager report = new ReportManager(in, prefix, prefix2);
+				final JKReportManager report = new JKReportManager(in, prefix, prefix2);
 				return report.getInstanceReports();
 			}
-			return new ArrayList<Report>();
+			return new ArrayList<JKReport>();
 		} catch (final JKXmlException e) {
 			throw new ModuleException(this, e);
 		}
@@ -260,7 +260,7 @@ public abstract class AbstractModule implements Module {
 	}
 
 	@Override
-	public void setDataSource(final DataSource datasource) {
+	public void setDataSource(final JKDataSource datasource) {
 		this.dataSource = datasource;
 	}
 

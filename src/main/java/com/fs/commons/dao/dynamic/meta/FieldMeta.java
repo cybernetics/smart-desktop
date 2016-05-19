@@ -22,9 +22,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 
 import com.fs.commons.dao.DaoUtil;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.trigger.FieldTrigger;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.dao.sql.query.QueryComponent;
 import com.fs.commons.desktop.dynform.ui.ComponentFactory;
 import com.fs.commons.desktop.swing.comp.editors.FSBindingComponentEditor;
@@ -101,20 +100,16 @@ public class FieldMeta implements Serializable, QueryComponent {
 
 	/**
 	 * @return
-	 * @throws DaoException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
+	 * @throws JKDataAccessException
 	 */
-	public String calculateDefaultValue() throws DaoException {
+	public String calculateDefaultValue() throws JKDataAccessException {
 		if (this.defaultValue.toUpperCase().startsWith("SELECT")) {
-			try {
 				final Object obj = DaoUtil.exeuteSingleOutputQuery(this.defaultValue);
 				if (obj == null) {
 					return null;
 				}
 				return obj.toString();
-			} catch (final RecordNotFoundException e) {
-				return null;
-			}
 		}
 		return this.defaultValue;
 	}
@@ -128,13 +123,9 @@ public class FieldMeta implements Serializable, QueryComponent {
 		return ((FieldMeta) obj).getFullQualifiedName().equals(this.getFullQualifiedName());
 	}
 
-	public String getCalculatedDefaultValue() throws DaoException {
+	public String getCalculatedDefaultValue() throws JKDataAccessException {
 		if (this.defaultValue != null && this.defaultValue.toUpperCase().startsWith("SELECT")) {
-			try {
-				return DaoUtil.exeuteSingleOutputQuery(this.defaultValue).toString();
-			} catch (final RecordNotFoundException e) {
-				return null;
-			}
+			return DaoUtil.exeuteSingleOutputQuery(this.defaultValue).toString();
 		}
 		return this.defaultValue;
 
@@ -436,7 +427,7 @@ public class FieldMeta implements Serializable, QueryComponent {
 		this.width = width;
 	}
 
-	public FSTableColumn toFSTableColumn() throws TableMetaNotFoundException, DaoException {
+	public FSTableColumn toFSTableColumn() throws TableMetaNotFoundException, JKDataAccessException {
 		final FSTableColumn col = new FSTableColumn();
 		col.setName(getName());
 		col.setHumanName(Lables.get(col.getName(), true));

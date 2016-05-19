@@ -25,7 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
@@ -54,9 +54,9 @@ public class AddDataDialog extends JKDialog {
 	 *            DataPanel
 	 * @param autoIncrement
 	 *            boolean
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static String showAddDialog(final Dialog frm, final DataPanel pnl, final boolean autoIncrement) throws DaoException {
+	public static String showAddDialog(final Dialog frm, final DataPanel pnl, final boolean autoIncrement) throws JKDataAccessException {
 		pnl.resetComponents();
 		final AddDataDialog dlg = new AddDataDialog(frm, pnl, autoIncrement);
 		dlg.setVisible(true);
@@ -71,9 +71,9 @@ public class AddDataDialog extends JKDialog {
 	 *            DataPanel
 	 * @param autoIncrement
 	 *            boolean
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static String showAddDialog(final Frame frm, final DataPanel pnl, final boolean autoIncrement) throws DaoException {
+	public static String showAddDialog(final Frame frm, final DataPanel pnl, final boolean autoIncrement) throws JKDataAccessException {
 		pnl.resetComponents();
 		final AddDataDialog dlg = new AddDataDialog(frm, pnl, autoIncrement);
 		dlg.setVisible(true);
@@ -147,7 +147,7 @@ public class AddDataDialog extends JKDialog {
 			dispose();
 		} catch (final ValidationException ex) {
 			SwingUtility.showUserErrorDialog(this, ex.getMessage(), ex);
-		} catch (final DaoException ex) {
+		} catch (final JKDataAccessException ex) {
 			SwingUtility.showDatabaseErrorDialog(this, ex.getMessage(), ex);
 		}
 	}

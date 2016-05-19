@@ -18,7 +18,7 @@ package com.fs.commons.apps.executors;
 import com.fs.commons.application.ApplicationException;
 import com.fs.commons.application.ApplicationManager;
 import com.fs.commons.desktop.swing.SwingUtility;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class LogoutExecutor implements Runnable {
 
@@ -28,7 +28,7 @@ public class LogoutExecutor implements Runnable {
 			try {
 				ApplicationManager.getInstance().logout();
 			} catch (final ApplicationException e) {
-				ExceptionUtil.handleException(e);
+				ExceptionUtil.handle(e);
 			}
 		}
 	}

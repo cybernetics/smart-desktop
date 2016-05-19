@@ -20,6 +20,8 @@ import java.util.Hashtable;
 
 import com.fs.commons.bean.binding.BindingComponent;
 import com.fs.commons.dao.DaoUtil;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.FSTypes;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
@@ -27,8 +29,6 @@ import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta.ViewMode;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.swing.comp.DaoComboWithManagePanel;
 import com.fs.commons.desktop.swing.comp.DaoComponent;
 import com.fs.commons.desktop.swing.comp.JKCheckBox;
@@ -48,7 +48,7 @@ public class ComponentFactory {
 	static Hashtable<FieldMeta, BindingComponent> componentsCache = new Hashtable();
 
 	// //////////////////////////////////////////////////////////////////////////////////
-	public static BindingComponent buildForeignKeyComponent(final ForiegnKeyFieldMeta meta) throws TableMetaNotFoundException, DaoException {
+	public static BindingComponent buildForeignKeyComponent(final ForiegnKeyFieldMeta meta) throws TableMetaNotFoundException, JKDataAccessException {
 		final TableMeta masterTable = AbstractTableMetaFactory.getTableMeta(meta.getParentTable().getDataSource(), meta.getReferenceTable());
 		BindingComponent comp = null;
 		if (!meta.isVisible()) {
@@ -97,7 +97,7 @@ public class ComponentFactory {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////
-	private static Object calculateDefaultValue(final Object defaultValue) throws DaoException {
+	private static Object calculateDefaultValue(final Object defaultValue) throws JKDataAccessException {
 		if (defaultValue == null || defaultValue != null && defaultValue.equals("-1") || defaultValue.toString().trim().equals("")) {
 			return null;
 		}
@@ -105,7 +105,7 @@ public class ComponentFactory {
 			try {
 				final Object obj = DaoUtil.exeuteSingleOutputQuery(defaultValue.toString());
 				return obj;
-			} catch (final RecordNotFoundException e) {
+			} catch (final JKRecordNotFoundException e) {
 				return null;
 			}
 		}
@@ -113,7 +113,7 @@ public class ComponentFactory {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////
-	public static BindingComponent createComponent(final FieldMeta field, final boolean createNew) throws TableMetaNotFoundException, DaoException {
+	public static BindingComponent createComponent(final FieldMeta field, final boolean createNew) throws TableMetaNotFoundException, JKDataAccessException {
 		BindingComponent component = componentsCache.get(field);
 		if (createNew || componentsCache.get(field) == null) {
 			if (field.getOptionsQuery() != null) {
@@ -191,7 +191,7 @@ public class ComponentFactory {
 	}
 
 	// //////////////////////////////////////////////////////////////////////////////////
-	private static BindingComponent createOptionsComponent(final FieldMeta field) throws DaoException {
+	private static BindingComponent createOptionsComponent(final FieldMeta field) throws JKDataAccessException {
 		final DaoComboBox cmb = new DaoComboBox(field.getOptionsQuery());
 		return cmb;
 	}

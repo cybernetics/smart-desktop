@@ -29,10 +29,10 @@ import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.DaoComboBox;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
-import com.fs.commons.reports.Report;
+import com.fs.commons.reports.JKReport;
 import com.fs.commons.reports.ReportException;
-import com.fs.commons.reports.ReportManager;
-import com.fs.commons.reports.ReportsUtil;
+import com.fs.commons.reports.JKReportManager;
+import com.fs.commons.reports.JKReportsUtil;
 import com.fs.commons.util.GeneralUtility;
 import com.fs.security.util.ListsBuilder;
 
@@ -79,11 +79,11 @@ public class PnlUserPrivileges extends JKPanel<Object> {
 	}
 
 	protected void handelPrintUserPrivilege() {
-		final Report report = ReportManager.getReport(getGroupReportName());
+		final JKReport report = JKReportManager.getReport(getGroupReportName());
 		final Hashtable<String, Object> params = new Hashtable<String, Object>();
 		params.put("user_id", this.cmbUser.getSelectedIdValue());
 		try {
-			ReportsUtil.printReport(report, params);
+			JKReportsUtil.printReport(report, params);
 		} catch (final ReportException e) {
 			e.printStackTrace();
 		}

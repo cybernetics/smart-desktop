@@ -25,8 +25,8 @@ import java.io.IOException;
 
 import javax.swing.ImageIcon;
 
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.event.RecordActionAdapter;
 import com.fs.commons.desktop.swing.SwingUtility;
@@ -214,7 +214,7 @@ public class QueryDialog extends JKDialog {
 	 * @param connectionManager
 	 */
 	public QueryDialog(final Frame frame, final String sql, final String title, final int filterIndex, final boolean multipleSelecion,
-			final DataSource connectionManager) {
+			final JKDataSource connectionManager) {
 		super(frame);
 		this.queryTable = new QueryJTable(title, connectionManager, sql, true);
 		this.multipleSelecion = multipleSelecion;
@@ -223,7 +223,7 @@ public class QueryDialog extends JKDialog {
 	}
 
 	public QueryDialog(final JKFrame defaultMainFrame, final String sql, final String title, final int filterIndex, final boolean multipleSelecion) {
-		this(defaultMainFrame, sql, title, filterIndex, multipleSelecion, DataSourceFactory.getDefaultDataSource());
+		this(defaultMainFrame, sql, title, filterIndex, multipleSelecion, JKDataSourceFactory.getDefaultDataSource());
 	}
 
 	public QueryJTable getQueryTable() {

@@ -31,12 +31,12 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import com.fs.commons.application.exceptions.ValidationException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.JKLabel;
@@ -49,7 +49,7 @@ import com.fs.commons.desktop.swing.comp.model.FSTableRecord;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class DynTabular extends JKMainPanel {
 
@@ -71,17 +71,17 @@ public class DynTabular extends JKMainPanel {
 	JKPanel<?> pnlSum = new JKPanel<Object>();
 	private JKPanel<Object> pnlButtons;
 
-	public DynTabular(final String tableName) throws RecordNotFoundException, TableMetaNotFoundException, DaoException {
+	public DynTabular(final String tableName) throws JKRecordNotFoundException, TableMetaNotFoundException, JKDataAccessException {
 		this(AbstractTableMetaFactory.getTableMeta(tableName));
 	}
 
 	/**
 	 *
 	 * @param meta
-	 * @throws RecordNotFoundException
-	 * @throws DaoException
+	 * @throws JKRecordNotFoundException
+	 * @throws JKDataAccessException
 	 */
-	public DynTabular(final TableMeta meta) throws RecordNotFoundException, DaoException {
+	public DynTabular(final TableMeta meta) throws JKRecordNotFoundException, JKDataAccessException {
 		this.meta = meta;
 		init();
 	}
@@ -180,7 +180,7 @@ public class DynTabular extends JKMainPanel {
 		this.tbl.fireTableStructureChanged();
 	}
 
-	public List<Record> getAllDaoRecords() throws TableMetaNotFoundException, DaoException {
+	public List<Record> getAllDaoRecords() throws TableMetaNotFoundException, JKDataAccessException {
 		return this.model.getAllDaoRecords();
 	}
 
@@ -317,7 +317,7 @@ public class DynTabular extends JKMainPanel {
 			// model.getDao().saveRecords(getAllRecords());
 			SwingUtility.showSuccessDialog("DATA_UPDATED_SUCC");
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		} finally {
 			if (reload) {
 				reloadData(false);
@@ -344,11 +344,11 @@ public class DynTabular extends JKMainPanel {
 	}
 
 	/**
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 *
 	 */
-	private void init() throws TableMetaNotFoundException, DaoException {
+	private void init() throws TableMetaNotFoundException, JKDataAccessException {
 		setFocusable(false);
 		initTable();
 		setBorder(SwingUtility.createTitledBorder(""));
@@ -393,7 +393,7 @@ public class DynTabular extends JKMainPanel {
 		});
 	}
 
-	private void initTable() throws TableMetaNotFoundException, DaoException {
+	private void initTable() throws TableMetaNotFoundException, JKDataAccessException {
 		this.model = new TableMetaModel(this.meta);
 		this.tbl.setModel(this.model);
 		// tbl.putClientProperty("JTable.autoStartsEdit", Boolean.TRUE);
@@ -438,11 +438,11 @@ public class DynTabular extends JKMainPanel {
 				// SwingUtility.showSuccessDialog("TABULAR_DATA_RELOADED_SUCC");
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
-	public void reloadRecords() throws RecordNotFoundException, DaoException {
+	public void reloadRecords() throws JKRecordNotFoundException, JKDataAccessException {
 		// model.reload();
 	}
 
@@ -504,10 +504,10 @@ public class DynTabular extends JKMainPanel {
 	 *
 	 * @param string
 	 * @param trxId
-	 * @throws DaoException
-	 * @throws RecordNotFoundException
+	 * @throws JKDataAccessException
+	 * @throws JKRecordNotFoundException
 	 */
-	public void setFilterValue(final String fieldName, final String trxId) throws RecordNotFoundException, DaoException {
+	public void setFilterValue(final String fieldName, final String trxId) throws JKRecordNotFoundException, JKDataAccessException {
 		this.model.setFilterValue(fieldName, trxId);
 		// model.reload();
 	}

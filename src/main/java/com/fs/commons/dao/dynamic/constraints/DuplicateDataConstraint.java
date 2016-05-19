@@ -17,11 +17,11 @@ package com.fs.commons.dao.dynamic.constraints;
 
 import java.util.ArrayList;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.ConstraintException;
 import com.fs.commons.dao.dynamic.constraints.exceptions.DuplicateDataException;
 import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.locale.Lables;
 
 public class DuplicateDataConstraint extends Constraint {
@@ -40,7 +40,7 @@ public class DuplicateDataConstraint extends Constraint {
 	 *
 	 */
 	@Override
-	public void validate(final Record record) throws DuplicateDataException, DaoException {
+	public void validate(final Record record) throws DuplicateDataException, JKDataAccessException {
 		if (!record.isNewRecord()) {
 			return;
 		}

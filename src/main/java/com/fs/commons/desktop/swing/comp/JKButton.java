@@ -27,21 +27,20 @@ import javax.swing.JButton;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.swing.dialogs.ProgressDialog;
 import com.fs.commons.desktop.validation.Validator;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.security.Privilige;
-import com.fs.commons.security.SecurityManager;
-import com.fs.commons.security.exceptions.NotAllowedOperationException;
-import com.fs.commons.security.exceptions.SecurityException;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.FormatUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.JKNotAllowedOperationException;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.security.JKSecurityManager;
+import com.jk.security.JKPrivilige;
 
 public class JKButton extends JButton implements BindingComponent {
 
@@ -55,7 +54,7 @@ public class JKButton extends JButton implements BindingComponent {
 	private String shortcut;
 	private boolean showProgress = false;
 	private ProgressDialog progress;
-	private Privilige privlige;
+	private JKPrivilige privlige;
 	private boolean progressAsModal;
 	// private Font font = new Font("arial", Font.BOLD, 10);
 	private final FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
@@ -103,7 +102,7 @@ public class JKButton extends JButton implements BindingComponent {
 		}
 	}
 
-	public JKButton(final String caption, final Privilige privlige) {
+	public JKButton(final String caption, final JKPrivilige privlige) {
 		this(caption, "", privlige);
 	}
 
@@ -116,7 +115,7 @@ public class JKButton extends JButton implements BindingComponent {
 		setShowProgress(progress);
 	}
 
-	public JKButton(final String caption, final String shortcut, final Privilige privlige) {
+	public JKButton(final String caption, final String shortcut, final JKPrivilige privlige) {
 		this(caption, false, shortcut);
 		setPrivlige(privlige);
 	}
@@ -139,7 +138,7 @@ public class JKButton extends JButton implements BindingComponent {
 	}
 
 	@Override
-	public void filterValues(final BindingComponent comp1) throws DaoException {
+	public void filterValues(final BindingComponent comp1) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 	}
 
@@ -147,9 +146,9 @@ public class JKButton extends JButton implements BindingComponent {
 	protected void fireActionPerformed(final ActionEvent event) {
 		if (this.privlige != null) {
 			try {
-				SecurityManager.getAuthorizer().checkAllowed(this.privlige);
+				JKSecurityManager.getAuthorizer().checkAllowed(this.privlige);
 			} catch (final SecurityException e) {
-				ExceptionUtil.handleException(e);
+				ExceptionUtil.handle(e);
 				return;
 			}
 		}
@@ -170,7 +169,7 @@ public class JKButton extends JButton implements BindingComponent {
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.fsWrapper.getDataSource();
 	}
 
@@ -196,7 +195,7 @@ public class JKButton extends JButton implements BindingComponent {
 		return SwingUtility.isLeftOrientation() ? "left" : "right";
 	}
 
-	public Privilige getPrivlige() {
+	public JKPrivilige getPrivlige() {
 		return this.privlige;
 	}
 
@@ -287,7 +286,7 @@ public class JKButton extends JButton implements BindingComponent {
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.fsWrapper.setDataSource(manager);
 	}
 
@@ -318,17 +317,17 @@ public class JKButton extends JButton implements BindingComponent {
 		setIcon(GeneralUtility.createIcon(iconName));
 	}
 
-	public void setPrivlige(final Privilige privlige) {
+	public void setPrivlige(final JKPrivilige privlige) {
 		if (privlige != null) {
 			this.privlige = privlige;
 			try {
-				SecurityManager.checkAllowedPrivilige(privlige);
+				JKSecurityManager.checkAllowedPrivilige(privlige);
 				this.authorized = true;
-			} catch (final NotAllowedOperationException e) {
+			} catch (final JKNotAllowedOperationException e) {
 				this.authorized = false;
 				setEnabled(false);
 			} catch (final SecurityException e) {
-				ExceptionUtil.handleException(e);
+				ExceptionUtil.handle(e);
 			}
 		}
 	}

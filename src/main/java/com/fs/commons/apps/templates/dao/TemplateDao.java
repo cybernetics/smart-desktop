@@ -25,23 +25,23 @@ import com.fs.commons.apps.templates.beans.QueryType;
 import com.fs.commons.apps.templates.beans.Template;
 import com.fs.commons.apps.templates.beans.TemplateVariable;
 import com.fs.commons.apps.templates.beans.Variable;
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.DaoFinder;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.jk.db.dataaccess.plain.JKFinder;
 
-public class TemplateDao extends AbstractDao {
+public class TemplateDao extends JKAbstractPlainDataAccess {
 	////////////////////////////////////////////////////////////////////////////////////
-	public Query findQuery(final int queryId) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Query findQuery(final int queryId) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM conf_queries WHERE query_id=?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final Query query = new Query();
 				query.setQueryId(rs.getInt("query_id"));
 				query.setDesc(rs.getString("desc"));
@@ -59,16 +59,16 @@ public class TemplateDao extends AbstractDao {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
-	protected QueryType findQueryType(final int typeId) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	protected QueryType findQueryType(final int typeId) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT  * FROM conf_query_types WHERE query_type_id=?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final QueryType type = new QueryType();
 				type.setId(rs.getInt(1));
 				type.setName(rs.getString(2));
@@ -84,16 +84,16 @@ public class TemplateDao extends AbstractDao {
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public Template findTemplate(final int tempId) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Template findTemplate(final int tempId) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM conf_templates WHERE template_id=? ";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final Template template = new Template();
 				template.setTempId(rs.getInt("template_id"));
 				template.setTempName(rs.getString("template_name"));
@@ -112,16 +112,16 @@ public class TemplateDao extends AbstractDao {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
-	public Variable findVariable(final int varId) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public Variable findVariable(final int varId) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM conf_vars WHERE var_id=?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final Variable variable = new Variable();
 				variable.setVarId(rs.getInt("var_id"));
 				variable.setVarName(rs.getString("var_name"));
@@ -143,16 +143,16 @@ public class TemplateDao extends AbstractDao {
 	}
 
 	// ///////////////////////////////////////////////////////////////
-	public ArrayList<TemplateVariable> lstTemplateVariables(final int tempId) throws RecordNotFoundException, DaoException {
-		final DaoFinder finder = new DaoFinder() {
+	public ArrayList<TemplateVariable> lstTemplateVariables(final int tempId) throws JKRecordNotFoundException, JKDataAccessException {
+		final JKFinder finder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM conf_template_vars WHERE template_id=? ORDER BY var_index";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				final TemplateVariable var = new TemplateVariable();
 				var.setTempVarId(rs.getInt("template_var_id"));
 				// var.setTemp(findTemplate(rs.getInt("template_id")));

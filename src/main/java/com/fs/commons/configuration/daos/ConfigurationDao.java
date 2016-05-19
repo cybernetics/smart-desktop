@@ -21,27 +21,27 @@ import java.sql.SQLException;
 
 import com.fs.commons.configuration.beans.Language;
 import com.fs.commons.configuration.beans.Module;
-import com.fs.commons.dao.AbstractDao;
-import com.fs.commons.dao.DaoFinder;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.jk.db.dataaccess.plain.JKFinder;
 
 /**
  *
  * @author mkiswani
  *
  */
-public class ConfigurationDao extends AbstractDao {
+public class ConfigurationDao extends JKAbstractPlainDataAccess {
 
-	public Language findLang(final int langId) throws RecordNotFoundException, DaoException {
-		final Language findRecord = (Language) findRecord(new DaoFinder() {
+	public Language findLang(final int langId) throws JKRecordNotFoundException, JKDataAccessException {
+		final Language findRecord = (Language) findRecord(new JKFinder() {
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM conf_languages WHERE conf_languages.lang_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return popualte(rs);
 			}
 
@@ -55,15 +55,15 @@ public class ConfigurationDao extends AbstractDao {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////
-	public Module findModule(final int moduleId) throws RecordNotFoundException, DaoException {
-		final Module findRecord = (Module) findRecord(new DaoFinder() {
+	public Module findModule(final int moduleId) throws JKRecordNotFoundException, JKDataAccessException {
+		final Module findRecord = (Module) findRecord(new JKFinder() {
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT * FROM conf_modules WHERE conf_modules.module_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return populateModule(rs);
 			}
 

@@ -23,13 +23,13 @@ import com.fs.commons.application.ui.UIPanel;
 import com.fs.commons.application.ui.UIPanelFactory;
 import com.fs.commons.application.ui.menu.MenuItem;
 import com.fs.commons.dao.DaoUtil;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 import com.fs.commons.desktop.dynform.ui.action.DynDaoActionAdapter;
 import com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailCRUDLPanel;
@@ -37,11 +37,11 @@ import com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailPanel;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
-import com.fs.commons.reports.Report;
-import com.fs.commons.reports.ReportManager;
+import com.fs.commons.reports.JKReport;
+import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.reports.ReportUIPanel;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * @author u087
@@ -86,11 +86,11 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 	 * @param prop
 	 * @return
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws UIOPanelCreationException
 	 */
 	public UIPanel createMasterDetailWithListPanel(final String tableMetaName, final Properties prop)
-			throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+			throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		// TODO : fix me
 		final TableMeta tableMeta = AbstractTableMetaFactory.getTableMeta(getDataSource(), tableMetaName);
 		if (prop.getProperty("detail-tables") != null) {
@@ -197,7 +197,7 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 			e.printStackTrace();
 			throw e;
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			return null;
 		} finally {
 			// System.out.println(new Date());
@@ -239,7 +239,7 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 	 */
 	private UIPanel createReportPanel(final String value) throws UIOPanelCreationException {
 		try {
-			final Report report = ReportManager.getReport(SwingUtility.getDefaultLocale() + "_" + value);
+			final JKReport report = JKReportManager.getReport(SwingUtility.getDefaultLocale() + "_" + value);
 			final ReportUIPanel pnl = new ReportUIPanel(report);
 			return pnl;
 		} catch (final Exception e) {
@@ -252,12 +252,12 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 	 * @param className
 	 * @param tableMeta
 	 * @return
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 * @throws UIOPanelCreationException
 	 */
 	private UIPanel createSingleRecordPanel(final String className, final TableMeta tableMeta)
-			throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+			throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		// final DynMasterDetailPanel pnl = new DynMasterDetailPanel(tableMeta);
 		final DynMasterDetailPanel pnl = (DynMasterDetailPanel) createPanelByClassName(className);
 		pnl.setTableMeta(tableMeta);
@@ -279,13 +279,13 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 			} else {
 				pnl.setMode(DynDaoMode.ADD);
 			}
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			pnl.setMode(DynDaoMode.ADD);
 		}
 		return pnl;
 	}
 
-	private DataSource getDataSource() {
+	private JKDataSource getDataSource() {
 		return this.menuItem.getParentMenu().getParentModule().getDataSource();
 	}
 }

@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fs.commons.configuration.beans.Lable;
-import com.fs.commons.dao.DaoFinder;
-import com.fs.commons.dao.DaoUpdater;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
+import com.jk.db.dataaccess.plain.JKFinder;
+import com.jk.db.dataaccess.plain.JKUpdater;
 
 /**
  *
@@ -34,10 +34,10 @@ import com.fs.commons.dao.exception.RecordNotFoundException;
  */
 public class LablesDao extends ConfigurationDao {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void addLable(final Lable lable) throws DaoException {
-		executeUpdate(new DaoUpdater() {
+	public void addLable(final Lable lable) throws JKDataAccessException {
+		executeUpdate(new JKUpdater() {
 			@Override
-			public String getUpdateSql() {
+			public String getQuery() {
 				return "insert into conf_lables(lable_key,lable_value,module_id,lang_id) values(?,?,?,?)";
 			}
 
@@ -53,16 +53,16 @@ public class LablesDao extends ConfigurationDao {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public boolean isLableExist(final String key) throws DaoException {
-		final DaoFinder daoFinder = new DaoFinder() {
+	public boolean isLableExist(final String key) throws JKDataAccessException {
+		final JKFinder daoFinder = new JKFinder() {
 
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "select * from conf_lables where lable_key=?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return null;
 			}
 
@@ -75,21 +75,21 @@ public class LablesDao extends ConfigurationDao {
 		try {
 			findRecord(daoFinder);
 			return true;
-		} catch (final RecordNotFoundException e) {
+		} catch (final JKRecordNotFoundException e) {
 			return false;
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public List<Lable> listLabels() throws DaoException {
-		final ArrayList<Lable> lstRecords = lstRecords(new DaoFinder() {
+	public List<Lable> listLabels() throws JKDataAccessException {
+		final ArrayList<Lable> lstRecords = lstRecords(new JKFinder() {
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT  * FROM conf_lables ";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return populateLable(rs);
 			}
 
@@ -101,15 +101,15 @@ public class LablesDao extends ConfigurationDao {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public List<Lable> listModuleLabels(final int moduleId) throws DaoException {
-		final ArrayList<Lable> lstRecords = lstRecords(new DaoFinder() {
+	public List<Lable> listModuleLabels(final int moduleId) throws JKDataAccessException {
+		final ArrayList<Lable> lstRecords = lstRecords(new JKFinder() {
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT  * FROM conf_lables WHERE conf_lables.module_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return populateLable(rs);
 			}
 
@@ -122,15 +122,15 @@ public class LablesDao extends ConfigurationDao {
 		return lstRecords;
 	}
 
-	public List<Lable> listModuleLabels(final int moduleId, final int langId) throws DaoException {
-		final ArrayList<Lable> lstRecords = lstRecords(new DaoFinder() {
+	public List<Lable> listModuleLabels(final int moduleId, final int langId) throws JKDataAccessException {
+		final ArrayList<Lable> lstRecords = lstRecords(new JKFinder() {
 			@Override
-			public String getFinderSql() {
+			public String getQuery() {
 				return "SELECT  * FROM conf_lables WHERE conf_lables.module_id = ? and conf_lables.lang_id = ?";
 			}
 
 			@Override
-			public Object populate(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+			public Object populate(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 				return populateLable(rs);
 			}
 
@@ -145,7 +145,7 @@ public class LablesDao extends ConfigurationDao {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private Object populateLable(final ResultSet rs) throws SQLException, RecordNotFoundException, DaoException {
+	private Object populateLable(final ResultSet rs) throws SQLException, JKRecordNotFoundException, JKDataAccessException {
 		final Lable lable = new Lable();
 		lable.setLableId(rs.getInt("lable_id"));
 		lable.setLableKey(rs.getString("lable_key"));

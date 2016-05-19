@@ -26,7 +26,7 @@ import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.desktop.UIPanelFactoryImpl;
 import com.fs.commons.desktop.swing.comp.DaoComponent;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.security.Privilige;
+import com.jk.security.JKPrivilige;
 
 /**
  * @author u087
@@ -138,9 +138,9 @@ public class MenuItem implements UIPanelFactory {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	public Privilige getPrivilige() {
+	public JKPrivilige getPrivilige() {
 		final int privId = (getParentMenu().getParentModule().toString() + getParentMenu().getName() + getName()).hashCode();
-		return new Privilige(privId, getName(), getParentMenu().getPrivilige());
+		return new JKPrivilige(privId, getName(), getParentMenu().getPrivilige());
 	}
 
 	/**

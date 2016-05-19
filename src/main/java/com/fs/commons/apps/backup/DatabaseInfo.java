@@ -15,7 +15,7 @@
  */
 package com.fs.commons.apps.backup;
 
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 
 /**
  * @1.1
@@ -35,7 +35,7 @@ public class DatabaseInfo {
 	public DatabaseInfo() {
 	}
 
-	public DatabaseInfo(final DataSource con) {
+	public DatabaseInfo(final JKDataSource con) {
 		setDatabaseHost(con.getDatabaseHost());
 		setDatabaseName(con.getDatabaseName());
 		setDatabasePort(con.getDatabasePort());

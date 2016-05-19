@@ -17,15 +17,15 @@ package com.fs.commons.dao.dynamic.meta.generator;
 
 import java.sql.SQLException;
 
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
 
 public class DefaultDatabaseAnalasyer extends AbstractDataBaseAnaylazer {
 
-	public DefaultDatabaseAnalasyer() throws DaoException, SQLException {
+	public DefaultDatabaseAnalasyer() throws JKDataAccessException, SQLException {
 	}
 
-	public DefaultDatabaseAnalasyer(final DataSource connectionManager) throws DaoException, SQLException {
+	public DefaultDatabaseAnalasyer(final JKDataSource connectionManager) throws JKDataAccessException, SQLException {
 		super(connectionManager);
 	}
 

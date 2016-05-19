@@ -21,17 +21,17 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
-import com.fs.commons.dao.exception.DaoException;
-import com.fs.commons.dao.exception.RecordNotFoundException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKButton;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.QueryJTable;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class PnlResetPrivilegs extends JKMainPanel {
 	/**
@@ -76,14 +76,14 @@ public class PnlResetPrivilegs extends JKMainPanel {
 			try {
 				try {
 					rolesDao.deleteAllRecords();
-				} catch (final RecordNotFoundException e) {
+				} catch (final JKRecordNotFoundException e) {
 				}
 				try {
 					dao.deleteAllRecords();
-				} catch (final RecordNotFoundException e) {
+				} catch (final JKRecordNotFoundException e) {
 				}
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			} finally {
 				this.tblPrivileges.reloadData();
 			}

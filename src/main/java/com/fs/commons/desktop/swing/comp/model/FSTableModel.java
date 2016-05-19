@@ -216,7 +216,7 @@ public class FSTableModel extends AbstractTableModel {
 		// }
 		// return clas;
 		// } catch (Exception e) {
-		// ExceptionUtil.handleException(e);
+		// ExceptionUtil.handle(e);
 		// return null;
 		// }
 	}

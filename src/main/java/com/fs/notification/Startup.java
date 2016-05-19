@@ -19,7 +19,7 @@ import java.io.FileNotFoundException;
 
 import com.fs.commons.application.ApplicationException;
 import com.fs.commons.application.ApplicationManager;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public class Startup {
 	public static void main(final String[] args) {
@@ -28,13 +28,13 @@ public class Startup {
 			instance.init();
 			instance.start();
 		} catch (final FileNotFoundException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			System.exit(0);
 		} catch (final ApplicationException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			System.exit(0);
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 			System.exit(0);
 		}
 	}

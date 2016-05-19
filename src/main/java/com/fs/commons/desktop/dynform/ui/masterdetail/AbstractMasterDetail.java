@@ -21,12 +21,12 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import com.fs.commons.application.ui.UIOPanelCreationException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 import com.fs.commons.desktop.dynform.ui.RecordTraversePolicy;
@@ -35,7 +35,7 @@ import com.fs.commons.desktop.dynform.ui.action.DynDaoActionListener;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 public abstract class AbstractMasterDetail extends JKMainPanel {
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -54,8 +54,8 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 				try {
 					this.pnlDetail.handleFind(record.getIdValue());
 					navigateNext();
-				} catch (final DaoException e) {
-					ExceptionUtil.handleException(e);
+				} catch (final JKDataAccessException e) {
+					ExceptionUtil.handle(e);
 				}
 			}
 		}
@@ -74,7 +74,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 						AbstractMasterDetail.this.pnlMaster.handleFindRecord(record.getIdValue());
 						navigateNext();
 					} catch (final Exception e) {
-						ExceptionUtil.handleException(e);
+						ExceptionUtil.handle(e);
 					}
 				}
 			});
@@ -93,8 +93,8 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 				final DynamicDao dao = AbstractMasterDetail.this.pnlMaster.getDao();
 				try {
 					dao.cloneDetails(AbstractMasterDetail.this.pnlMaster.getDuplicatedRecord().getIdValue(), newRecord.getIdValue());
-				} catch (final DaoException e) {
-					ExceptionUtil.handleException(e);
+				} catch (final JKDataAccessException e) {
+					ExceptionUtil.handle(e);
 				}
 			}
 		}
@@ -106,8 +106,8 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 					final DetailPanel pnlDetail = AbstractMasterDetail.this.detailPanels.get(i);
 					pnlDetail.setMasterIdValue(masterRecord.getIdValue());
 				}
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			}
 		}
 
@@ -117,7 +117,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 		}
 
 		@Override
-		public void onRecordNotFound(final Object recordId, final DaoException e) {
+		public void onRecordNotFound(final Object recordId, final JKDataAccessException e) {
 			resetDetailPanels();
 		}
 
@@ -127,8 +127,8 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 				final DetailPanel pnl = AbstractMasterDetail.this.detailPanels.get(i);
 				try {
 					pnl.setMasterIdValue(null);
-				} catch (final DaoException e) {
-					ExceptionUtil.handleException(e);
+				} catch (final JKDataAccessException e) {
+					ExceptionUtil.handle(e);
 				}
 			}
 		}
@@ -151,7 +151,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	public AbstractMasterDetail(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public AbstractMasterDetail(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		setTableMeta(tableMeta);
 	}
 
@@ -175,12 +175,12 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 		for (int i = 0; i < this.detailPanels.size(); i++) {
 			final TableMeta detailTable = getDetailFields().get(i).getParentTable();
 			// try {
-			// SecurityManager.checkAllowedPrivilige(detailTable.getPriviligeId());
+			// JKSecurityManager.checkAllowedPrivilige(detailTable.getPriviligeId());
 			addPanelToView(detailTable.getCaption(), detailTable.getIconName(), (JKPanel) this.detailPanels.get(i));
 			// } catch (NotAllowedOperationException e) {
 			// // its safe to eat this exception
 			// } catch (SecurityException e) {
-			// ExceptionUtil.handleException(e);
+			// ExceptionUtil.handle(e);
 			// }
 		}
 	}
@@ -189,14 +189,14 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	protected abstract void addPanelToView(String title, String icon, JKPanel pnl);
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	protected DetailPanel createDetailPanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws DaoException, UIOPanelCreationException {
+	protected DetailPanel createDetailPanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta) throws JKDataAccessException, UIOPanelCreationException {
 		final DetailPanel pnlDetail = DetailPanelFactory.createDetailPanel(foriegnKeyFieldMeta);
 		pnlDetail.addDynDaoActionListener(new DetailDaoAdpater(pnlDetail));
 		return pnlDetail;
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	protected DynDaoPanel createMasterPanel(final TableMeta tableMeta) throws DaoException {
+	protected DynDaoPanel createMasterPanel(final TableMeta tableMeta) throws JKDataAccessException {
 		final DynDaoPanel dynDaoPanel = new DynDaoPanel(tableMeta);
 		dynDaoPanel.addDynDaoActionListener(new MasterDynActionListener());
 		dynDaoPanel.setAllowDuplicate(true);
@@ -248,12 +248,12 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	public void handleFind(final Object masterId) throws DaoException {
+	public void handleFind(final Object masterId) throws JKDataAccessException {
 		getMasterPanel().handleFind(masterId.toString(), true);
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	public void init() throws DaoException, TableMetaNotFoundException, UIOPanelCreationException {
+	public void init() throws JKDataAccessException, TableMetaNotFoundException, UIOPanelCreationException {
 		initPanel();
 		initUI();
 		addPanelsToContainer();
@@ -262,7 +262,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	protected void initPanel() throws DaoException, UIOPanelCreationException {
+	protected void initPanel() throws JKDataAccessException, UIOPanelCreationException {
 		this.pnlMaster = createMasterPanel(this.tableMeta);
 		for (int i = 0; i < getDetailFields().size(); i++) {
 			final ForiegnKeyFieldMeta foriegnKeyFieldMeta = getDetailFields().get(i);
@@ -290,7 +290,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	public void setMode(final DynDaoMode mode) throws DaoException {
+	public void setMode(final DynDaoMode mode) throws JKDataAccessException {
 		this.pnlMaster.setMode(mode);
 	}
 
@@ -299,7 +299,7 @@ public abstract class AbstractMasterDetail extends JKMainPanel {
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////////
-	public void setTableMeta(final TableMeta tableMeta) throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+	public void setTableMeta(final TableMeta tableMeta) throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		this.tableMeta = tableMeta;
 		// init();
 	}

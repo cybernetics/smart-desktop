@@ -22,8 +22,8 @@ import java.awt.Container;
 import javax.swing.JComponent;
 
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.AbstractDao;
 import com.fs.commons.dao.DaoUtil;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
 import com.fs.commons.dao.dynamic.DaoFactory;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
@@ -31,9 +31,9 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.comp2.FSDataTable;
 import com.fs.commons.desktop.swing.listener.RecordSelectionListener;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.security.Audit;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.security.JKAudit;
 
 public class PnlAuditHistory extends JKMainPanel {
 	/**
@@ -87,15 +87,15 @@ public class PnlAuditHistory extends JKMainPanel {
 	private void handleAuditSelected() {
 		try {
 			final int id = this.tbl.getSelectedIdAsInteger();
-			final AbstractDao dao = DaoFactory.createDao();
-			final Audit audit = dao.findAudit(id);
+			final JKAbstractPlainDataAccess dao = DaoFactory.createDao();
+			final JKAudit audit = dao.findAudit(id);
 			if (audit.getGui() != null) {
 				SwingUtility.showEncodedComponent(audit.getGui(), Lables.get(audit.getTableName(), true));
 			} else {
 				SwingUtility.showSuccessDialog(audit.getAuditText());
 			}
 		} catch (final Exception e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 

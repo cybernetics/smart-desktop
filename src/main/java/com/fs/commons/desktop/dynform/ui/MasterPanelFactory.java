@@ -16,9 +16,9 @@
 package com.fs.commons.desktop.dynform.ui;
 
 import com.fs.commons.application.ui.UIOPanelCreationException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.masterdetail.AbstractMasterDetail;
 import com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailPanel;
 
@@ -40,12 +40,12 @@ public class MasterPanelFactory {
 	/**
 	 *
 	 * @param meta
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws TableMetaNotFoundException
 	 * @throws UIOPanelCreationException
 	 */
 	public static AbstractMasterDetail createMasterPanel(final TableMeta meta)
-			throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+			throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		if (meta.getPanelClassName() != null && !meta.getPanelClassName().equals("")) {
 			final Object panel = createDynamicPanel(meta.getPanelClassName());
 			if (panel instanceof AbstractMasterDetail) {

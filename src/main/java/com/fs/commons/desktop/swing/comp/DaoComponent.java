@@ -15,10 +15,10 @@
  */
 package com.fs.commons.desktop.swing.comp;
 
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 
 public interface DaoComponent {
-	public DataSource getDataSource();
+	public JKDataSource getDataSource();
 
-	public void setDataSource(DataSource manager);
+	public void setDataSource(JKDataSource manager);
 }

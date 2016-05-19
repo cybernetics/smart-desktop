@@ -18,8 +18,8 @@ package com.fs.commons.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fs.commons.security.SecurityManager;
-import com.fs.commons.security.User;
+import com.jk.security.JKSecurityManager;
+import com.jk.security.JKUser;
 
 public class WebUtil {
 	public static final String FS_HEADER_PASSWORD = "fs-password";
@@ -32,7 +32,7 @@ public class WebUtil {
 	 */
 	public static Map<String, String> getDefaultHeaders() {
 		final Map<String, String> map = new HashMap<String, String>();
-		final User user = SecurityManager.getCurrentUser();
+		final JKUser user = JKSecurityManager.getCurrentUser();
 		map.put(FS_HEADER_DESKTOP, "true");
 		map.put(FS_HEADER_USERNAME, user.getUserId());
 		map.put(FS_HEADER_PASSWORD, user.getPassword());

@@ -22,11 +22,11 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.util.DateTimeUtil;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  *
@@ -42,7 +42,7 @@ public class AutomaticDBBackup extends DataBaseBackup {
 	//
 	////////////////////////////////////////////////////////////////////////////////////
 	public static String getProperty(final String propName, final String defultValue) {
-		return DataSourceFactory.getDefaultDataSource().getProperty(propName, defultValue);
+		return JKDataSourceFactory.getDefaultDataSource().getProperty(propName, defultValue);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ public class AutomaticDBBackup extends DataBaseBackup {
 					backup.startBackup(false);
 				} catch (final Exception e) {
 					SwingUtility.showUserErrorDialog("UNABLE_TO_PROCESS_AUTOAMATIC_BACKUP");
-					ExceptionUtil.handleException(e);
+					ExceptionUtil.handle(e);
 				}
 			}
 		});
@@ -130,7 +130,7 @@ public class AutomaticDBBackup extends DataBaseBackup {
 			fileWriter = new FileWriter(getLogFileName());
 			out = new BufferedWriter(fileWriter);
 		} catch (final IOException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		} finally {
 			if (out != null) {
 				try {

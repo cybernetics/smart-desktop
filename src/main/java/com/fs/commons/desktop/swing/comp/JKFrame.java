@@ -29,14 +29,14 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.ImagePanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.locale.Lables;
-import com.fs.commons.util.ExceptionUtil;
+import com.jk.exceptions.handler.ExceptionUtil;
 
 /**
  * @author u087
@@ -54,7 +54,7 @@ public class JKFrame extends JFrame implements DaoComponent {
 
 	private boolean showAnotherPanel;
 
-	private DataSource manager;
+	private JKDataSource manager;
 
 	// this flag used to avoid painting the home panel when
 	// menu item clicked and another menu panel is shown
@@ -106,14 +106,14 @@ public class JKFrame extends JFrame implements DaoComponent {
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		if (this.manager != null) {
 			return this.manager;
 		}
 		if (getParent() instanceof DaoComponent) {
 			return ((DaoComponent) getParent()).getDataSource();
 		}
-		return DataSourceFactory.getDefaultDataSource();
+		return JKDataSourceFactory.getDefaultDataSource();
 	}
 
 	/**
@@ -188,12 +188,12 @@ public class JKFrame extends JFrame implements DaoComponent {
 			setHomePanel(new ImagePanel(SwingUtility.getImage(image), type));
 			showHomePanel();
 		} catch (final IOException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.manager = manager;
 		applyDataSource();
 	}

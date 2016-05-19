@@ -17,14 +17,14 @@ package com.fs.security;
 
 import com.fs.commons.application.AbstractModule;
 import com.fs.commons.application.exceptions.ModuleException;
-import com.fs.commons.security.SecurityManager;
+import com.jk.security.JKSecurityManager;
 
 public class SecurityModule extends AbstractModule {
 	@Override
 	public void init() throws ModuleException {
 		final SecurityImpl securityImpl = new SecurityImpl();
-		SecurityManager.setAuthenticaor(securityImpl);
-		SecurityManager.setAuthorizer(securityImpl);
+		JKSecurityManager.setAuthenticaor(securityImpl);
+		JKSecurityManager.setAuthorizer(securityImpl);
 		super.init();
 	}
 }

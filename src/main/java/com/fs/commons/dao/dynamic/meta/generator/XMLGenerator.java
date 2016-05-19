@@ -23,7 +23,7 @@ import com.fs.commons.dao.dynamic.meta.FieldMeta;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.IdFieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.logging.Logger;
+import com.jk.logging.JKLogger;
 
 public class XMLGenerator {
 	/**
@@ -160,7 +160,7 @@ public class XMLGenerator {
 	 * @return
 	 */
 	private String generateTableMetaXML(final TableMeta tableMeta) {
-		Logger.info("Generating tableMeta for table : " + tableMeta.getTableName());
+		JKLogger.info("Generating tableMeta for table : " + tableMeta.getTableName());
 		final StringBuffer buf = new StringBuffer();
 		buf.append("<table ");
 		buf.append("name='" + tableMeta.getTableName() + "' ");

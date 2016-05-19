@@ -15,6 +15,6 @@
  */
 package com.fs.commons.dao;
 
-public class CommonsDao extends AbstractDao {
+public class CommonsDao extends JKAbstractPlainDataAccess {
 
 }

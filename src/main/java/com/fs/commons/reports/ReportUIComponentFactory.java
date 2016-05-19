@@ -18,10 +18,10 @@ package com.fs.commons.reports;
 import java.util.Properties;
 
 import com.fs.commons.bean.binding.BindingComponent;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel;
 import com.fs.commons.desktop.dynform.ui.DynDaoPanel.DynDaoMode;
 import com.fs.commons.desktop.dynform.ui.FieldPanelWithFilter;
@@ -38,9 +38,9 @@ public class ReportUIComponentFactory {
 	 * @param param
 	 * @return
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 */
-	public static BindingComponent createComponenet(final Paramter param) throws TableMetaNotFoundException, DaoException {
+	public static BindingComponent createComponenet(final Paramter param) throws TableMetaNotFoundException, JKDataAccessException {
 		final Properties prop = param.getProperties();
 		if (prop.getProperty("table-meta") != null) {
 			final String tableMetaName = prop.getProperty("table-meta");

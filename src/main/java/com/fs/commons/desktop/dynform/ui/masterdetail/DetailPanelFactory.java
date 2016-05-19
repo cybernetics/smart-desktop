@@ -16,9 +16,9 @@
 package com.fs.commons.desktop.dynform.ui.masterdetail;
 
 import com.fs.commons.application.ui.UIOPanelCreationException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.ForiegnKeyFieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
-import com.fs.commons.dao.exception.DaoException;
 import com.fs.commons.desktop.dynform.ui.DetailOneToManyPanel;
 
 /**
@@ -32,11 +32,11 @@ public class DetailPanelFactory {
 	 * @param foriegnKeyFieldMeta
 	 * @return
 	 * @throws TableMetaNotFoundException
-	 * @throws DaoException
+	 * @throws JKDataAccessException
 	 * @throws UIOPanelCreationException
 	 */
 	public static DetailPanel createDetailPanel(final ForiegnKeyFieldMeta foriegnKeyFieldMeta)
-			throws TableMetaNotFoundException, DaoException, UIOPanelCreationException {
+			throws TableMetaNotFoundException, JKDataAccessException, UIOPanelCreationException {
 		DetailPanel pnl;
 		final String panelClassName = foriegnKeyFieldMeta.getParentTable().getPanelClassName();
 		if (panelClassName != null && !panelClassName.equals("")) {

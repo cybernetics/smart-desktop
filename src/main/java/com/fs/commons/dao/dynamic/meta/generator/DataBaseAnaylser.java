@@ -18,8 +18,8 @@ package com.fs.commons.dao.dynamic.meta.generator;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
-import com.fs.commons.dao.exception.DaoException;
 
 public interface DataBaseAnaylser {
 
@@ -33,15 +33,15 @@ public interface DataBaseAnaylser {
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public abstract ArrayList<TableMeta> getTablesMeta() throws SQLException, DaoException;
+	public abstract ArrayList<TableMeta> getTablesMeta() throws SQLException, JKDataAccessException;
 
 	// /////////////////////////////////////////////////////////////////////////
-	public abstract ArrayList<TableMeta> getTablesMeta(String databaseName) throws SQLException, DaoException;
+	public abstract ArrayList<TableMeta> getTablesMeta(String databaseName) throws SQLException, JKDataAccessException;
 
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public abstract boolean isTableExist(String tableName) throws SQLException, DaoException;
+	public abstract boolean isTableExist(String tableName) throws SQLException, JKDataAccessException;
 
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public abstract void loadFields(String catalogName, TableMeta tableMeta) throws SQLException, DaoException;
+	public abstract void loadFields(String catalogName, TableMeta tableMeta) throws SQLException, JKDataAccessException;
 
 }

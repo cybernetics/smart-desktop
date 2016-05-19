@@ -20,17 +20,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.JKDataAccessException;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.dynamic.meta.generator.AbstractDataBaseAnaylazer;
-import com.fs.commons.dao.exception.DaoException;
 
 public class OracleDatabaseAnaylaser extends AbstractDataBaseAnaylazer {
 	//////////////////////////////////////////////////////////////////////
-	public OracleDatabaseAnaylaser() throws DaoException, SQLException {
+	public OracleDatabaseAnaylaser() throws JKDataAccessException, SQLException {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	public OracleDatabaseAnaylaser(final DataSource connectionManager) throws DaoException, SQLException {
+	public OracleDatabaseAnaylaser(final JKDataSource connectionManager) throws JKDataAccessException, SQLException {
 		super(connectionManager);
 	}
 
@@ -85,7 +85,7 @@ public class OracleDatabaseAnaylaser extends AbstractDataBaseAnaylazer {
 	}
 
 	@Override
-	protected boolean isAutoIncrement(final String databaseName, final String tableName) throws DaoException, SQLException {
+	protected boolean isAutoIncrement(final String databaseName, final String tableName) throws JKDataAccessException, SQLException {
 		return false;// since oracle doesnot support auto-increment by default
 	}
 

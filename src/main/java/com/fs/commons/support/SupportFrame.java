@@ -38,8 +38,8 @@ import com.fs.commons.desktop.swing.comp.JKFrame;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
-import com.fs.license.client.HttpLicenseClient;
-import com.fs.license.client.Installer;
+import com.jk.license.client.HttpLicenseClient;
+import com.jk.license.client.Installer;
 
 public class SupportFrame extends JKFrame {
 
@@ -94,7 +94,7 @@ public class SupportFrame extends JKFrame {
 	 */
 	private Date getExpiryDate() {
 		final JKDate dt = new JKDate();
-		dt.setDate(com.fs.license.server.Installer.SEX_MONTHS_DATE);
+		dt.setDate(com.jk.license.server.Installer.SEX_MONTHS_DATE);
 		final JKDialog dialog = new JKDialog();
 		dialog.add(new JKLabledComponent("expiry date", dt));
 		dialog.pack();
@@ -126,7 +126,7 @@ public class SupportFrame extends JKFrame {
 			for (final File file : files) {
 				try {
 					if (file.getName().endsWith("lic")) {
-						com.fs.license.server.Installer.importFile(file, expiryDate);
+						com.jk.license.server.Installer.importFile(file, expiryDate);
 					}
 				} catch (final Exception e) {
 					JOptionPane.showMessageDialog(this, e.getMessage());
@@ -164,7 +164,7 @@ public class SupportFrame extends JKFrame {
 	 */
 	protected void handleShowServerRepo() {
 		try {
-			final String data = com.fs.license.server.Installer.readServerLicenseRepositoroy();
+			final String data = com.jk.license.server.Installer.readServerLicenseRepositoroy();
 			JOptionPane.showMessageDialog(this, data);
 		} catch (final Exception e) {
 			JOptionPane.showMessageDialog(this, e.getMessage());

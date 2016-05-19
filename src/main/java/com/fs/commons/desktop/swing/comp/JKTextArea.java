@@ -22,7 +22,7 @@ import javax.swing.text.Document;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.connection.DataSource;
+import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.validation.Validator;
@@ -95,7 +95,7 @@ public class JKTextArea extends JTextArea implements BindingComponent<String>, J
 	}
 
 	@Override
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		return this.fsWrapper.getDataSource();
 	}
 
@@ -130,7 +130,7 @@ public class JKTextArea extends JTextArea implements BindingComponent<String>, J
 	}
 
 	@Override
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.fsWrapper.setDataSource(manager);
 	}
 

@@ -25,8 +25,8 @@ import javax.swing.JComponent;
 import javax.swing.border.Border;
 
 import com.fs.commons.bean.binding.BindingComponent;
-import com.fs.commons.dao.connection.DataSource;
-import com.fs.commons.dao.connection.DataSourceFactory;
+import com.fs.commons.dao.connection.JKDataSource;
+import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.validation.Problems;
@@ -53,7 +53,7 @@ public class FSAbstractComponent implements Serializable {
 	private final Vector<Validator> validators = new Vector<Validator>();
 	private Border originalBorder;;
 	private String originalTooltip;
-	private transient DataSource manager;
+	private transient JKDataSource manager;
 	private final Vector<ValueChangeListener> valueListeners = new Vector<ValueChangeListener>();
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ public class FSAbstractComponent implements Serializable {
 	// /////////////////////////////////////////////////////////////////////////
 
 	// /////////////////////////////////////////////////////////////////////////
-	public DataSource getDataSource() {
+	public JKDataSource getDataSource() {
 		if (this.manager != null) {
 			return this.manager;
 		}
@@ -123,7 +123,7 @@ public class FSAbstractComponent implements Serializable {
 				return ((DaoComponent) cont).getDataSource();
 			}
 		}
-		return DataSourceFactory.getDefaultDataSource();
+		return JKDataSourceFactory.getDefaultDataSource();
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -177,7 +177,7 @@ public class FSAbstractComponent implements Serializable {
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
-	public void setDataSource(final DataSource manager) {
+	public void setDataSource(final JKDataSource manager) {
 		this.manager = manager;
 		applyDataSource();
 	}
@@ -218,7 +218,7 @@ public class FSAbstractComponent implements Serializable {
 	// try {
 	// targetComponent.filterValues(comp);
 	// } catch (DaoException e1) {
-	// ExceptionUtil.handleException(e1);
+	// ExceptionUtil.handle(e1);
 	// }
 	// }
 	// });

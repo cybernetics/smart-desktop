@@ -32,7 +32,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.dao.exception.DaoException;
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.SwingValidator;
 import com.fs.commons.desktop.swing.comp.JKButton;
@@ -43,12 +43,11 @@ import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
-import com.fs.commons.security.User;
-import com.fs.commons.security.exceptions.InvalidUserException;
-import com.fs.commons.security.exceptions.SecurityException;
-import com.fs.commons.util.ExceptionUtil;
 import com.fs.commons.util.GeneralUtility;
 import com.fs.security.facade.SecurityFacade;
+import com.jk.exceptions.JKInvalidUserException;
+import com.jk.exceptions.handler.ExceptionUtil;
+import com.jk.security.JKUser;
 
 /**
  * @author u087
@@ -63,7 +62,7 @@ public class AuthenicationDialog extends JKDialog {
 	 * @return
 	 * @throws SecurityException
 	 */
-	public static User authenticateUser(final JFrame parent, final String title, final int maxRetries) throws InvalidUserException {
+	public static JKUser authenticateUser(final JFrame parent, final String title, final int maxRetries) throws JKInvalidUserException {
 		final AuthenicationDialog dlg = new AuthenicationDialog(parent, title);
 		for (int i = 0; i < maxRetries; i++) {
 			dlg.reset();
@@ -76,11 +75,11 @@ public class AuthenicationDialog extends JKDialog {
 				SwingUtility.showUserErrorDialog("INVALID_USER_NAME_OR_PASSWORD", false);
 			}
 		}
-		throw new InvalidUserException("INVALID_USER");
+		throw new JKInvalidUserException("INVALID_USER");
 	}
 
 	public static void main(final String[] args) throws SecurityException {
-		final User info = authenticateUser(null, "Test", 3);
+		final JKUser info = authenticateUser(null, "Test", 3);
 		System.out.println(info);
 
 	}
@@ -93,7 +92,7 @@ public class AuthenicationDialog extends JKDialog {
 
 	JKButton btnCancel = new JKButton("CLOSE");
 
-	private User user;
+	private JKUser user;
 
 	boolean cancelled;
 
@@ -138,14 +137,14 @@ public class AuthenicationDialog extends JKDialog {
 	/**
 	 * @return the authenticationInfo
 	 */
-	public User getUser() {
+	public JKUser getUser() {
 		return this.user;
 	}
 
 	private void handleAuthenticate() {
 		try {
 			validateInput();
-			final User user = viewToModel();
+			final JKUser user = viewToModel();
 			final SecurityFacade facade = new SecurityFacade();
 			try {
 				if (facade.isValidUser(user)) {
@@ -165,11 +164,11 @@ public class AuthenicationDialog extends JKDialog {
 					});
 					SwingUtility.showUserErrorDialog("INVAILD_USER_NAME_OR_PASSWORD", false);
 				}
-			} catch (final DaoException e) {
-				ExceptionUtil.handleException(e);
+			} catch (final JKDataAccessException e) {
+				ExceptionUtil.handle(e);
 			}
 		} catch (final ValidationException e) {
-			ExceptionUtil.handleException(e);
+			ExceptionUtil.handle(e);
 		}
 	}
 
@@ -272,7 +271,7 @@ public class AuthenicationDialog extends JKDialog {
 	 * @param authenticationInfo
 	 *            the authenticationInfo to set
 	 */
-	public void setUser(final User user) {
+	public void setUser(final JKUser user) {
 		this.user = user;
 	}
 
@@ -289,8 +288,8 @@ public class AuthenicationDialog extends JKDialog {
 	 *
 	 * @return
 	 */
-	private User viewToModel() {
-		final User user = new User();
+	private JKUser viewToModel() {
+		final JKUser user = new JKUser();
 		user.setUserId(this.txtUserName.getText());
 		user.setPassword(GeneralUtility.encode(this.txtPassword.getText()));
 		return user;

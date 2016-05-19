@@ -15,47 +15,47 @@
  */
 package com.fs.commons.dao.dynamic.trigger;
 
+import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.Record;
-import com.fs.commons.dao.exception.DaoException;
 
 public class TriggerAdapter implements Trigger {
 
 	@Override
-	public void afterAdd(final Record record) throws DaoException {
+	public void afterAdd(final Record record) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void afterDelete(final Record record) throws DaoException {
+	public void afterDelete(final Record record) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void afterFind(final Record record) throws DaoException {
+	public void afterFind(final Record record) throws JKDataAccessException {
 	}
 
 	@Override
-	public void afterUpdate(final Record oldRecord, final Record newRecord) throws DaoException {
+	public void afterUpdate(final Record oldRecord, final Record newRecord) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void beforeAdd(final Record record) throws DaoException {
+	public void beforeAdd(final Record record) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void beforeDelete(final Record record) throws DaoException {
+	public void beforeDelete(final Record record) throws JKDataAccessException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void beforeUpdate(final Record oldRecord, final Record newRecord) throws DaoException {
+	public void beforeUpdate(final Record oldRecord, final Record newRecord) throws JKDataAccessException {
 	}
 
 }
