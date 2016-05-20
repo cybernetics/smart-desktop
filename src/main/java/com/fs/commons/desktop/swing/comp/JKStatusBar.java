@@ -16,7 +16,6 @@
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.SwingUtilities;

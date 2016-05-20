@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.jalalkiswani</groupId>
-	<version>0.0.7</version>
+	<version>0.0.8</version>
 	<artifactId>smart-desktop</artifactId>
 
 	<name>smart-desktop</name>
@@ -146,12 +146,12 @@
 		<dependency>
 			<groupId>com.jalalkiswani</groupId>
 			<artifactId>jk-util</artifactId>
-			<version>0.0.7</version>
+			<version>0.0.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.jalalkiswani</groupId>
 			<artifactId>jk-db</artifactId>
-			<version>0.0.7</version>
+			<version>0.0.8</version>
 		</dependency>
 	</dependencies>
 

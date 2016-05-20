@@ -17,8 +17,6 @@ package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.util.GeneralUtility;

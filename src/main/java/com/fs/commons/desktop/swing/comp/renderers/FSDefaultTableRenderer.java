@@ -21,7 +21,6 @@ import java.sql.Time;
 import java.text.Format;
 import java.util.Date;
 
-import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 

@@ -16,7 +16,6 @@
 package com.fs.commons.desktop.swing;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 

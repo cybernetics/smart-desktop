@@ -16,7 +16,6 @@
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 
 import javax.swing.border.EmptyBorder;

@@ -22,12 +22,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JToolTip;
-import javax.swing.border.EmptyBorder;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
@@ -45,7 +42,6 @@ import com.jk.exceptions.JKNotAllowedOperationException;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKPrivilige;
 import com.jk.security.JKSecurityManager;
-import com.jk.util.StringUtil;
 
 public class JKButton extends JButton implements BindingComponent {
 

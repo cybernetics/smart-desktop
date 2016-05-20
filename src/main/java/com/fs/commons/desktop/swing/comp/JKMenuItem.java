@@ -18,10 +18,6 @@ package com.fs.commons.desktop.swing.comp;
 import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
-
 import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.locale.Lables;
 
