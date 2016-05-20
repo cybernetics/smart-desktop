@@ -194,7 +194,7 @@ class JKRootPane extends JRootPane {
 	private static final long serialVersionUID = 1L;
 
 	public JKRootPane() {
-		setBorder(BorderFactory.createLineBorder(Colors.MENU_PANEL_BG, 5));
+//		setBorder(BorderFactory.createLineBorder(Colors.MENU_PANEL_BG, 5));
 		// Border border2=BorderFactory.createRaisedBevelBorder();
 		// setBorder(BorderFactory.createCompoundBorder(border1,border2));
 		// setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));

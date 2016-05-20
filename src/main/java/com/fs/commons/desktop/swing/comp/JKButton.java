@@ -27,6 +27,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolTip;
+import javax.swing.border.EmptyBorder;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
@@ -232,6 +233,7 @@ public class JKButton extends JButton implements BindingComponent {
 	 */
 	void init() {
 		// setFont(font);
+		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setBackground(BACKGROUND_COLOR);
 		setSelected(false);// to set the right shape
 		addKeyListener(new KeyAdapter() {

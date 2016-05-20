@@ -68,6 +68,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
@@ -155,6 +156,8 @@ public class SwingUtility {
 
 	private static Font DEFAULT_TITLE_FONT = new Font("Times", Font.BOLD, 14);
 	private static final Font DEFAULT_TITLE_RIGHT_FONT = new Font("Arial", Font.BOLD, 14);
+
+	private static final Border DEFAULT_EMPTY_BORDER = new EmptyBorder(5, 5, 5, 5);
 
 	/**
 	 *
@@ -1291,6 +1294,10 @@ public class SwingUtility {
 			return DEFAULT_TITLE_FONT;
 		}
 		return DEFAULT_TITLE_RIGHT_FONT;
+	}
+
+	public static Border getDefaultEmptyBorder() {
+		return DEFAULT_EMPTY_BORDER;
 	}
 
 	// public static void setLookAndFeel() {

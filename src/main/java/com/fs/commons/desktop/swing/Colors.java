@@ -68,7 +68,7 @@ public class Colors {
 	public static final Color JK_TITLE_FG = getColor("title_fg");
 	public static final Color TITLE_BORDER_BG = getColor("title_border_bg");
 
-	public static final Color TABLE_EVEN_ROW = getColor("table_even_row", new Color(220, 255, 255));
+	public static final Color TABLE_EVEN_ROW = getColor("table_even_row");
 	public static final Color TABLE_ODD_ROW = getColor("table_odd_row");
 	public static final Color FAVORITE_ITEM_BORDER = new Color(173, 20, 0);
 	public static final Color CELL_EDITOR_BG = MAIN_PANEL_BG;

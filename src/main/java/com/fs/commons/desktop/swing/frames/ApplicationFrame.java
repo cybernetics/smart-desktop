@@ -214,7 +214,7 @@ public class ApplicationFrame extends JKFrame {
 							// BorderFactory.createLineBorder(Colors.FAVORITE_ITEM_BORDER);
 							final Border normalBorder = BorderFactory.createRaisedBevelBorder();
 							pnlThumb.setBorder(normalBorder);
-							btnItem.setBorder(null);
+							btnItem.setBorder(SwingUtility.getDefaultEmptyBorder());
 
 							pnlThumb.add(btnItem, BorderLayout.NORTH);
 							pnlThumb.add(pnlItem, BorderLayout.CENTER);
