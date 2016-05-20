@@ -35,6 +35,7 @@ import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.listeners.ValueChangeListener;
 import com.fs.commons.desktop.swing.dialogs.ProgressDialog;
 import com.fs.commons.desktop.validation.Validator;
+import com.fs.commons.desktop.validation.exception.UIValidationException;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.FormatUtil;
 import com.fs.commons.util.GeneralUtility;
@@ -147,27 +148,35 @@ public class JKButton extends JButton implements BindingComponent {
 
 	@Override
 	protected void fireActionPerformed(final ActionEvent event) {
-		if (this.privlige != null) {
-			try {
-				JKSecurityManager.getAuthorizer().checkAllowed(this.privlige);
-			} catch (final SecurityException e) {
-				JKExceptionUtil.handle(e);
-				return;
+		// if (this.privlige != null) {
+		// try {
+		// JKSecurityManager.getAuthorizer().checkAllowed(this.privlige);
+		// } catch (final SecurityException e) {
+		// JKExceptionUtil.handle(e);
+		// return;
+		// }
+		// }
+		try {
+			if (this.showProgress) {
+				final Runnable runnable = new Runnable() {
+					@Override
+					public void run() {
+						JKButton.super.fireActionPerformed(event);
+					}
+				};
+				this.progress = ProgressDialog.create("", null, this.progressAsModal);
+				this.progress.setCancellable(true);
+				this.progress.addTask(runnable);
+				this.progress.run();
+			} else {
+				JKButton.super.fireActionPerformed(event);
 			}
-		}
-		if (this.showProgress) {
-			final Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					JKButton.super.fireActionPerformed(event);
-				}
-			};
-			this.progress = ProgressDialog.create("", null, this.progressAsModal);
-			this.progress.setCancellable(true);
-			this.progress.addTask(runnable);
-			this.progress.run();
-		} else {
-			JKButton.super.fireActionPerformed(event);
+		} catch (RuntimeException e) {
+			if (!(e.getCause() instanceof ValidationException)) {
+				e.printStackTrace();
+			} else {
+				// It is safe to eat this exception
+			}
 		}
 	}
 
@@ -247,17 +256,17 @@ public class JKButton extends JButton implements BindingComponent {
 			@Override
 			public void mouseExited(MouseEvent e) {
 				setOpaque(false);
-//				Color background=getBackground();
-//				setBackground(getForeground());
-//				setForeground(background);
+				// Color background=getBackground();
+				// setBackground(getForeground());
+				// setForeground(background);
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				setOpaque(true);
-//				Color background=getBackground();
-//				setBackground(getForeground());
-//				setForeground(background);
+				// Color background=getBackground();
+				// setBackground(getForeground());
+				// setForeground(background);
 			}
 		});
 	}
@@ -464,7 +473,6 @@ public class JKButton extends JButton implements BindingComponent {
 			super.setForeground(fg);
 		}
 	}
-	
 
 	public void setShortcutText(String shortcut) {
 		setShortcut(shortcut, null);

@@ -23,9 +23,11 @@ import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class AbstractTableMetaFactory {
-	static Logger logger = Logger.getLogger(AbstractTableMetaFactory.class.getName());
+	static JKLogger logger = JKLoggerFactory.getLogger(AbstractTableMetaFactory.class);
 	static Hashtable<JKDataSource, TableMetaFactory> metaFactorys = new Hashtable<JKDataSource, TableMetaFactory>();
 	static JKDataSource defaultConnectionManager = JKDataSourceFactory.getDefaultDataSource();
 	static {
@@ -40,7 +42,7 @@ public class AbstractTableMetaFactory {
 	// //////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static TableMetaFactory addTablesMeta(final JKDataSource connectionManager, final Hashtable<String, TableMeta> newTables)
 			throws JKDataAccessException {
-		logger.info("addTablesMeta: " + newTables);
+		logger.debug("addTablesMeta: " + newTables);
 		final TableMetaFactory metaFactory = getMetaFactory(connectionManager);
 		metaFactory.addTablesMeta(newTables);
 		return metaFactory;
@@ -71,7 +73,7 @@ public class AbstractTableMetaFactory {
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////
 	public static TableMeta getTableMeta(final JKDataSource connectionManager, final String metaName) {
-		logger.info("getTableMeta :" + metaName);
+		logger.debug("getTableMeta :" + metaName);
 		return metaFactorys.get(connectionManager).getTableMeta(metaName);
 	}
 
@@ -103,14 +105,14 @@ public class AbstractTableMetaFactory {
 	 * @throws TableMetaNotFoundException
 	 */
 	public static TableMeta getTableMeta(final String tableName) throws TableMetaNotFoundException {
-		logger.info("2getTableMeta : " + tableName);
+		logger.debug("getTableMeta : " + tableName);
 		final TableMetaFactory defaultMetaFactory = getDefaultMetaFactory();
 		if (defaultMetaFactory.isMetaExists(tableName)) {
-			logger.info("get from default datasource");
+			logger.debug("get from default datasource");
 			return defaultMetaFactory.getTableMeta(tableName);
 		}
 		// look in other connections
-		logger.info("not found inside default datasource , look into other connections");
+		logger.debug("not found inside default datasource , look into other connections");
 		final Enumeration<JKDataSource> keys = metaFactorys.keys();
 		while (keys.hasMoreElements()) {
 			final TableMetaFactory tableMetaFactory = metaFactorys.get(keys.nextElement());

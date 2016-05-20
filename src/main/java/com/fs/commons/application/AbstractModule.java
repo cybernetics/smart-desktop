@@ -37,9 +37,12 @@ import com.fs.commons.reports.JKReport;
 import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 import com.jk.security.JKPrivilige;
 
 public abstract class AbstractModule implements Module {
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	String moduleName;
 	String configFilePath;
 	// int priviligeId;
@@ -141,7 +144,7 @@ public abstract class AbstractModule implements Module {
 			if (this.menu != null) {
 				return this.menu;
 			}
-			final String fileFullPath = getFileFullPath("menu.xml");			
+			final String fileFullPath = getFileFullPath("menu.xml");
 			final InputStream in = GeneralUtility.getFileInputStream(fileFullPath);
 			if (in != null) {
 				final ModuleMenuXmlParser p = new ModuleMenuXmlParser(this);
@@ -212,7 +215,7 @@ public abstract class AbstractModule implements Module {
 				tables = parser.parse(in, getModuleName());
 				return tables;
 			}
-			System.err.println("meta.xml not found in module in :" + getModuleName());
+			logger.debug("meta.xml not found in module in :", getModuleName());
 			return new Hashtable<String, TableMeta>();
 		} catch (final JKXmlException e) {
 			throw new ModuleException(this, e);

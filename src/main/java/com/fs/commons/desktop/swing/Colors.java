@@ -21,15 +21,18 @@ import java.util.Properties;
 
 import com.fs.commons.util.CollectionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class Colors {
+	private static JKLogger logger = JKLoggerFactory.getLogger(Color.class);
 	static Properties prop = new Properties();
 	static {
 		InputStream inputStream = GeneralUtility.getFileInputStream("/color.properties");
 		if (inputStream != null) {
 			prop = GeneralUtility.readPropertyStream(inputStream);
 		} else {
-			System.err.println("No theme found , default theme will be loaded");
+			logger.info("No theme found , default theme will be loaded");
 		}
 	}
 	public static final Color DARK_BLUE = new Color(22, 125, 219);
@@ -77,7 +80,7 @@ public class Colors {
 	public static final Color JK_STATUS_BAR_FG = getColor("status_bg");
 	public static final Color MI_PANEL_TITLE_BG = getColor("mi-panel-title-bg");
 	public static final Color MI_PANEL_TITLE_FG = getColor("mi-panel-title-fg");
-	public static final Color SPLASH_HEADER_COLOR = getColor("splash-header-fg",Color.WHITE);
+	public static final Color SPLASH_HEADER_COLOR = getColor("splash-header-fg", Color.WHITE);
 
 	// public static final Color MENU_PANEL= SKY_BLUE;
 	// public static final Color MENU_ITEMS_PANEL= NICE_BLUE;
@@ -93,7 +96,7 @@ public class Colors {
 	private static Color getColor(String colorStr, final Color defaultColor) {
 		colorStr = CollectionUtil.fixPropertyKey(colorStr);
 		if (prop.getProperty(colorStr) == null) {
-			System.out.println("Color  " + colorStr + " Is not avaiable ");
+			logger.debug("Color  ", colorStr, " Is not avaiable ");
 			return defaultColor;
 		}
 		final String[] color = prop.getProperty(colorStr).split(",");
@@ -104,7 +107,6 @@ public class Colors {
 		return new Color(Integer.parseInt(colorHex), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
 
 	}
-
 
 	public static void main(final String[] args) {
 		System.out.println();

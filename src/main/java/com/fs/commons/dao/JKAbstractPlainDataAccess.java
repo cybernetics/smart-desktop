@@ -38,13 +38,15 @@ import com.fs.commons.desktop.swin.ConversionUtil;
 import com.fs.commons.locale.Lables;
 import com.jk.db.dataaccess.plain.JKFinder;
 import com.jk.db.dataaccess.plain.JKUpdater;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 import com.jk.security.JKAudit;
 import com.jk.security.JKUser;
 import com.jk.util.IOUtil;
 import com.sun.rowset.CachedRowSetImpl;
 
 public class JKAbstractPlainDataAccess {
-	Logger logger = Logger.getLogger(getClass().getName());
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	// TODO : add support for max cache size
 	private static Hashtable<String, Hashtable<Object, Object>> cache = new Hashtable<String, Hashtable<Object, Object>>();
 	private static Hashtable<String, List<? extends Object>> listCache = new Hashtable<>();
@@ -80,7 +82,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////
 	public void addAudit(final JKAudit audit) throws JKDataAccessException {
-		logger.info("Audit : " + audit);
+		logger.debug("Audit : " , audit.toString());
 		final JKUpdater updater = new JKUpdater() {
 
 			@Override
@@ -108,7 +110,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////////////
 	protected void close(final Connection connection) {
-		logger.info("close connection");
+		logger.debug("close connection");
 		if (connection == null) {
 			return;
 		}
@@ -124,7 +126,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////////////
 	protected void close(final java.sql.PreparedStatement ps) {
-		logger.info("close ps");
+		logger.debug("close ps");
 		if (ps != null) {
 			try {
 				ps.close();
@@ -168,7 +170,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////////////////////
 	public List createRecordsFromSQL(String sql) throws JKDataAccessException {
-		logger.info("createRecordsFromSQL : " + sql);
+		logger.debug("createRecordsFromSQL : " + sql);
 		if (listCache.get(sql) == null) {
 			Connection con = null;
 			ResultSet rs = null;
@@ -188,12 +190,12 @@ public class JKAbstractPlainDataAccess {
 
 					if (metaData.getColumnCount() >= 2) {
 						if (rs.getString(2) == null) {
-							logger.info(sql + "\n generating null values");
+							logger.debug(sql + "\n generating null values");
 						} else {
 							combo.setValue(rs.getString(2));
 						}
 					} else {
-						logger.info(sql + "\n generating single column only");
+						logger.debug(sql + "\n generating single column only");
 					}
 					results.add(combo);
 				}
@@ -225,7 +227,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////
 	public String executeOutputQuery(final String query, final String fieldSeparator, final String recordsSepartor) throws JKDataAccessException {
-		logger.info(query);
+		logger.debug(query);
 		try {
 			final CachedRowSet rs = executeQuery(query);
 			final ResultSetMetaData meta = rs.getMetaData();
@@ -247,7 +249,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////////////
 	public CachedRowSet executeQuery(final String query) throws JKDataAccessException {
-		logger.info(query);
+		logger.debug(query);
 		Statement ps = null;
 		Connection con = null;
 		ResultSet rs = null;
@@ -287,9 +289,9 @@ public class JKAbstractPlainDataAccess {
 
 			updater.setParamters(ps);
 			final int count = ps.executeUpdate();
-			logger.info("Executeing : " + ps.toString());
-			logger.info("Affeted Rows : " + count);
-			logger.info(ps.toString());
+			logger.debug("Executeing : " + ps.toString());
+			logger.debug("Affeted Rows : " + count);
+			logger.debug(ps.toString());
 			if (count == 0) {
 				throw new JKRecordNotFoundException("RECORD_NOT_FOUND");
 			}
@@ -328,9 +330,9 @@ public class JKAbstractPlainDataAccess {
 		try {
 			connection = getConnection();
 			ps = createStatement(connection);
-			logger.info("Executeing : " + sql);
+			logger.debug("Executeing : " + sql);
 			final int count = ps.executeUpdate(sql);
-			logger.info("Affeted Rows : " + count);
+			logger.debug("Affeted Rows : " + count);
 			// no auto increment fields
 			return 0;
 		} catch (final SQLException e) {
@@ -342,7 +344,7 @@ public class JKAbstractPlainDataAccess {
 	}
 
 	public Object[] exeuteQueryAsArray(final String query) throws JKDataAccessException {
-		logger.info(query);
+		logger.debug(query);
 		try {
 			final CachedRowSet rs = executeQuery(query);
 			final ResultSetMetaData meta = rs.getMetaData();
@@ -362,7 +364,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////////////
 	public Object exeuteSingleOutputQuery(final String query) throws JKDataAccessException {
-		logger.info(query);
+		logger.debug(query);
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -383,7 +385,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////////////
 	public Object exeuteSingleOutputQuery(final String query, final Object... params) throws JKDataAccessException {
-		logger.info(query);
+		logger.debug(query);
 		return exeuteSingleOutputQuery(DaoUtil.compileSql(query, params));
 	}
 
@@ -395,7 +397,7 @@ public class JKAbstractPlainDataAccess {
 	 * @throws JKRecordNotFoundException
 	 */
 	public JKAudit findAudit(final int id) throws JKRecordNotFoundException, JKDataAccessException {
-		logger.info(id + "");
+		logger.debug(id + "");
 		final JKFinder finder = new JKFinder() {
 
 			@Override
@@ -428,7 +430,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////
 	public Object findRecord(final JKFinder finder) throws JKRecordNotFoundException, JKDataAccessException {
-		logger.info(finder.getQuery());
+		logger.debug(finder.getQuery());
 		// GeneralUtility.printStackTrace();
 		Connection connection = null;
 		PreparedStatement ps = null;
@@ -461,18 +463,18 @@ public class JKAbstractPlainDataAccess {
 		try {
 			final Hashtable<Object, Object> tableCache = JKAbstractPlainDataAccess.cache.get(tableName);
 			if (tableCache.get(recordId) == null) {
-				logger.info("not found in cache , look from db");
+				logger.debug("not found in cache , look from db");
 				// System.out.println("loading record "+tableName);
 				final Object record = findRecord(finder);
 				// if the size exceeded the max cache size , don't cache
 				if (tableCache.size() > Integer.parseInt(getDataSource().getProperty("max-cache-size", "1000"))) {
-					logger.info("cache size exceeded , void caching");
+					logger.debug("cache size exceeded , void caching");
 					return record;
 				}
-				logger.info("cache query for id :" + record);
+				logger.debug("cache query for id :" + record);
 				tableCache.put(recordId, record);
 			} else {
-				// System.out.println("return "+tableName+" info from cache");
+				// System.out.println("return "+tableName+" debug from cache");
 			}
 			return tableCache.get(recordId);
 		} catch (final JKRecordNotFoundException e) {
@@ -577,7 +579,7 @@ public class JKAbstractPlainDataAccess {
 
 	// ///////////////////////////////////////////////////////////////////
 	public int getRowsCount(final String query) throws NumberFormatException, JKDataAccessException {
-		logger.info(query);
+		logger.debug(query);
 		final String sql = "SELECT COUNT(*) FROM (" + query + ") ";
 		// System.out.println(sql);
 		return new Integer(exeuteSingleOutputQuery(sql).toString());
@@ -605,7 +607,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////
 	public ArrayList lstRecords(final JKFinder finder) throws JKDataAccessException {
-		logger.info(finder.getQuery());
+		logger.debug(finder.getQuery());
 		// System.out.println("Executing : "+finder.getFinderSql());
 		Connection connection = null;
 		PreparedStatement ps = null;
@@ -615,7 +617,7 @@ public class JKAbstractPlainDataAccess {
 			ps = prepareStatement(connection, finder.getQuery());
 			finder.setParamters(ps);
 			rs = ps.executeQuery();
-			logger.info(ps.toString().substring(ps.toString().toUpperCase().indexOf("SELECT")));
+			logger.debug(ps.toString().substring(ps.toString().toUpperCase().indexOf("SELECT")));
 			final ArrayList list = new ArrayList();
 			while (rs.next()) {
 				list.add(finder.populate(rs));
@@ -623,7 +625,7 @@ public class JKAbstractPlainDataAccess {
 			return list;
 		} catch (final SQLException e) {
 			if (ps != null) {
-				logger.info(ps.toString());
+				logger.error(ps.toString());
 			}
 			throw new JKDataAccessException(e);
 		} finally {

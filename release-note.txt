@@ -16,6 +16,7 @@
 17- fix select print fields size
 18 fix the style of printed table to html
 19- fix privliges sync
+20- add banner on startup
 	
 
 0.0.9

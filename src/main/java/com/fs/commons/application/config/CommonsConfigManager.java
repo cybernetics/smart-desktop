@@ -26,6 +26,8 @@ import java.util.Properties;
 
 import com.fs.commons.util.CollectionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 import com.lowagie.text.pdf.codec.Base64;
 
 public class CommonsConfigManager {
@@ -67,6 +69,8 @@ public class CommonsConfigManager {
 
 	// static Base64 encDec = Base64. new Base64();
 	private String fileName;
+
+	private JKLogger logger=JKLoggerFactory.getLogger(getClass());
 
 	/**
 	 *
@@ -208,7 +212,7 @@ public class CommonsConfigManager {
 		// }
 		CollectionUtil.fixPropertiesKeys(this.prop);
 		System.getProperties().putAll(this.prop);
-		System.out.println(System.getProperties().toString().replaceAll(",", "\n"));
+		logger.debug(System.getProperties().toString().replaceAll(",", "\n"));
 	}
 
 	/**

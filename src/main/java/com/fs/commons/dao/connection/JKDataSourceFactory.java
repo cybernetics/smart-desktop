@@ -21,9 +21,11 @@ import java.util.logging.Logger;
 import com.fs.commons.application.ApplicationManager;
 import com.fs.commons.application.exceptions.ServerDownException;
 import com.fs.commons.dao.JKDataAccessException;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class JKDataSourceFactory {
-	static Logger logger = Logger.getLogger(JKDataSourceFactory.class.getName());
+	static JKLogger logger = JKLoggerFactory.getLogger(JKDataSourceFactory.class);
 	private static JKDataSource defaultResourceManager;
 
 	/**
@@ -32,7 +34,7 @@ public class JKDataSourceFactory {
 	 */
 	private static void checkApplicationInitialized() throws Exception {
 		try {
-			logger.info("ApplicationManager.getInstance().init()");
+			logger.debug("ApplicationManager.getInstance().init()");
 			ApplicationManager.getInstance().init();
 		} catch (final Exception e) {
 			throw e;
@@ -48,7 +50,7 @@ public class JKDataSourceFactory {
 	public static JKDataSource getDefaultDataSource() {
 		if (defaultResourceManager == null) {
 			try {
-				logger.info("checkApplicationInitialized();");
+				logger.debug("checkApplicationInitialized();");
 				checkApplicationInitialized();
 			} catch (final Exception e) {
 				throw new IllegalStateException("Unable to Initialize the Application due to the following error:\n" + e.getMessage(), e);
@@ -64,7 +66,7 @@ public class JKDataSourceFactory {
 	 * @throws JKDataAccessException
 	 */
 	public static void setDefaultDataSource(final JKDataSource impl) throws ServerDownException, JKDataAccessException {
-		logger.info("setDefaultDataSource");
+		logger.debug("setDefaultDataSource");
 		defaultResourceManager = impl;
 		// check weather
 //		GeneralUtility.checkDatabaseServer(impl.getDatabaseName(), impl.getDatabaseHost(), impl.getDatabasePort());
@@ -72,7 +74,7 @@ public class JKDataSourceFactory {
 		// password
 		Connection connection = null;
 		try {
-			logger.info("check database connetion");
+			logger.debug("check database connetion");
 			connection = impl.getQueryConnection();
 		} finally {
 			impl.close(connection);

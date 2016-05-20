@@ -23,8 +23,11 @@ import java.io.InputStream;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class DefaultConfigManager extends CommonsConfigManager {
+	JKLogger logger=JKLoggerFactory.getLogger(getClass());
 	private static final String FILE_NAME = System.getProperty("db.config", "config.properties");
 	public static final String CONFIG_FILE_NAMES[] = { FILE_NAME, "system.config", "system.config.xml" };
 
@@ -45,7 +48,7 @@ public class DefaultConfigManager extends CommonsConfigManager {
 				in = GeneralUtility.getFileInputStream(name);
 				if (in != null) {
 					load(in);
-					System.err.println("Config File : " + name + " loaded");
+					logger.debug("Config File : " + name + " loaded");
 					return;
 				}
 			}
@@ -57,7 +60,7 @@ public class DefaultConfigManager extends CommonsConfigManager {
 					if (in != null) {
 						load(in);
 					}
-					System.err.println("Config File : /" + name + " loaded");
+					logger.debug("Config File : /" + name + " loaded");
 					return;
 				} catch (final FileNotFoundException e) {
 				}

@@ -56,12 +56,14 @@ import com.jk.exceptions.JKInvalidUserException;
 import com.jk.exceptions.handler.JKExceptionHandlerFactory;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.license.client.LicenseClientFactory;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 import com.jk.resources.JKResourceLoaderFactory;
 import com.jk.security.JKSecurityManager;
 import com.jk.security.JKUser;
 
 public class ApplicationManager {
-	static Logger logger = Logger.getLogger(ApplicationManager.class.getName());
+	static JKLogger logger = JKLoggerFactory.getLogger(ApplicationManager.class);
 	private static final String[] DEFAULT_SYSTEM_FILES = { "/system.xml", "/default.system.xml" };
 	private static final int LOGIN_RETRIES = 3;
 	private static ApplicationManager instance;
@@ -90,13 +92,13 @@ public class ApplicationManager {
 	 */
 	public static ApplicationManager getInstance() {
 		if (instance == null) {
-			logger.info("set default exception handler");
+			logger.debug("set default exception handler");
 			JKExceptionHandlerFactory.getInstance().setDefaultExceptionHandler(new JKDesktopExceptionHandler());
 			try {
-				logger.info("set default datasource");
+				logger.debug("set default datasource");
 				JKDataSourceFactory.setDefaultDataSource(new JKPoolingDataSource());
 				checkScriptsInstalled();
-				logger.info("set default instance");
+				logger.debug("set default instance");
 				instance = new ApplicationManager();
 			} catch (final Exception e) {
 				JKExceptionUtil.handle(e);
@@ -129,7 +131,7 @@ public class ApplicationManager {
 	}
 
 	public static void setCurrentClient(final ClientInfo client) {
-		logger.info("Set default client info : " + client);
+		logger.debug("Set default client info : " + client);
 		ApplicationManager.client = client;
 		TableModelHtmlBuilder.setCompanyName(client.getClientName());
 		TableModelHtmlBuilder.setCompanyLogo(client.getLogo());
@@ -143,7 +145,7 @@ public class ApplicationManager {
 	 *
 	 */
 	public void closeMainFrame() {
-		logger.info("close main frame");
+		logger.debug("close main frame");
 		if (this.application != null && this.applicationFrame != null) {
 			this.applicationFrame.dispose();
 		}
@@ -164,7 +166,7 @@ public class ApplicationManager {
 
 	// ////////////////////////////////////////////////////////////////////////////////////
 	private Application createDefaultApplication() {
-		logger.info("create default application");
+		logger.debug("create default application");
 		final Application a = new Application();
 		return a;
 	}
@@ -259,7 +261,7 @@ public class ApplicationManager {
 	 */
 	public Application init() throws FileNotFoundException, ApplicationException {
 		for (String fileName : DEFAULT_SYSTEM_FILES) {
-			logger.info("trying to init application with file :" + fileName);
+			logger.debug("trying to init application with file :" + fileName);
 			InputStream fileInputStream = GeneralUtility.getFileInputStream(fileName);
 			if (fileInputStream != null) {
 				return init(fileInputStream);
@@ -275,45 +277,45 @@ public class ApplicationManager {
 	 * @throws JKXmlException
 	 */
 	public Application init(final InputStream in) throws ApplicationException {
-		logger.info("init with inputstream");
+		logger.debug("init with inputstream");
 		Splash splash = null;
 		try {
-			logger.info("initConfig");
+			logger.debug("initConfig");
 			initConfig();
-			logger.info("init labels");
+			logger.debug("init labels");
 			Lables.getDefaultInstance();// to foce init
 			// loadDefaultLables();
-			logger.info("loadDefaultMeta()");
+			logger.debug("loadDefaultMeta()");
 			loadDefaultMeta();
 			if (in != null) {
-				logger.info("parse application");
+				logger.debug("parse application");
 				final ApplicationXmlParser parser = new ApplicationXmlParser();
 				this.application = parser.parseApplication(in);
 			} else {
-				logger.info("create default application");
+				logger.debug("create default application");
 				this.application = createDefaultApplication();
 			}
 			if (this.application.getSplashImage() != null) {
-				logger.info("show splash");
+				logger.debug("show splash");
 				splash = new Splash(this.application.getSplashImage());
 				splash.setVisible(true);
 			}
-			logger.info("validate license");
+			logger.debug("validate license");
 			LicenseClientFactory.getClient().validateLicense();
 			fireBeforeApplicationInit();
 			if (this.application.getLocale() != null) {
-				logger.info("set locale to : " + application.getLocale());
+				logger.debug("set locale to : " + application.getLocale());
 				SwingUtility.setDefaultLocale(this.application.getLocale());
 			} else {
 				System.err.println("null locale");
 			}
 			// ExceptionUtil.initExceptionLogging();
-			logger.info("application.init");
+			logger.debug("application.init");
 			this.application.init();
 			// WE DELAY THE CHECK UNTIL NOW TO BE SURE THAT WE HAVE LOADED THE
 			// LABLES
 			if (firstRun && isAllowSingleInstanceOnly()) {
-				logger.info("single instance only");
+				logger.debug("single instance only");
 				// to avoid any issues with swicthLocale or restart
 				InstanceManager.registerInstance(this.application.getApplicationId());
 				firstRun = false;
@@ -355,15 +357,15 @@ public class ApplicationManager {
 
 	// ////////////////////////////////////////////////////////////////////////////////////
 	private void loadDefaultMeta() throws JKXmlException, JKDataAccessException {
-		logger.info("start loading default meta");
+		logger.debug("start loading default meta");
 		final TableMetaXmlParser parser = new TableMetaXmlParser();
 		String resourceName = "/resources/meta/meta.xml";
-		logger.info("load default meta at :" + resourceName);
+		logger.debug("load default meta at :" + resourceName);
 		final InputStream in = JKResourceLoaderFactory.getResourceLoader().getResourceAsStream(resourceName);
 		if (in != null) {
-			logger.info("parse default meta");
+			logger.debug("parse default meta");
 			final Hashtable<String, TableMeta> meta = parser.parse(in, "default");
-			logger.info("add meta to abstract table meta factory : " + meta);
+			logger.debug("add meta to abstract table meta factory : " + meta);
 			AbstractTableMetaFactory.addTablesMeta(JKDataSourceFactory.getDefaultDataSource(), meta);
 		}
 

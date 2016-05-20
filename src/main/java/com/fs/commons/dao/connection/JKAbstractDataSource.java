@@ -27,9 +27,11 @@ import com.fs.commons.dao.JKSession;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public abstract class JKAbstractDataSource implements JKDataSource {
-	Logger logger = Logger.getLogger(getClass().getName());
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	protected static int connectionsCount;
 	private JKSession parentSession;
 	private Connection queryConnection;
@@ -45,7 +47,7 @@ public abstract class JKAbstractDataSource implements JKDataSource {
 		try {
 			if (con != null && !con.isClosed() && con != this.queryConnection) {
 				// GeneralUtility.printStackTrace();
-				logger.info("closing connection : Current connection " + --connectionsCount);
+				logger.debug("closing connection : Current connection " + --connectionsCount);
 				// System.err.println("closing connection");
 				con.close();
 			}
@@ -57,7 +59,7 @@ public abstract class JKAbstractDataSource implements JKDataSource {
 	// ////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void close(final Connection connection, final boolean commit) throws JKDataAccessException {
-		logger.info("close connection with commit :  " + commit);
+		logger.debug("close connection with commit :  " + commit);
 		try {
 			if (commit) {
 				connection.commit();
@@ -112,7 +114,7 @@ public abstract class JKAbstractDataSource implements JKDataSource {
 	// ////////////////////////////////////////////////////////////////////////////
 	@Override
 	public Connection getConnection() throws JKDataAccessException {
-		logger.info("request new connection");
+		logger.debug("request new connection");
 		if (!this.driverClassLoaded) {
 			loadDriverClass();
 			this.driverClassLoaded = true;
@@ -120,7 +122,7 @@ public abstract class JKAbstractDataSource implements JKDataSource {
 		try {
 			// System.err.println("Createing new connection");
 			// GeneralUtility.printStackTrace();
-			logger.info("Creating connection , current opened connections : " + (++connectionsCount));
+			logger.debug("Creating connection , current opened connections : " + (++connectionsCount));
 			return connect();
 		} catch (final Exception e) {
 			try {
@@ -135,7 +137,7 @@ public abstract class JKAbstractDataSource implements JKDataSource {
 
 	@Override
 	public Connection getQueryConnection() throws JKDataAccessException {
-		logger.info("getQueryConnection()");
+		logger.debug("getQueryConnection()");
 //		GeneralUtility.printStackTrace();
 		if (this.queryConnection == null) {
 			this.queryConnection = getConnection();

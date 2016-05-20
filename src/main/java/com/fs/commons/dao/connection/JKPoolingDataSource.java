@@ -24,9 +24,11 @@ import org.apache.commons.dbcp.BasicDataSource;
 
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class JKPoolingDataSource extends JKDefaultDataSource {
-	Logger logger = Logger.getLogger(getClass().getName());
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	private BasicDataSource datasource;
 
 	// ////////////////////////////////////////////////////////////////////////////
@@ -44,7 +46,7 @@ public class JKPoolingDataSource extends JKDefaultDataSource {
 	// ////////////////////////////////////////////////////////////////////////////
 	@Override
 	protected Connection connect() throws SQLException {
-		logger.info("trying to get connection from datasource");
+		logger.debug("trying to get connection from datasource");
 		if (connectionsCount >= getMaxPoolSize()) {
 			GeneralUtility.printStackTrace();
 			SwingUtility.showUserErrorDialog("CONNECTION_POOL_IS_FULL");
@@ -71,17 +73,17 @@ public class JKPoolingDataSource extends JKDefaultDataSource {
 		return Integer.parseInt(getProperty("db-max-active", "10"));
 	}
 
-//	@Override
-//	public Connection getQueryConnection() throws DaoException {
-//		return getQueryConnection();
-		// try {
-		// testConnection(queryConnection);
-		// } catch (final SQLException e) {
-		// queryConnection = null;
-		// throw new DaoException("DATABASE_DOWN_ERROR", e);
-		// }
-//		return queryConnection;
-//	}
+	// @Override
+	// public Connection getQueryConnection() throws DaoException {
+	// return getQueryConnection();
+	// try {
+	// testConnection(queryConnection);
+	// } catch (final SQLException e) {
+	// queryConnection = null;
+	// throw new DaoException("DATABASE_DOWN_ERROR", e);
+	// }
+	// return queryConnection;
+	// }
 
 	// ////////////////////////////////////////////////////////////////////////////
 	private void init() {
@@ -96,17 +98,18 @@ public class JKPoolingDataSource extends JKDefaultDataSource {
 		// datasource.setPoolPreparedStatements(Boolean.parseBoolean(getProperty("db-cache-ps","true")));
 		this.datasource.setMaxActive(getMaxPoolSize());
 
-		logger.info(this.datasource.toString());
+		logger.debug(this.datasource.toString());
 		// datasource.setMaxWait(1000);
 	}
 
-//	private void testConnection(final Connection queryConnection) throws SQLException {
-//		PreparedStatement ps = null;
-//		try {
-//			ps = queryConnection.prepareStatement(getTestQuery());
-//			ps.executeQuery();
-//		} finally {
-//			close(ps);
-//		}
-//	}
+	// private void testConnection(final Connection queryConnection) throws
+	// SQLException {
+	// PreparedStatement ps = null;
+	// try {
+	// ps = queryConnection.prepareStatement(getTestQuery());
+	// ps.executeQuery();
+	// } finally {
+	// close(ps);
+	// }
+	// }
 }

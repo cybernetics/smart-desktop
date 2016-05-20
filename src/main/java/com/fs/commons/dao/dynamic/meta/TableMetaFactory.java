@@ -35,9 +35,11 @@ import com.fs.commons.dao.dynamic.meta.xml.TableMetaXMLGenerator;
 import com.fs.commons.dao.dynamic.meta.xml.TableMetaXmlParser;
 import com.fs.commons.util.CollectionUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class TableMetaFactory {
-	Logger logger = Logger.getLogger(getClass().getName());
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	Hashtable<String, TableMeta> metas = new Hashtable<String, TableMeta>();
 	Hashtable<String, TableMeta> dynamicTable = new Hashtable<String, TableMeta>();
 	private final JKDataSource connectionManager;
@@ -54,7 +56,7 @@ public class TableMetaFactory {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	public void addTablesMeta(final Hashtable<String, TableMeta> newTables) {
-		logger.info("addTablesMeta");
+		logger.debug("addTablesMeta");
 		for (final String tableMetaName : newTables.keySet()) {
 			if (this.metas.get(tableMetaName) != null) {
 				// Logger.fatal(tableMetaName +
@@ -72,10 +74,10 @@ public class TableMetaFactory {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	public TableMeta getTableMeta(final String tableName) throws TableMetaNotFoundException {
-		logger.info("getTableMeta : " + tableName);
+		logger.debug("getTableMeta : " + tableName);
 		TableMeta meta = this.metas.get(tableName);
 		if (meta == null) {
-			logger.info("not found , look into dynamic meta");
+			logger.debug("not found , look into dynamic meta");
 			// System.err.println("TableMeta for " + tableName +
 			// " not defined , return default meta \n");
 			meta = this.dynamicTable.get(tableName);
@@ -84,7 +86,7 @@ public class TableMetaFactory {
 			}
 		}
 		meta.setDataSource(this.connectionManager);
-		logger.info(meta.toString());
+		logger.debug(meta.toString());
 		return meta;
 	}
 
@@ -111,25 +113,25 @@ public class TableMetaFactory {
 	// /////////////////////////////////////////////////////////////////////////////////////
 	private void loadDynamicMeta(final JKDataSource connectionManager)
 			throws JKDataAccessException, SQLException, FileNotFoundException, IOException, JKXmlException {
-		logger.info("loadDynamicMeta");
+		logger.debug("loadDynamicMeta");
 		if (System.getProperty(CollectionUtil.fixPropertyKey("tablemeta.dynamic.generate"), "true").equals("true")) {
 			final File file = new File("meta-" + connectionManager.getDatabaseName() + ".xml");
 			try {
 				if (file.exists()) {
-					logger.info("Dynamic Meta file is already exist , loading from file.");
+					logger.debug("Dynamic Meta file is already exist , loading from file.");
 					final TableMetaXmlParser parser = new TableMetaXmlParser();
-					logger.info("parsing dynamic meta");
+					logger.debug("parsing dynamic meta");
 					this.dynamicTable = parser.parse(new FileInputStream(file), "dynamic");
 				} else {
-					logger.info("");
+					logger.debug("");
 					final DataBaseAnaylser analyszer = connectionManager.getDatabaseAnasyaler();
-					logger.info("Generating table meta : " + file);
+					logger.debug("Generating table meta : " + file);
 					this.dynamicTable = toHashTable(analyszer.getTablesMeta(), "dynamic");
 					if (System.getProperty("tablemeta.dynamic.save", "true").equals("false")) {
 						final TableMetaXMLGenerator generator = new TableMetaXMLGenerator();
 						final String metaXml = generator.generateTablesMetaXml(new ArrayList<TableMeta>(this.dynamicTable.values()));
 						GeneralUtility.writeDataToFile(metaXml.getBytes(), file);
-						logger.info("Table meta generation done");
+						logger.debug("Table meta generation done");
 					}
 				}
 			} finally {
@@ -140,7 +142,7 @@ public class TableMetaFactory {
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	public void loadMetaFiles(final InputStream in) throws FileNotFoundException, JKXmlException {
-		logger.info("loadMetaFiles");
+		logger.debug("loadMetaFiles");
 		final TableMetaXmlParser parser = new TableMetaXmlParser();
 		final Hashtable<String, TableMeta> newTables = parser.parse(in, "user");
 		addTablesMeta(newTables);

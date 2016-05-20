@@ -1107,7 +1107,7 @@ public class SwingUtility {
 
 	public static void showMessageDialog(final String message, final Throwable ex) {
 		JOptionPane.showMessageDialog(getDefaultMainFrame(), Lables.get(message, true));
-		throw new RuntimeException(message);
+		throw new RuntimeException(message,ex);
 	}
 
 	/**

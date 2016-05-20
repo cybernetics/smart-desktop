@@ -46,9 +46,11 @@ import com.fs.commons.dao.dynamic.meta.IdFieldMeta;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.trigger.FieldTrigger;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class TableMetaXmlParser {
-	Logger logger = Logger.getLogger(getClass().getName());
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	// private final String fileName;
 
 	/**
@@ -101,7 +103,7 @@ public class TableMetaXmlParser {
 	 * @throws IllegalAccessException
 	 */
 	public Hashtable<String, TableMeta> parse(final InputStream in, final String source) throws JKXmlException {
-		logger.info("parsing tablemeta for source : " + source);
+		logger.debug("parsing tablemeta for source : " + source);
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			final DocumentBuilder builder = factory.newDocumentBuilder();
@@ -113,7 +115,7 @@ public class TableMetaXmlParser {
 				final Element table = (Element) tablesNode.item(i);
 				final TableMeta tableInstance = TableMeta.class.newInstance();
 				tableInstance.setTableName(table.getAttribute("name"));
-				logger.info("parsing table : " + tableInstance.getTableName());
+				logger.debug("parsing table : " + tableInstance.getTableName());
 				tableInstance.setSource(source);
 				if (!table.getAttribute("id").equals("")) {
 					tableInstance.setTableId(table.getAttribute("id"));
@@ -202,7 +204,7 @@ public class TableMetaXmlParser {
 					}
 
 				}
-				logger.info("add tablemeta to hash");
+				logger.debug("add tablemeta to hash");
 				tablesHash.put(tableInstance.getTableId(), tableInstance);
 			}
 			return tablesHash;
@@ -221,7 +223,7 @@ public class TableMetaXmlParser {
 	 */
 	private Constraint parseConstraint(final TableMeta tableMeta, final Element element)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		logger.info("parseConstraint");
+		logger.debug("parseConstraint");
 		Constraint instance;
 		if (!element.getAttribute("class").equals("")) {
 			instance = (Constraint) Class.forName(element.getAttribute("class")).newInstance();
@@ -290,7 +292,7 @@ public class TableMetaXmlParser {
 	 */
 	private ArrayList<Constraint> parseConstraints(final TableMeta tableMeta, final Node constraintsNode)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		logger.info("parseConstraint2");
+		logger.debug("parseConstraint2");
 		final ArrayList<Constraint> constraints = new ArrayList<Constraint>();
 		for (int i = 0; i < constraintsNode.getChildNodes().getLength(); i++) {
 			final Node node = constraintsNode.getChildNodes().item(i);
@@ -311,7 +313,7 @@ public class TableMetaXmlParser {
 	 * @throws IllegalAccessException
 	 */
 	private FieldMeta parseField(final Element element, final TableMeta tableInstance) throws Exception {
-		logger.info("parseField");
+		logger.debug("parseField");
 		FieldMeta instance;
 		if (!element.getAttribute("reference_table").equals("")) {
 			instance = ForiegnKeyFieldMeta.class.newInstance();
@@ -334,7 +336,7 @@ public class TableMetaXmlParser {
 
 	// ///////////////////////////////////////////////////////////////////
 	private void parseFieldProperties(final Element element, final TableMeta tableInstance, final FieldMeta instance) throws Exception {
-		logger.info("parseFieldProperties");
+		logger.debug("parseFieldProperties");
 		instance.setParentTable(tableInstance);
 		instance.setName(element.getAttribute("name"));
 		instance.setCaption(element.getAttribute("caption"));
@@ -401,7 +403,7 @@ public class TableMetaXmlParser {
 	 * @throws Exception
 	 */
 	private void parseGroup(final Element groupNode, final TableMeta tableInstance) throws Exception {
-		logger.info("parseGroup");
+		logger.debug("parseGroup");
 		final FieldGroup group = new FieldGroup();
 		if (!groupNode.getAttribute("name").equals("")) {
 			group.setName(groupNode.getAttribute("name"));
@@ -433,7 +435,7 @@ public class TableMetaXmlParser {
 	 * @throws Exception
 	 */
 	private IdFieldMeta parseIdField(final Element element, final TableMeta tableInstance) throws Exception {
-		logger.info("parseIdField");
+		logger.debug("parseIdField");
 		final IdFieldMeta instance = IdFieldMeta.class.newInstance();
 		// instance.setName(element.getAttribute("name"));
 		// instance.setCaption(element.getAttribute("caption"));
@@ -468,7 +470,7 @@ public class TableMetaXmlParser {
 	 * @throws InstantiationException
 	 */
 	private HashSet<String> parseTriggers(final Node node) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		logger.info("parse triggers");
+		logger.debug("parse triggers");
 		final HashSet<String> triggers = new HashSet<String>();
 		for (int i = 0; i < node.getChildNodes().getLength(); i++) {
 			final Node n = node.getChildNodes().item(i);
@@ -486,7 +488,7 @@ public class TableMetaXmlParser {
 	}
 
 	private ArrayList<FieldTrigger> setFieldTriggers(final Element element, final FieldMeta instance) throws Exception {
-		logger.info("setFieldTriggers");
+		logger.debug("setFieldTriggers");
 		final ArrayList<FieldTrigger> triggers = new ArrayList<FieldTrigger>();
 		final NodeList nodes = element.getChildNodes();
 		for (int j = 0; j < nodes.getLength(); j++) {
