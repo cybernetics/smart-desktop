@@ -184,4 +184,8 @@ public class Menu {
 	public int size() {
 		return this.items.size();
 	}
+
+	public String getFullTitle() {
+		return getParentModule().getModuleName().concat(" > ").concat(getName());
+	}
 }

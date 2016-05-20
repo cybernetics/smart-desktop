@@ -97,10 +97,6 @@ public class JKMenu extends JKButton {
 		}
 	}
 
-	public void setShortcutText(String string, boolean b) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	public void setIcon(String iconName) {
 		setIcon(GeneralUtility.getIcon(iconName));

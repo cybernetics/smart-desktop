@@ -77,60 +77,6 @@ import com.jk.security.JKSecurityManager;
 
 public class ApplicationFrame extends JKFrame {
 
-	/**
-	 * @author jk
-	 */
-	class MenuItemTitledPanel extends TitledPanel {
-
-		/**
-		 *
-		 */
-		private static final long serialVersionUID = 1L;
-		private final MenuItem item;
-
-		public MenuItemTitledPanel(final MenuItem item) throws UIOPanelCreationException {
-			super(item.getName(), item.createPanel(), item.getIconName());
-			this.item = item;
-		}
-
-		@Override
-		protected void handleAddToFavorites() {
-			captureCurrentPanelImage(this, this.item.getName());
-			ApplicationFrame.this.favoritePanels.put(this.item.getName(), Integer.MAX_VALUE);
-			UserPreferences.putHashTable(getFavortiesPanelKeyName(), ApplicationFrame.this.favoritePanels);
-			loadFavoritesPanel();
-			addFavoritePanelToHome();
-		}
-
-		@Override
-		protected void handleNext() {
-			if (ApplicationFrame.this.currentHistoryIndex < ApplicationFrame.this.history.size() - 1) {
-				ApplicationFrame.this.currentHistoryIndex++;
-				showMenuItemPanel(ApplicationFrame.this.history.get(ApplicationFrame.this.currentHistoryIndex), false, true);
-			}
-		}
-
-		@Override
-		protected void handlePreviouse() {
-			if (ApplicationFrame.this.currentHistoryIndex > 0) {
-				ApplicationFrame.this.currentHistoryIndex--;
-				showMenuItemPanel(ApplicationFrame.this.history.get(ApplicationFrame.this.currentHistoryIndex), false, true);
-			}
-		}
-
-		@Override
-		protected void handleReload() {
-			try {
-				remove((Container) this.panel);
-				JKAbstractPlainDataAccess.resetCache();
-				SwingUtility.resetComponents();
-				this.panel = this.item.createPanel(true);
-				showPanel();
-			} catch (final UIOPanelCreationException e) {
-				JKExceptionUtil.handle(e);
-			}
-		}
-	}
 
 	private static final long serialVersionUID = 1L;
 
@@ -734,7 +680,7 @@ public class ApplicationFrame extends JKFrame {
 				if (btnItem != null) {
 					final int order = i;
 					SwingUtility.setHotKeyFoButton(btnItem, "alt " + order, "alt " + order);
-					btnItem.setShortcutText("Alt " + order + "", false);
+					btnItem.setShortcutText("Alt " + order + "");
 					// btnItem.setPrivlige(new Privilige(item.getPriviligeId(),
 					// item.getName()));
 					pnlItems.add(btnItem);
@@ -766,7 +712,7 @@ public class ApplicationFrame extends JKFrame {
 				final JKMenu btnMenu = new JKMenu(menu.getName());
 				final int order = i + 1;
 				SwingUtility.setHotKeyFoButton(btnMenu, "control " + order, "control " + order);
-				btnMenu.setShortcutText("Ctrl " + order + "", false);
+				btnMenu.setShortcutText("Ctrl " + order + "");
 				btnMenu.setIcon(menu.getIconName());
 				// btnMenu.setPrivlige(new Privilige(menu.getPriviligeId(),
 				// menu.getName()));
@@ -793,4 +739,61 @@ public class ApplicationFrame extends JKFrame {
 		}
 	}
 
+	
+	/**
+	 * @author jk
+	 */
+	class MenuItemTitledPanel extends TitledPanel {
+
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+		private final MenuItem item;
+
+		public MenuItemTitledPanel(final MenuItem item) throws UIOPanelCreationException {
+			super(item.getFullTitle(), item.createPanel(), item.getIconName());
+			this.item = item;
+		}
+
+		@Override
+		protected void handleAddToFavorites() {
+			captureCurrentPanelImage(this, this.item.getName());
+			ApplicationFrame.this.favoritePanels.put(this.item.getName(), Integer.MAX_VALUE);
+			UserPreferences.putHashTable(getFavortiesPanelKeyName(), ApplicationFrame.this.favoritePanels);
+			loadFavoritesPanel();
+			addFavoritePanelToHome();
+		}
+
+		@Override
+		protected void handleNext() {
+			if (ApplicationFrame.this.currentHistoryIndex < ApplicationFrame.this.history.size() - 1) {
+				ApplicationFrame.this.currentHistoryIndex++;
+				showMenuItemPanel(ApplicationFrame.this.history.get(ApplicationFrame.this.currentHistoryIndex), false, true);
+			}
+		}
+
+		@Override
+		protected void handlePreviouse() {
+			if (ApplicationFrame.this.currentHistoryIndex > 0) {
+				ApplicationFrame.this.currentHistoryIndex--;
+				showMenuItemPanel(ApplicationFrame.this.history.get(ApplicationFrame.this.currentHistoryIndex), false, true);
+			}
+		}
+
+		@Override
+		protected void handleReload() {
+			try {
+				remove((Container) this.panel);
+				JKAbstractPlainDataAccess.resetCache();
+				SwingUtility.resetComponents();
+				this.panel = this.item.createPanel(true);
+				showPanel();
+			} catch (final UIOPanelCreationException e) {
+				JKExceptionUtil.handle(e);
+			}
+		}
+	}
+	
 }
+

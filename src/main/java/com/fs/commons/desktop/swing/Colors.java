@@ -95,14 +95,14 @@ public class Colors {
 			return defaultColor;
 		}
 		final String[] color = prop.getProperty(colorStr).split(",");
+		String colorHex = color[0];
 		if (color.length != 3) {
-			final String replace = color[0].replace("#", "0x");
-			// System.out.println(replace);
-			return Color.decode(replace);
+			return SwingUtility.hexToColor(colorHex);
 		}
-		return new Color(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
+		return new Color(Integer.parseInt(colorHex), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
 
 	}
+
 
 	public static void main(final String[] args) {
 		System.out.println();

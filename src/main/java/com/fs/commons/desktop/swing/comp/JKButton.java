@@ -26,6 +26,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JToolTip;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
@@ -43,6 +44,7 @@ import com.jk.exceptions.JKNotAllowedOperationException;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKPrivilige;
 import com.jk.security.JKSecurityManager;
+import com.jk.util.StringUtil;
 
 public class JKButton extends JButton implements BindingComponent {
 
@@ -97,7 +99,7 @@ public class JKButton extends JButton implements BindingComponent {
 	public JKButton(final String caption, final boolean leadingAligned, final String shortcut) {
 		super(caption);
 		setContentAreaFilled(false);
-//		setOpaque(true);
+		// setOpaque(true);
 		setShortcut(shortcut, shortcut);
 		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
 		init();
@@ -188,7 +190,7 @@ public class JKButton extends JButton implements BindingComponent {
 	 * @return
 	 */
 	protected String getFontName() {
-		return SwingUtility.isLeftOrientation() ? "Calibri" : getFont().getFamily();
+		return SwingUtility.isLeftOrientation() ? "Gerogia" : getFont().getFamily();
 	}
 
 	protected int getFontSize() {
@@ -242,12 +244,12 @@ public class JKButton extends JButton implements BindingComponent {
 			}
 		});
 		addMouseListener(new MouseAdapter() {
-			
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				setOpaque(false);
 			}
-			
+
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				setOpaque(true);
@@ -278,18 +280,18 @@ public class JKButton extends JButton implements BindingComponent {
 		return this.showProgress;
 	}
 
-//	@Override
-//	public void paint(final Graphics g) {
-//		if (isOpaque()) {
-//			// setOpaque(false);
-//			// GraphicsFactory.makeGradient(this, g, getBackground());
-//			super.paint(g);
-//			// setOpaque(true);
-//		} else {
-//			super.paint(g);
-//		}
-//
-//	}
+	// @Override
+	// public void paint(final Graphics g) {
+	// if (isOpaque()) {
+	// // setOpaque(false);
+	// // GraphicsFactory.makeGradient(this, g, getBackground());
+	// super.paint(g);
+	// // setOpaque(true);
+	// } else {
+	// super.paint(g);
+	// }
+	//
+	// }
 
 	@Override
 	public void reset() {
@@ -372,7 +374,7 @@ public class JKButton extends JButton implements BindingComponent {
 	 */
 	public void setShortcut(final String shortcut, final String text) {
 		SwingUtility.setHotKeyFoButton(this, shortcut);
-		setShortcutText(text, false);
+		setShortcutText(text == null ? shortcut : text, false);
 	}
 
 	/**
@@ -380,15 +382,20 @@ public class JKButton extends JButton implements BindingComponent {
 	 * @param shortcut
 	 * @param b
 	 */
-	public void setShortcutText(String shortcut, final boolean pre) {
+	protected void setShortcutText(String shortcut, final boolean pre) {
+		setToolTipText(getToolTipText().concat(" ").concat(shortcut));
 		if (shortcut != null && !shortcut.equals("")) {
 			shortcut = FormatUtil.capitalizeFirstLetters(shortcut);
 			final String htmlText = "<html><div align='" + getLabelAlignment() + "' width='100%'>" + "<font color=\""
 					+ SwingUtility.colorToHex(getForeground()) + "\" " + "size=\"" + getFontSize() + "\" face=\"" + getFontName() + "\">" + getText()
-					+ "</font></div> " + "<div align='" + getShortCutAlignment() + "'><font size=\"1\" color=\"#AA0000\"><em>" + shortcut
-					+ "</em></font></div></html>";
-			setText(htmlText);
+					+ "</font></div> " + "<div align='" + getShortCutAlignment() + "'><font size=\"1\" color=\"" + getShortcutColor() + "\">"
+					+ shortcut + "</font></div></html>";
+			super.setText(htmlText);
 		}
+	}
+
+	public String getShortcutColor() {
+		return SwingUtility.colorToHex(getForeground());// "#000000";//"#AA0000";
 	}
 
 	/**
@@ -421,6 +428,22 @@ public class JKButton extends JButton implements BindingComponent {
 	}
 
 	// @Override
+	// public JToolTip createToolTip() {
+	// JToolTip tip = new JToolTip() {
+	// public Color getBackground() {
+	// return Color.yellow;
+	// }
+	//
+	// public Color getForeground() {
+	// return SwingUtility.hexToColor("#AA0000");
+	// }
+	// };
+	// tip.setComponent(this);
+	// return tip;
+	//
+	// }
+
+	// @Override
 	// public Dimension getPreferredSize() {
 	// // TODO Auto-generated method stub
 	// Dimension preferredSize = super.getPreferredSize();
@@ -436,4 +459,10 @@ public class JKButton extends JButton implements BindingComponent {
 			super.setForeground(fg);
 		}
 	}
+	
+
+	public void setShortcutText(String shortcut) {
+		setShortcut(shortcut, null);
+	}
+
 }

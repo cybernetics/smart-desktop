@@ -105,10 +105,12 @@ public class SwingUtility {
 			// PlasticXPLookAndFeel.setHighContrastFocusColorsEnabled(true);
 			// PlasticXPLookAndFeel.setPlasticTheme(new SkyBlue());
 
-//			final ColorUIResource disabledBackground = new ColorUIResource(Color.white);
-//			UIManager.put("ComboBox.disabledBackground", disabledBackground);
-//			final ColorUIResource disabledForeground = new ColorUIResource(Color.black);
-//			UIManager.put("ComboBox.disabledForeground", disabledForeground);
+			// final ColorUIResource disabledBackground = new
+			// ColorUIResource(Color.white);
+			// UIManager.put("ComboBox.disabledBackground", disabledBackground);
+			// final ColorUIResource disabledForeground = new
+			// ColorUIResource(Color.black);
+			// UIManager.put("ComboBox.disabledForeground", disabledForeground);
 			UIManager.setLookAndFeel(new WindowsLookAndFeel());
 			// NativeInterface.open();
 
@@ -1272,6 +1274,12 @@ public class SwingUtility {
 
 	public static BufferedImage toBufferedImage(final byte[] imageBytes) throws IOException {
 		return javax.imageio.ImageIO.read(new ByteArrayInputStream(imageBytes));
+	}
+
+	public static Color hexToColor(String colorHex) {
+		final String replace = colorHex.replace("#", "0x");
+		// System.out.println(replace);
+		return Color.decode(replace);
 	}
 
 	// public static void setLookAndFeel() {
