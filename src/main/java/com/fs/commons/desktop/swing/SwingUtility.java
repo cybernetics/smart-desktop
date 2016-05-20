@@ -159,6 +159,9 @@ public class SwingUtility {
 
 	private static final Border DEFAULT_EMPTY_BORDER = new EmptyBorder(5, 5, 5, 5);
 
+	private static final Border DEFAULT_EMPTY_SELECTED_BORDER = BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),
+			DEFAULT_EMPTY_BORDER);
+
 	/**
 	 *
 	 * @param btn
@@ -1298,6 +1301,10 @@ public class SwingUtility {
 
 	public static Border getDefaultEmptyBorder() {
 		return DEFAULT_EMPTY_BORDER;
+	}
+
+	public static Border getDefaultEmptySelectedBorder() {
+		return DEFAULT_EMPTY_SELECTED_BORDER;
 	}
 
 	// public static void setLookAndFeel() {

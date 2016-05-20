@@ -233,8 +233,9 @@ public class JKButton extends JButton implements BindingComponent {
 	 */
 	void init() {
 		// setFont(font);
-		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setBackground(BACKGROUND_COLOR);
+		setForeground(FORGROUND_COLOR);
+		setBorder(SwingUtility.getDefaultEmptyBorder());
 		setSelected(false);// to set the right shape
 		addKeyListener(new KeyAdapter() {
 			@Override
@@ -250,11 +251,17 @@ public class JKButton extends JButton implements BindingComponent {
 			@Override
 			public void mouseExited(MouseEvent e) {
 				setOpaque(false);
+//				Color background=getBackground();
+//				setBackground(getForeground());
+//				setForeground(background);
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				setOpaque(true);
+//				Color background=getBackground();
+//				setBackground(getForeground());
+//				setForeground(background);
 			}
 		});
 	}

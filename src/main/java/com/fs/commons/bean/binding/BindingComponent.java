@@ -114,4 +114,6 @@ public interface BindingComponent<T> extends DaoComponent, FormField, Serializab
 
 	// /////////////////////////////////////////////////////////////////////
 	public void validateValue() throws ValidationException;
+
+	public Dimension getPreferredSize();
 }

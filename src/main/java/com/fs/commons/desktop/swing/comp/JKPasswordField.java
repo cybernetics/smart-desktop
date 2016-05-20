@@ -15,7 +15,11 @@
  */
 package com.fs.commons.desktop.swing.comp;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -46,6 +50,8 @@ public class JKPasswordField extends JPasswordField implements BindingComponent<
 	private String defaultValue;
 
 	private boolean transfer;
+
+	private String placeholder;
 
 	public JKPasswordField() {
 		this(10, 10);
@@ -184,5 +190,29 @@ public class JKPasswordField extends JPasswordField implements BindingComponent<
 	public void validateValue() throws ValidationException {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	protected void paintComponent(final Graphics pG) {
+		super.paintComponent(pG);
+
+		if (placeholder == null || placeholder.length() == 0 || getText().length() > 0) {
+			return;
+		}
+
+		final Graphics2D g = (Graphics2D) pG;
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setColor(Color.lightGray);
+		g.drawString(placeholder, getInsets().left, pG.getFontMetrics().getMaxAscent() + getInsets().top);
+	}
+
+	public String getPlaceholder() {
+		return placeholder;
+	}
+
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
+		revalidate();
+		repaint();
 	}
 }

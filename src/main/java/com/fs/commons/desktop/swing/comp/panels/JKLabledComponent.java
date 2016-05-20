@@ -25,6 +25,7 @@ import javax.swing.BorderFactory;
 import com.fs.commons.bean.binding.BindingComponent;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.JKLabel;
+import com.fs.commons.desktop.swing.comp.JKPasswordField;
 import com.fs.commons.desktop.swing.comp.JKTextField;
 
 public class JKLabledComponent extends JKPanel {
@@ -39,6 +40,8 @@ public class JKLabledComponent extends JKPanel {
 
 	private int lableWidth = 75;
 
+	private int labelWidth;
+
 	public JKLabledComponent() {
 		init();
 	}
@@ -51,20 +54,28 @@ public class JKLabledComponent extends JKPanel {
 	 *            JTextComponent
 	 */
 	public JKLabledComponent(final JKLabel lbl, final int labelWidth, final BindingComponent txt) {
-		setLableWidth(labelWidth);
+		this.lbl = lbl;
+		this.labelWidth = labelWidth;
+		this.txt = txt;
 		init();
-		add(lbl);
-		add((Component) txt);
+//		add(lbl);
+//		add((Component) txt);
 	}
 
-	public JKLabledComponent(final JKLabel lbl, final JKTextField txt) {
-		init();
-		add(lbl);
-		add(txt);
+	/**
+	 * fix the label width hard-coded value
+	 * @param lbl
+	 * @param txt
+	 */
+	public JKLabledComponent(final JKLabel lbl, final BindingComponent txt) {
+		this(lbl,120,txt);
+//		init();
+//		add(lbl);
+//		add(txt);
 	}
 
 	public JKLabledComponent(final String labelKey, final BindingComponent comp) {
-		this(new JKLabel(labelKey), 120, comp);
+		this(new JKLabel(labelKey), comp);
 	}
 
 	/**
@@ -88,26 +99,6 @@ public class JKLabledComponent extends JKPanel {
 		txt.setWidth(txtWidth);
 	}
 
-	@Override
-	protected void addImpl(final Component comp, final Object constraints, final int index) {
-		if (comp == null) {
-			return;
-		}
-		if (this.lbl == null) {
-			this.lbl = (BindingComponent) comp;
-			final Dimension preferredSize = comp.getPreferredSize();
-			preferredSize.width = getLableWidth();
-			this.lbl.setPreferredSize(preferredSize);
-			super.addImpl(comp, BorderLayout.LINE_START, 0);
-		} else if (this.txt == null) {
-			this.txt = (BindingComponent) comp;
-			super.addImpl(comp, BorderLayout.CENTER, 1);
-		} else {
-			// just ignore the call
-		}
-
-		// super.addImpl(comp, constraints, index);
-	}
 
 	public int getLableWidth() {
 		return this.lableWidth;
@@ -124,6 +115,21 @@ public class JKLabledComponent extends JKPanel {
 		SwingUtility.setFont(this);
 		// txt.getPreferredSize().setSize(1, 30);
 		applyComponentOrientation(SwingUtility.getDefaultComponentOrientation());
+		if(txt instanceof JKTextField){
+			((JKTextField) txt).setPlaceholder(lbl.getValue().toString());
+		}
+		if(txt instanceof JKPasswordField){
+			((JKPasswordField) txt).setPlaceholder(lbl.getValue().toString());
+		}
+
+		setLableWidth(labelWidth);
+		
+		final Dimension preferredSize = lbl.getPreferredSize();
+		preferredSize.width = getLableWidth();
+		this.lbl.setPreferredSize(preferredSize);
+		add((Component)lbl, BorderLayout.LINE_START,0);
+		add((Component) txt, BorderLayout.CENTER, 1);
+
 	}
 
 	public void setLableWidth(final int lableWidth) {

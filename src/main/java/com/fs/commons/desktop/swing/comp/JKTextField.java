@@ -17,6 +17,9 @@ package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -108,6 +111,8 @@ public class JKTextField extends JTextField implements BindingComponent {
 	private boolean autoSelectText = true;
 
 	private boolean transfer = true;
+
+	private String placeholder;
 
 	public JKTextField() {
 		init();
@@ -336,8 +341,8 @@ public class JKTextField extends JTextField implements BindingComponent {
 	 * init
 	 */
 	private void init() {
-		setFont(DEFAULT_FONT);
-		setDisabledTextColor(Color.black);
+//		setFont(DEFAULT_FONT);
+//		setDisabledTextColor(Color.black);
 		setLocale(SwingUtility.getDefaultLocale());
 		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
 		// if(getDocument() instanceof FloatDocument || getDocument() instanceof
@@ -540,4 +545,29 @@ public class JKTextField extends JTextField implements BindingComponent {
 			throw e;
 		}
 	}
+
+	@Override
+	protected void paintComponent(final Graphics pG) {
+		super.paintComponent(pG);
+
+		if (placeholder==null || placeholder.length() == 0 ||  getText().length() > 0) {
+			return;
+		}
+
+		final Graphics2D g = (Graphics2D) pG;
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setColor(Color.lightGray);
+		g.drawString(placeholder, getInsets().left, pG.getFontMetrics().getMaxAscent() + getInsets().top);
+	}
+
+	public String getPlaceholder() {
+		return placeholder;
+	}
+
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
+		revalidate();
+		repaint();
+	}
+
 }
