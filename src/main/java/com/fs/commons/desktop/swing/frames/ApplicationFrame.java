@@ -77,7 +77,6 @@ import com.jk.security.JKSecurityManager;
 
 public class ApplicationFrame extends JKFrame {
 
-
 	private static final long serialVersionUID = 1L;
 
 	public static final int DEFAULT_FRAME_WIDTH = 1024;
@@ -142,7 +141,7 @@ public class ApplicationFrame extends JKFrame {
 		}
 		this.pnlFavorit = buildFavoritPanelsToHomePage();
 		if (this.pnlFavorit != null) {
-//			pnlFavorit.setPreferredSize(180, 200);
+			// pnlFavorit.setPreferredSize(180, 200);
 			getHomePanel().add(pnlFavorit, BorderLayout.SOUTH);
 			pnlFavorit.requestFocusInWindow();
 		}
@@ -194,8 +193,8 @@ public class ApplicationFrame extends JKFrame {
 		if (minSize > 0) {
 			final JKPanel<?> pnl = new JKMainPanel(new FlowLayout(FlowLayout.CENTER));
 			pnl.setBackground(Colors.FAVORITE_BG);
-			 pnl.setBorder(SwingUtility.createTitledBorder("Favorties_pages"));
-			 pnl.setPreferredSize(new Dimension(600, 180));
+//			pnl.setBorder(SwingUtility.createTitledBorder("Favorties_pages"));
+//			pnl.setPreferredSize(new Dimension(600, 180));
 			int count = 0;
 			for (int i = 0; i < minSize; i++) {
 				final String menuItemName = (String) list.get(i).getKey();
@@ -284,8 +283,8 @@ public class ApplicationFrame extends JKFrame {
 			this.pnlMenuItems = new JKMainPanel();
 			this.pnlMenuItems.setGradientType(GradientType.VERTICAL_LINEAR);
 			this.pnlMenuItems.setBackground(Colors.MI_PANEL_BG);
-			this.pnlMenuItems.setBorder(BorderFactory.createRaisedBevelBorder());
-			this.pnlMenuItems.setBackground(Colors.MI_PANEL_BG);
+			// this.pnlMenuItems.setBorder(BorderFactory.createRaisedBevelBorder());
+			// this.pnlMenuItems.setBackground(Colors.MI_PANEL_BG);
 		}
 		return this.pnlMenuItems;
 	}
@@ -666,8 +665,8 @@ public class ApplicationFrame extends JKFrame {
 		final GridLayout layout = new GridLayout(1, 1, 2, 5);
 		final JKPanel<?> pnlItems = new JKPanel<Object>(layout);
 		final JKTitle comp = new JKTitle(menu.getName());
-		// comp.setBackground(Colors.MI_PANEL_TITLE_BG);
-		// comp.setForeground(Colors.MI_PANEL_TITLE_FG);
+		comp.setBackground(Colors.MI_PANEL_TITLE_BG);
+		comp.setForeground(Colors.MI_PANEL_TITLE_FG);
 		pnlItems.add(comp);
 
 		// pnlItems.setOpaque(false);
@@ -739,7 +738,6 @@ public class ApplicationFrame extends JKFrame {
 		}
 	}
 
-	
 	/**
 	 * @author jk
 	 */
@@ -794,6 +792,5 @@ public class ApplicationFrame extends JKFrame {
 			}
 		}
 	}
-	
-}
 
+}

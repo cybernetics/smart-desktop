@@ -76,6 +76,8 @@ public class Colors {
 	public static final Color JK_STATUS_BAR_BG = getColor("status_bg");
 	public static final Color FAVORITE_BG = getColor("favorite_bg");
 	public static final Color JK_STATUS_BAR_FG = getColor("status_bg");
+	public static final Color MI_PANEL_TITLE_BG = getColor("mi-panel-title-bg");
+	public static final Color MI_PANEL_TITLE_FG = getColor("mi-panel-title-fg");
 
 	// public static final Color MENU_PANEL= SKY_BLUE;
 	// public static final Color MENU_ITEMS_PANEL= NICE_BLUE;

@@ -47,7 +47,7 @@ public class JKMenuItem extends JKButton {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static Dimension size = new Dimension(160, 40);
+	static Dimension size = new Dimension(180, 50);
 
 	// static Color bgColor = new Color(206, 222, 239);
 	static Color backColor = Colors.MI_BUTTON_BG;// new Color(229, 238, 255);

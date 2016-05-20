@@ -227,7 +227,7 @@ public class TitledPanel extends JKMainPanel {
 		this.lbl.setForeground(Colors.JK_TITLE_BAR_FG);// new Color(22, 125,
 														// 219));
 		this.lbl.setPreferredSize(null);
-		this.lbl.setFont(new Font("Arial", Font.BOLD, 16));
+		this.lbl.setFont(SwingUtility.getDefaultTitleFont());
 		this.lbl.setVerticalAlignment(SwingConstants.TOP);
 		if (this.icon != null) {
 			this.lbl.setIcon(this.icon);
@@ -248,8 +248,8 @@ public class TitledPanel extends JKMainPanel {
 
 		this.btnReload.setIcon("small_reload_2.png");
 		this.btnClose.setIcon("smal_close.png");
-		this.btnAddToFavorites.setIcon("favorite.gif");
-		this.btnShowInFrame.setIcon("favorite.gif");
+		this.btnAddToFavorites.setIcon("add.png");
+		this.btnShowInFrame.setIcon("show_courses.png");
 		this.btnClose.setToolTipText("CLOSE_PANEL");
 		this.btnReload.setToolTipText("RELOAD");
 		this.btnClose.setToolTipText("CLOSE");

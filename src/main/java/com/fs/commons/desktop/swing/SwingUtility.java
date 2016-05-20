@@ -99,6 +99,7 @@ import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKUser;
 
 public class SwingUtility {
+
 	static {
 		try {
 			// PlasticXPLookAndFeel.set3DEnabled(true);
@@ -151,6 +152,9 @@ public class SwingUtility {
 	static String defaultLocale = "en";
 
 	private static JFileChooser chooser = new JFileChooser(".");
+
+	private static Font DEFAULT_TITLE_FONT = new Font("Times", Font.BOLD, 14);
+	private static final Font DEFAULT_TITLE_RIGHT_FONT = new Font("Arial", Font.BOLD, 14);
 
 	/**
 	 *
@@ -1280,6 +1284,13 @@ public class SwingUtility {
 		final String replace = colorHex.replace("#", "0x");
 		// System.out.println(replace);
 		return Color.decode(replace);
+	}
+
+	public static Font getDefaultTitleFont() {
+		if (SwingUtility.isLeftOrientation()) {
+			return DEFAULT_TITLE_FONT;
+		}
+		return DEFAULT_TITLE_RIGHT_FONT;
 	}
 
 	// public static void setLookAndFeel() {

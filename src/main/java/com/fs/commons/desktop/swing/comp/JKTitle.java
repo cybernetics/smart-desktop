@@ -22,6 +22,7 @@ import java.awt.Graphics;
 import javax.swing.border.EmptyBorder;
 
 import com.fs.commons.desktop.graphics.GraphicsFactory;
+import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.locale.Lables;
 
 public class JKTitle extends JKLabel {
@@ -44,8 +45,8 @@ public class JKTitle extends JKLabel {
 		setText(Lables.get(label, true));
 		setBorder(new EmptyBorder(2, 8, 2, 8));
 		setAlignmentX(HORIZONTAL);
-		setFont(new Font("Arial", Font.BOLD, 16));
-		setOpaque(false);
+		setFont(SwingUtility.getDefaultTitleFont());
+		setOpaque(true);
 		setPreferredSize(new Dimension(150, 30));
 	}
 
