@@ -48,6 +48,7 @@ import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.desktop.swing.comp.model.FSTableModel;
 import com.fs.commons.parsers.ParserException;
 import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 /**
  *
@@ -203,6 +204,8 @@ public class ExcelUtil {
 
 	private final FSTableModel model;
 
+	private JKLogger logger=JKLoggerFactory.getLogger(getClass());
+
 	/**
 	 *
 	 * @param model2
@@ -293,7 +296,7 @@ public class ExcelUtil {
 		} else if (value instanceof Date) {
 			cell.setCellValue((Date) value);
 		} else {
-			JKLogger.info("No Special excel r endering for class : " + value.getClass().getName());
+			logger.info("No Special excel r endering for class : " + value.getClass().getName());
 			cell.setCellValue(value.toString());
 		}
 	}

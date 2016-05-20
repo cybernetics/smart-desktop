@@ -346,6 +346,6 @@ public class MenuItem implements UIPanelFactory {
 	}
 
 	public String getFullTitle() {
-		return getParentMenu().getFullTitle().concat(" > ").concat(getName());
+		return  getParentMenu().getFullTitle().concat(" > ").concat(Lables.get(getName(),true));
 	}
 }

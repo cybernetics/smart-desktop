@@ -117,6 +117,9 @@ public class Lables {
 	// /////////////////////////////////////////////////////////////////////
 	public String fixValue(String value) {
 		if (value != null && !value.equals("")) {
+			value=value.toUpperCase().replace("MI", "");
+			value=value.toUpperCase().replace("MEN", "");
+			value=value.toUpperCase().replace("MOD", "");
 			final String[] words = value.toLowerCase().split("_");
 			value = "";
 			for (final String word : words) {

@@ -27,7 +27,6 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 import com.fs.commons.application.config.DefaultConfigManager;
-import com.fs.commons.application.exceptions.util.ExceptionHandlerFactory;
 import com.fs.commons.application.listener.ApplicationListener;
 import com.fs.commons.application.xml.ApplicationXmlParser;
 import com.fs.commons.apps.backup.AutomaticDBBackup;
@@ -43,7 +42,7 @@ import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
 import com.fs.commons.dao.dynamic.meta.xml.TableMetaXmlParser;
-import com.fs.commons.desktop.DesktopExceptionHandler;
+import com.fs.commons.desktop.JKDesktopExceptionHandler;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dao.TableModelHtmlBuilder;
@@ -54,6 +53,7 @@ import com.fs.commons.locale.Locale;
 import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.JKInvalidUserException;
+import com.jk.exceptions.handler.JKExceptionHandlerFactory;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.license.client.LicenseClientFactory;
 import com.jk.resources.JKResourceLoaderFactory;
@@ -91,7 +91,7 @@ public class ApplicationManager {
 	public static ApplicationManager getInstance() {
 		if (instance == null) {
 			logger.info("set default exception handler");
-			ExceptionHandlerFactory.setDefaultHandler(new DesktopExceptionHandler());
+			JKExceptionHandlerFactory.getInstance().setDefaultExceptionHandler(new JKDesktopExceptionHandler());
 			try {
 				logger.info("set default datasource");
 				JKDataSourceFactory.setDefaultDataSource(new JKPoolingDataSource());
@@ -424,6 +424,7 @@ public class ApplicationManager {
 			}
 			if (this.application.getSplashImage() != null) {
 				splash = new Splash(this.application.getSplashImage());
+				splash.setHeader(Lables.get(application.getApplicationName(),true));
 				splash.setVisible(true);
 			}
 			this.applicationFrame = new ApplicationFrame(this.application);
@@ -448,6 +449,7 @@ public class ApplicationManager {
 			throw new ApplicationException(e);
 		} finally {
 			if (splash != null) {
+				GeneralUtility.sleep(2);
 				splash.dispose();
 			}
 		}

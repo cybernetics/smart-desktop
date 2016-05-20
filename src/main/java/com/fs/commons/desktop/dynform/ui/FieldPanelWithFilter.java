@@ -42,6 +42,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.desktop.swing.dialogs.QueryDialog;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 /**
  * @author u087
@@ -56,6 +57,7 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 	private Object defaultValue;
 	private JKDataSource manager;
 	private boolean allowManage;
+	private JKLogger logger=JKLoggerFactory.getLogger(getClass());
 
 	public FieldPanelWithFilter() {
 	}
@@ -246,7 +248,7 @@ public class FieldPanelWithFilter extends JKPanel<Object> implements DaoComponen
 				this.record = dao.findRecord(value);
 				this.txtView.setValue(this.record.getSummaryValue());
 			} catch (final JKRecordNotFoundException e) {
-				JKLogger.fatal("Record not found for field :" + this.tableMeta.getTableName() + " for id : " + value);
+				logger.error("Record not found for field :" + this.tableMeta.getTableName() + " for id : " + value);
 				setValue(null);// recursion
 			} catch (final JKDataAccessException e) {
 				JKExceptionUtil.handle(e);

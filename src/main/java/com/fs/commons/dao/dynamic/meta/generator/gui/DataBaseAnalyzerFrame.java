@@ -66,6 +66,7 @@ import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class DataBaseAnalyzerFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -129,6 +130,8 @@ public class DataBaseAnalyzerFrame extends JFrame {
 	JFileChooser chooser = new JFileChooser(".");
 
 	private final JKDataSource connectionManager;
+
+	private JKLogger logger=JKLoggerFactory.getLogger(getClass());
 
 	/**
 	 *
@@ -215,9 +218,9 @@ public class DataBaseAnalyzerFrame extends JFrame {
 			for (int i = 0; i < databaseTables.size(); i++) {
 				final TableMeta databaseMeta = databaseTables.get(i);
 				final TableMeta currentTableMeta = this.tablesHash.get(databaseMeta.getTableName());
-				JKLogger.info("Comparing Table  : " + currentTableMeta.getTableName());
+				logger.info("Comparing Table  : " + currentTableMeta.getTableName());
 				if (currentTableMeta == null) {
-					JKLogger.info("Table  : " + databaseMeta.getTableName() + " exists in the database and doesnot exist the current meta");
+					logger.info("Table  : " + databaseMeta.getTableName() + " exists in the database and doesnot exist the current meta");
 				} else {
 					final Vector<FieldMeta> databaseTableFields = databaseMeta.getFieldList();
 					databaseMeta.getFieldList();
@@ -225,7 +228,7 @@ public class DataBaseAnalyzerFrame extends JFrame {
 						final String fildName = databaseTableFields.get(i).getName();
 						final FieldMeta field = currentTableMeta.getField(fildName);
 						if (field == null) {
-							JKLogger.info("Field : " + fildName + " doesnot exist");
+							logger.info("Field : " + fildName + " doesnot exist");
 						}
 					}
 				}

@@ -1,5 +1,5 @@
 <main-menu>
-	<menu name="MEN_SECURITY" icon-name="security_key_icons.gif" privlige-id="102">
+	<menu name="MEN_SECURITY" icon-name="1463782342_lock.png" privlige-id="102">
 		<menu-item name="MI_ROLES" icon-name="roles.png" privlige-id="10201">
 			<properties>
 				<property name="table-meta" value="sec_roles" />
@@ -8,7 +8,7 @@
 				<property name="cross-table" value="true" />
 			</properties>
 		</menu-item>
-		<menu-item name="MI_ADVANCED_ROLES" icon-name="advanced_roles.png" privlige-id="10201">
+		<menu-item name="MI_ADVANCED_ROLES" icon-name="1463782422_Group_MilitaryPersonnel_Light.png" privlige-id="10201">
 			<properties>
 				<property name="panel-class" value="com.fs.security.ui.helpers.PnlSecuityPrivliges" />
 			</properties>

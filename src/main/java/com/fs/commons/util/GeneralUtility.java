@@ -78,6 +78,7 @@ import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.Record;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 import com.jk.resources.JKResourceLoaderFactory;
 import com.jk.security.JKEncDec;
 import com.lowagie.text.pdf.codec.Base64;
@@ -143,6 +144,7 @@ public class GeneralUtility {
 
 	// ////////////////////////
 	private static String FILE_READ_HARDDISK_SERIAL = "diskid32.exe";
+	private static JKLogger logger=JKLoggerFactory.getLogger(GeneralUtility.class);
 
 	/**
 	 * @description : to add autocommit false in the first on the sql file and
@@ -442,7 +444,7 @@ public class GeneralUtility {
 	 */
 	public static Process executeFile(final String fileName) throws IOException {
 		final String command = "cmd /c \"" + fileName + "\"";
-		JKLogger.info(command);
+		logger.info(command);
 		return Runtime.getRuntime().exec(command);
 	}
 

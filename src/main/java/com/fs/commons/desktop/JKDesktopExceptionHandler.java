@@ -44,9 +44,10 @@ import com.fs.commons.reports.EmptyReportException;
 import com.fs.commons.reports.ReportException;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.JKInvalidUserException;
+import com.jk.exceptions.handler.JKExceptionHandler;
 import com.jk.license.LicenseException;
 
-public class DesktopExceptionHandler implements ExceptionHandler {
+public class JKDesktopExceptionHandler implements JKExceptionHandler {
 
 	private static String LOGS_FOLDER = "logs";
 
@@ -88,7 +89,7 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 	}
 
 	@Override
-	public void handleException(final Throwable e) {
+	public void handle(final Throwable e,boolean throwRuntimeException) {
 		if (e instanceof ServerDownException) {
 			showError(e, e.getMessage(), "GeneralDatabaseerror.gif", false);
 		}
@@ -108,16 +109,16 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 				return;
 			}
 			if (ex.getCause() instanceof ValidationException) {
-				handleException(ex.getCause());
+				handle(ex.getCause(),throwRuntimeException);
 				return;
 			}
 			if (ex.isInvalidUsernamePassword() || ex.isInvalidDatabaseName()) {
 				showError(e, e.getMessage(), "GeneralDatabaseerror.gif", false);
 				System.exit(0);
 			} else if (e.getCause() instanceof java.net.ConnectException || e.getCause() instanceof java.net.SocketException) {
-				handleException(new ServerDownException(ex.getCause()));
+				handle(new ServerDownException(ex.getCause()),throwRuntimeException);
 			} else if (ex.getCause() instanceof ServerDownException) {
-				handleException(ex.getCause());
+				handle(ex.getCause(),throwRuntimeException);
 			} else if (ex.isDuplicateKeyErrorCode()) {
 				showError(e, "DUPLICATE_RECORD", "GeneralDatabaseerror.gif", false);
 			} else {
@@ -152,7 +153,7 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 			throw new RuntimeException();
 		}
 		if (e instanceof SQLException) {
-			handleException(new JKDataAccessException(e));
+			handle(new JKDataAccessException(e),throwRuntimeException);
 			return;
 		}
 		if (e instanceof ReportException) {
@@ -184,9 +185,9 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 					// just eat the exception since it is already handled in the
 					// security framework
 				} else if (e.getCause() instanceof LicenseException) {
-					handleException(e.getCause());
+					handle(e.getCause(),throwRuntimeException);
 				} else if (e.getCause() instanceof InstanceException) {
-					handleException(e.getCause());
+					handle(e.getCause(),throwRuntimeException);
 				} else {
 					SwingUtility.showErrorDialog(e.getMessage(), e, SwingUtility.getDefaultMainFrame());
 				}
@@ -218,7 +219,6 @@ public class DesktopExceptionHandler implements ExceptionHandler {
 	 * @param errorMessage
 	 * @param iconName
 	 */
-	@Override
 	public void showError(final Throwable e, final String errorMessage, final String iconName, final boolean throwRunTime) {
 		JOptionPane.showMessageDialog(SwingUtility.getDefaultMainFrame(), Lables.get(errorMessage, true), Lables.get("ERROR"),
 				JOptionPane.ERROR_MESSAGE, new ImageIcon(GeneralUtility.getIconURL(iconName)));

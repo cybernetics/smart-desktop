@@ -1,0 +1,26 @@
+0.0.8
+4- finalize default theme
+5- fix Exception  handler : you can test it on change password
+6- fix change password
+7- Change default application label on login-screen
+8- add exit icon on close application
+9- activate feedback screen
+10- add screen to edit labels (from console)
+11- Check clear sysem cache screen
+12- add versions table to script
+13- activate db backup
+14- activate import database
+16- fix labels
+	mi reset privliges
+	men reports
+17- fix select print fields size
+18 fix the style of printed table to html
+19- fix privliges sync
+	
+
+0.0.9
+1-Make the default homepage comes from Smart-API.com domain
+2-Title on the splash 
+3-Title on the home page
+
+

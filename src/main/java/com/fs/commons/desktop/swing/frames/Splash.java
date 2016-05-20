@@ -16,13 +16,17 @@
 package com.fs.commons.desktop.swing.frames;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.Window;
 
 import javax.swing.JPanel;
 
 import com.fs.commons.desktop.swing.AnimationUtil;
+import com.fs.commons.desktop.swing.Colors;
 import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.desktop.swing.comp.panels.ImagePanel;
 import com.fs.commons.util.GeneralUtility;
@@ -54,6 +58,7 @@ public class Splash extends Window {
 	 */
 	private static final long serialVersionUID = 1L;
 	private final String imageName;
+	private String header;
 
 	/**
 	 * p
@@ -99,6 +104,31 @@ public class Splash extends Window {
 			// }
 
 		}
+	}
+
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		if (header != null) {
+//			setForeground(Colors.SPLASH_HEADER_COLOR);
+//			// text
+//			setFont(getFont().deriveFont(40f));
+//			FontMetrics metrics = g.getFontMetrics(getFont());
+//			int width = metrics.stringWidth(header);
+//			g.drawString(header, (getWidth() / 2) - (width - 2), getHeight() / 2);
+//			// shaddow
+//			setForeground(Color.black);
+//			g.drawString(header, (getWidth() / 2) - (width - 2) + 10, getHeight() / 2 + 10);
+//
+		}
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
+	}
+
+	public String getHeader() {
+		return header;
 	}
 
 }

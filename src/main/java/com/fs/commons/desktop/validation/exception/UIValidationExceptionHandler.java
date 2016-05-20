@@ -17,15 +17,16 @@ package com.fs.commons.desktop.validation.exception;
 
 import javax.swing.JComponent;
 
-import com.fs.commons.application.exceptions.util.DefaultExceptionHandler;
 import com.fs.commons.desktop.validation.Problems;
 import com.fs.commons.desktop.validation.Severity;
 import com.fs.commons.desktop.validation.ui.ComponentDecorator;
+import com.jk.exceptions.handler.JKDefaultExceptionHandler;
+import com.jk.exceptions.handler.JKExceptionHandler;
 
-public class UIValidationExceptionHandler extends DefaultExceptionHandler<UIValidationException> {
+public class UIValidationExceptionHandler extends JKDefaultExceptionHandler<UIValidationException> {
 
 	@Override
-	public void handleException(final UIValidationException e) {
+	public void handle(final UIValidationException e, boolean throwRuntime) {
 		final Problems problems = e.getProblems();
 		if (e.getComponent() != null) {
 			final ComponentDecorator d = new ComponentDecorator();
@@ -36,7 +37,7 @@ public class UIValidationExceptionHandler extends DefaultExceptionHandler<UIVali
 				component.setToolTipText(problems.getLeadProblem().getMessage());
 			}
 		} else {
-			super.handleException(e);
+			super.handle(e, throwRuntime);
 		}
 	}
 }

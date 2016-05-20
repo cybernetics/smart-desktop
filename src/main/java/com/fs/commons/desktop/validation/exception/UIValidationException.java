@@ -16,12 +16,12 @@
 package com.fs.commons.desktop.validation.exception;
 
 import com.fs.commons.application.exceptions.ValidationException;
-import com.fs.commons.application.exceptions.util.ExceptionHandlerFactory;
 import com.fs.commons.bean.binding.BindingComponent;
 import com.fs.commons.dao.dynamic.constraints.exceptions.ConstraintException;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.desktop.validation.Problem;
 import com.fs.commons.desktop.validation.Problems;
+import com.jk.exceptions.handler.JKExceptionHandlerFactory;
 
 public class UIValidationException extends ValidationException {
 	/**
@@ -29,9 +29,9 @@ public class UIValidationException extends ValidationException {
 	 */
 	private static final long serialVersionUID = -3842491515338579076L;
 
-	static {
-		ExceptionHandlerFactory.registerExceptionHandler(UIValidationException.class, new UIValidationExceptionHandler());
-	}
+//	static {
+//		JKExceptionHandlerFactory.registerExceptionHandler(UIValidationException.class, new UIValidationExceptionHandler());
+//	}
 
 	public UIValidationException() {
 		super();

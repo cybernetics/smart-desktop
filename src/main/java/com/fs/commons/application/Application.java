@@ -253,7 +253,7 @@ public class Application {
 					// if (debugPriviliges) {
 					// printModuleDebugInfo(module, i != 0);
 					// }
-					tableMetaFactory.writeDynamicMeta(new FileOutputStream(module.getModuleName() + "_meta-out.xml"));
+					//tableMetaFactory.writeDynamicMeta(new FileOutputStream(module.getModuleName() + "_meta-out.xml"));
 				}
 			}
 		} catch (final ModuleException e) {

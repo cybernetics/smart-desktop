@@ -29,6 +29,7 @@ import com.fs.commons.locale.LablesLoader;
 import com.fs.commons.locale.LablesLoaderException;
 import com.fs.commons.locale.database.importer.ui.LablesImporter;
 import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 /**
  *
@@ -38,7 +39,7 @@ import com.jk.logging.JKLogger;
 public class DatabaseLablesLoader implements LablesLoader {
 	private AbstractModule module;
 	private int locale;
-
+	private JKLogger logger=JKLoggerFactory.getLogger(getClass());
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public List<Lable> getLables() throws LablesLoaderException {
@@ -71,18 +72,18 @@ public class DatabaseLablesLoader implements LablesLoader {
 
 				@Override
 				public void fireEndImport(final Importer importer) {
-					JKLogger.info("Number Of Added Lables is : " + ((LablesImporter) importer).getNumberOfAddedLables());
-					JKLogger.info("Import " + this.moduleName + " Lables Finished ");
+					logger.info("Number Of Added Lables is : " + ((LablesImporter) importer).getNumberOfAddedLables());
+					logger.info("Import " + this.moduleName + " Lables Finished ");
 				}
 
 				@Override
 				public void fireStartImport(final Importer importer) {
-					JKLogger.info("Import " + this.moduleName + " Lables Started ");
+					logger.info("Import " + this.moduleName + " Lables Started ");
 				}
 
 				@Override
 				public void onException(final Exception e, final Importer importer) {
-					JKLogger.fatal("Error occuers while importing " + this.moduleName + " lables possabile reson : " + e.getMessage());
+					logger.error("Error occuers while importing " + this.moduleName + " lables possabile reson : " + e.getMessage());
 				}
 			});
 			importer.imporT();

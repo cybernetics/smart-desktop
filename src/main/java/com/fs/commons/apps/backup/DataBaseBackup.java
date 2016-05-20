@@ -22,6 +22,7 @@ import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 /**
  * @author ahmad
@@ -43,6 +44,7 @@ public class DataBaseBackup {
 	private boolean compress;
 
 	private String outputPath;
+	private JKLogger logger=JKLoggerFactory.getLogger(getClass());
 
 	// /////////////////////////////////////////////////////////
 	public DataBaseBackup() {
@@ -95,9 +97,9 @@ public class DataBaseBackup {
 				// CompressionUtil.compressAndSetPassword(info.getFileName(),
 				// info.getDatabasePassword());
 				GeneralUtility.writeLog("after compress", logFilePath);
-				JKLogger.info("Done Compress sql file");
+				logger.info("Done Compress sql file");
 				GeneralUtility.deleteFile(getOutputPath() + ".sql");
-				JKLogger.info("After delete sql file");
+				logger.info("After delete sql file");
 			}
 		}
 	}
