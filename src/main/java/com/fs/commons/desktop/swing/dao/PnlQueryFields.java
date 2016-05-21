@@ -21,6 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 
 import com.fs.commons.desktop.swing.Colors;
@@ -94,7 +96,7 @@ public class PnlQueryFields extends JKPanel {
 	private void init() {
 		// setPreferredSize(new Dimension(200,600));
 		final JKPanel pnl = new JKPanel();
-		// pnl.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+//		 pnl.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		pnl.setLayout(new GridLayout(this.model.getActualColumnCount() + 1, 1));
 		pnl.add(this.chkAll);
 		for (int i = 0; i < this.model.getActualColumnCount(); i++) {
@@ -105,7 +107,7 @@ public class PnlQueryFields extends JKPanel {
 			pnl.add(new JKLabledComponent(i + 2 + " ", 25, chkBox));
 		}
 		final JScrollPane scroll = new JScrollPane(pnl);
-		scroll.setPreferredSize(new Dimension(250, 600));
+		//scroll.setPreferredSize(new Dimension(250, 600));
 		add(scroll);
 		this.chkAll.addActionListener(new ActionListener() {
 			@Override

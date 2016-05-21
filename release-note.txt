@@ -1,16 +1,7 @@
 0.0.8
-4- finalize default theme
-14- activate import database
-16- fix labels
-	mi reset privliges
-	men reports
-17- fix select print fields size
-18 fix the style of printed table to html
-19- fix privliges sync
-20- add banner on startup
-	
-
+20- add banner on startup	
 0.0.9
+4-  finalize default theme
 1-Make the default homepage comes from Smart-API.com domain
 2-Title on the splash 
 3-Title on the home page
@@ -21,4 +12,6 @@
 10- Add screen to edit labels (from console)
 11- Fix order by in users management screen
 12- fix advanced roles management
+make import the database script from zip files that encrypted in db password
+add handling for donations and licensing
 

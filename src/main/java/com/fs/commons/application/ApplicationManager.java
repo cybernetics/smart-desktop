@@ -61,6 +61,7 @@ import com.jk.logging.JKLoggerFactory;
 import com.jk.resources.JKResourceLoaderFactory;
 import com.jk.security.JKSecurityManager;
 import com.jk.security.JKUser;
+import com.jk.util.IOUtil;
 
 public class ApplicationManager {
 	static JKLogger logger = JKLoggerFactory.getLogger(ApplicationManager.class);
@@ -267,7 +268,7 @@ public class ApplicationManager {
 				return init(fileInputStream);
 			}
 		}
-		System.err.println(" config files doesnot exist, init with defaults");
+		logger.info(" config files doesnot exist, init with defaults");
 		return init(null);
 
 	}
@@ -277,6 +278,7 @@ public class ApplicationManager {
 	 * @throws JKXmlException
 	 */
 	public Application init(final InputStream in) throws ApplicationException {
+		System.out.println(IOUtil.readFile("/resources/banner.txt"));
 		logger.debug("init with inputstream");
 		Splash splash = null;
 		try {
@@ -307,7 +309,7 @@ public class ApplicationManager {
 				logger.debug("set locale to : " + application.getLocale());
 				SwingUtility.setDefaultLocale(this.application.getLocale());
 			} else {
-				System.err.println("null locale");
+				logger.debug("null locale");
 			}
 			// ExceptionUtil.initExceptionLogging();
 			logger.debug("application.init");
