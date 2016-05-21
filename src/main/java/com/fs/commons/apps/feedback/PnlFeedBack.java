@@ -91,18 +91,13 @@ public class PnlFeedBack extends JKPanel<Object> {
 			SwingValidator.checkEmpty(this.txtDescription);
 			SwingValidator.checkEmpty(this.txtScenario);
 
-			DatabaseInfo db = null;
-			if (isSendDatabaseBackup()) {
-				db = getDatabase();
-			}
-
 			final Message msg = new Message();
 			msg.setPanelName(this.txtScreenName.getText().trim());
 			msg.setErrorDesc(this.txtDescription.getText().trim());
 			msg.setErrorScenario(this.txtScenario.getText().trim());
 
 			final FeedbackManager feedbackManager = new FeedbackManager();
-			feedbackManager.sendFeddback(getSenderEmail(), db, msg);
+			feedbackManager.sendFeddback(getSenderEmail(), msg,isSendDatabaseBackup());
 			SwingUtility.showSuccessDialog("FEED_BACK_SENT_SUCCESSFULLY");
 			SwingUtility.closePanel(this);
 		} catch (final Exception e) {
@@ -113,16 +108,6 @@ public class PnlFeedBack extends JKPanel<Object> {
 	private String getSenderEmail() {
 		//TODO : handle this in more proper way
 		return "user@smart-desktop.com";
-	}
-
-	private DatabaseInfo getDatabase() {
-		final DatabaseInfo info = new DatabaseInfo();
-		info.setDatabaseHost(System.getProperty("db-host", "localhost"));
-		info.setDatabaseName(System.getProperty("db-name", "db"));
-		info.setDatabasePort(Integer.parseInt(System.getProperty("db-port", "3306")));
-		info.setDatabaseUser(CommonsConfigManager.decode(System.getProperty("db-user")));
-		info.setDatabasePassword(CommonsConfigManager.decode(System.getProperty("db-password")));
-		return info;
 	}
 
 	/**

@@ -21,5 +21,6 @@
 3-Title on the home page
 4- add development mode
 	view view panel name
+5- enable attaching databse in feedback screen
 
 

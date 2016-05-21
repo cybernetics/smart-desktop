@@ -21,8 +21,10 @@ import java.io.IOException;
 
 import org.apache.commons.mail.EmailException;
 
+import com.fs.commons.application.config.CommonsConfigManager;
 import com.fs.commons.apps.backup.CompressionException;
 import com.fs.commons.apps.backup.DatabaseInfo;
+import com.fs.commons.apps.backup.MySqlUtil;
 import com.fs.commons.util.FormatUtil;
 import com.jk.logging.JKLogger;
 import com.jk.logging.JKLoggerFactory;
@@ -37,10 +39,11 @@ import com.jk.mail.MailSender;
  *
  */
 public class FeedbackManager {
-	JKLogger logger=JKLoggerFactory.getLogger(getClass());
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	private static final String SUPPORT_EMAIL_TITLE = "Bug Report";
 	private static final String SUPPORT_TO = System.getProperty("jk-support-mail-to");
-//	private static final String SUPPORT_HOST = System.getProperty("jk-mail-host");
+	// private static final String SUPPORT_HOST =
+	// System.getProperty("jk-mail-host");
 
 	/**
 	 *
@@ -59,21 +62,27 @@ public class FeedbackManager {
 	 * @return
 	 * @throws IOException
 	 */
-	private String compressFiles(final DatabaseInfo info) throws IOException {
+	private String getDatabaseFile() throws IOException {
+		final DatabaseInfo info = new DatabaseInfo();
+		info.setDatabaseHost(System.getProperty("db-host", "localhost"));
+		info.setDatabaseName(System.getProperty("db-name", "db"));
+		info.setDatabasePort(Integer.parseInt(System.getProperty("db-port", "3306")));
+		//TODO : handle encrypted password case
+		info.setDatabaseUser(System.getProperty("db-user"));
+		info.setDatabasePassword(System.getProperty("db-password"));
+
 		// final String logFileName = ExceptionUtil.getLogFileName();
 		// final String dbCompressedFileName = getFileName("feeback", "rar");
 		// String[] filestoCompress;
-		// if (includeDatabaseBackup) {
-		// final String dbFileName = getFileName("DB", "sql");
-		// info.setFileName(dbFileName);
-		// MySqlUtil.export(info);
+		final String dbFileName = getFileName("db", "sql");
+		info.setFileName(dbFileName);
+		MySqlUtil.export(info);
 		// filestoCompress = new String[] { dbFileName, logFileName };
 		// } else {
 		// filestoCompress = new String[] { logFileName };
 		// }
 		//
-		// // CompressionUtil.compressFiles(filestoCompress,
-		// dbCompressedFileName);
+		//CompressionUtil.compressFiles(filestoCompress, dbCompressedFileName);
 		// return dbCompressedFileName;
 		return null;
 	}
@@ -101,7 +110,7 @@ public class FeedbackManager {
 	 */
 	private MailInfo createMailInfo(final String from, final Message msg) {
 		final MailInfo mailInfo = new MailInfo();
-//		mailInfo.setHost(SUPPORT_HOST);
+		// mailInfo.setHost(SUPPORT_HOST);
 		mailInfo.setTo(SUPPORT_TO);
 		mailInfo.setFrom(from);
 		mailInfo.setSubject(SUPPORT_EMAIL_TITLE);
@@ -127,15 +136,15 @@ public class FeedbackManager {
 	 * @throws CompressionException
 	 * @throws EmailException
 	 */
-	public void sendFeddback(final String from, final DatabaseInfo db, final Message msg)
+	public void sendFeddback(final String from, final Message msg, final boolean sendDatabaseBackup)
 			throws FileNotFoundException, IOException, CompressionException, EmailException {
 		final MailInfo mailInfo = createMailInfo(from, msg);
-		if (db != null) {
-			final String dbCompressedFileName = compressFiles(db);
-			if (dbCompressedFileName != null) {
-				final Attachment attachement = createAttachement(dbCompressedFileName);
-				mailInfo.addAttachment(attachement);
-			}
+		if (sendDatabaseBackup) {
+//			final String dbCompressedFileName = getDatabaseFile();
+//			if (dbCompressedFileName != null) {
+//				final Attachment attachement = createAttachement(dbCompressedFileName);
+//				mailInfo.addAttachment(attachement);
+//			}
 		}
 		MailSender.send(mailInfo);
 		logger.info("Feed back sent succ...");

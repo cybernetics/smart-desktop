@@ -19,6 +19,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
+
 /**
  * @1.1
  * 
@@ -26,7 +29,7 @@ import java.io.InputStreamReader;
  *
  */
 public class MySqlUtil {
-
+	static JKLogger logger=JKLoggerFactory.getLogger(MySqlUtil.class);
 	private static final Object EXPORT_UTIL_FILE_NAME = "mysqldump.exe";
 	private static final String IMPORT_UTIL_FILE_NAME = "mysql.exe";
 
@@ -45,7 +48,7 @@ public class MySqlUtil {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String line;
 			while ((line = reader.readLine()) != null) {
-				System.err.println(line);
+				logger.debug(line);
 			}
 			if (process.exitValue() != 0) {
 				final BufferedReader buf = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -55,7 +58,7 @@ public class MySqlUtil {
 					System.err.println(errorValue);
 				}
 				buf.close();
-				System.err.println("MySql Export failed with the following error code : " + process.exitValue());
+				logger.error("MySql Export failed with the following error code : " , process.exitValue());
 				throw new IOException(errorValue);
 			}
 		} finally {
@@ -96,9 +99,9 @@ public class MySqlUtil {
 		buffer.append(" " + info.getDatabaseName());
 		buffer.append(" >");
 		buffer.append("\"" + info.getFileName() + "\"");
-		System.err.println(buffer);
+		logger.debug(buffer);
 		execute(buffer);
-		System.err.println("Done dump sql file : " + info.getFileName());
+		logger.debug("Done dump sql file : " + info.getFileName());
 	}
 
 	/**
