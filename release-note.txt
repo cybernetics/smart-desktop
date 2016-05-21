@@ -20,4 +20,5 @@
 - make versions histry windows read only
 10- Add screen to edit labels (from console)
 11- Fix order by in users management screen
+12- fix advanced roles management
 

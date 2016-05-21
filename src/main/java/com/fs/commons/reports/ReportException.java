@@ -15,11 +15,13 @@
  */
 package com.fs.commons.reports;
 
+import com.jk.exceptions.JKException;
+
 /**
  * @author u087
  *
  */
-public class ReportException extends RuntimeException {
+public class ReportException extends JKException {
 
 	/**
 	 *

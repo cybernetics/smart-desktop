@@ -1,6 +1,6 @@
 <reports>
 	<source-path>/resources/reports</source-path>
 	<out-path>reports-out</out-path>
-	
-	
+	<report name="sec_privilege"/>
+	<report name="sec_user_role_privilege"/>
 </reports>

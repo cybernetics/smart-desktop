@@ -35,12 +35,10 @@ import com.fs.commons.reports.JKReportsUtil;
 import com.fs.commons.reports.ReportException;
 import com.fs.commons.util.GeneralUtility;
 import com.fs.security.util.ListsBuilder;
+import com.jk.exceptions.handler.JKExceptionUtil;
 
 public class PnlPrivileges extends JKPanel<Object> {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
 	DaoComboBox cmbRole = ListsBuilder.buildRoleComboBox();
 	JKButton btnPrint = new JKButton("PRINT");
@@ -85,18 +83,14 @@ public class PnlPrivileges extends JKPanel<Object> {
 		try {
 			JKReportsUtil.printReport(report, params);
 		} catch (final ReportException e) {
-			e.printStackTrace();
+			JKExceptionUtil.handle(e);
 		}
 	}
 
 	public void init() {
 		this.btnPrint.setEnabled(false);
 		this.btnPrint.setShowProgress(true);
-		final URL iconURL = GeneralUtility.getIconURL("selcted_print.png");
-		if (iconURL != null) {
-			this.btnPrint.setIcon(new ImageIcon(iconURL));
-		}
-
+		this.btnPrint.setIcon("selcted_print.png");
 		setLayout(new BorderLayout());
 		final JPanel pnlNorth = getNorthPanel();
 		final JPanel pnlCenter = getCenterPanel();

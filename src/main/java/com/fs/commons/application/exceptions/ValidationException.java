@@ -20,6 +20,8 @@ import com.fs.commons.dao.dynamic.constraints.exceptions.ConstraintException;
 import com.fs.commons.dao.dynamic.meta.Field;
 import com.fs.commons.desktop.validation.Problem;
 import com.fs.commons.desktop.validation.Problems;
+import com.jk.exceptions.JKException;
+import com.jk.exceptions.JKNonPrintableException;
 
 /**
  * <p>
@@ -41,7 +43,7 @@ import com.fs.commons.desktop.validation.Problems;
  * @author not attributable
  * @version 1.0
  */
-public class ValidationException extends Exception {
+public class ValidationException extends JKException implements JKNonPrintableException {
 	/**
 	 *
 	 */

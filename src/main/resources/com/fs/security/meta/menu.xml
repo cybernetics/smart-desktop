@@ -13,11 +13,8 @@
 				<property name="cross-table" value="true" />
 			</properties>
 		</menu-item>
-		<menu-item name="MI_ADVANCED_ROLES" icon-name="1463782422_Group_MilitaryPersonnel_Light.png" privlige-id="10201">
-			<properties>
-				<property name="panel-class" value="com.fs.security.ui.helpers.PnlSecuityPrivliges" />
-			</properties>
-		</menu-item>
+		<!-- <menu-item name="MI_ADVANCED_ROLES" icon-name="1463782422_Group_MilitaryPersonnel_Light.png" privlige-id="10201"> <properties> <property name="panel-class" 
+			value="com.fs.security.ui.helpers.PnlSecuityPrivliges" /> </properties> </menu-item> -->
 		<menu-item name="MI_USERS" icon-name="manage_account_icons.gif" privlige-id="10202">
 			<properties>
 				<property name="table-meta" value="sec_users" />
@@ -27,11 +24,6 @@
 			</properties>
 		</menu-item>
 
-		<menu-item name="MI_ROLE_PRIVILEGE" privlige-id="10204" icon-name="role_privliges.png">
-			<properties>
-				<property name="panel-class" value="com.fs.security.ui.privileges.PnlPrivileges" />
-			</properties>
-		</menu-item>
 		<menu-item name="MI_SYNC_PRIVLIGES" icon-name="Sync_priv.png">
 			<properties>
 				<property name="executor" value="com.fs.commons.apps.executors.PnlSyncPriviliges" />
@@ -45,7 +37,13 @@
 		</menu-item>
 	</menu>
 	<menu name="MEN_REPORTS" icon-name="reports.png" privlige-id="102">
-		<menu-item name="MI_USER_ROLE_PRIVILEGE" privlige-id="10206" icon-name="user_role_privliges.png">
+		<menu-item name="MI_ROLE_PRIVILEGE" icon-name="role_privliges.png">
+			<properties>
+				<property name="panel-class" value="com.fs.security.ui.privileges.PnlPrivileges" />
+			</properties>
+		</menu-item>
+
+		<menu-item name="MI_USER_ROLE_PRIVILEGE" icon-name="user_role_privliges.png">
 			<properties>
 				<property name="panel-class" value="com.fs.security.ui.privileges.PnlUserPrivileges" />
 			</properties>

@@ -31,7 +31,7 @@ p1.privilege_name as parent_privilige_name
 FROM
 sec_privileges
 LEFT JOIN sec_privileges as p1 ON sec_privileges.parent_privilege = p1.privilege_id
-ORDER BY p1.priv_num
+ORDER BY sec_privileges.privilege_desc
 </report-sql>
 <short-sql>
 SELECT

@@ -15,13 +15,9 @@
  */
 package com.fs.commons.reports;
 
-/**
- * @1.1
- * 
- * @author jamil
- *
- */
-public class EmptyReportException extends ReportException {
+import com.jk.exceptions.JKNonPrintableException;
+
+public class EmptyReportException extends ReportException implements JKNonPrintableException{
 
 	/**
 	 *

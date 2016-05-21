@@ -39,6 +39,7 @@ import com.fs.commons.desktop.validation.exception.UIValidationException;
 import com.fs.commons.locale.Lables;
 import com.fs.commons.util.FormatUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.exceptions.JKNonPrintableException;
 import com.jk.exceptions.JKNotAllowedOperationException;
 import com.jk.exceptions.JKSecurityException;
 import com.jk.exceptions.handler.JKExceptionUtil;
@@ -174,14 +175,12 @@ public class JKButton extends JButton implements BindingComponent {
 				JKButton.super.fireActionPerformed(event);
 			}
 		} catch (RuntimeException e) {
-			if (!(e.getCause() instanceof ValidationException)) {
-				if(!(e.getCause() instanceof JKSecurityException)){
+			if (!(e.getCause() instanceof JKNonPrintableException)) {
 				e.printStackTrace();
-				}
 			} else {
 				// It is safe to eat this exception
 			}
-		}finally{
+		} finally {
 			setEnabled(true);
 		}
 	}

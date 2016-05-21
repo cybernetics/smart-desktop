@@ -42,12 +42,15 @@ import com.fs.commons.reports.JKReportManager;
 import com.fs.commons.reports.ReportUIPanel;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 /**
  * @author u087
  *
  */
 public class UIPanelFactoryImpl implements UIPanelFactory {
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	public static final String DYN_MASTER_DETAIL_CRUDL_PANEL = "com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailCRUDLPanel";
 
 	public static final String DYN_SINGLE_MASTER_DETAIL_CRUDL_PANEL = "com.fs.commons.desktop.dynform.ui.masterdetail.DynMasterDetailPanel";
@@ -144,6 +147,7 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 	 */
 	@Override
 	public UIPanel createPanel(final Properties prop, final boolean createNew) throws UIOPanelCreationException {
+		logger.debug("createPanel , createNew :  ", createNew, " , Properties: ", prop);
 		try {
 			// System.out.println(new Date());
 			if (!createNew && this.instance != null) {
@@ -166,8 +170,6 @@ public class UIPanelFactoryImpl implements UIPanelFactory {
 				try {
 					this.instance = (UIPanel) Class.forName(value).newInstance();
 				} catch (final Exception e) {
-					System.err.println(prop);
-					e.printStackTrace();
 					throw new UIOPanelCreationException(e);
 				}
 			} else if ((value = prop.getProperty("executor")) != null) {
