@@ -21,18 +21,21 @@ import java.util.List;
 import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.JKRecordNotFoundException;
 import com.fs.security.dao.UserDao;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 import com.jk.security.JKPrivilige;
 import com.jk.security.JKUser;
 
 public class SecurityFacade {
+	JKLogger logger=JKLoggerFactory.getLogger(getClass());
 	UserDao dao = new UserDao();
 
 	public void checkPrivlige(final JKPrivilige privilige) throws JKDataAccessException {
 		try {
 			this.dao.findPrivilige(privilige.getPriviligeId());
 		} catch (final JKRecordNotFoundException e) {
+			logger.info("Add new privilige : " , privilige);
 			this.dao.addPrivlige(privilige);
-			System.err.println("Adding new privilige : " + privilige);
 		}
 	}
 

@@ -1,12 +1,5 @@
 <tables>
 <!-- ///////////////////////////////////////////////////////////////////////////// -->
-<!-- Table Meta for : -boolean-with id : -boolean- -->
-<!-- ///////////////////////////////////////////////////////////////////////////// -->
-<table name='boolean'  allow-manage='false'  caption='boolean'>
-<id-field  name='boolean_id'  type='2'  max-length='50' />
-<field  name='boolean_name'  max-length='50' />
-</table>
-<!-- ///////////////////////////////////////////////////////////////////////////// -->
 <!-- Table Meta for : -sec_audit_type-with id : -sec_audit_type- -->
 <!-- ///////////////////////////////////////////////////////////////////////////// -->
 <table name='sec_audit_type'  allow-manage='true'  caption='sec_audit_type'>
@@ -29,14 +22,17 @@
 <id-field  name='privilege_id'  type='2'  max-length='50' />
 <field  name='privilege_name'  max-length='50'  default-value='null'/>
 <field  name='privilege_desc'  max-length='50'  default-value='null'/>
-<short-sql>
+<report-sql>
 SELECT
 sec_privileges.privilege_id,
-concat_ws('',sec_privileges.privilege_id),
-sec_privileges.privilege_desc
+sec_privileges.privilege_name,
+sec_privileges.privilege_desc,
+p1.privilege_name as parent_privilige_name
 FROM
 sec_privileges
-</short-sql>
+LEFT JOIN sec_privileges as p1 ON sec_privileges.parent_privilege = p1.privilege_id
+ORDER BY p1.priv_num
+</report-sql>
 </table>
 <!-- ///////////////////////////////////////////////////////////////////////////// -->
 <!-- Table Meta for : -sec_role_privileges-with id : -sec_role_privileges- -->
@@ -76,10 +72,9 @@ sec_privileges
 <report-sql>
 SELECT sec_users.user_record_id, sec_users.user_id,
 			sec_users.user_full_name, 
-			sec_boolean.boolean_name  as `sec_boolean.boolean_name`			
+			sec_users.disabled		
 			FROM	
 			sec_users 		
-			Inner Join boolean as sec_boolean ON sec_boolean.boolean_id =sec_users.disabled
 	</report-sql>
 </table>
 

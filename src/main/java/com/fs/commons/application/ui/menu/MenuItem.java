@@ -27,6 +27,7 @@ import com.fs.commons.desktop.UIPanelFactoryImpl;
 import com.fs.commons.desktop.swing.comp.DaoComponent;
 import com.fs.commons.locale.Lables;
 import com.jk.security.JKPrivilige;
+import com.jk.security.JKSecurityManager;
 
 /**
  * @author u087
@@ -139,8 +140,8 @@ public class MenuItem implements UIPanelFactory {
 
 	//////////////////////////////////////////////////////////////////////////////
 	public JKPrivilige getPrivilige() {
-		final int privId = (getParentMenu().getParentModule().toString() + getParentMenu().getName() + getName()).hashCode();
-		return new JKPrivilige(privId, getName(), getParentMenu().getPrivilige());
+//		final int privId = (getParentMenu().getParentModule().toString() + getParentMenu().getName() + getName()).hashCode();
+		return  JKSecurityManager.createPrivilige(Lables.get(getName(),true), getParentMenu().getPrivilige());
 	}
 
 	/**

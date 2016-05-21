@@ -71,11 +71,11 @@ public class PnlPrivileges extends JKPanel<Object> {
 	}
 
 	public String getSql() {
-		return GeneralUtility.getSqlFile("role_privileges.sql");
+		return GeneralUtility.getSqlFile("sec_role_privileges.sql");
 	}
 
 	public String getSql2() {
-		return GeneralUtility.getSqlFile("role_privileges2.sql");
+		return GeneralUtility.getSqlFile("sec_role_privileges2.sql");
 	}
 
 	protected void handelPrintUserPrivilege() {

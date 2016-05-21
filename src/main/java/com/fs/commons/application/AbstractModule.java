@@ -30,6 +30,7 @@ import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.xml.JKXmlException;
 import com.fs.commons.dao.dynamic.meta.xml.TableMetaXmlParser;
 import com.fs.commons.locale.FilesLablesLoader;
+import com.fs.commons.locale.Lables;
 import com.fs.commons.locale.LablesLoader;
 import com.fs.commons.locale.LablesLoaderException;
 import com.fs.commons.locale.Locale;
@@ -40,6 +41,7 @@ import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.logging.JKLogger;
 import com.jk.logging.JKLoggerFactory;
 import com.jk.security.JKPrivilige;
+import com.jk.security.JKSecurityManager;
 
 public abstract class AbstractModule implements Module {
 	JKLogger logger = JKLoggerFactory.getLogger(getClass());
@@ -150,7 +152,7 @@ public abstract class AbstractModule implements Module {
 				final ModuleMenuXmlParser p = new ModuleMenuXmlParser(this);
 				this.menu = p.parse(in);
 			} else {
-				logger.debug("No menu.xml found for module : " , getModuleName());
+				logger.debug("No menu.xml found for module : ", getModuleName());
 				this.menu = new ArrayList<Menu>();
 			}
 			return this.menu;
@@ -182,7 +184,7 @@ public abstract class AbstractModule implements Module {
 	 */
 	@Override
 	public JKPrivilige getPrivilige() {
-		return new JKPrivilige(getModuleName().hashCode(), getModuleName(), null);
+		return JKSecurityManager.createPrivilige(Lables.get(getModuleName(), true), null);
 	}
 
 	/**

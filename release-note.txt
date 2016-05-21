@@ -1,10 +1,5 @@
 0.0.8
 4- finalize default theme
-9- activate feedback screen
-10- add screen to edit labels (from console)
-11- Check clear sysem cache screen
-12- add versions table to script
-13- activate db backup
 14- activate import database
 16- fix labels
 	mi reset privliges
@@ -23,5 +18,5 @@
 	view view panel name
 5- enable attaching databse in feedback screen
 - make versions histry windows read only
-
+10- add screen to edit labels (from console)
 

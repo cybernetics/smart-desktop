@@ -21,6 +21,7 @@ import java.util.Collection;
 import com.fs.commons.application.Module;
 import com.fs.commons.locale.Lables;
 import com.jk.security.JKPrivilige;
+import com.jk.security.JKSecurityManager;
 
 /**
  * @author u087
@@ -129,8 +130,9 @@ public class Menu {
 	 * @return the priviligeId
 	 */
 	public JKPrivilige getPrivilige() {
-		final int privId = (getParentModule().getModuleName() + getName()).hashCode();
-		return new JKPrivilige(privId, getName(), getParentModule().getPrivilige());
+		// final int privId = (getParentModule().getModuleName() +
+		// getName()).hashCode();
+		return JKSecurityManager.createPrivilige(Lables.get(getName(),true), getParentModule().getPrivilige());
 	}
 
 	public void init() {

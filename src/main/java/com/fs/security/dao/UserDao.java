@@ -54,7 +54,7 @@ public class UserDao extends JKAbstractPlainDataAccess {
 				int counter = 1;
 				ps.setInt(counter++, privilige.getPriviligeId());
 				ps.setString(counter++, privilige.getPriviligeName());
-				ps.setString(counter++, privilige.getDesc());
+				ps.setString(counter++, privilige.getDesc()==null?"":privilige.getDesc());
 				if (privilige.getParentPrivlige() != null) {
 					ps.setInt(counter++, privilige.getParentPrivlige().getPriviligeId());
 				} else {

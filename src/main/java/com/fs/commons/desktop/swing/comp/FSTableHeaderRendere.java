@@ -23,6 +23,7 @@ import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
 import com.fs.commons.desktop.swing.Colors;
+import com.fs.commons.desktop.swing.SwingUtility;
 import com.lowagie.text.Font;
 
 public class FSTableHeaderRendere extends JLabel implements TableCellRenderer {
@@ -46,8 +47,9 @@ public class FSTableHeaderRendere extends JLabel implements TableCellRenderer {
 		setBackground(Colors.JK_LABEL_BG);
 		setOpaque(true);
 		setHorizontalAlignment(CENTER);
-		setBorder(UIManager.getBorder("TitledBorder.border"));
-		setFont(getFont().deriveFont(Font.BOLD));
+//		setBorder(UIManager.getBorder("TitledBorder.border"));
+//		setFont(getFont().deriveFont(Font.BOLD));
+		setBorder(SwingUtility.getDefaultEmptyBorder());
 	}
 
 }

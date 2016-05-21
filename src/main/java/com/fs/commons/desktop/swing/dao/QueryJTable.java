@@ -72,10 +72,12 @@ import com.fs.commons.locale.Lables;
 import com.fs.commons.util.ExcelUtil;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.logging.JKLoggerFactory;
+import com.jk.logging.JKLogger;
 
 //////////////////////////////////////////////////////////////////////////////
 public class QueryJTable extends JKPanel implements FilterListener, RecordTraversePolicy {
-
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	private static final long serialVersionUID = 1L;
 
 	public static void main(final String[] args) {
@@ -1270,6 +1272,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 	 * @param orderbyColunmIndex
 	 */
 	public void setQuery(final String sql, final int orderByColunmIndex) {
+		logger.debug("setQuery: ",sql," order by index,:",orderByColunmIndex);
 		if (isVisible()) {
 			final String staticSql = this.model.getStaticWhere();
 			final JKDataSource manager = this.model.getReourceManager();
@@ -1278,6 +1281,7 @@ public class QueryJTable extends JKPanel implements FilterListener, RecordTraver
 			final boolean showIdColunm = this.model.getShowIdColunm();
 
 			this.model = new QueryTableModel(manager, sql, orderByColunmIndex);
+			logger.debug("Create new table model: ",pagesRowsCount,",",showIdColunm,",",staticSql);
 			this.model.setPageRowsCount(pagesRowsCount);
 			this.model.setShowIdColunm(showIdColunm);
 			this.model.setStaticWhere(staticSql);

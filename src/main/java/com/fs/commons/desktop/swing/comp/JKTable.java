@@ -16,6 +16,7 @@
 package com.fs.commons.desktop.swing.comp;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -60,8 +61,12 @@ import com.fs.commons.desktop.swing.comp2.FSDate;
 import com.fs.commons.desktop.swing.comp2.FSTextField;
 import com.fs.commons.util.DateTimeUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class JKTable extends JTable {
+	private static JKLogger logger = JKLoggerFactory.getLogger(JKTable.class);
+
 	class TableFocusListener extends FocusAdapter {
 		@Override
 		public void focusGained(final FocusEvent e) {
@@ -272,14 +277,21 @@ public class JKTable extends JTable {
 			return;
 		}
 		final int userColunmWidth = getFsModel().getPrefferedWidth(column);
+		final int compWidth = comp.getPreferredSize().width;
 		final TableColumn tableColumn = getColumnModel().getColumn(column);
-		if (userColunmWidth > 0 && userColunmWidth > tableColumn.getPreferredWidth()) {
+
+		logger.debug("Fix width Column : ", column, getColumnName(column));
+		logger.debug("User width ", userColunmWidth, "compWidth:", compWidth);
+		logger.debug("Col reference:", tableColumn.toString(), " Col profered width : ", tableColumn.getPreferredWidth(), " , width: ",
+				tableColumn.getWidth());
+		if (userColunmWidth > tableColumn.getPreferredWidth()) {
+			logger.debug("respect user width");
 			tableColumn.setPreferredWidth(userColunmWidth);
 		} else {
 			comp.setPreferredSize(null);// to ignore value set by the caller
-			final int compWidth = comp.getPreferredSize().width + 10;
 			if (compWidth > tableColumn.getPreferredWidth()) {
 				// we add one for the fraction loss purpose
+				logger.debug("approve component width", compWidth);
 				tableColumn.setPreferredWidth(compWidth);
 			}
 		}
@@ -537,12 +549,21 @@ public class JKTable extends JTable {
 	 *
 	 */
 	protected void handleTableStuctorChanged() {
-		final FSTableModel model = getFsModel();
-		for (int i = 0; i < model.getColumnCount(); i++) {
-			final TableColumn column = getColumnModel().getColumn(i);
-			column.setMinWidth(SwingUtility.getTextWidth(model.getColumnName(i), true) + 15);
-			// column.setPreferredWidth(column.getWidth()+20);
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				logger.debug("handleTableStuctorChanged");
+				final FSTableModel model = getFsModel();
+				for (int i = 0; i < model.getColumnCount(); i++) {
+					final TableColumn column = getColumnModel().getColumn(i);
+					int textWidth = SwingUtility.getTextWidth(model.getColumnName(i), true)+10;
+					column.setMinWidth(textWidth);
+					column.setPreferredWidth(textWidth);
+					logger.debug("Column :", i, " Name : ", model.getColumnName(i), " Min width:", textWidth, " width : ", column.getWidth());
+					logger.debug("Column reference:", column.toString());
+				}
+			}
+		});
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
@@ -621,7 +642,7 @@ public class JKTable extends JTable {
 
 	private void initTableHeader() {
 		getTableHeader().setDefaultRenderer(new FSTableHeaderRendere());
-		// getTableHeader().setPreferredSize(new Dimension(0,30));
+		getTableHeader().setPreferredSize(new Dimension(100, 30));
 		getTableHeader().setBackground(Colors.MAIN_PANEL_BG);
 	}
 
@@ -875,6 +896,7 @@ public class JKTable extends JTable {
 
 	@Override
 	public void setModel(final TableModel model) {
+		logger.debug("setModel :", model != null ? model.getClass().getName() : "NULL");
 		if (!(model instanceof FSTableModel)) {
 			throw new IllegalStateException("FSTable only accept FSTableModel");
 		}

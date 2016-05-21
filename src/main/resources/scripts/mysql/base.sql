@@ -65,7 +65,7 @@ DROP TABLE IF EXISTS `sec_privileges`;
 CREATE TABLE `sec_privileges` (
   `privilege_id` int(11) NOT NULL,
   `privilege_name` varchar(255) NOT NULL,
-  `privilege_desc` varchar(255) NOT NULL,
+  `privilege_desc` varchar(255) ,
   `parent_privilege` int(11) DEFAULT NULL,
   `priv_num` int(11) DEFAULT NULL,
   PRIMARY KEY (`privilege_id`)
@@ -148,7 +148,7 @@ CREATE TABLE `sec_users` (
   `user_id` varchar(255) NOT NULL,
   `user_full_name` varchar(255) NOT NULL,
   `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `disabled` int(11) NOT NULL,
+  `disabled` tinyint(1) NOT NULL,
   PRIMARY KEY (`user_record_id`),
   UNIQUE KEY `user_id` (`user_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;

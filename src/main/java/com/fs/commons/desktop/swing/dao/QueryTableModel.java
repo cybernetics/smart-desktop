@@ -35,8 +35,11 @@ import com.fs.commons.desktop.swing.comp.model.FSTableModel;
 import com.fs.commons.desktop.swing.comp.model.FSTableRecord;
 import com.fs.commons.locale.Lables;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class QueryTableModel extends FSTableModel implements DataPager {
+	JKLogger logger=JKLoggerFactory.getLogger(getClass());
 	enum OrderDirection {
 		ASCENDING, DESCENDING;
 		/**
@@ -681,6 +684,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 	 *            String
 	 */
 	public void setSql(String sql) {
+		logger.debug("Query : ",sql);
 		// this.sql=sql;
 		// if(orderByColunmIndex!=-1 &&
 		// sql.toUpperCase().indexOf("ORDER BY")!=-1){

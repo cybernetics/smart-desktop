@@ -1,6 +1,11 @@
 <main-menu>
-	<menu name="MEN_SECURITY" icon-name="1463782342_lock.png" privlige-id="102">
-		<menu-item name="MI_ROLES" icon-name="roles.png" privlige-id="10201">
+	<menu name="MEN_SECURITY" icon-name="1463782342_lock.png">
+		<menu-item name="MI_PRIVILIGES" icon-name="roles.png">
+			<properties>
+				<property name="table-meta" value="sec_privileges" />
+			</properties>
+		</menu-item>
+		<menu-item name="MI_ROLES" icon-name="roles.png">
 			<properties>
 				<property name="table-meta" value="sec_roles" />
 				<property name="detail-tables" value="sec_role_privileges" />

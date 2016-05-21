@@ -23,6 +23,7 @@ import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.KeyboardFocusManager;
@@ -32,6 +33,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.ByteArrayInputStream;
@@ -579,22 +582,15 @@ public class SwingUtility {
 	 * @return
 	 */
 	public static int getTextWidth(final String text, final Font font) {
-		final JLabel lbl = new JLabel(text);
-		lbl.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-		lbl.setFont(font);
-		return (int) lbl.getPreferredSize().getWidth();
-		// get metrics from the graphics
-		// FontMetrics metrics = new FontMetrics(font){};
-		// get the height of a line of text in this
-		// font and render context
-		// int hgt = metrics.getHeight();
-		// get the advance of my text in this font
-		// and render context
-		// int adv = metrics.stringWidth(text);
-		// calculate the size of a box to hold the
-		// text with some padding.
-		// Dimension size = new Dimension(adv+2, hgt+2);
-		// return size;
+//		final JLabel lbl = new JLabel(text);
+//		lbl.setBorder(g);
+//		lbl.setFont(font);
+//		return (int) lbl.getPreferredSize().getWidth();
+		AffineTransform affinetransform = new AffineTransform();     
+		FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
+		int textwidth = (int)(font.getStringBounds(text, frc).getWidth());
+		int textheight = (int)(font.getStringBounds(text, frc).getHeight());
+		return textwidth;
 	}
 
 	private static Window getWindow(final JComponent comp) {
@@ -1107,7 +1103,7 @@ public class SwingUtility {
 
 	public static void showMessageDialog(final String message, final Throwable ex) {
 		JOptionPane.showMessageDialog(getDefaultMainFrame(), Lables.get(message, true));
-		throw new RuntimeException(message,ex);
+		throw new RuntimeException(message, ex);
 	}
 
 	/**

@@ -30,9 +30,11 @@ import com.fs.commons.dao.dynamic.constraints.TableDataValidator;
 import com.fs.commons.dao.dynamic.constraints.TableDataValidatorFactory;
 import com.fs.commons.dao.dynamic.trigger.Trigger;
 import com.fs.commons.dao.sql.query.QueryComponent;
+import com.fs.commons.locale.Lables;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKPrivilige;
+import com.jk.security.JKSecurityManager;
 
 public class TableMeta implements Serializable, QueryComponent {
 	/**
@@ -446,7 +448,7 @@ public class TableMeta implements Serializable, QueryComponent {
 	}
 
 	public JKPrivilige getPrivilige() {
-		return new JKPrivilige(getTableName().hashCode(), getTableName(), getParentPrivilige());
+		return JKSecurityManager.createPrivilige(Lables.get(getTableName(),true), getParentPrivilige());
 	}
 
 	/**
@@ -474,10 +476,11 @@ public class TableMeta implements Serializable, QueryComponent {
 	}
 
 	public String getShortReportSql() {
-//		final String sql = GeneralUtility.loadSqlFromDatabase("Short_" + getTableId());
-//		if (sql != null) {
-//			return sql;
-//		}
+		// final String sql = GeneralUtility.loadSqlFromDatabase("Short_" +
+		// getTableId());
+		// if (sql != null) {
+		// return sql;
+		// }
 		if (this.shortReportSql == null) {
 			return new MetaSqlBuilder(this).buildDefaultShortSql();
 		}
