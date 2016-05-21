@@ -245,7 +245,7 @@ public class TitledPanel extends JKMainPanel {
 
 		this.btnReload.setIcon("small_reload_2.png");
 		this.btnClose.setIcon("smal_close.png");
-		this.btnAddToFavorites.setIcon("add.png");
+		this.btnAddToFavorites.setIcon("1463807492_keditbookmarks.png");
 		this.btnShowInFrame.setIcon("show_courses.png");
 		this.btnClose.setToolTipText("CLOSE_PANEL");
 		this.btnReload.setToolTipText("RELOAD");
