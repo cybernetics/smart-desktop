@@ -40,6 +40,7 @@ import com.fs.commons.locale.Lables;
 import com.fs.commons.util.FormatUtil;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.JKNotAllowedOperationException;
+import com.jk.exceptions.JKSecurityException;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKPrivilige;
 import com.jk.security.JKSecurityManager;
@@ -148,6 +149,7 @@ public class JKButton extends JButton implements BindingComponent {
 
 	@Override
 	protected void fireActionPerformed(final ActionEvent event) {
+		setEnabled(false);
 		// if (this.privlige != null) {
 		// try {
 		// JKSecurityManager.getAuthorizer().checkAllowed(this.privlige);
@@ -173,10 +175,14 @@ public class JKButton extends JButton implements BindingComponent {
 			}
 		} catch (RuntimeException e) {
 			if (!(e.getCause() instanceof ValidationException)) {
+				if(!(e.getCause() instanceof JKSecurityException)){
 				e.printStackTrace();
+				}
 			} else {
 				// It is safe to eat this exception
 			}
+		}finally{
+			setEnabled(true);
 		}
 	}
 

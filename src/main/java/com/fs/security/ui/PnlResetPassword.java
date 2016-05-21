@@ -71,8 +71,8 @@ public class PnlResetPassword extends JKPanel<Object> {
 		this.txtOldPassword.checkEmpty();
 		this.txtNewPassword.checkEmpty();
 		this.txtConfirmPassword.checkEmpty();
-
-		if (!this.txtOldPassword.getText().equals(this.user.getPassword())) {
+		if(!JKSecurityManager.matchPassword(txtOldPassword.getText(),user)){
+//		if (!this.user.matchPassword(txtOldPassword.getText())) {
 			throw new ValidationException("OLD_PASSWORD_INCORRECT", this.txtOldPassword);
 		}
 		if (!this.txtNewPassword.getText().equals(this.txtConfirmPassword.getText())) {
@@ -123,9 +123,7 @@ public class PnlResetPassword extends JKPanel<Object> {
 			facade.updateUser(user);
 			SwingUtility.showSuccessDialog("PASSWORD_CHANGED_SUCC");
 			SwingUtility.closePanel(this);
-		} catch (final ValidationException e) {
-			JKExceptionUtil.handle(e);
-		} catch (final JKDataAccessException e) {
+		} catch (Exception e) {
 			JKExceptionUtil.handle(e);
 		}
 	}
@@ -169,7 +167,7 @@ public class PnlResetPassword extends JKPanel<Object> {
 	 * @return
 	 */
 	private JKUser viewToModel() {
-		this.user.setPassword(this.txtNewPassword.getText());
+		this.user.setPassword(JKSecurityManager.encryptPassword(this.txtNewPassword.getText()));
 		return this.user;
 	}
 

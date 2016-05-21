@@ -303,7 +303,7 @@ public class UserDao extends JKAbstractPlainDataAccess {
 			public void setParamters(final PreparedStatement ps) throws SQLException {
 
 				ps.setString(1, user.getFullName());
-				ps.setString(2, GeneralUtility.encode(user.getPassword()));
+				ps.setString(2, user.getPassword());
 				ps.setInt(3, user.getStatus());
 				ps.setString(4, user.getUserId());
 			}

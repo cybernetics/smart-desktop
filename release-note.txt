@@ -23,5 +23,7 @@
 1-Make the default homepage comes from Smart-API.com domain
 2-Title on the splash 
 3-Title on the home page
+4- add development mode
+	view view panel name
 
 

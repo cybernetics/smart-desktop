@@ -150,7 +150,7 @@ public abstract class AbstractModule implements Module {
 				final ModuleMenuXmlParser p = new ModuleMenuXmlParser(this);
 				this.menu = p.parse(in);
 			} else {
-				System.err.println("No menu.xml found for module : " + getModuleName());
+				logger.debug("No menu.xml found for module : " , getModuleName());
 				this.menu = new ArrayList<Menu>();
 			}
 			return this.menu;
