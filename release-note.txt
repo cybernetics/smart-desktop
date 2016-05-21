@@ -1,9 +1,5 @@
 0.0.8
 4- finalize default theme
-5- fix Exception  handler : you can test it on change password
-6- fix change password
-7- Change default application label on login-screen
-8- add exit icon on close application
 9- activate feedback screen
 10- add screen to edit labels (from console)
 11- Check clear sysem cache screen

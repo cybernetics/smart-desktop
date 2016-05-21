@@ -39,13 +39,13 @@ import com.fs.commons.desktop.swing.comp.JKTextField;
 import com.fs.commons.desktop.swing.comp.panels.JKLabledComponent;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.security.JKSecurityManager;
 
 public class PnlFeedBack extends JKPanel<Object> {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final String SUPPORT_EMAIL = System.getProperty("mail-to", "Bug-Report@final-solutions.net");
 
 	/**
 	 *
@@ -90,12 +90,11 @@ public class PnlFeedBack extends JKPanel<Object> {
 			this.txtScreenName.checkEmpty();
 			SwingValidator.checkEmpty(this.txtDescription);
 			SwingValidator.checkEmpty(this.txtScenario);
-			final DatabaseInfo info = new DatabaseInfo();
-			info.setDatabaseHost(System.getProperty("db-host", "localhost"));
-			info.setDatabaseName(System.getProperty("db-name", "db"));
-			info.setDatabasePort(Integer.parseInt(System.getProperty("db-port", "3306")));
-			info.setDatabaseUser(CommonsConfigManager.decode(System.getProperty("db-user")));
-			info.setDatabasePassword(CommonsConfigManager.decode(System.getProperty("db-password")));
+
+			DatabaseInfo db = null;
+			if (isSendDatabaseBackup()) {
+				db = getDatabase();
+			}
 
 			final Message msg = new Message();
 			msg.setPanelName(this.txtScreenName.getText().trim());
@@ -103,18 +102,27 @@ public class PnlFeedBack extends JKPanel<Object> {
 			msg.setErrorScenario(this.txtScenario.getText().trim());
 
 			final FeedbackManager feedbackManager = new FeedbackManager();
-			feedbackManager.sendFeddback(SUPPORT_EMAIL, info, msg, isSendDatabaseBackup());
+			feedbackManager.sendFeddback(getSenderEmail(), db, msg);
 			SwingUtility.showSuccessDialog("FEED_BACK_SENT_SUCCESSFULLY");
 			SwingUtility.closePanel(this);
-		} catch (final ValidationException e) {
-			JKExceptionUtil.handle(e);
-		} catch (final IOException e) {
-			JKExceptionUtil.handle(e);
-		} catch (final CompressionException e) {
-			JKExceptionUtil.handle(e);
-		} catch (final EmailException e) {
+		} catch (final Exception e) {
 			JKExceptionUtil.handle(e);
 		}
+	}
+
+	private String getSenderEmail() {
+		//TODO : handle this in more proper way
+		return "user@smart-desktop.com";
+	}
+
+	private DatabaseInfo getDatabase() {
+		final DatabaseInfo info = new DatabaseInfo();
+		info.setDatabaseHost(System.getProperty("db-host", "localhost"));
+		info.setDatabaseName(System.getProperty("db-name", "db"));
+		info.setDatabasePort(Integer.parseInt(System.getProperty("db-port", "3306")));
+		info.setDatabaseUser(CommonsConfigManager.decode(System.getProperty("db-user")));
+		info.setDatabasePassword(CommonsConfigManager.decode(System.getProperty("db-password")));
+		return info;
 	}
 
 	/**
