@@ -22,5 +22,6 @@
 4- add development mode
 	view view panel name
 5- enable attaching databse in feedback screen
+- make versions histry windows read only
 
 

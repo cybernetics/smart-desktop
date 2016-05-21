@@ -117,7 +117,6 @@ public class PnlDbManagment extends JKPanel<Object> {
 
 	////////////////////////////////////////////////////////////////////////////////////
 	protected void handleImport() {
-
 		try {
 			this.bcFilePath.checkEmpty();
 			final ImportManager importManager = new ImportManager(this.bcFilePath.getText());

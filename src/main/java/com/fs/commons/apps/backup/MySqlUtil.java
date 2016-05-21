@@ -55,7 +55,7 @@ public class MySqlUtil {
 				String errorValue = "";
 				while (errorValue != null) {
 					errorValue = buf.readLine();
-					System.err.println(errorValue);
+					logger.debug(errorValue);
 				}
 				buf.close();
 				logger.error("MySql Export failed with the following error code : " , process.exitValue());
@@ -123,9 +123,9 @@ public class MySqlUtil {
 		buffer.append(" " + info.getDatabaseName());
 		buffer.append("<");
 		buffer.append("\"" + info.getFileName() + "\"");
-		System.err.println(buffer);
+		logger.debug(buffer);
 		execute(buffer);
-		System.err.println("Done Import sql file : " + info.getFileName());
+		logger.debug("Done Import sql file : " + info.getFileName());
 	}
 
 	/**

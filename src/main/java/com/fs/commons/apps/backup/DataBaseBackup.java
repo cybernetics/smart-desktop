@@ -23,6 +23,7 @@ import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.logging.JKLogger;
 import com.jk.logging.JKLoggerFactory;
+import com.jk.util.JKCompressionUtil;
 
 /**
  * @author ahmad
@@ -92,10 +93,8 @@ public class DataBaseBackup {
 			GeneralUtility.writeLog("After Add AutoCommit ", logFilePath);
 			if (isCompress()) {
 				GeneralUtility.writeLog("Before compress", logFilePath);
-				// CompressionUtil.compress(info.getFileName(),
-				// dbCompressedFileName);
-				// CompressionUtil.compressAndSetPassword(info.getFileName(),
-				// info.getDatabasePassword());
+				 JKCompressionUtil.compress(info.getFileName(),dbCompressedFileName,info.getDatabasePassword());
+//				 JKCompressionUtil.compressAndSetPassword(info.getFileName(),info.getDatabasePassword());
 				GeneralUtility.writeLog("after compress", logFilePath);
 				logger.info("Done Compress sql file");
 				GeneralUtility.deleteFile(getOutputPath() + ".sql");

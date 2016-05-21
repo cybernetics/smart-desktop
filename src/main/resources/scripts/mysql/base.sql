@@ -157,3 +157,11 @@ CREATE TABLE `sec_users` (
 -- Records of sec_users
 -- ----------------------------
 INSERT INTO `sec_users` VALUES ('1', 'admin', 'Administator', 'MTIzNDU2', '0');
+
+CREATE TABLE `version` (
+  `version_id` int(10) NOT NULL AUTO_INCREMENT,
+  `version_number` varchar(50) DEFAULT NULL,
+  `version_date` date DEFAULT NULL,
+  `version_note` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`version_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8;

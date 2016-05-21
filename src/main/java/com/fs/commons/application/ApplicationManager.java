@@ -120,7 +120,7 @@ public class ApplicationManager {
 				String next = scanner.next();
 				if (next.toLowerCase().startsWith("y")) {
 					JKDefaultDataAccess dao = new JKDefaultDataAccess();
-					dao.runScript("/scripts/mysql/security.sql");
+					dao.runScript("/scripts/mysql/base.sql");
 				}
 			}
 		}
