@@ -23,7 +23,7 @@
 				<property name="executor" value="com.fs.commons.apps.executors.ChangeLocaleExecutor" />
 			</properties>
 		</menu-item>
-		<menu-item name="MI_CLEAR_CACHE" icon-name="1463782101_edit-clear.png" privlige-id="10306">
+		<menu-item name="MI_RESTORE_DEFAULTS" icon-name="1463782101_edit-clear.png" privlige-id="10306">
 			<properties>
 				<property name="executor" value="com.fs.commons.apps.executors.RestoreDefaultsExecutor" />
 			</properties>

@@ -16,6 +16,7 @@
 package com.fs.commons.apps.executors;
 
 import com.fs.commons.application.config.UserPreferences;
+import com.fs.commons.desktop.swing.SwingUtility;
 import com.fs.commons.util.GeneralUtility;
 import com.jk.exceptions.handler.JKExceptionUtil;
 
@@ -26,7 +27,7 @@ public class RestoreDefaultsExecutor implements Runnable {
 		try {
 			UserPreferences.clear();
 			GeneralUtility.clearTempFiles();
-			System.exit(0);
+			SwingUtility.showSuccessDialog("DEFAULTS_RESTORED_SUCCESSFULLY,PLEASE_RESTART_THE_APPLICATION");
 		} catch (final Exception e) {
 			JKExceptionUtil.handle(e);
 		}
