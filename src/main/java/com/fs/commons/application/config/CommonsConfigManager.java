@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
 import com.fs.commons.util.CollectionUtil;
@@ -70,7 +71,7 @@ public class CommonsConfigManager {
 	// static Base64 encDec = Base64. new Base64();
 	private String fileName;
 
-	private JKLogger logger=JKLoggerFactory.getLogger(getClass());
+	private JKLogger logger = JKLoggerFactory.getLogger(getClass());
 
 	/**
 	 *
@@ -200,16 +201,16 @@ public class CommonsConfigManager {
 	 */
 	public void load(final InputStream inStream) throws IOException {
 		final BufferedInputStream in = new BufferedInputStream(inStream);
-		// try {
-		// in.mark(0);
-		// this.prop.loadFromXML(in);
-		// // Note : the keys is not fixed if in xml format
-		//
-		// } catch (final InvalidPropertiesFormatException e) {
-		// // not xml , try to load normal properties file
-		// in.reset();
-		this.prop = GeneralUtility.readPropertyStream(in);
-		// }
+		try {
+			in.mark(0);
+			this.prop.loadFromXML(in);
+			// Note : the keys is not fixed if in xml format
+
+		} catch (InvalidPropertiesFormatException e) {
+			// not xml , try to load normal properties file
+			in.reset();
+			this.prop = GeneralUtility.readPropertyStream(in);
+		}
 		CollectionUtil.fixPropertiesKeys(this.prop);
 		System.getProperties().putAll(this.prop);
 		logger.debug(System.getProperties().toString().replaceAll(",", "\n"));

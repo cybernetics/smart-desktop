@@ -64,6 +64,7 @@ public class Application {
 	private ApplicationFrame applicationFrame;
 
 	private boolean viewModules = true;
+	private String backgroundImage;
 
 	// /**
 	// * @return the mainMenu
@@ -437,6 +438,14 @@ public class Application {
 			buf.append(this.modules.get(i).toString());
 		}
 		return buf.toString();
+	}
+
+	public String getBackgroundImage() {
+		return backgroundImage==null?getHomeImage():backgroundImage;
+	}
+	
+	public void setBackgroundImage(String backgroundImage) {
+		this.backgroundImage = backgroundImage;
 	}
 
 }

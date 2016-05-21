@@ -2,7 +2,7 @@
 	<id>786</id>
 	<name>Smart-Desktop Application</name>
 	<splash-img>/resources/images/splash.jpg</splash-img>
-	<home-img>/resources/images/background.jpg</home-img>
+	<background-img>/resources/images/background4.jpg</background-img>
 	<config-file>system.config</config-file>
 	<locale>en</locale>
 	<auto-logout-interval>15</auto-logout-interval>

@@ -47,13 +47,15 @@ import com.fs.commons.util.GeneralUtility;
 import com.fs.security.facade.SecurityFacade;
 import com.jk.exceptions.JKInvalidUserException;
 import com.jk.exceptions.handler.JKExceptionUtil;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 import com.jk.security.JKUser;
 
 /**
  * @author u087
  */
 public class AuthenicationDialog extends JKDialog {
-
+	JKLogger logger=JKLoggerFactory.getLogger(getClass());
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -88,7 +90,7 @@ public class AuthenicationDialog extends JKDialog {
 
 	JKPasswordField txtPassword = new JKPasswordField(14, 15);
 
-	JKButton btnAuthenticate = new JKButton("AUTHENTICATE");
+	JKButton btnAuthenticate = new JKButton("LOGIN");
 
 	JKButton btnCancel = new JKButton("CLOSE");
 
@@ -143,15 +145,19 @@ public class AuthenicationDialog extends JKDialog {
 
 	private void handleAuthenticate() {
 		try {
+			logger.debug("handleAuth");
 			validateInput();
 			final JKUser user = viewToModel();
 			final SecurityFacade facade = new SecurityFacade();
 			try {
 				if (facade.isValidUser(user)) {
+					logger.debug("valid user");
 					if (user.isDisabled()) {
+						logger.debug("disabled");
 						SwingUtility.showUserErrorDialog("DISABLED_USER");
 					} else {
 						// facade.addUserLoginAudit();
+						logger.debug("Valid user , login");
 						this.user = user;
 						dispose();
 					}

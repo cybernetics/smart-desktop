@@ -75,9 +75,10 @@ public class JKMenu extends JKButton {
 //	@Override
 	void init() {
 		super.init();
-		setFocusable(false);
+		setLightView(true);
 		setBackground(backColor);
 		setForeground(forColor);
+		setFocusable(false);
 		setPreferredSize(dim);
 		// setBackground(bgColor);
 

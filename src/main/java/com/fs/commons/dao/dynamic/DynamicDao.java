@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.fs.commons.dao.DaoUtil;
 import com.fs.commons.dao.JKAbstractPlainDataAccess;
@@ -39,18 +38,20 @@ import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
 import com.fs.commons.dao.dynamic.trigger.Trigger;
 import com.jk.db.dataaccess.plain.JKFinder;
 import com.jk.db.dataaccess.plain.JKUpdater;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 import com.jk.security.JKAudit;
 import com.jk.security.JKAuditType;
 
 public class DynamicDao extends JKAbstractPlainDataAccess {
-	Logger logger = Logger.getLogger(getClass().getName());
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	protected final TableMeta tableMeta;
 	protected MetaSqlBuilder sqlBuilder;
 
 	// //////////////////////////////////////////////////////////////
 	public DynamicDao(final String tableMetaName) {
 		this(AbstractTableMetaFactory.getTableMeta(tableMetaName));
-		logger.info(tableMetaName);
+		logger.debug(tableMetaName);
 	}
 
 	// //////////////////////////////////////////////////////////////
@@ -79,14 +80,14 @@ public class DynamicDao extends JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////
 	protected void addDeleteAudit(final Record record) throws JKDataAccessException {
-		logger.info(record.toString());
+		logger.debug(record.toString());
 		final JKAudit audit = createAudit(record, JKAuditType.AUDIT_DELETE_RECORD);
 		addAudit(audit);
 	}
 
 	// //////////////////////////////////////////////////////////////
 	protected void addInsertAudit(final Record record) throws JKDataAccessException {
-		logger.info(record.toString());
+		logger.debug(record.toString());
 		final JKAuditType aUDIT_ADD_RECORD = JKAuditType.AUDIT_ADD_RECORD;
 		final JKAudit audit = createAudit(record, aUDIT_ADD_RECORD);
 		addAudit(audit);
@@ -94,7 +95,7 @@ public class DynamicDao extends JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////
 	protected void addUpdateAudit(final Record oldRecord, final Record newRecord) throws JKDataAccessException {
-		logger.info(oldRecord == null ? newRecord.toString() : oldRecord.toString());
+		logger.debug(oldRecord == null ? newRecord.toString() : oldRecord.toString());
 		final JKAudit audit = createAudit(newRecord, JKAuditType.AUDIT_UPDATE_RECORD);
 		audit.setOldValue(oldRecord.toString(true));
 		addAudit(audit);
@@ -208,7 +209,7 @@ public class DynamicDao extends JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////
 	public void deleteAllRecords() throws JKDataAccessException {
-		logger.info("deleteAllRecords for tablemeta : " + tableMeta);
+		logger.debug("deleteAllRecords for tablemeta : " , tableMeta);
 		final JKUpdater updater = new JKUpdater() {
 
 			@Override
@@ -224,7 +225,7 @@ public class DynamicDao extends JKAbstractPlainDataAccess {
 	}
 
 	public void deleteByFieldsValues(final HashMap<String, String> fieldNameToValue) throws JKDataAccessException {
-		logger.info(fieldNameToValue.toString());
+		logger.debug(fieldNameToValue.toString());
 		try {
 			final Record filterRecord = this.tableMeta.createEmptyRecord();
 			final Set<String> keySet = fieldNameToValue.keySet();
@@ -242,7 +243,7 @@ public class DynamicDao extends JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////
 	public void deleteByFieldValue(final String fieldName, final Object value) throws JKRecordNotFoundException, JKDataAccessException {
-		logger.info(fieldName + " = " + value);
+		logger.debug(fieldName , " = " , value);
 		final Record record = createEmptyRecord(false);
 		record.setFieldValue(fieldName, value);
 		deleteRecord(record.getField(fieldName), false);
@@ -250,13 +251,13 @@ public class DynamicDao extends JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////
 	public void deleteRecord(final Field field) throws JKRecordNotFoundException, JKDataAccessException {
-		logger.info(field.toString());
+		logger.debug(field.toString());
 		deleteRecord(field, true);
 	}
 
 	// //////////////////////////////////////////////////////////////
 	public void deleteRecord(final Field field, final boolean addAudit) throws JKRecordNotFoundException, JKDataAccessException {
-		logger.info(field + " , add audit : " + addAudit);
+		logger.debug(field , " , add audit : " , addAudit);
 		final JKUpdater updater = new JKUpdater() {
 
 			@Override
@@ -415,7 +416,7 @@ public class DynamicDao extends JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////
 	public Record getFirstRecordInTable() throws JKRecordNotFoundException, JKDataAccessException {
-		logger.info("First record");
+		logger.debug("First record");
 		final ArrayList<Record> r = lstRecords();
 		if (r.size() > 0) {
 			return r.get(0);
@@ -498,13 +499,13 @@ public class DynamicDao extends JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////
 	public ArrayList<Record> lstRecords() throws JKRecordNotFoundException, JKDataAccessException {
-		logger.info("lstRecords : " + tableMeta.getTableName());
+		logger.debug("lstRecords : " , tableMeta.getTableName());
 		return lstRecords(createEmptyRecord(false));
 	}
 
 	// //////////////////////////////////////////////////////////////
 	public ArrayList<Record> lstRecords(final Record filter) throws JKDataAccessException {
-		logger.info(filter.toString());
+		logger.debug(filter);
 		final JKFinder finder = new JKFinder() {
 			@Override
 			public String getQuery() {

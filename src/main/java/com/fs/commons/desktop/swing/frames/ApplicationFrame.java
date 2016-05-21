@@ -30,6 +30,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -145,7 +146,7 @@ public class ApplicationFrame extends JKFrame {
 			getHomePanel().add(pnlFavorit, BorderLayout.SOUTH);
 			pnlFavorit.requestFocusInWindow();
 		}
-		getHomePanel().invalidate();
+		getHomePanel().revalidate();
 		getHomePanel().repaint();
 	}
 
@@ -193,8 +194,8 @@ public class ApplicationFrame extends JKFrame {
 		if (minSize > 0) {
 			final JKPanel<?> pnl = new JKMainPanel(new FlowLayout(FlowLayout.CENTER));
 			pnl.setBackground(Colors.FAVORITE_BG);
-//			pnl.setBorder(SwingUtility.createTitledBorder("Favorties_pages"));
-//			pnl.setPreferredSize(new Dimension(600, 180));
+			// pnl.setBorder(SwingUtility.createTitledBorder("Favorties_pages"));
+			// pnl.setPreferredSize(new Dimension(600, 180));
 			int count = 0;
 			for (int i = 0; i < minSize; i++) {
 				final String menuItemName = (String) list.get(i).getKey();
@@ -255,20 +256,18 @@ public class ApplicationFrame extends JKFrame {
 	 *
 	 */
 	private void buildHomePanel() {
-		final JKPanel mainPanel = SwingUtility.buildImagePanel(GeneralUtility.getURL(this.application.getHomeImage()), ImagePanel.SCALED);
+		final JKPanel mainPanel = SwingUtility.buildImagePanel(GeneralUtility.getURL(application.getBackgroundImage()), ImagePanel.SCALED);
 		// TODO : Fix the following to be non-hard coded value
-		// if (GeneralUtility.getURL("/resources/images/home.png") != null) {
-		// final ImagePanel pnlImage =
-		// SwingUtility.buildImagePanel(GeneralUtility.getURL("/resources/images/home.png"),
-		// ImagePanel.ACTUAL);
-		// pnlImage.setBorder(BorderFactory.createLineBorder(Colors.MENU_PANEL_BG,
-		// 5));
-		// pnlImage.setSizeToFitImage();
-		// mainPanel.add(pnlImage);
-		// }
-		// mainPanel.setOpaque(true);
+		URL homeUrl = GeneralUtility.getURL(application.getHomeImage());
+		if (homeUrl != null) {
+			final ImagePanel pnlImage = SwingUtility.buildImagePanel(homeUrl, ImagePanel.ACTUAL);
+			// pnlImage.setBorder(BorderFactory.createLineBorder(Colors.MENU_PANEL_BG,5));
+			pnlImage.setSizeToFitImage();
+			mainPanel.add(pnlImage, BorderLayout.CENTER);
+		}
+//		mainPanel.setOpaque(true);
 		// mainPanel.setGradientType(GradientType.DIAGNOLE);
-		// mainPanel.setBackground(SwingUtility.getDefaultBackgroundColor());
+		mainPanel.setBackground(SwingUtility.getDefaultBackgroundColor());
 		setHomePanel(mainPanel);
 
 		addFavoritePanelToHome();

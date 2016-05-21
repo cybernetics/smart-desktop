@@ -114,7 +114,7 @@ public class TableMetaFactory {
 	private void loadDynamicMeta(final JKDataSource connectionManager)
 			throws JKDataAccessException, SQLException, FileNotFoundException, IOException, JKXmlException {
 		logger.debug("loadDynamicMeta");
-		if (System.getProperty(CollectionUtil.fixPropertyKey("tablemeta.dynamic.generate"), "true").equals("true")) {
+		if (System.getProperty(CollectionUtil.fixPropertyKey("tablemeta.dynamic.generate"), "true").equals("false")) {
 			final File file = new File("meta-" + connectionManager.getDatabaseName() + ".xml");
 			try {
 				if (file.exists()) {

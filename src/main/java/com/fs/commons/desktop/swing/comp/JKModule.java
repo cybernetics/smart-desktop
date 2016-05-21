@@ -50,6 +50,7 @@ public class JKModule extends JKButton {
 	@Override
 	void init() {
 		super.init();
+		setLightView(true);
 		setFocusable(false);
 		setHorizontalAlignment(CENTER);
 		setBackground(backColor);

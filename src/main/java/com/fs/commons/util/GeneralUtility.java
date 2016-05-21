@@ -711,11 +711,11 @@ public class GeneralUtility {
 	 * @return InputStream
 	 */
 	public static URL getURL(final String fileName) {
-		final URL resourceUrl = JKResourceLoaderFactory.getResourceLoader().getResourceUrl(fileName);
-		if (resourceUrl == null) {
-			System.err.println("Unable to load resource : " + fileName);
-		}
-		return resourceUrl;
+		return JKResourceLoaderFactory.getResourceLoader().getResourceUrl(fileName);
+//		if (resourceUrl == null) {
+//			System.err.println("Unable to load resource : " + fileName);
+//		}
+//		return resourceUrl;
 	}
 
 	// ////////////////////////////////////////////////////////////////////

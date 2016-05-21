@@ -65,7 +65,7 @@ public class JKPoolingDataSource extends JKDefaultDataSource {
 
 	// ////////////////////////////////////////////////////////////////////////////
 	private int getInitialPoolSize() {
-		return Integer.parseInt(getProperty("db-initial-size", "10"));
+		return Integer.parseInt(getProperty("db-initial-size", "2"));
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////
@@ -87,6 +87,7 @@ public class JKPoolingDataSource extends JKDefaultDataSource {
 
 	// ////////////////////////////////////////////////////////////////////////////
 	private void init() {
+
 		this.datasource = new BasicDataSource();
 		this.datasource.setDriverClassName(super.getDriverName());
 		this.datasource.setUrl(getDatabaseUrl());
@@ -97,6 +98,7 @@ public class JKPoolingDataSource extends JKDefaultDataSource {
 		// "5")));
 		// datasource.setPoolPreparedStatements(Boolean.parseBoolean(getProperty("db-cache-ps","true")));
 		this.datasource.setMaxActive(getMaxPoolSize());
+		logger.info("Init database connection-pool(", getInitialPoolSize(), "-", getMaxPoolSize(), ")...");
 
 		logger.debug(this.datasource.toString());
 		// datasource.setMaxWait(1000);

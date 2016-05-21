@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
+import com.fs.commons.application.config.ConfigManagerFactory;
 import com.fs.commons.application.config.DefaultConfigManager;
 import com.fs.commons.application.listener.ApplicationListener;
 import com.fs.commons.application.xml.ApplicationXmlParser;
@@ -93,14 +94,17 @@ public class ApplicationManager {
 	 */
 	public static ApplicationManager getInstance() {
 		if (instance == null) {
+			System.out.println(IOUtil.readFile("/resources/banner.txt"));
+			logger.info("Starting Smart-Desktop framework....");
 			logger.debug("set default exception handler");
 			JKExceptionHandlerFactory.getInstance().setDefaultExceptionHandler(new JKDesktopExceptionHandler());
 			try {
-				logger.debug("set default datasource");
+				logger.info("Set data-sources...");
 				JKDataSourceFactory.setDefaultDataSource(new JKPoolingDataSource());
-				checkScriptsInstalled();
-				logger.debug("set default instance");
+				logger.debug("Check if default database script installed...");
 				instance = new ApplicationManager();
+				logger.info("Initialize Application-Manager...");
+				instance.init();
 			} catch (final Exception e) {
 				JKExceptionUtil.handle(e);
 			}
@@ -167,7 +171,6 @@ public class ApplicationManager {
 
 	// ////////////////////////////////////////////////////////////////////////////////////
 	private Application createDefaultApplication() {
-		logger.debug("create default application");
 		final Application a = new Application();
 		return a;
 	}
@@ -262,7 +265,7 @@ public class ApplicationManager {
 	 */
 	public Application init() throws FileNotFoundException, ApplicationException {
 		for (String fileName : DEFAULT_SYSTEM_FILES) {
-			logger.debug("trying to init application with file :" + fileName);
+			logger.debug("trying to init application with file :", fileName);
 			InputStream fileInputStream = GeneralUtility.getFileInputStream(fileName);
 			if (fileInputStream != null) {
 				return init(fileInputStream);
@@ -278,23 +281,21 @@ public class ApplicationManager {
 	 * @throws JKXmlException
 	 */
 	public Application init(final InputStream in) throws ApplicationException {
-		System.out.println(IOUtil.readFile("/resources/banner.txt"));
-		logger.debug("init with inputstream");
 		Splash splash = null;
 		try {
-			logger.debug("initConfig");
+			logger.info("Init configurations...");
 			initConfig();
-			logger.debug("init labels");
+			logger.info("Init common labels...");
 			Lables.getDefaultInstance();// to foce init
 			// loadDefaultLables();
-			logger.debug("loadDefaultMeta()");
+			logger.info("Load default Metadata...");
 			loadDefaultMeta();
 			if (in != null) {
-				logger.debug("parse application");
+				logger.info("Parse application....");
 				final ApplicationXmlParser parser = new ApplicationXmlParser();
 				this.application = parser.parseApplication(in);
 			} else {
-				logger.debug("create default application");
+				logger.debug("Create default application...");
 				this.application = createDefaultApplication();
 			}
 			if (this.application.getSplashImage() != null) {
@@ -302,26 +303,28 @@ public class ApplicationManager {
 				splash = new Splash(this.application.getSplashImage());
 				splash.setVisible(true);
 			}
-			logger.debug("validate license");
+			logger.debug("Validate license...");
 			LicenseClientFactory.getClient().validateLicense();
 			fireBeforeApplicationInit();
 			if (this.application.getLocale() != null) {
-				logger.debug("set locale to : " + application.getLocale());
+				logger.info("Set locale to : ", application.getLocale());
 				SwingUtility.setDefaultLocale(this.application.getLocale());
 			} else {
-				logger.debug("null locale");
+				logger.info("NO default-locale has been specified");
 			}
 			// ExceptionUtil.initExceptionLogging();
-			logger.debug("application.init");
+			logger.debug("Init application instance...");
 			this.application.init();
 			// WE DELAY THE CHECK UNTIL NOW TO BE SURE THAT WE HAVE LOADED THE
 			// LABLES
 			if (firstRun && isAllowSingleInstanceOnly()) {
-				logger.debug("single instance only");
+				logger.debug("Set single instance only...");
 				// to avoid any issues with swicthLocale or restart
 				InstanceManager.registerInstance(this.application.getApplicationId());
 				firstRun = false;
 			}
+			logger.debug("Check database base script executed...");
+			checkScriptsInstalled();
 			fireAfterApplicationInit();
 
 			// new
@@ -338,7 +341,7 @@ public class ApplicationManager {
 			throw new ApplicationException(e);
 		} finally {
 			if (splash != null) {
-//				GeneralUtility.sleep(2);
+				// GeneralUtility.sleep(2);
 				splash.dispose();
 			}
 		}
@@ -346,10 +349,11 @@ public class ApplicationManager {
 
 	// ////////////////////////////////////////////////////////////////////////////////////
 	private void initConfig() throws FileNotFoundException, IOException {
-		final DefaultConfigManager manager = new DefaultConfigManager();
+		final DefaultConfigManager manager = ConfigManagerFactory.getDefaultConfigManager();
 		// Properties prop = new Properties();
 		// prop.loadFromXML(new FileInputStream("system.config"));
 		System.getProperties().putAll(manager.getProperties());
+		logger.info(manager.getProperties());
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////
@@ -428,7 +432,7 @@ public class ApplicationManager {
 			}
 			if (this.application.getSplashImage() != null) {
 				splash = new Splash(this.application.getSplashImage());
-				splash.setHeader(Lables.get(application.getApplicationName(),true));
+				splash.setHeader(Lables.get(application.getApplicationName(), true));
 				splash.setVisible(true);
 			}
 			this.applicationFrame = new ApplicationFrame(this.application);

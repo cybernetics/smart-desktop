@@ -25,6 +25,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
 
 import com.fs.commons.application.exceptions.ValidationException;
 import com.fs.commons.bean.binding.BindingComponent;
@@ -64,6 +66,7 @@ public class JKButton extends JButton implements BindingComponent {
 	private final FSAbstractComponent fsWrapper = new FSAbstractComponent(this);
 	private boolean authorized = true;
 	private boolean transfer;
+	private boolean lightView;
 
 	public JKButton() {
 		this("");
@@ -98,14 +101,12 @@ public class JKButton extends JButton implements BindingComponent {
 	 */
 	public JKButton(final String caption, final boolean leadingAligned, final String shortcut) {
 		super(caption);
-		setContentAreaFilled(false);
-		// setOpaque(true);
-		setShortcut(shortcut, shortcut);
-		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
-		init();
 		if (leadingAligned) {
 			setHorizontalTextPosition(LEADING);
 		}
+
+		setShortcut(shortcut, shortcut);
+		init();
 	}
 
 	public JKButton(final String caption, final JKPrivilige privlige) {
@@ -242,10 +243,12 @@ public class JKButton extends JButton implements BindingComponent {
 	 *
 	 */
 	void init() {
+		// setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
+
 		// setFont(font);
 		setBackground(BACKGROUND_COLOR);
 		setForeground(FORGROUND_COLOR);
-		setBorder(SwingUtility.getDefaultEmptyBorder());
+		// setBorder(SwingUtility.getDefaultEmptyBorder());
 		setSelected(false);// to set the right shape
 		addKeyListener(new KeyAdapter() {
 			@Override
@@ -254,24 +257,6 @@ public class JKButton extends JButton implements BindingComponent {
 					// transferFocus();
 					doClick();
 				}
-			}
-		});
-		addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				setOpaque(false);
-				// Color background=getBackground();
-				// setBackground(getForeground());
-				// setForeground(background);
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				setOpaque(true);
-				// Color background=getBackground();
-				// setBackground(getForeground());
-				// setForeground(background);
 			}
 		});
 	}
@@ -438,8 +423,6 @@ public class JKButton extends JButton implements BindingComponent {
 
 	@Override
 	public void setValue(final Object value) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -481,6 +464,42 @@ public class JKButton extends JButton implements BindingComponent {
 
 	public void setShortcutText(String shortcut) {
 		setShortcut(shortcut, null);
+	}
+
+	public boolean isLightView() {
+		return lightView;
+	}
+
+	public void setLightView(boolean lightView) {
+		this.lightView = lightView;
+		setContentAreaFilled(!lightView);
+		setOpaque(!lightView);
+		if (lightView) {
+			addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(MouseEvent e) {
+					setOpaque(false);
+					//setContentAreaFilled(false);
+					// Color background=getBackground();
+					// setBackground(getForeground());
+					// setForeground(background);
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					setOpaque(true);
+					//setContentAreaFilled(true);
+					// Color background=getBackground();
+					// setBackground(getForeground());
+					// setForeground(background);
+				}
+			});
+		}
+	}
+	
+	@Override
+	public void setBackground(Color bg) {
+		super.setBackground(bg);		
 	}
 
 }

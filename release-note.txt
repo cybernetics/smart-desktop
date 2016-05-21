@@ -1,5 +1,5 @@
 0.0.8
-20- add banner on startup	
+add in browser view support
 0.0.9
 4-  finalize default theme
 1-Make the default homepage comes from Smart-API.com domain
@@ -14,4 +14,5 @@
 12- fix advanced roles management
 make import the database script from zip files that encrypted in db password
 add handling for donations and licensing
+- disable logging in production environment
 

@@ -27,7 +27,8 @@ import com.jk.logging.JKLogger;
 import com.jk.logging.JKLoggerFactory;
 
 public class DefaultConfigManager extends CommonsConfigManager {
-	JKLogger logger=JKLoggerFactory.getLogger(getClass());
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
+	private static DefaultConfigManager instance;
 	private static final String FILE_NAME = System.getProperty("db.config", "config.properties");
 	public static final String CONFIG_FILE_NAMES[] = { FILE_NAME, "system.config", "system.config.xml" };
 
@@ -41,6 +42,7 @@ public class DefaultConfigManager extends CommonsConfigManager {
 	 * @throws IOException
 	 */
 	public DefaultConfigManager() {
+		logger.info("Init ConfigManager...");
 		try {
 			// try to find within the classes
 			for (final String name : CONFIG_FILE_NAMES) {
@@ -90,7 +92,8 @@ public class DefaultConfigManager extends CommonsConfigManager {
 	// }
 	// }
 
-	public DefaultConfigManager(final InputStream configStream) throws IOException {
+	private DefaultConfigManager(final InputStream configStream) throws IOException {
 		load(configStream);
 	}
+
 }

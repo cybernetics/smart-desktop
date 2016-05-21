@@ -48,6 +48,7 @@ class JKTitleButton extends JKButton {
 		setOpaque(false);
 		setBorder(null);
 		setPreferredSize(new Dimension(24, 24));
+		setLightView(true);
 	}
 
 }

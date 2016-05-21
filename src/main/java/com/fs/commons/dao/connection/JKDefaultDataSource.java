@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import com.fs.commons.application.config.CommonsConfigManager;
+import com.fs.commons.application.config.ConfigManagerFactory;
 import com.fs.commons.application.config.DefaultConfigManager;
 import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.dynamic.meta.generator.DataBaseAnaylser;
@@ -60,12 +61,12 @@ public abstract class JKDefaultDataSource extends JKAbstractDataSource {
 	 *
 	 */
 	public JKDefaultDataSource() {
-		this.config = new DefaultConfigManager();
+		this.config = ConfigManagerFactory.getDefaultConfigManager();
 		init();
 	}
 
 	public JKDefaultDataSource(final String configFileName) throws IOException {
-		this.config = new DefaultConfigManager(GeneralUtility.getFileInputStream(configFileName));
+		this.config =  ConfigManagerFactory.DefaultConfigManager(GeneralUtility.getFileInputStream(configFileName));
 		init();
 	}
 

@@ -71,6 +71,8 @@ public class ApplicationXmlParser {
 					application.setViewModules(Boolean.parseBoolean(text));
 				} else if (node.getNodeName().equals("home-img")) {
 					application.setHomeImage(text);
+				} else if (node.getNodeName().equals("background-img")) {
+					application.setBackgroundImage(text);					
 				} else if (node.getNodeName().equals("locale")) {
 					application.setLocale(text, true);
 				} else if (node.getNodeName().equals("auto-logout-interval")) {

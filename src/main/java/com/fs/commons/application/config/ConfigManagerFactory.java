@@ -15,6 +15,8 @@
  */
 package com.fs.commons.application.config;
 
+import java.io.InputStream;
+
 public class ConfigManagerFactory {
 	private static DefaultConfigManager defaultConfigManager;
 
@@ -24,5 +26,10 @@ public class ConfigManagerFactory {
 			defaultConfigManager = new DefaultConfigManager();
 		}
 		return defaultConfigManager;
+	}
+
+	public static DefaultConfigManager DefaultConfigManager(InputStream fileInputStream) {
+		// TODO : insure who calls this method
+		throw new IllegalStateException("Check me");
 	}
 }
