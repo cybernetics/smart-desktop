@@ -28,8 +28,11 @@ import com.fs.commons.configuration.beans.Lable;
 import com.fs.commons.util.CollectionUtil;
 import com.fs.commons.util.FormatUtil;
 import com.fs.commons.util.GeneralUtility;
+import com.jk.logging.JKLogger;
+import com.jk.logging.JKLoggerFactory;
 
 public class Lables {
+	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	public static final String LABLES_FILE_NAME = "/lables.properties";
 
 	private static Lables instance;
@@ -75,7 +78,7 @@ public class Lables {
 
 	// // /////////////////////////////////////////////////////////////////////
 	private Lables(final InputStream in) {
-		if (in!= null) {
+		if (in != null) {
 			addLables(GeneralUtility.readPropertyStream(in));
 		}
 	}
@@ -83,6 +86,7 @@ public class Lables {
 	// /////////////////////////////////////////////////////////////////////
 	private Lables(final String lablesFileName) throws FileNotFoundException {
 		this(GeneralUtility.getFileInputStream(lablesFileName));
+		logger.debug("load labels for file : ", lablesFileName);
 	}
 
 	// // /////////////////////////////////////////////////////////////////////
@@ -116,10 +120,11 @@ public class Lables {
 
 	// /////////////////////////////////////////////////////////////////////
 	public String fixValue(String value) {
+		logger.debug("Fix label value : ", value);
 		if (value != null && !value.equals("")) {
-			value=value.toUpperCase().replace("MI", "");
-			value=value.toUpperCase().replace("MEN", "");
-			value=value.toUpperCase().replace("MOD", "");
+			value = value.toUpperCase().replace("MI", "");
+			value = value.toUpperCase().replace("MEN", "");
+			value = value.toUpperCase().replace("MOD", "");
 			final String[] words = value.toLowerCase().split("_");
 			value = "";
 			for (final String word : words) {
@@ -199,6 +204,7 @@ public class Lables {
 
 	// /////////////////////////////////////////////////////////////////////
 	protected void setProperty(final String propName, final String value) {
+		logger.debug("Add label :", propName, " , with value: ", value);
 		this.prop.setProperty(CollectionUtil.fixPropertyKey(propName), value);
 	}
 

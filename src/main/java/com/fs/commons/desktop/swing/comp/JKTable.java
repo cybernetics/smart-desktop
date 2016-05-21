@@ -559,8 +559,6 @@ public class JKTable extends JTable {
 					int textWidth = SwingUtility.getTextWidth(model.getColumnName(i), true)+10;
 					column.setMinWidth(textWidth);
 					column.setPreferredWidth(textWidth);
-					logger.debug("Column :", i, " Name : ", model.getColumnName(i), " Min width:", textWidth, " width : ", column.getWidth());
-					logger.debug("Column reference:", column.toString());
 				}
 			}
 		});

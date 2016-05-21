@@ -33,6 +33,13 @@ sec_privileges
 LEFT JOIN sec_privileges as p1 ON sec_privileges.parent_privilege = p1.privilege_id
 ORDER BY p1.priv_num
 </report-sql>
+<short-sql>
+SELECT
+sec_privileges.privilege_id,
+sec_privileges.privilege_desc
+FROM
+sec_privileges
+</short-sql>
 </table>
 <!-- ///////////////////////////////////////////////////////////////////////////// -->
 <!-- Table Meta for : -sec_role_privileges-with id : -sec_role_privileges- -->

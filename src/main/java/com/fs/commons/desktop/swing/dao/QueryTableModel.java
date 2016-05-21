@@ -720,6 +720,7 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 
 	// ///////////////////////////////////////////////////////////////////////
 	protected void setTablesColumnFromMetaData(final ResultSetMetaData rsMetaData) throws SQLException, ClassNotFoundException {
+		logger.debug("setTablesColumnFromMetaData");
 		for (int i = 0; i < rsMetaData.getColumnCount(); i++) {
 			final int sqlIndex = i + 1;
 			FSTableColumn col;
@@ -730,12 +731,13 @@ public class QueryTableModel extends FSTableModel implements DataPager {
 				col = getTableColumn(i, false);
 			}
 			col.setName(rsMetaData.getColumnName(sqlIndex));
-			col.setHumanName(Lables.get(col.getName()));
+			col.setHumanName(Lables.get(rsMetaData.getColumnLabel(sqlIndex)));
 			col.setColumnClassName(rsMetaData.getColumnClassName(sqlIndex));
 			// col.setRequired(rsMetaData.isNullable(sqlIndex) ==
 			// rsMetaData.columnNullable);
 			col.setColumnType(rsMetaData.getColumnType(sqlIndex));
 			col.setColumnTypeName(rsMetaData.getColumnTypeName(sqlIndex));
+			logger.debug("DB-Column: ",col);
 		}
 		setShowIdColunm(this.showIdColunm);
 	}

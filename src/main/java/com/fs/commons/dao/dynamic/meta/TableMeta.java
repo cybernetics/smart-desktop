@@ -37,9 +37,6 @@ import com.jk.security.JKPrivilige;
 import com.jk.security.JKSecurityManager;
 
 public class TableMeta implements Serializable, QueryComponent {
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 2829460516590650258L;
 
 	public static final int PAGE_ROW_COUNT = 25;

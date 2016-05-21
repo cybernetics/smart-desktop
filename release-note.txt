@@ -18,5 +18,6 @@
 	view view panel name
 5- enable attaching databse in feedback screen
 - make versions histry windows read only
-10- add screen to edit labels (from console)
+10- Add screen to edit labels (from console)
+11- Fix order by in users management screen
 
