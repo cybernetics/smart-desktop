@@ -135,7 +135,7 @@ public class GeneralUtility {
 		}
 	}
 
-	private static final String USER_LOCAL_PATH = System.getProperty("user.home") + System.getProperty("file.separator") + "final-solutions";
+	private static final String USER_LOCAL_PATH = System.getProperty("user.home") + System.getProperty("file.separator") + ".jk";
 	private static Hashtable<String, ImageIcon> icons = new Hashtable<String, ImageIcon>();
 
 	public static Locale Locale = new Locale("EN", "US");

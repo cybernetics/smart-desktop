@@ -67,6 +67,7 @@ import com.fs.commons.desktop.swing.comp.JKTitle;
 import com.fs.commons.desktop.swing.comp.panels.ImagePanel;
 import com.fs.commons.desktop.swing.comp.panels.JKMainPanel;
 import com.fs.commons.desktop.swing.comp.panels.JKPanel;
+import com.fs.commons.desktop.swing.comp.panels.PnlImport;
 import com.fs.commons.desktop.swing.comp.panels.TitledPanel;
 import com.fs.commons.desktop.swing.dialogs.JKDialog;
 import com.fs.commons.util.GeneralUtility;
@@ -75,7 +76,13 @@ import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.license.client.LicenseClientFactory;
 import com.jk.security.JKPrivilige;
 import com.jk.security.JKSecurityManager;
+import com.jk.util.IOUtil;
 
+/**
+ * Please Please Re-factor me , I am now 12 years old and i need a refreshment
+ * 
+ * @author Jalal Kiswani May 22, 2016
+ */
 public class ApplicationFrame extends JKFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -205,8 +212,10 @@ public class ApplicationFrame extends JKFrame {
 
 						final JKPanel<?> pnlThumb = new JKPanel(new BorderLayout());
 						pnlThumb.setPreferredSize(new Dimension(150, 130));
-						final byte[] file = GeneralUtility.readFile(new File(getPanelFileName(menuItem.getName())));
-						final JPanel pnlItem = SwingUtility.buildImagePanel(file, ImagePanel.SCALED);
+						String panelFileName = getPanelFileName(menuItem.getName());
+						// final byte[] file =
+						// GeneralUtility.readFile(panelFileName);
+						final JPanel pnlItem = SwingUtility.buildImagePanel(IOUtil.getInputStream(panelFileName), ImagePanel.SCALED);
 						final JKMenuItem btnItem = createJKMenuItem(menuItem, true);
 
 						if (btnItem != null && pnlItem != null) {
@@ -241,8 +250,8 @@ public class ApplicationFrame extends JKFrame {
 							pnlThumb.addMouseListener(adapter);
 						}
 					}
-				} catch (final IOException e) {
-					e.printStackTrace();
+					// } catch (final IOException e) {
+					// e.printStackTrace();
 				} catch (final SecurityException e) {
 					// Its safe to eat this exception
 				}
@@ -265,7 +274,7 @@ public class ApplicationFrame extends JKFrame {
 			pnlImage.setSizeToFitImage();
 			mainPanel.add(pnlImage, BorderLayout.CENTER);
 		}
-//		mainPanel.setOpaque(true);
+		// mainPanel.setOpaque(true);
 		// mainPanel.setGradientType(GradientType.DIAGNOLE);
 		mainPanel.setBackground(SwingUtility.getDefaultBackgroundColor());
 		setHomePanel(mainPanel);
@@ -586,8 +595,8 @@ public class ApplicationFrame extends JKFrame {
 					} else {
 						final MenuItemTitledPanel panel = new MenuItemTitledPanel(item);
 						if (addToHistory) {
-							ApplicationFrame.this.history.add(item);
-							ApplicationFrame.this.currentHistoryIndex = ApplicationFrame.this.history.size() - 1;
+							history.add(item);
+							currentHistoryIndex = history.size() - 1;
 						}
 						if (refreshModuleAndMenu) {
 							// this block will be called from history navigation
@@ -595,8 +604,8 @@ public class ApplicationFrame extends JKFrame {
 							showMenuItems(item.getParentMenu());
 						}
 						handleShowPanel(panel);
-						// captureCurrentPanelImage(panel, item.getName());
-						// addOpenPanelLog(item);
+						captureCurrentPanelImage(panel, item.getName());
+						addOpenPanelLog(item);
 						setUserStatus(item.getFullQualifiedPath());
 					}
 				} catch (final UIOPanelCreationException e) {

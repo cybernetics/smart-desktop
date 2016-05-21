@@ -98,6 +98,7 @@ import com.fs.commons.util.GeneralUtility;
 import com.fs.commons.util.ImageUtil;
 import com.fs.commons.util.ReflicationUtil;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
+import com.jk.exceptions.JKException;
 import com.jk.exceptions.JKNotAllowedOperationException;
 import com.jk.exceptions.handler.JKExceptionUtil;
 import com.jk.security.JKUser;
@@ -249,12 +250,15 @@ public class SwingUtility {
 	}
 
 	public static JPanel buildImagePanel(final InputStream in, final int scaled) {
+		if (in == null) {
+			return new JKPanel();
+		}
 		BufferedImage image = null;
 		try {
 			image = javax.imageio.ImageIO.read(in);
 			return new ImagePanel(image, scaled);
 		} catch (final IOException ex) {
-			return new JPanel();
+			throw new JKException(ex);
 		}
 	}
 
@@ -582,14 +586,14 @@ public class SwingUtility {
 	 * @return
 	 */
 	public static int getTextWidth(final String text, final Font font) {
-//		final JLabel lbl = new JLabel(text);
-//		lbl.setBorder(g);
-//		lbl.setFont(font);
-//		return (int) lbl.getPreferredSize().getWidth();
-		AffineTransform affinetransform = new AffineTransform();     
-		FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
-		int textwidth = (int)(font.getStringBounds(text, frc).getWidth());
-		int textheight = (int)(font.getStringBounds(text, frc).getHeight());
+		// final JLabel lbl = new JLabel(text);
+		// lbl.setBorder(g);
+		// lbl.setFont(font);
+		// return (int) lbl.getPreferredSize().getWidth();
+		AffineTransform affinetransform = new AffineTransform();
+		FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
+		int textwidth = (int) (font.getStringBounds(text, frc).getWidth());
+		int textheight = (int) (font.getStringBounds(text, frc).getHeight());
 		return textwidth;
 	}
 
