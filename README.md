@@ -3,9 +3,9 @@ My baby framework ,I built it in 2005, and it has been used to build more than 4
  
 ![JK-Smart-Desktop](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")  
 ## Prerequisites:
-  1-Install `MySql` (e.g. `root` as username , `123456` as password)
-  2-On mysql , create database name (e.g. `jk-smart-desktop-db`)
-  3-**Optional**: for Feedback and Support functionality (`SMTP` mail server settings)
+  1-Install `MySql` (e.g. `root` as username , `123456` as password)  
+  2-On mysql , create database name (e.g. `jk-smart-desktop-db`)  
+  3-**Optional**: for Feedback and Support functionality (`SMTP` mail server settings)  
 
 ## Usage:
 1-	Create Maven project
