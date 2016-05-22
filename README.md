@@ -111,10 +111,11 @@ To enter new record , click on `Add`  on the top left on the windows , enter the
 4- To edit any record , double record on the record in the Data table : 
  ![Edit mode](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/6.PNG "JK-Smart-Desktop")
  
- ## Example 2 : Advanced CRUD with Master Details (One-To-One,One-Many,Many-To-Many)    
- ## Exmaple 3 : Database UI Components   
- ## Example 4 : Build Simple UI   
- ## Example 5 : Build Advanced UI   
- ## Example 6 : Reports    
+## Example 2 : Advanced CRUD with Master Details (One-To-One,One-Many,Many-To-Many)    
+## Exmaple 3 : Database UI Components   
+## Example 4 : Build Simple UI   
+## Example 5 : Build Advanced UI   
+## Example 6 : Reports    
+And many others...
  
-<http://http://wwww.JalalKiswani.com>
+<http://wwww.JalalKiswani.com>
