@@ -1,6 +1,8 @@
 # JK-Smart-Desktop
 My baby framework ,I built it in 2005, and it has been used to build more than 40 applications for different sectors(Education,Banking and Government) .
- 
+
+**JK-Smart-Desktop is free for Personal use only, for quotation , kindly contact me at Kiswanij@GMail.com **
+  
 ![JK-Smart-Desktop](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")  
 ## Prerequisites:
   1-Install MySql database (e.g. `root` as username , `123456` as password)  
@@ -102,8 +104,17 @@ Coming soon ...
 		</menu>
 	</main-menu>
  
- 3- Run your application , and you will have this magic:
+3- Run your application , login , on the top of the windows, click on the `Application` module , click on `Hr` menu , then `Employees` menu-item,
+To enter new record , click on `Add`  on the top left on the windows , enter the information , then click add:
  ![Example CRUD Views](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/5.PNG "JK-Smart-Desktop")
+
+4- To edit any record , double record on the record in the Data table : 
  ![Edit mode](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/6.PNG "JK-Smart-Desktop")
  
+ ## Example 2 : Advanced CRUD with Master Details (One-To-One,One-Many,Many-To-Many)    
+ ## Exmaple 3 : Database UI Components   
+ ## Example 4 : Build Simple UI   
+ ## Example 5 : Build Advanced UI   
+ ## Example 6 : Reports    
  
+<http://http://wwww.JalalKiswani.com>
