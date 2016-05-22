@@ -83,7 +83,7 @@ There is a very long long of features which you can't expect, be patient until i
 Coming soon ...
 
 ## Example 1 : Simple Add new CRUD page
-1- create table in the database , for example
+1- In the database, create sample table , for example:
 
 	CREATE TABLE `employees` (
 	  `id` int(11) NOT NULL AUTO_INCREMENT,
