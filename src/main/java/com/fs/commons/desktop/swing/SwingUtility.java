@@ -952,7 +952,7 @@ public class SwingUtility {
 
 		final String no = Lables.get("No");
 		final String yes = Lables.get("Yes");
-		final int selection = JOptionPane.showOptionDialog(window, Lables.get(message, true), Lables.get("WARNING"), JOptionPane.YES_NO_OPTION,
+		final int selection = JOptionPane.showOptionDialog(window, Lables.get(message), Lables.get("WARNING"), JOptionPane.YES_NO_OPTION,
 				JOptionPane.QUESTION_MESSAGE, null, new String[] { yes, no }, no);
 		return selection == JOptionPane.YES_OPTION;
 	}

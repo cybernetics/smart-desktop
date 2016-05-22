@@ -1,18 +1,25 @@
-0.0.8
-add in browser view support
-0.0.9
-4-  finalize default theme
-1-Make the default homepage comes from Smart-API.com domain
-2-Title on the splash 
-3-Title on the home page
-4- add development mode
-	view view panel name
-5- enable attaching databse in feedback screen
-- make versions histry windows read only
-10- Add screen to edit labels (from console)
-11- Fix order by in users management screen
-12- fix advanced roles management
-make import the database script from zip files that encrypted in db password
-add handling for donations and licensing
-- disable logging in production environment
+0.8.1
+- Solve the duplicate record bug
+- Make the lables more intelligent
 
+0.0.9
+1- Add in browser view support
+2- Finalize default theme
+3- Make the default homepage comes from Smart-API.com domain
+4- Title on the splash 
+5- Title on the home page
+6- enable attaching database in feedback screen
+7- make versions history windows read only
+8- Add screen to edit labels (from console)
+9- Fix order by in users management screen
+10- fix advanced roles management
+11- make import the database script from zip files that encrypted in db password
+12- add handling for donations and licensing
+13- disable logging in production environment
+14- reduce final build size
+
+0.1.0
+1- Add development mode
+	- view view panel name
+	- Lables on runtime
+	- Tables on runtime

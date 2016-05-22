@@ -82,7 +82,7 @@ public class JKAbstractPlainDataAccess {
 
 	// //////////////////////////////////////////////////////////////////////
 	public void addAudit(final JKAudit audit) throws JKDataAccessException {
-		logger.debug("Audit : " , audit.toString());
+		logger.debug("Audit : ", audit.toString());
 		final JKUpdater updater = new JKUpdater() {
 
 			@Override
@@ -682,11 +682,21 @@ public class JKAbstractPlainDataAccess {
 	// //////////////////////////////////////////////////////////////////////////////
 
 	public void runScript(String fileName) {
-//		ScriptRunner runner=new ScriptRunner(getConnection(true));
-//		runner.setSendFullScript(true);
-//		runner.runScript();
-		String query= IOUtil.readFile(fileName);
+		// ScriptRunner runner=new ScriptRunner(getConnection(true));
+		// runner.setSendFullScript(true);
+		// runner.runScript();
+		String query = IOUtil.readFile(fileName);
 		executeUpdate(query);
-		
+
+	}
+
+	public boolean isTableExists(String tableName) {
+		try {
+			executeQuery("select 1 from ".concat(tableName));
+			return true;
+		} catch (JKDataAccessException e) {
+			return false;
+		}
+
 	}
 }

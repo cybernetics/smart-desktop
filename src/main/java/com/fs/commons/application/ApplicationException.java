@@ -15,7 +15,9 @@
  */
 package com.fs.commons.application;
 
-public class ApplicationException extends Exception {
+import com.jk.exceptions.JKException;
+
+public class ApplicationException extends JKException {
 
 	/**
 	 *

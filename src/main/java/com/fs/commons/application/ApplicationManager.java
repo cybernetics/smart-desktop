@@ -32,12 +32,15 @@ import com.fs.commons.application.listener.ApplicationListener;
 import com.fs.commons.application.xml.ApplicationXmlParser;
 import com.fs.commons.apps.backup.AutomaticDBBackup;
 import com.fs.commons.apps.instance.InstanceManager;
+import com.fs.commons.dao.JKAbstractPlainDataAccess;
 import com.fs.commons.dao.JKDataAccessException;
 import com.fs.commons.dao.JKDefaultDataAccess;
 import com.fs.commons.dao.connection.JKDataSource;
 import com.fs.commons.dao.connection.JKDataSourceFactory;
 import com.fs.commons.dao.connection.JKDataSourceUtil;
 import com.fs.commons.dao.connection.JKPoolingDataSource;
+import com.fs.commons.dao.dynamic.DaoFactory;
+import com.fs.commons.dao.dynamic.DynamicDao;
 import com.fs.commons.dao.dynamic.meta.AbstractTableMetaFactory;
 import com.fs.commons.dao.dynamic.meta.TableMeta;
 import com.fs.commons.dao.dynamic.meta.TableMetaNotFoundException;
@@ -116,18 +119,13 @@ public class ApplicationManager {
 		// TODO : add generic way to apply db-scripts
 		JKDataSource source = JKDataSourceFactory.getDefaultDataSource();
 		if (JKDataSourceUtil.isMysql(source)) {
-			try {
-				TableMeta tableMeta = AbstractTableMetaFactory.getTableMeta("sec_users");
-			} catch (TableMetaNotFoundException e) {
-
-				System.err.println("It looks like a first usage , apply security script on DB?(y,n)");
-				Scanner scanner = new Scanner(System.in);
-				String next = scanner.next();
-				if (next.toLowerCase().startsWith("y")) {
-					JKDefaultDataAccess dao = new JKDefaultDataAccess();
+			JKAbstractPlainDataAccess dao = DaoFactory.createDao();
+			if (!dao.isTableExists("sec_users")) {
+				if (SwingUtility.showConfirmationDialog("It looks like a first usage, execute base script on DB?")) {
 					dao.runScript("/scripts/mysql/base.sql");
 				}
 			}
+
 		}
 	}
 
@@ -324,6 +322,7 @@ public class ApplicationManager {
 				firstRun = false;
 			}
 			logger.debug("Check database base script executed...");
+			splash.setVisible(false);
 			checkScriptsInstalled();
 			fireAfterApplicationInit();
 
@@ -353,7 +352,7 @@ public class ApplicationManager {
 		// Properties prop = new Properties();
 		// prop.loadFromXML(new FileInputStream("system.config"));
 		System.getProperties().putAll(manager.getProperties());
-		logger.info(manager.getProperties());
+		logger.debug(manager.getProperties());
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////

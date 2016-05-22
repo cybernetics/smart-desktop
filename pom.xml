@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.jalalkiswani</groupId>
-	<version>0.0.8-SNAPSHOT</version>
+	<version>0.0.8</version>
 	<artifactId>smart-desktop</artifactId>
 
 	<name>smart-desktop</name>
@@ -32,6 +32,10 @@
 		<connection>scm:git:git@github.com:kiswanij/smart-desktop</connection>
 		<developerConnection>kiswanij</developerConnection>
 	</scm>
+	
+	<properties>
+		<jk.util.version>0.0.9</jk.util.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -141,7 +145,7 @@
 		<dependency>
 			<groupId>com.jalalkiswani</groupId>
 			<artifactId>jk-util</artifactId>
-			<version>0.0.9-SNAPSHOT</version>
+			<version>${jk.util.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.jalalkiswani</groupId>

@@ -297,9 +297,9 @@ public class DynMasterDetailCRUDLPanel extends JKMainPanel {
 	 */
 	private void getTitle() {
 		if (SwingUtility.isLeftOrientation()) {
-			this.title = Lables.get(this.tableMeta.getCaption()) + " " + Lables.get("MANAGEMENT");
+			this.title = Lables.get(this.tableMeta.getCaption()) + " " + Lables.get("Management");
 		} else {
-			this.title = Lables.get("MANAGEMENT") + " " + Lables.get(this.tableMeta.getCaption());
+			this.title = Lables.get("Management") + " " + Lables.get(this.tableMeta.getCaption());
 		}
 	}
 

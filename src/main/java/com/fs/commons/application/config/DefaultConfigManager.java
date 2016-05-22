@@ -30,7 +30,7 @@ public class DefaultConfigManager extends CommonsConfigManager {
 	JKLogger logger = JKLoggerFactory.getLogger(getClass());
 	private static DefaultConfigManager instance;
 	private static final String FILE_NAME = System.getProperty("db.config", "config.properties");
-	public static final String CONFIG_FILE_NAMES[] = { FILE_NAME, "system.config", "system.config.xml" };
+	public static final String CONFIG_FILE_NAMES[] = { FILE_NAME, "system.config", "system.config.xml","application.properties" };
 
 	public static void main(final String[] args) {
 		final DefaultConfigManager m = new DefaultConfigManager();
