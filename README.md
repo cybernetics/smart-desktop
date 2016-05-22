@@ -36,7 +36,7 @@ My baby framework ,I started to implement it since 2005, and it has been used to
 		</plugins>
 	</build>
 
-4- Create config files named `system.config` :
+4- Create config files named `system.config` in your project root folder:
 
 	db-host=localhost
 	db-user=root
@@ -65,18 +65,18 @@ My baby framework ,I started to implement it since 2005, and it has been used to
 		}
 	}
 	 
-6- Now run your main class, to check your installation:
+6- Now run your main class, to check your installation:  
 ![Application Console](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/1.PNG "JK-Smart-Desktop Application console")
 
 7- If this was your first installation, a confirmation dialog will apear to ask you installing the base script on the specified database in the configuration file:   
-![Database script confirmation dialog](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/2.PNG "JK-Smart-Desktop script confirmation")
+![Database script confirmation dialog](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/2.PNG "JK-Smart-Desktop script confirmation")  
 Click `Yes`  
 
-7- The appliction login-dialog will appear , Enter `admin` as username , `123456` as password:
+7- The appliction login-dialog will appear , Enter `admin` as username , `123456` as password:  
 ![Application Login Dialog](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/3.PNG "JK-Smart-Desktop login dialog")  
 
-8- Now you have the application and the framework up and running :
-![Application home page](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")
+8- Now you have the application and the framework up and running :  
+![Application home page](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")  
 
 ## Features
 There is a very long long of features which you can't expect, be patient until i have some time to summarize it. 
