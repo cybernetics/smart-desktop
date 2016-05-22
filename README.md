@@ -11,13 +11,15 @@ My baby framework ,I started to implement it since 2005, and it has been used to
 
 ## Usage:
 1-	Create Maven project
-2-	Add smart-desktop dependency  
+2-	Add smart-desktop dependency to your pom.xml file:
 
-	<dependency>
-		<groupId>com.jalalkiswani</groupId>
-		<artifactId>smart-desktop</artifactId>
-		<version>0.0.8</version>
-	</dependency>
+	<dependencies>
+		<dependency>
+			<groupId>com.jalalkiswani</groupId>
+			<artifactId>smart-desktop</artifactId>
+			<version>0.0.8</version>
+		</dependency>
+	</dependencies>
 
 3- Be sure to set the minimum JDK level in your pom file to 1.7 and tell maven to ignore web.xml by adding the following sections to your pom file:
 
