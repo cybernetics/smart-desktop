@@ -1,8 +1,9 @@
-0.8.1
+0.0.9 
+Use SystemLookAndFeel for for comptablity with Max OS
+
+0.1.0
 - Solve the duplicate record bug
 - Make the lables more intelligent
-
-0.0.9
 1- Add in browser view support
 2- Finalize default theme
 3- Make the default homepage comes from Smart-API.com domain

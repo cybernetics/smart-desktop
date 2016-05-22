@@ -117,6 +117,11 @@ To enter new record , click on `Add`  on the top left on the windows , enter the
 4- To edit any record , double record on the record in the Data table : 
  ![Edit mode](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/6.PNG "JK-Smart-Desktop")
  
+###Tested on 
+-Microsoft Windows XP,7,8,8.1,10   
+-Mac OS Captain  
+Please let us know if you make it on any other O.S. 
+ 
 ## Example 2 : 
 Advanced CRUD with Master Details (One-To-One,One-Many,Many-To-Many)    
 ## Example 3 : 
@@ -128,5 +133,6 @@ Build Advanced UI
 ## Example 6 : 
 Reports    
 And many others...
- 
+
+
 <http://wwww.JalalKiswani.com>

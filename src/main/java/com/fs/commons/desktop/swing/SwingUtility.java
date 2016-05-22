@@ -117,7 +117,9 @@ public class SwingUtility {
 			// final ColorUIResource disabledForeground = new
 			// ColorUIResource(Color.black);
 			// UIManager.put("ComboBox.disabledForeground", disabledForeground);
-			UIManager.setLookAndFeel(new WindowsLookAndFeel());
+//			UIManager.setLookAndFeel(new WindowsLookAndFeel());
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
 			// NativeInterface.open();
 
 			// addFocusForwardKey(KeyEvent.VK_DOWN);
