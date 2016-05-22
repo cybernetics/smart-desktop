@@ -1,7 +1,7 @@
 # JK-Smart-Desktop
 My baby framework ,I started to implement it since 2005, and it has been used to build more than 40 applications for different sectors(Education,Banking and Government) .
 
-**Important:** _JK-Smart-Desktop is free for Personal use only, for quotation , kindly contact me at Kiswanij@GMail.com _
+**Important:** _JK-Smart-Desktop is free for Personal use only, for quotation , kindly contact me at Kiswanij@GMail.com _ 
   
 ![JK-Smart-Desktop](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")  
 ## Prerequisites:
