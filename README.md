@@ -38,6 +38,10 @@ My baby framework ,I started to implement it since 2005, and it has been used to
 		</plugins>
 	</build>
 
+*Important for eclipse users:*
+
+After you add the above section for Java version , it is important it refresh maven projects by right click on the `project-->Maven-->Update Project`
+
 4- Create config files named `system.config` in your project root folder:
 
 	db-host=localhost
