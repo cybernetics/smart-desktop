@@ -3,9 +3,9 @@ My baby framework ,I built it in 2005, and it has been used to build more than 4
  
 ![JK-Smart-Desktop](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")  
 ## Prerequisites:
-  1-Install `MySql` (e.g. `root` as username , `123456` as password)  
+  1-Install MySql database (e.g. `root` as username , `123456` as password)  
   2-On mysql , create database name (e.g. `jk-smart-desktop-db`)  
-  3-**Optional**: for Feedback and Support functionality (`SMTP` mail server settings)  
+  **Optional**: for Feedback and Support functionality `SMTP` mail server settings will be needed
 
 ## Usage:
 1-	Create Maven project
@@ -63,23 +63,24 @@ My baby framework ,I built it in 2005, and it has been used to build more than 4
 		}
 	}
 	 
-6- Now run your main class:
-![Application Console](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/1.PNG "JK-Smart-Desktop Application console")  
+6- Now run your main class, to check your installation:
+![Application Console](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/1.PNG "JK-Smart-Desktop Application console")
+
+7- If this was your first installation, a confirmation dialog will apear to ask you installing the base script on the specified database in the configuration file:   
 ![Database script confirmation dialog](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/2.PNG "JK-Smart-Desktop script confirmation")
 Click `Yes`  
 
+7- The appliction login-dialog will appear , Enter `admin` as username , `123456` as password:
 ![Application Login Dialog](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/3.PNG "JK-Smart-Desktop login dialog")  
 
-7- Enter `admin` as username , `123456` as password , and here we go.
+8- Now you have the application and the framework up and running :
 ![Application home page](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")
-
-Now you have the framework up and running.
 
 ## Features
 There is a very long long of features which you can't expect, be patient until i have some time to summarize it. 
 Coming soon ...
 
-## Add new CRUD page
+## Example 1 : Simple Add new CRUD page
 1- create table in the database , for example
 
 	CREATE TABLE `employees` (
