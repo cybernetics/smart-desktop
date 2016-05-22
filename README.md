@@ -1,6 +1,7 @@
 # JK-Smart-Desktop
 My baby framework ,I built it in 2005, and it has been used to build more than 40 applications for different sectors(Education,Banking and Government) .
  
+![JK-Smart-Desktop](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")  
 ## Prerequisites:
   1-Install `MySql` (e.g. `root` as username , `123456` as password)
   2-On mysql , create database name (e.g. `jk-smart-desktop-db`)
@@ -63,20 +64,23 @@ My baby framework ,I built it in 2005, and it has been used to build more than 4
 	}
 	 
 6- Now run your main class:
-Screenshot 1
-Screenshot 2
-Screenshot 3
+![Application Console](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/1.PNG "JK-Smart-Desktop Application console")  
+![Database script confirmation dialog](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/2.PNG "JK-Smart-Desktop script confirmation")
+Click `Yes`  
+
+![Application Login Dialog](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/3.PNG "JK-Smart-Desktop login dialog")  
 
 7- Enter `admin` as username , `123456` as password , and here we go.
-Screenshot 4
+![Application home page](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")
 
 Now you have the framework up and running.
 
 ## Features
-Coming soon
+There is a very long long of features which you can't expect, be patient until i have some time to summarize it. 
+Coming soon ...
 
 ## Add new CRUD page
-1- create your table in the database , for example
+1- create table in the database , for example
 
 	CREATE TABLE `employees` (
 	  `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -97,4 +101,8 @@ Coming soon
 		</menu>
 	</main-menu>
  
- 3- Run your application , login ,  
+ 3- Run your application , and you will have this magic:
+ ![Example CRUD Views](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/5.PNG "JK-Smart-Desktop")
+ ![Edit mode](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/6.PNG "JK-Smart-Desktop")
+ 
+ 
