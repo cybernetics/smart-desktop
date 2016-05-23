@@ -192,6 +192,7 @@ public class AuthenicationDialog extends JKDialog {
 	private void initUI() {
 		setComponentOrientation(SwingUtility.getDefaultComponentOrientation());
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setAlwaysOnTop(true);
 		setModal(true);
 		final JKPanel<?> pnlInfo = new JKPanel<Object>(new FlowLayout(FlowLayout.LEADING));
 		pnlInfo.setLayout(new GridLayout(2, 1, 5, 2));
