@@ -1,9 +1,11 @@
 # JK-Smart-Desktop
-My baby framework ,I started to implement it since 2005, and it has been used to build more than 40 applications for different sectors(Education,Banking and Government) .
+You can build an application like this in 5 min,  and implement a full information system in one single day. 
+![JK-Smart-Desktop](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")  
+
+Smart-Dekstop is my baby framework ,I started to implement it since 2005, and it has been used to build more than 40 applications for different sectors(Education,Banking and Government) .
 
 **Important:** JK-Smart-Desktop is free for Personal use only, for quotation , kindly contact me at Kiswanij@GMail.com 
   
-![JK-Smart-Desktop](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/doc/screenshots/4.PNG "JK-Smart-Desktop")  
 ## Prerequisites:
   1-Install MySql database (e.g. `root` as username , `123456` as password)  
   2-On mysql , create database name (e.g. `jk-smart-desktop-db`)  
@@ -134,5 +136,6 @@ Build Advanced UI
 Reports    
 And many others...
 
-
+##Design and Architecture
+![Smart-Desktop dependencies](https://raw.githubusercontent.com/kiswanij/smart-desktop/master/design/smart-dsktop-the-full-picture.PNG)
 <http://wwww.JalalKiswani.com>
